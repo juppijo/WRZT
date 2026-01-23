@@ -3,623 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Große Physiker & Physikerinnen ab 1700</title>
+    <title>Meine Link-Sammlung</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 20px;
         }
-
+        
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: white;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .subtitle {
-            text-align: center;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 50px;
-            font-size: 1.2em;
-        }
-
-        .timeline {
-            position: relative;
-            padding: 20px 0;
-        }
-
-        .physicist-card {
             background: white;
             border-radius: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: box-shadow 0.3s ease;
-            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
         }
-
-        .physicist-card:hover {
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
         }
-
-        .physicist-header {
+        
+        .add-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        .links-list {
+            list-style: none;
+        }
+        
+        .link-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 25px 30px;
-            cursor: pointer;
-            user-select: none;
-            flex-wrap: wrap;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .physicist-header:hover {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        
+        .link-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
-        .physicist-header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .expand-icon {
-            font-size: 1.5em;
+        
+        .link-item a {
             color: #667eea;
-            transition: transform 0.3s ease;
+            text-decoration: none;
+            flex: 1;
+            font-weight: 500;
+            word-break: break-all;
         }
-
-        .physicist-card.expanded .expand-icon {
-            transform: rotate(90deg);
+        
+        .link-item a:hover {
+            text-decoration: underline;
         }
-
-        .physicist-name {
-            font-size: 1.8em;
-            color: #667eea;
-            font-weight: bold;
+        
+        .delete-btn {
+            padding: 8px 15px;
+            background: #dc3545;
+            font-size: 12px;
+            margin-left: 10px;
         }
-
-        .physicist-years {
-            font-size: 1.1em;
-            color: #666;
-            font-style: italic;
+        
+        .delete-btn:hover {
+            background: #c82333;
         }
-
-        .physicist-content {
-            padding: 0 30px 0 30px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease, padding 0.4s ease;
-        }
-
-        .physicist-card.expanded .physicist-content {
-            max-height: 3000px;
-            padding: 10px 30px 30px 30px;
-        }
-
-        .section {
-            margin: 15px 0;
-        }
-
-        .section-title {
-            font-weight: bold;
-            color: #764ba2;
-            margin-bottom: 8px;
-            font-size: 1.1em;
-        }
-
-        .section-content {
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .formula {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 4px solid #667eea;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-        }
-
-        .formula-name {
-            font-weight: bold;
-            color: #764ba2;
-            margin-bottom: 5px;
-        }
-
-        .formula-equation {
-            font-size: 1.2em;
-            margin: 10px 0;
-            color: #000;
-        }
-
-        .formula-explanation {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 0.95em;
-            color: #555;
-            margin-top: 8px;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            .physicist-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .physicist-name {
-                font-size: 1.4em;
-            }
-
-            .expand-icon {
-                font-size: 1.2em;
-            }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌟 Große Physiker & Physikerinnen 🌟</h1>
-        <p class="subtitle">Eine Zeitreise durch die bedeutendsten Entdeckungen ab 1700<br>
-        <small style="opacity: 0.8;">Klicke auf einen Namen, um mehr zu erfahren!</small></p>
-
-        <div class="timeline">
-            <!-- Isaac Newton -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Isaac Newton</div>
-                    </div>
-                    <div class="physicist-years">1643 - 1727</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Gravitationsgesetz und die drei Bewegungsgesetze; Begründung der klassischen Mechanik</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Gravitationsgesetz</div>
-                        <div class="formula-equation">F = G · (m₁ · m₂) / r²</div>
-                        <div class="formula-explanation">Die Gravitationskraft zwischen zwei Massen ist proportional zum Produkt ihrer Massen und umgekehrt proportional zum Quadrat ihres Abstands.</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">2. Newtonsches Gesetz</div>
-                        <div class="formula-equation">F = m · a</div>
-                        <div class="formula-explanation">Kraft gleich Masse mal Beschleunigung - das fundamentale Gesetz der Dynamik.</div>
-                    </div>
-                </div>
+        <h1>🔗 Meine Link-Sammlung</h1>
+        
+        <div class="add-section">
+            <h3 style="margin-bottom: 15px; color: #555;">Neuen Link hinzufügen</h3>
+            <div class="input-group">
+                <input type="text" id="linkName" placeholder="Link-Name (optional)">
+                <input type="text" id="linkUrl" placeholder="URL eingeben">
+                <button onclick="addLink()">Hinzufügen</button>
             </div>
-
-            <!-- Daniel Bernoulli -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Daniel Bernoulli</div>
-                    </div>
-                    <div class="physicist-years">1700 - 1782</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Bernoulli-Gleichung für strömende Flüssigkeiten und Gase</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Bernoulli-Gleichung</div>
-                        <div class="formula-equation">p + ½ρv² + ρgh = konstant</div>
-                        <div class="formula-explanation">Die Summe aus statischem Druck, dynamischem Druck und geodätischem Druck bleibt entlang einer Stromlinie konstant.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charles-Augustin de Coulomb -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Charles-Augustin de Coulomb</div>
-                    </div>
-                    <div class="physicist-years">1736 - 1806</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Das Coulombsche Gesetz der elektrostatischen Kraft</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Coulombsches Gesetz</div>
-                        <div class="formula-equation">F = k · (q₁ · q₂) / r²</div>
-                        <div class="formula-explanation">Die elektrostatische Kraft zwischen zwei Ladungen ist proportional zum Produkt der Ladungen und umgekehrt proportional zum Quadrat ihres Abstands.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Michael Faraday -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Michael Faraday</div>
-                    </div>
-                    <div class="physicist-years">1791 - 1867</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Elektromagnetische Induktion und Grundlagen der Elektrochemie</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Faradaysches Induktionsgesetz</div>
-                        <div class="formula-equation">U<sub>ind</sub> = -dΦ/dt</div>
-                        <div class="formula-explanation">Die induzierte Spannung ist gleich der negativen zeitlichen Änderung des magnetischen Flusses.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- James Clerk Maxwell -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">James Clerk Maxwell</div>
-                    </div>
-                    <div class="physicist-years">1831 - 1879</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Vereinigung von Elektrizität, Magnetismus und Licht; Maxwell-Gleichungen</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Maxwell-Gleichungen (eine davon)</div>
-                        <div class="formula-equation">∇ × E = -∂B/∂t</div>
-                        <div class="formula-explanation">Die Rotation des elektrischen Feldes ist gleich der negativen zeitlichen Änderung des magnetischen Feldes (Faraday-Gesetz in differentieller Form).</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ludwig Boltzmann -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Ludwig Boltzmann</div>
-                    </div>
-                    <div class="physicist-years">1844 - 1906</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Statistische Mechanik und Thermodynamik; Zusammenhang von Entropie und Wahrscheinlichkeit</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Boltzmann-Entropie</div>
-                        <div class="formula-equation">S = k<sub>B</sub> · ln(W)</div>
-                        <div class="formula-explanation">Die Entropie eines Systems ist proportional zum Logarithmus der Anzahl seiner möglichen Mikrozustände - auf seinem Grabstein eingraviert!</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Marie Curie -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Marie Curie</div>
-                    </div>
-                    <div class="physicist-years">1867 - 1934</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Radioaktivität; Entdeckung von Polonium und Radium; erste Frau mit Nobelpreis</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Radioaktives Zerfallsgesetz</div>
-                        <div class="formula-equation">N(t) = N₀ · e<sup>-λt</sup></div>
-                        <div class="formula-explanation">Die Anzahl radioaktiver Atome nimmt exponentiell mit der Zeit ab, wobei λ die Zerfallskonstante ist.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Max Planck -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Max Planck</div>
-                    </div>
-                    <div class="physicist-years">1858 - 1947</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Quantentheorie; Energiequantisierung der Strahlung</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Planck-Einstein-Beziehung</div>
-                        <div class="formula-equation">E = h · f</div>
-                        <div class="formula-explanation">Die Energie eines Photons ist proportional zu seiner Frequenz, wobei h das Plancksche Wirkungsquantum ist.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Albert Einstein -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Albert Einstein</div>
-                    </div>
-                    <div class="physicist-years">1879 - 1955</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Relativitätstheorie (speziell & allgemein); Photoelektrischer Effekt</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Masse-Energie-Äquivalenz</div>
-                        <div class="formula-equation">E = m · c²</div>
-                        <div class="formula-explanation">Energie und Masse sind äquivalent und durch das Quadrat der Lichtgeschwindigkeit verbunden - die berühmteste Formel der Welt!</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Zeitdilatation (Spezielle Relativität)</div>
-                        <div class="formula-equation">t' = t / √(1 - v²/c²)</div>
-                        <div class="formula-explanation">Die Zeit vergeht für bewegte Objekte langsamer - bei hohen Geschwindigkeiten wird dieser Effekt messbar.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Niels Bohr -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Niels Bohr</div>
-                    </div>
-                    <div class="physicist-years">1885 - 1962</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Bohrsches Atommodell; Kopenhagener Deutung der Quantenmechanik</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Bohrsche Quantenbedingung</div>
-                        <div class="formula-equation">L = n · ℏ = n · h/(2π)</div>
-                        <div class="formula-explanation">Der Bahndrehimpuls eines Elektrons im Atom ist ein ganzzahliges Vielfaches des reduzierten Planckschen Wirkungsquantums.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lise Meitner -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Lise Meitner</div>
-                    </div>
-                    <div class="physicist-years">1878 - 1968</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Theoretische Erklärung der Kernspaltung; Kernphysik</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Massendefekt bei Kernspaltung</div>
-                        <div class="formula-equation">ΔE = Δm · c²</div>
-                        <div class="formula-explanation">Die bei der Kernspaltung freigesetzte Energie entspricht dem Massendefekt multipliziert mit dem Quadrat der Lichtgeschwindigkeit.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Erwin Schrödinger -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Erwin Schrödinger</div>
-                    </div>
-                    <div class="physicist-years">1887 - 1961</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Schrödinger-Gleichung; Wellenmechanik der Quantentheorie</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Zeitabhängige Schrödinger-Gleichung</div>
-                        <div class="formula-equation">iℏ · ∂Ψ/∂t = ĤΨ</div>
-                        <div class="formula-explanation">Diese fundamentale Gleichung beschreibt die zeitliche Entwicklung quantenmechanischer Systeme durch die Wellenfunktion Ψ.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Paul Dirac -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Paul Dirac</div>
-                    </div>
-                    <div class="physicist-years">1902 - 1984</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Dirac-Gleichung für relativistische Quantenmechanik; Vorhersage der Antimaterie</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Dirac-Gleichung</div>
-                        <div class="formula-equation">(iℏγ<sup>μ</sup>∂<sub>μ</sub> - mc)ψ = 0</div>
-                        <div class="formula-explanation">Diese Gleichung vereint Quantenmechanik und spezielle Relativitätstheorie und sagte die Existenz von Antimaterie voraus!</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Werner Heisenberg -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Werner Heisenberg</div>
-                    </div>
-                    <div class="physicist-years">1901 - 1976</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Heisenbergsche Unschärferelation; Matrizenmechanik</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Unschärferelation</div>
-                        <div class="formula-equation">Δx · Δp ≥ ℏ/2</div>
-                        <div class="formula-explanation">Ort und Impuls eines Teilchens können nicht gleichzeitig beliebig genau bestimmt werden - eine fundamentale Grenze der Natur!</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enrico Fermi -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Enrico Fermi</div>
-                    </div>
-                    <div class="physicist-years">1901 - 1954</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Erster kontrollierter nuklearer Kettenreaktor; Fermi-Dirac-Statistik; schwache Wechselwirkung</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Fermi-Dirac-Verteilung</div>
-                        <div class="formula-equation">f(E) = 1 / (e<sup>(E-μ)/k<sub>B</sub>T</sup> + 1)</div>
-                        <div class="formula-explanation">Beschreibt die Wahrscheinlichkeitsverteilung von Fermionen (z.B. Elektronen) in Energiezuständen bei gegebener Temperatur.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Richard Feynman -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Richard Feynman</div>
-                    </div>
-                    <div class="physicist-years">1918 - 1988</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Quantenelektrodynamik (QED); Feynman-Diagramme; Pfadintegral-Formulierung</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Pfadintegral</div>
-                        <div class="formula-equation">⟨x<sub>f</sub>|e<sup>-iĤt/ℏ</sup>|x<sub>i</sub>⟩ = ∫ e<sup>iS[x]/ℏ</sup> Dx</div>
-                        <div class="formula-explanation">Ein Teilchen nimmt alle möglichen Wege gleichzeitig - die Wahrscheinlichkeitsamplitude ist die Summe über alle Pfade.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Murray Gell-Mann -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Murray Gell-Mann</div>
-                    </div>
-                    <div class="physicist-years">1929 - 2019</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Quark-Modell; Theorie der starken Wechselwirkung (Quantenchromodynamik)</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Quark-Zusammensetzung (Beispiel Proton)</div>
-                        <div class="formula-equation">p = uud</div>
-                        <div class="formula-explanation">Ein Proton besteht aus zwei Up-Quarks und einem Down-Quark - Quarks sind die fundamentalen Bausteine der Materie.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stephen Hawking -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Stephen Hawking</div>
-                    </div>
-                    <div class="physicist-years">1942 - 2018</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Hawking-Strahlung; Schwarze Löcher und Kosmologie</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Hawking-Temperatur</div>
-                        <div class="formula-equation">T = ℏc³ / (8πGMk<sub>B</sub>)</div>
-                        <div class="formula-explanation">Schwarze Löcher haben eine Temperatur und strahlen Energie ab - sie sind nicht vollkommen schwarz!</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Emmy Noether -->
-            <div class="physicist-card">
-                <div class="physicist-header" onclick="toggleCard(this)">
-                    <div class="physicist-header-left">
-                        <span class="expand-icon">▶</span>
-                        <div class="physicist-name">Emmy Noether</div>
-                    </div>
-                    <div class="physicist-years">1882 - 1935</div>
-                </div>
-                <div class="physicist-content">
-                    <div class="section">
-                        <div class="section-title">Größte Entdeckung:</div>
-                        <div class="section-content">Noether-Theorem: Verbindung zwischen Symmetrien und Erhaltungssätzen; fundamentale theoretische Physik</div>
-                    </div>
-                    <div class="formula">
-                        <div class="formula-name">Noether-Theorem (Konzept)</div>
-                        <div class="formula-equation">Symmetrie ⟺ Erhaltungsgröße</div>
-                        <div class="formula-explanation">Zu jeder kontinuierlichen Symmetrie gehört eine Erhaltungsgröße: Zeitsymmetrie → Energieerhaltung, Raumsymmetrie → Impulserhaltung!</div>
-                    </div>
-                </div>
-            </div>
-
         </div>
+        
+        <h3 style="margin-bottom: 15px; color: #555;">Gespeicherte Links</h3>
+        <ul class="links-list" id="linksList"></ul>
     </div>
 
     <script>
-        function toggleCard(header) {
-            const card = header.parentElement;
-            card.classList.toggle('expanded');
+        const defaultLinks = [
+            { name: 'WRZT', url: 'https://juppijo.github.io/WRZT/' },
+            { name: 'Zaminia LisaK', url: 'https://juppijo.github.io/zaminia/LisaK' },
+            { name: 'WRZT (2)', url: 'https://juppijo.github.io/WRZT/' },
+            { name: 'WRZT LisaK', url: 'https://juppijo.github.io/WRZT/LisaK' }
+        ];
+
+        let links = [];
+
+        function loadLinks() {
+            const saved = window.fs?.readFile?.('links.json', { encoding: 'utf8' });
+            if (saved) {
+                try {
+                    links = JSON.parse(saved);
+                } catch (e) {
+                    links = [...defaultLinks];
+                    saveLinks();
+                }
+            } else {
+                links = [...defaultLinks];
+                saveLinks();
+            }
         }
+
+        function saveLinks() {
+            window.fs?.writeFile?.('links.json', JSON.stringify(links, null, 2));
+        }
+
+        function renderLinks() {
+            const linksList = document.getElementById('linksList');
+            
+            if (links.length === 0) {
+                linksList.innerHTML = '<div class="empty-state">Noch keine Links vorhanden. Füge deinen ersten Link hinzu!</div>';
+                return;
+            }
+            
+            linksList.innerHTML = links.map((link, index) => `
+                <li class="link-item">
+                    <a href="${link.url}" target="_blank">${link.name || link.url}</a>
+                    <button class="delete-btn" onclick="deleteLink(${index})">Löschen</button>
+                </li>
+            `).join('');
+        }
+
+        function addLink() {
+            const nameInput = document.getElementById('linkName');
+            const urlInput = document.getElementById('linkUrl');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                alert('Bitte gib eine URL ein!');
+                return;
+            }
+            
+            links.push({
+                name: nameInput.value.trim() || url,
+                url: url
+            });
+            
+            nameInput.value = '';
+            urlInput.value = '';
+            saveLinks();
+            renderLinks();
+        }
+
+        function deleteLink(index) {
+            if (confirm('Möchtest du diesen Link wirklich löschen?')) {
+                links.splice(index, 1);
+                saveLinks();
+                renderLinks();
+            }
+        }
+
+        document.getElementById('linkUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addLink();
+            }
+        });
+
+        loadLinks();
+        renderLinks();
     </script>
 </body>
 </html>
