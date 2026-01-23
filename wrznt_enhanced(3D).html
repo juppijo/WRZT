@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WRZNT – 3D Netzwerksimulation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --bg-primary: #0a0e27;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent-blue: #60a5fa;
+      --accent-cyan: #22d3ee;
+      --accent-purple: #a78bfa;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+      overflow: hidden;
+    }
+    
+    .app {
+      display: flex;
+      height: 100vh;
+      gap: 24px;
+      padding: 24px;
+      position: relative;
+    }
+    
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(10, 14, 39, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 60px var(--shadow);
+    }
+    
+    #scene {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .sidebar {
+      width: 380px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px);
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 60px var(--shadow);
+      overflow-y: auto;
+    }
+    
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(96, 165, 250, 0.3); border-radius: 10px; }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    
+    .section { margin-bottom: 28px; }
+    
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 2px;
+    }
+    
+    .control-group { margin-bottom: 20px; }
+    
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .value-display {
+      font-family: 'Courier New', monospace;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(96, 165, 250, 0.4);
+    }
+    
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      box-shadow: 0 4px 15px rgba(96, 165, 250, 0.3);
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 6px 25px rgba(96, 165, 250, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent-blue);
+    }
+    
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    
+    .preset-btn {
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .preset-btn:hover {
+      background: rgba(96, 165, 250, 0.1);
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+    
+    .stats {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+    
+    .stat-row:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .stat-label { color: var(--text-secondary); }
+    
+    .stat-value {
+      font-weight: 600;
+      color: var(--accent-cyan);
+      font-family: 'Courier New', monospace;
+    }
+    
+    .footer {
+      position: absolute;
+      bottom: 28px;
+      left: 28px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+    
+    .info-badge {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      z-index: 10;
+    }
+    
+    .info-badge strong { color: var(--accent-cyan); }
+    
+    .fullscreen-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    .fullscreen-btn:hover {
+      background: rgba(96, 165, 250, 0.2);
+      border-color: var(--accent-blue);
+      transform: scale(1.05);
+    }
+    
+    .fullscreen-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    @media (max-width: 1024px) {
+      .app { flex-direction: column; padding: 16px; gap: 16px; }
+      .sidebar { width: 100%; max-height: 50vh; }
+      .canvas-container { height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="canvas-container">
+      <div id="scene"></div>
+      <div class="info-badge">
+        <strong>🖱️ Steuerung:</strong> Linke Maustaste = Drehen | Mausrad = Zoom
+      </div>
+      <button class="fullscreen-btn" id="fullscreen" title="Vollbild">
+        <svg viewBox="0 0 24 24">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+      <div class="footer">WRZNT 3D – Jo & Zami 2025</div>
+    </div>
+
+    <aside class="sidebar">
+      <h1>WRZNT 3D</h1>
+      <p class="subtitle">Erlebe ein lebendes 3D-Energienetz. Gleichfarbige Knoten stoßen sich ab, verschiedenfarbige ziehen sich an!</p>
+      
+      <div class="section">
+        <div class="section-title">Netzwerk-Parameter</div>
+        
+        <div class="control-group">
+          <label>
+            <span>Anzahl Knoten</span>
+            <span class="value-display" id="nodesVal">50</span>
+          </label>
+          <input id="nodes" type="range" min="10" max="150" value="50">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Verbindungsdichte</span>
+            <span class="value-display" id="connVal">0.08</span>
+          </label>
+          <input id="conn" type="range" min="0.01" max="0.3" step="0.01" value="0.08">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Federstärke</span>
+            <span class="value-display" id="kVal">0.015</span>
+          </label>
+          <input id="k" type="range" min="0.002" max="0.08" step="0.001" value="0.015">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Dämpfung</span>
+            <span class="value-display" id="dampVal">0.03</span>
+          </label>
+          <input id="damp" type="range" min="0.0" max="0.2" step="0.005" value="0.03">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Ladungsstärke</span>
+            <span class="value-display" id="chargeVal">3000</span>
+          </label>
+          <input id="charge" type="range" min="500" max="8000" step="100" value="3000">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Steuerung</div>
+        <div class="button-group">
+          <button id="reset" class="btn btn-primary">Neu erstellen</button>
+          <button id="pause" class="btn btn-secondary">Pause</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Presets</div>
+        <div class="presets">
+          <button class="preset-btn" data-preset="sparse">Spärlich</button>
+          <button class="preset-btn" data-preset="dense">Dicht</button>
+          <button class="preset-btn" data-preset="chaotic">Chaotisch</button>
+          <button class="preset-btn" data-preset="calm">Ruhig</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Statistiken</div>
+        <div class="stats">
+          <div class="stat-row">
+            <span class="stat-label">Knoten</span>
+            <span class="stat-value" id="statNodes">50</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Verbindungen</span>
+            <span class="stat-value" id="statEdges">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Blau (schwach)</span>
+            <span class="stat-value" id="statBlue">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Gelb (mittel)</span>
+            <span class="stat-value" id="statYellow">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Rot (stark)</span>
+            <span class="stat-value" id="statRed">0</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    const container = document.getElementById('scene');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050810);
+
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 1, 2000);
+    camera.position.set(0, 0, 250);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const light1 = new THREE.PointLight(0x60a5fa, 1.5, 500);
+    light1.position.set(100, 100, 100);
+    scene.add(light1);
+
+    const light2 = new THREE.PointLight(0x22d3ee, 1.5, 500);
+    light2.position.set(-100, -100, 100);
+    scene.add(light2);
+
+    // Mouse controls
+    let isDragging = false;
+    let previousMouse = { x: 0, y: 0 };
+    const rotationSpeed = 0.005;
+
+    renderer.domElement.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      previousMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    renderer.domElement.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - previousMouse.x;
+      const deltaY = e.clientY - previousMouse.y;
+      
+      scene.rotation.y += deltaX * rotationSpeed;
+      scene.rotation.x += deltaY * rotationSpeed;
+      
+      previousMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      camera.position.z += e.deltaY * 0.2;
+      camera.position.z = Math.max(100, Math.min(600, camera.position.z));
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    // UI
+    const ui = {
+      nodes: document.getElementById('nodes'),
+      conn: document.getElementById('conn'),
+      k: document.getElementById('k'),
+      damp: document.getElementById('damp'),
+      charge: document.getElementById('charge'),
+      reset: document.getElementById('reset'),
+      pause: document.getElementById('pause')
+    };
+
+    const displays = {
+      nodesVal: document.getElementById('nodesVal'),
+      connVal: document.getElementById('connVal'),
+      kVal: document.getElementById('kVal'),
+      dampVal: document.getElementById('dampVal'),
+      chargeVal: document.getElementById('chargeVal'),
+      statNodes: document.getElementById('statNodes'),
+      statEdges: document.getElementById('statEdges'),
+      statBlue: document.getElementById('statBlue'),
+      statYellow: document.getElementById('statYellow'),
+      statRed: document.getElementById('statRed')
+    };
+
+    function updateDisplays() {
+      displays.nodesVal.textContent = ui.nodes.value;
+      displays.connVal.textContent = Number(ui.conn.value).toFixed(2);
+      displays.kVal.textContent = Number(ui.k.value).toFixed(3);
+      displays.dampVal.textContent = Number(ui.damp.value).toFixed(3);
+      displays.chargeVal.textContent = ui.charge.value;
+    }
+
+    ['nodes', 'conn', 'k', 'damp', 'charge'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateDisplays);
+    });
+    updateDisplays();
+
+    let nodes = [];
+    let edges = [];
+    let nodeMeshes = [];
+    let edgeLines = [];
+    let paused = false;
+
+    const presets = {
+      sparse: { nodes: 30, conn: 0.04, k: 0.01, damp: 0.04, charge: 4000 },
+      dense: { nodes: 80, conn: 0.12, k: 0.025, damp: 0.03, charge: 2500 },
+      chaotic: { nodes: 60, conn: 0.10, k: 0.05, damp: 0.01, charge: 2000 },
+      calm: { nodes: 40, conn: 0.06, k: 0.012, damp: 0.08, charge: 5000 }
+    };
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = presets[btn.dataset.preset];
+        ui.nodes.value = preset.nodes;
+        ui.conn.value = preset.conn;
+        ui.k.value = preset.k;
+        ui.damp.value = preset.damp;
+        ui.charge.value = preset.charge;
+        updateDisplays();
+        init();
+      });
+    });
+
+    function getCharge(nodeIndex) {
+      const degree = edges.filter(e => e.a === nodeIndex || e.b === nodeIndex).length;
+      const strength = Math.min(1, degree / 12);
+      
+      if (strength < 0.33) return 'blue';
+      else if (strength < 0.66) return 'yellow';
+      else return 'red';
+    }
+
+    function getColor(charge) {
+      if (charge === 'blue') return 0x3b82f6;
+      if (charge === 'yellow') return 0xfacc15;
+      return 0xef4444;
+    }
+
+    function init() {
+      // Vollständiges Löschen aller alten Objekte
+      while(nodeMeshes.length > 0) {
+        const mesh = nodeMeshes.pop();
+        scene.remove(mesh);
+        if (mesh.geometry) mesh.geometry.dispose();
+        if (mesh.material) mesh.material.dispose();
+      }
+      
+      while(edgeLines.length > 0) {
+        const {line} = edgeLines.pop();
+        scene.remove(line);
+        if (line.geometry) line.geometry.dispose();
+        if (line.material) line.material.dispose();
+      }
+      
+      nodes = [];
+      edges = [];
+      
+      const N = parseInt(ui.nodes.value);
+      const p = Number(ui.conn.value);
+      const bounds = 120;
+      
+      for (let i = 0; i < N; i++) {
+        nodes.push({
+          x: (Math.random() - 0.5) * bounds,
+          y: (Math.random() - 0.5) * bounds,
+          z: (Math.random() - 0.5) * bounds,
+          vx: 0, vy: 0, vz: 0,
+          ax: 0, ay: 0, az: 0,
+          mass: 1,
+          r: 2 + Math.random() * 2
+        });
+      }
+      
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          if (Math.random() < p) {
+            edges.push({ a: i, b: j });
+          }
+        }
+      }
+      
+      // Create nodes
+      for (let i = 0; i < N; i++) {
+        const charge = getCharge(i);
+        const color = getColor(charge);
+        
+        const geometry = new THREE.SphereGeometry(nodes[i].r, 16, 16);
+        const material = new THREE.MeshPhongMaterial({
+          color: color,
+          emissive: color,
+          emissiveIntensity: 0.6,
+          shininess: 100
+        });
+        
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(nodes[i].x, nodes[i].y, nodes[i].z);
+        scene.add(mesh);
+        nodeMeshes.push(mesh);
+      }
+      
+      // Create edges
+      for (const edge of edges) {
+        const material = new THREE.LineBasicMaterial({
+          color: 0x60a5fa,
+          transparent: true,
+          opacity: 0.4,
+          linewidth: 2
+        });
+        const geometry = new THREE.BufferGeometry();
+        const line = new THREE.Line(geometry, material);
+        scene.add(line);
+        edgeLines.push({ line, edge });
+      }
+      
+      updateStats();
+    }
+
+    function updateStats() {
+      displays.statNodes.textContent = nodes.length;
+      displays.statEdges.textContent = edges.length;
+      
+      let blue = 0, yellow = 0, red = 0;
+      for (let i = 0; i < nodes.length; i++) {
+        const charge = getCharge(i);
+        if (charge === 'blue') blue++;
+        else if (charge === 'yellow') yellow++;
+        else red++;
+      }
+      displays.statBlue.textContent = blue;
+      displays.statYellow.textContent = yellow;
+      displays.statRed.textContent = red;
+    }
+
+    function step(dt) {
+      const k = Number(ui.k.value);
+      const damp = Number(ui.damp.value);
+      const chargeForce = Number(ui.charge.value);
+
+      for (const n of nodes) {
+        n.ax = 0; n.ay = 0; n.az = 0;
+      }
+
+      // Spring forces
+      for (const e of edges) {
+        const a = nodes[e.a];
+        const b = nodes[e.b];
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let dz = b.z - a.z;
+        let d = Math.sqrt(dx*dx + dy*dy + dz*dz) || 0.001;
+        const rest = 35;
+        const force = k * (d - rest);
+        const fx = (dx / d) * force;
+        const fy = (dy / d) * force;
+        const fz = (dz / d) * force;
+        a.ax += fx;
+        a.ay += fy;
+        a.az += fz;
+        b.ax -= fx;
+        b.ay -= fy;
+        b.az -= fz;
+      }
+
+      // Charge forces
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const A = nodes[i];
+          const B = nodes[j];
+          const chargeA = getCharge(i);
+          const chargeB = getCharge(j);
+          
+          let dx = B.x - A.x;
+          let dy = B.y - A.y;
+          let dz = B.z - A.z;
+          let d2 = dx*dx + dy*dy + dz*dz + 1;
+          let d = Math.sqrt(d2);
+          
+          let f;
+          if (chargeA === chargeB) {
+            f = chargeForce / d2;
+            const fx = (dx / d) * f;
+            const fy = (dy / d) * f;
+            const fz = (dz / d) * f;
+            A.ax -= fx;
+            A.ay -= fy;
+            A.az -= fz;
+            B.ax += fx;
+            B.ay += fy;
+            B.az += fz;
+          } else {
+            f = (chargeForce * 0.25) / d2;
+            const fx = (dx / d) * f;
+            const fy = (dy / d) * f;
+            const fz = (dz / d) * f;
+            A.ax += fx;
+            A.ay += fy;
+            A.az += fz;
+            B.ax -= fx;
+            B.ay -= fy;
+            B.az -= fz;
+          }
+        }
+      }
+
+      // Update positions
+      const bounds = 120;
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        n.vx += n.ax * dt;
+        n.vy += n.ay * dt;
+        n.vz += n.az * dt;
+        n.vx *= (1 - damp);
+        n.vy *= (1 - damp);
+        n.vz *= (1 - damp);
+        n.x += n.vx * dt * 40;
+        n.y += n.vy * dt * 40;
+        n.z += n.vz * dt * 40;
+
+        if (Math.abs(n.x) > bounds) { n.x = Math.sign(n.x) * bounds; n.vx *= -0.5; }
+        if (Math.abs(n.y) > bounds) { n.y = Math.sign(n.y) * bounds; n.vy *= -0.5; }
+        if (Math.abs(n.z) > bounds) { n.z = Math.sign(n.z) * bounds; n.vz *= -0.5; }
+
+        nodeMeshes[i].position.set(n.x, n.y, n.z);
+      }
+
+      // Update edges
+      for (const {line, edge} of edgeLines) {
+        const a = nodes[edge.a];
+        const b = nodes[edge.b];
+        const positions = new Float32Array([
+          a.x, a.y, a.z,
+          b.x, b.y, b.z
+        ]);
+        line.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      }
+    }
+
+    let lastTime = performance.now();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
+      
+      if (!paused) {
+        step(dt);
+      }
+      
+      renderer.render(scene, camera);
+    }
+
+    ui.reset.addEventListener('click', init);
+    ui.pause.addEventListener('click', () => {
+      paused = !paused;
+      ui.pause.textContent = paused ? 'Fortsetzen' : 'Pause';
+    });
+
+    // Fullscreen functionality
+    const fullscreenBtn = document.getElementById('fullscreen');
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Fullscreen error:', err);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    ['nodes', 'conn'].forEach(id => {
+      document.getElementById(id).addEventListener('change', init);
+    });
+
+    init();
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Interaktives Vektorfeld Dipolquelle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1a1a2e;
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #72FFFF;
+        }
+        p {
+            max-width: 700px;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        canvas {
+            border: 1px solid #4a4a6e;
+            background-color: #0d0d1e;
+            box-shadow: 0 0 20px rgba(114, 255, 255, 0.3);
+        }
+        .controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            display: flex;
+            gap: 30px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .control-group label {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #72FFFF;
+        }
+        .control-group span {
+            margin-top: 5px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚛️ WRZT: Interaktives Vektorfeld des Undatrons</h1>
+        <p>
+            Nutzen Sie die Regler, um den **Abstand** der rotierenden Teilchen (Orbit Radius) und die **sichtbare Stärke** des Vektorfeldes (Feldstärke) zu ändern. Beobachten Sie, wie sich die Verformung der Raumzeit durch diese Parameter verändert.
+        </p>
+    </header>
+
+    <canvas id="vectorFieldCanvas" width="600" height="600"></canvas>
+
+    <div class="controls">
+        
+        <div class="control-group">
+            <label for="orbitRadiusSlider">Abstand der Teilchen (Orbit Radius)</label>
+            <input type="range" id="orbitRadiusSlider" min="0" max="100" value="50">
+            <span id="orbitRadiusValue">50 px</span>
+        </div>
+
+        <div class="control-group">
+            <label for="fieldStrengthSlider">Vektor-Skalierung (Feldstärke-Sichtbarkeit)</label>
+            <input type="range" id="fieldStrengthSlider" min="1" max="50" value="25">
+            <span id="fieldStrengthValue">25</span>
+        </div>
+
+    </div>
+
+    <div class="legend" style="margin-top: 15px;">
+        <span style="color: #2b7bd3; font-weight: bold;">🔵 Teilchen (Krümmung weg)</span>
+        <span style="color: #d33b4b; font-weight: bold;">🔴 Antiteilchen (Krümmung hin)</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('vectorFieldCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width;
+        const H = canvas.height;
+        const centerX = W / 2;
+        const centerY = H / 2;
+
+        // --- Regler-Elemente ---
+        const orbitRadiusSlider = document.getElementById('orbitRadiusSlider');
+        const orbitRadiusValueSpan = document.getElementById('orbitRadiusValue');
+        const fieldStrengthSlider = document.getElementById('fieldStrengthSlider');
+        const fieldStrengthValueSpan = document.getElementById('fieldStrengthValue');
+
+        // --- Simulationsparameter ---
+        let orbitRadius = parseFloat(orbitRadiusSlider.value);
+        let fieldStrengthScale = parseFloat(fieldStrengthSlider.value) / 5; // Startwert 25 / 5 = 5.0
+        
+        const rotationSpeed = 0.03;
+        const gridSize = 20;
+        const maxVectorLength = 15;
+        const particleRadius = 6;
+        
+        let time = 0;
+
+        // --- Event Listener für Regler ---
+        orbitRadiusSlider.oninput = function() {
+            orbitRadius = parseFloat(this.value);
+            orbitRadiusValueSpan.textContent = this.value + " px";
+        };
+
+        fieldStrengthSlider.oninput = function() {
+            // Skaliere den Reglerwert, um eine brauchbare Zahl für die Vektorberechnung zu erhalten
+            fieldStrengthScale = parseFloat(this.value) / 5; 
+            fieldStrengthValueSpan.textContent = this.value;
+        };
+
+        // --- Funktion zur Vektorberechnung ---
+        function calculateFieldVector(px, py, ePos, pPos) {
+            let totalVx = 0;
+            let totalVy = 0;
+
+            // 1. Beitrag des Teilchens (ePos)
+            let dx_e = px - ePos.x;
+            let dy_e = py - ePos.y;
+            let dist_e_sq = dx_e * dx_e + dy_e * dy_e;
+            
+            // Stärke (Abstandsgesetz)
+            const strength_e = 5000 / (dist_e_sq + 1000); 
+
+            // Teilchen Krümmung WEG
+            totalVx += dx_e * strength_e;
+            totalVy += dy_e * strength_e;
+
+            // 2. Beitrag des Antiteilchens (pPos)
+            let dx_p = px - pPos.x;
+            let dy_p = py - pPos.y;
+            let dist_p_sq = dx_p * dx_p + dy_p * dy_p;
+            
+            const strength_p = 5000 / (dist_p_sq + 1000); 
+            
+            // Antiteilchen Krümmung HIN
+            totalVx -= dx_p * strength_p; 
+            totalVy -= dy_p * strength_p;
+
+            return { vx: totalVx, vy: totalVy };
+        }
+
+        // --- Funktion zum Zeichnen eines Vektors (Pfeils) ---
+        function drawVector(x, y, vx, vy) {
+            let magnitude = Math.sqrt(vx * vx + vy * vy);
+            
+            // Verwende fieldStrengthScale zur Anpassung der sichtbaren Länge
+            let finalVx = vx * fieldStrengthScale; 
+            let finalVy = vy * fieldStrengthScale;
+            
+            // Skaliere die Pfeile, damit sie nicht zu lang werden
+            if (magnitude * fieldStrengthScale > maxVectorLength) {
+                const ratio = maxVectorLength / (magnitude * fieldStrengthScale);
+                finalVx *= ratio;
+                finalVy *= ratio;
+            }
+
+            // Farbe basierend auf der Vektorstärke (Cyan-Akzent)
+            let colorIntensity = Math.min(1, magnitude * 0.05); 
+            let c_r = Math.floor(255 * colorIntensity);
+            let c_g = Math.floor(255 * colorIntensity);
+            let c_b = 255;
+            
+            ctx.strokeStyle = `rgb(${c_r}, ${c_g}, ${c_b})`;
+            ctx.lineWidth = 1;
+
+            // Vektorlinie zeichnen
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + finalVx, y + finalVy);
+            ctx.stroke();
+
+            // Pfeilspitze zeichnen
+            let arrowSize = 3;
+            let angle = Math.atan2(finalVy, finalVx);
+            
+            ctx.fillStyle = ctx.strokeStyle;
+            ctx.save();
+            ctx.translate(x + finalVx, y + finalVy);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-arrowSize, arrowSize / 2);
+            ctx.lineTo(-arrowSize, -arrowSize / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // --- Hauptanimations-Loop ---
+        function draw() {
+            // 1. Hintergrund löschen
+            ctx.fillStyle = '#0d0d1e';
+            ctx.fillRect(0, 0, W, H);
+
+            // 2. Positionen der rotierenden Quellen berechnen
+            const angle = time * rotationSpeed;
+            
+            const ePos = {
+                x: centerX + orbitRadius * Math.cos(angle),
+                y: centerY + orbitRadius * Math.sin(angle)
+            };
+
+            const pPos = {
+                x: centerX + orbitRadius * Math.cos(angle + Math.PI),
+                y: centerY + orbitRadius * Math.sin(angle + Math.PI)
+            };
+            
+            // 3. Vektorfeld zeichnen
+            for (let i = gridSize; i < W - gridSize; i += gridSize) {
+                for (let j = gridSize; j < H - gridSize; j += gridSize) {
+                    const vector = calculateFieldVector(i, j, ePos, pPos);
+                    drawVector(i, j, vector.vx, vector.vy);
+                }
+            }
+
+            // 4. Rotierende Quellen zeichnen
+
+            // Teilchen (Blau)
+            ctx.beginPath();
+            ctx.arc(ePos.x, ePos.y, particleRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2b7bd3'; 
+            ctx.fill();
+            
+            // Antiteilchen (Rot)
+            ctx.beginPath();
+            ctx.arc(pPos.x, pPos.y, particleRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = '#d33b4b'; 
+            ctx.fill();
+            
+            // 5. Zeit aktualisieren und Loop starten
+            time++;
+            requestAnimationFrame(draw);
+        }
+
+        // Starte die Animation
+        draw();
+    </script>
+
+</body>
+</html>

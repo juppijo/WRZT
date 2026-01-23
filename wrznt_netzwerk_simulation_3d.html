@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WRZNT — 3D Netzwerksimulation (Undatrone)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    /* Styling */
+    :root{--bg:#071226;--panel:#071a2a;--glass:rgba(255,255,255,0.04);--accent:#7dd3fc;--muted:#9aa7b2}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#dff6fb;background:linear-gradient(180deg,#04121a,#071226)}
+    .app{display:flex;height:100vh;gap:18px;padding:18px;box-sizing:border-box}
+    .canvas-wrap{flex:1;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(2,6,23,0.6);background:radial-gradient(circle at 10% 10%,rgba(125,211,252,0.02),transparent 10%)}
+    canvas{display:block;width:100%;height:100%}
+    .sidebar{width:340px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:16px;color:var(--muted);box-shadow:0 6px 20px rgba(2,6,23,0.5)}
+    h1{margin:0 0 12px;color:var(--accent);font-size:18px}
+    label{display:block;font-size:13px;color:#cfeefb;margin-top:10px}
+    input[type=range]{width:100%}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:linear-gradient(180deg,#0b7aa0,#056b88);color:#e9fbff;border:none;cursor:pointer;margin-top:12px}
+    .muted{font-size:13px;color:var(--muted)}
+    footer{position:absolute;left:18px;bottom:18px;color:rgba(255,255,255,0.6);font-size:13px}
+    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{background:var(--glass);padding:6px 8px;border-radius:999px;font-size:12px;color:#d9f6ff}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="canvas-wrap">
+      <canvas id="sim"></canvas>
+      <footer>WRZNT – 3D Netzwerksimulation • Ziehe Nodes, ändere Parameter, klicke „Reset“.</footer>
+    </div>
+
+    <aside class="sidebar">
+      <h1>3D Simulationssteuerung</h1>
+      <p class="muted">Das Universum als 3D-Netz: Undatrone = Kanten, Knoten = Teilchen. Rot: Starke Anziehung (hoher Degree), Blau: Schwache Anziehung.</p>
+
+      <label>Anzahl Knoten: <span id="nodesVal">80</span></label>
+      <input id="nodes" type="range" min="10" max="250" value="80">
+
+      <label>Verbindungsdichte (Wahrscheinlichkeit): <span id="connVal">0.05</span></label>
+      <input id="conn" type="range" min="0.005" max="0.2" step="0.005" value="0.05">
+
+      <label>Federstärke (Steifigkeit): <span id="kVal">0.005</span></label>
+      <input id="k" type="range" min="0.001" max="0.05" step="0.001" value="0.005">
+
+      <label>Dämpfung: <span id="dampVal">0.02</span></label>
+      <input id="damp" type="range" min="0.0" max="0.2" step="0.005" value="0.02">
+
+      <label>Node-Abstoßung: <span id="repVal">2500</span></label>
+      <input id="rep" type="range" min="500" max="8000" step="100" value="2500">
+
+      <div class="row">
+        <button id="reset" class="btn">Reset</button>
+        <button id="pause" class="btn">Pause</button>
+      </div>
+
+      <div class="legend">
+        <div class="chip" style="background-color:hsl(0, 100%, 75%)">Stark: Rot (Hohe Anziehung)</div>
+        <div class="chip" style="background-color:hsl(250, 100%, 75%)">Schwach: Blau (Niedrige Anziehung)</div>
+      </div>
+
+      <p class="muted" style="margin-top:14px">Tipps: Halte die Maustaste gedrückt und ziehe, um die 3D-Szene zu drehen (Orbit-Steuerung). Klicke auf "Reset" nach Ändern der Knoten/Dichte.</p>
+    </aside>
+  </div>
+
+  <script>
+    // Three.js-Basisvariablen
+    let scene, camera, renderer, lineSegments;
+    let nodeMeshes = [];
+    let W, H;
+    const BOX_SIZE = 400; // Größe des 3D-Simulationsbereichs
+
+    // Parameter & UI
+    const canvas = document.getElementById('sim');
+    const ui = {
+      nodes: document.getElementById('nodes'),
+      conn: document.getElementById('conn'),
+      k: document.getElementById('k'),
+      damp: document.getElementById('damp'),
+      rep: document.getElementById('rep'),
+      reset: document.getElementById('reset'),
+      pause: document.getElementById('pause')
+    };
+    const displays = { nodesVal: document.getElementById('nodesVal'), connVal: document.getElementById('connVal'), kVal: document.getElementById('kVal'), dampVal: document.getElementById('dampVal'), repVal: document.getElementById('repVal') };
+
+    // Simulations-Objekte
+    let nodes = [];
+    let edges = [];
+    let paused = false;
+    let controls; // Für 3D-Maussteuerung
+
+    // Vektor-Objekte zur Vermeidung von Neuzuweisungen (Performance)
+    const tempVector = new THREE.Vector3();
+    const tempColor = new THREE.Color();
+    const threeColor = new THREE.Color(0x7dd3fc); // Standardfarbe für Undatrone
+
+    // *** HELFERKLASSE FÜR 3D-KAMERASTEUERUNG (MINIMAL) ***
+    // Da Three.js keine integrierte Steuerung hat, implementieren wir eine vereinfachte Orbit-Control
+    class OrbitControls {
+        constructor(camera, domElement) {
+            this.camera = camera;
+            this.domElement = domElement;
+            this.isDragging = false;
+            this.dragStart = { x: 0, y: 0 };
+            this.rotation = { x: 0, y: 0 };
+            this.distance = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+
+            this.domElement.addEventListener('pointerdown', this.onPointerDown.bind(this));
+            window.addEventListener('pointermove', this.onPointerMove.bind(this));
+            window.addEventListener('pointerup', this.onPointerUp.bind(this));
+            this.domElement.addEventListener('wheel', this.onWheel.bind(this));
+
+            this.update();
+        }
+
+        onPointerDown(event) {
+            this.isDragging = true;
+            this.dragStart.x = event.clientX;
+            this.dragStart.y = event.clientY;
+            this.domElement.style.cursor = 'grabbing';
+        }
+
+        onPointerMove(event) {
+            if (!this.isDragging) return;
+            const dx = event.clientX - this.dragStart.x;
+            const dy = event.clientY - this.dragStart.y;
+            this.rotation.y += dx * 0.005; // Y-Achsen-Drehung
+            this.rotation.x += dy * 0.005; // X-Achsen-Drehung
+            this.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.rotation.x)); // Limit rotation
+            this.dragStart.x = event.clientX;
+            this.dragStart.y = event.clientY;
+            this.update();
+        }
+
+        onPointerUp() {
+            this.isDragging = false;
+            this.domElement.style.cursor = 'grab';
+        }
+
+        onWheel(event) {
+            event.preventDefault();
+            this.distance *= (1 + event.deltaY * 0.001);
+            this.distance = Math.max(100, Math.min(2000, this.distance)); // Limit zoom
+            this.update();
+        }
+
+        update() {
+            this.camera.position.x = this.distance * Math.sin(this.rotation.y) * Math.cos(this.rotation.x);
+            this.camera.position.y = this.distance * Math.sin(this.rotation.x);
+            this.camera.position.z = this.distance * Math.cos(this.rotation.y) * Math.cos(this.rotation.x);
+            this.camera.lookAt(0, 0, 0); // Schaut immer auf den Zentrum
+        }
+    }
+    // *** ENDE HELFERKLASSE ***
+
+
+    function setup3D() {
+      W = canvas.clientWidth;
+      H = canvas.clientHeight;
+      
+      // Initialisiere Renderer (WebGL)
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setSize(W, H);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      
+      // Initialisiere Szene und Kamera
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, W / H, 0.1, 2000);
+      camera.position.z = BOX_SIZE * 2;
+      
+      // Steuerung für 3D-Drehung
+      controls = new OrbitControls(camera, canvas);
+
+      // Licht hinzufügen
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(1, 1, 1).normalize();
+      scene.add(directionalLight);
+
+      // Edge-Geometrie für Undatrone (LineSegments)
+      const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.8 });
+      const edgeGeometry = new THREE.BufferGeometry();
+      lineSegments = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+      scene.add(lineSegments);
+
+      window.addEventListener('resize', onResize);
+    }
+
+    function onResize() {
+        W = canvas.clientWidth;
+        H = canvas.clientHeight;
+        camera.aspect = W / H;
+        camera.updateProjectionMatrix();
+        renderer.setSize(W, H);
+    }
+
+    function updateDisplays(){
+      displays.nodesVal.textContent = ui.nodes.value;
+      displays.connVal.textContent = Number(ui.conn.value).toFixed(3);
+      displays.kVal.textContent = Number(ui.k.value).toFixed(3);
+      displays.dampVal.textContent = Number(ui.damp.value).toFixed(3);
+      displays.repVal.textContent = ui.rep.value;
+    }
+    ['nodes','conn','k','damp','rep'].forEach(id=>{
+      document.getElementById(id).addEventListener('input', updateDisplays);
+    });
+    updateDisplays();
+
+    // Initialisierung des 3D-Netzwerks
+    function init(){
+      // 1. Simulationsdaten zurücksetzen
+      nodes = [];
+      edges = [];
+      
+      // 2. Three.js-Objekte zurücksetzen
+      nodeMeshes.forEach(mesh => scene.remove(mesh));
+      nodeMeshes = [];
+
+      const N = parseInt(ui.nodes.value);
+      const p = Number(ui.conn.value);
+      
+      // 3. Initialisiere Knoten mit 3D-Positionen und 3D-Vektoren
+      for(let i=0;i<N;i++){
+        const r = 4 + Math.random() * 2;
+        nodes.push({
+          x: (Math.random()-0.5) * BOX_SIZE,
+          y: (Math.random()-0.5) * BOX_SIZE,
+          z: (Math.random()-0.5) * BOX_SIZE, // NEU: Z-Koordinate
+          vx: (Math.random()-0.5)*0.5,
+          vy: (Math.random()-0.5)*0.5,
+          vz: (Math.random()-0.5)*0.5, // NEU: Z-Geschwindigkeit
+          mass: 1,
+          fixed: false,
+          r: r,
+          degree: 0 
+        });
+
+        // 4. Erstelle 3D-Mesh (Kugel)
+        const geometry = new THREE.SphereGeometry(r, 16, 16);
+        // Material für Leuchteffekt (keine Lichtberechnung nötig)
+        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(nodes[i].x, nodes[i].y, nodes[i].z);
+        scene.add(mesh);
+        nodeMeshes.push(mesh);
+      }
+      
+      // 5. Erstelle Kanten und zähle Degree
+      for(let i=0;i<N;i++){
+        for(let j=i+1;j<N;j++){
+          if(Math.random()<p){
+            edges.push({a:i,b:j});
+            nodes[i].degree++;
+            nodes[j].degree++;
+          }
+        }
+      }
+      
+      // 6. Edge-Geometrie für LineSegments vorbereiten
+      // Jede Kante hat 2 Vertices (Start/Ende) * 3 Koordinaten (x, y, z)
+      const maxVertices = edges.length * 2 * 3;
+      const positions = new Float32Array(maxVertices);
+      lineSegments.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
+    }
+
+    // 3D-Simulationsschritt (Kräfteberechnung und Integration)
+    function step(dt){
+      const k = Number(ui.k.value);
+      const damp = Number(ui.damp.value);
+      const repulse = Number(ui.rep.value);
+      const N = nodes.length;
+
+      // reset accelerations
+      for(const n of nodes){ n.ax=0; n.ay=0; n.az=0; } // NEU: AZ
+
+      // spring forces (3D Federkräfte / Undatron-Spannung)
+      for(const e of edges){
+        const a = nodes[e.a];
+        const b = nodes[e.b];
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let dz = b.z - a.z; // NEU: DZ
+        
+        // 3D Distanz
+        let d = Math.sqrt(dx*dx + dy*dy + dz*dz) || 0.0001; 
+        const rest = 80; 
+        const force = k*(d - rest);
+        const fx = (dx/d)*force;
+        const fy = (dy/d)*force;
+        const fz = (dz/d)*force; // NEU: FZ
+
+        a.ax += fx / a.mass;
+        a.ay += fy / a.mass;
+        a.az += fz / a.mass; // NEU: AZ
+        b.ax -= fx / b.mass;
+        b.ay -= fy / b.mass;
+        b.az -= fz / b.mass; // NEU: AZ
+      }
+
+      // repulsion (3D Teilchen-Abstoßung)
+      for(let i=0;i<N;i++){
+        for(let j=i+1;j<N;j++){
+          const A = nodes[i];
+          const B = nodes[j];
+          let dx = B.x - A.x;
+          let dy = B.y - A.y;
+          let dz = B.z - A.z; // NEU: DZ
+
+          let d2 = dx*dx + dy*dy + dz*dz + 0.01;
+          let d = Math.sqrt(d2);
+          let f = repulse / d2;
+          const fx = (dx/d)*f;
+          const fy = (dy/d)*f;
+          const fz = (dz/d)*f; // NEU: FZ
+
+          A.ax -= fx / A.mass;
+          A.ay -= fy / A.mass;
+          A.az -= fz / A.mass; // NEU: AZ
+          B.ax += fx / B.mass;
+          B.ay += fy / B.mass;
+          B.az += fz / B.mass; // NEU: AZ
+        }
+      }
+
+      // integrate (3D Bewegungsupdate)
+      for(const n of nodes){
+        if(n.fixed) continue;
+        
+        // velocity Verlet-ish
+        n.vx += n.ax*dt;
+        n.vy += n.ay*dt;
+        n.vz += n.az*dt; // NEU: VZ
+
+        // damping
+        n.vx *= (1 - damp);
+        n.vy *= (1 - damp);
+        n.vz *= (1 - damp); // NEU: Damping auf Z
+
+        n.x += n.vx*dt*60; 
+        n.y += n.vy*dt*60;
+        n.z += n.vz*dt*60; // NEU: Z-Position
+
+        // boundary soft (Begrenzung auf BOX_SIZE)
+        const halfBox = BOX_SIZE / 2;
+        if(n.x<-halfBox){ n.x=-halfBox; n.vx*=-0.5 }
+        if(n.x>halfBox){ n.x=halfBox; n.vx*=-0.5 }
+        if(n.y<-halfBox){ n.y=-halfBox; n.vy*=-0.5 }
+        if(n.y>halfBox){ n.y=halfBox; n.vy*=-0.5 }
+        if(n.z<-halfBox){ n.z=-halfBox; n.vz*=-0.5 }
+        if(n.z>halfBox){ n.z=halfBox; n.vz*=-0.5 }
+      }
+    }
+
+    // 3D-Rendering (Zeichnung)
+    function render(){
+      controls.update(); // Maussteuerung aktualisieren
+
+      // 1. Farbberechnung (wie in 2D, aber für 3D-Mesh)
+      const degrees = nodes.map(n => n.degree);
+      const maxDegree = Math.max(...degrees) || 1; 
+      const minDegree = Math.min(...degrees) || 0;
+      const degreeRange = maxDegree - minDegree;
+
+      for(let i = 0; i < nodes.length; i++){
+          const n = nodes[i];
+          const mesh = nodeMeshes[i];
+          
+          // 1.1 Position aktualisieren
+          mesh.position.set(n.x, n.y, n.z);
+          
+          // 1.2 Farbe (Rot/Blau) aktualisieren
+          let hue;
+          if (degreeRange === 0) {
+              hue = 200; 
+          } else {
+              const normalizedDegree = (n.degree - minDegree) / degreeRange;
+              // Hue von 250 (Blau) nach 0 (Rot)
+              hue = 250 - (normalizedDegree * 250); 
+          }
+          
+          // Konvertiere HSL zu THREE.Color (Hue muss von 0-360 auf 0-1 skaliert werden)
+          // S=1.0 (voll), L=0.7 (hell)
+          tempColor.setHSL(hue / 360, 1.0, 0.7);
+          mesh.material.color.copy(tempColor);
+      }
+
+      // 2. Kanten-Geometrie (Undatron-Fäden) aktualisieren
+      const positions = lineSegments.geometry.attributes.position.array;
+      let ptr = 0;
+      for(const e of edges){
+        const a = nodes[e.a];
+        const b = nodes[e.b];
+        
+        // Startpunkt
+        positions[ptr++] = a.x;
+        positions[ptr++] = a.y;
+        positions[ptr++] = a.z;
+        // Endpunkt
+        positions[ptr++] = b.x;
+        positions[ptr++] = b.y;
+        positions[ptr++] = b.z;
+
+        // Optional: Opazität der Kanten basierend auf Distanz anpassen (wie in 2D)
+        const d = Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2 + (b.z - a.z)**2);
+        const alpha = Math.max(0, 1 - d / (BOX_SIZE * 1.5));
+        
+        // Setze Opazität für die LineSegments
+        lineSegments.material.opacity = alpha * 0.8;
+      }
+      lineSegments.geometry.attributes.position.needsUpdate = true;
+      lineSegments.geometry.setDrawRange(0, edges.length * 2 * 3);
+
+      // 3. Szene rendern
+      renderer.render(scene, camera);
+    }
+
+    // Animation loop
+    let last = performance.now();
+    function loop(t){
+      const dt = Math.min(0.06,(t-last)/1000);
+      last = t;
+      if(!paused){ step(dt); }
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    // UI handlers
+    ui.reset.addEventListener('click', ()=>{ init(); });
+    ui.pause.addEventListener('click', ()=>{ paused = !paused; ui.pause.textContent = paused ? 'Resume' : 'Pause'; });
+    ['nodes','conn'].forEach(id=>{
+      document.getElementById(id).addEventListener('change', ()=>{ init(); });
+    });
+    
+    // Initialisiere 3D und starte
+    setup3D();
+    init();
+    requestAnimationFrame(loop);
+
+  </script>
+</body>
+</html>

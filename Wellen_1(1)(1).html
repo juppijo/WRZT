@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Wellenfeld</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #000010 0%, #000000 100%);
+  }
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+  .controls {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 30, 0.45);
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: #aeefff;
+    font-family: sans-serif;
+    box-shadow: 0 0 10px rgba(0,0,80,0.4);
+  }
+  label {
+    margin-right: 10px;
+  }
+  input[type=range] {
+    accent-color: #44ccff;
+  }
+</style>
+</head>
+<body>
+<div class="controls">
+  <label>Frequenz: <input type="range" id="freq" min="0.1" max="5" value="1" step="0.1"></label>
+  <label>Abstand: <input type="range" id="dist" min="20" max="200" value="100" step="5"></label>
+</div>
+<canvas id="wellen"></canvas>
+
+<script>
+const canvas = document.getElementById('wellen');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+let t = 0;
+const freqSlider = document.getElementById('freq');
+const distSlider = document.getElementById('dist');
+
+function wave3D(x, y, sx, sy, phase) {
+  const dx = x - sx;
+  const dy = y - sy;
+  const r = Math.sqrt(dx*dx + dy*dy);
+  return Math.sin(r * 0.06 - phase);
+}
+
+function draw() {
+  const freq = parseFloat(freqSlider.value);
+  const dist = parseFloat(distSlider.value);
+  ctx.clearRect(0, 0, w, h);
+  
+  const cx = w / 2;
+  const cy = h / 2;
+  
+  const sx1 = cx + Math.cos(t * 0.5) * dist;
+  const sy1 = cy + Math.sin(t * 0.5) * dist;
+  const sx2 = cx - Math.cos(t * 0.5) * dist;
+  const sy2 = cy - Math.sin(t * 0.5) * dist;
+
+  const img = ctx.createImageData(w, h);
+  const data = img.data;
+  for (let y = 0; y < h; y += 2) {
+    for (let x = 0; x < w; x += 2) {
+      const v1 = wave3D(x, y, sx1, sy1, t * freq);
+      const v2 = wave3D(x, y, sx2, sy2, t * freq);
+      const v = (v1 + v2) * 0.5;
+
+      // 3D Tiefe simulieren
+      const depth = (1 + v) * 0.5; 
+      const glow = Math.pow(depth, 2.5);
+      const r = Math.floor(50 + 205 * glow);
+      const g = Math.floor(150 * glow);
+      const b = Math.floor(255 * depth);
+      const a = 255;
+
+      const index = (y * w + x) * 4;
+      data[index] = r;
+      data[index + 1] = g;
+      data[index + 2] = b;
+      data[index + 3] = a;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  
+  // sanftes Pulsieren
+  t += 0.025;
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+</body>
+</html>

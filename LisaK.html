@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Lissajous-Figuren</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+    
+    #container {
+      width: 100dvw;
+      height: calc(100dvh - 20px);
+      transition: height 0.3s ease;
+    }
+    
+    #container.fullview {
+      height: 100dvh;
+    }
+    
+    #controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1a1a;
+      padding: 20px;
+      border-top: 2px solid #3b82f6;
+      max-height: 200px;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+    
+    #controls.hidden {
+      transform: translateY(100%);
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    h1 {
+      color: #93c5fd;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    #fullscreenBtn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.3s;
+    }
+    
+    #fullscreenBtn:hover {
+      background: #1d4ed8;
+    }
+    
+    #toggleControlsBtn:hover {
+      background: #047857;
+    }
+    
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      color: #bfdbfe;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+    
+    :fullscreen #container {
+      height: calc(100dvh - 20px);
+    }
+    
+    :fullscreen #controls {
+      position: fixed;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  
+  <div id="controls">
+    <div class="header">
+      <h1>3D Lissajous-Figuren</h1>
+      <div style="display: flex; gap: 10px;">
+        <button id="toggleControlsBtn" style="background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: background 0.3s;">
+          Steuerung ausblenden
+        </button>
+        <button id="fullscreenBtn">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <span id="fullscreenText">Vollbild</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="controls-grid">
+      <div class="control-group">
+        <label>Frequenz X: <span id="freqXVal">3.0</span></label>
+        <input type="range" id="freqX" min="1" max="10" step="0.1" value="3">
+      </div>
+      
+      <div class="control-group">
+        <label>Frequenz Y: <span id="freqYVal">2.0</span></label>
+        <input type="range" id="freqY" min="1" max="10" step="0.1" value="2">
+      </div>
+      
+      <div class="control-group">
+        <label>Frequenz Z: <span id="freqZVal">1.0</span></label>
+        <input type="range" id="freqZ" min="1" max="10" step="0.1" value="1">
+      </div>
+      
+      <div class="control-group">
+        <label>Phase X: <span id="phaseXVal">0.00</span></label>
+        <input type="range" id="phaseX" min="0" max="6.28" step="0.1" value="0">
+      </div>
+      
+      <div class="control-group">
+        <label>Phase Y: <span id="phaseYVal">1.57</span></label>
+        <input type="range" id="phaseY" min="0" max="6.28" step="0.1" value="1.57">
+      </div>
+      
+      <div class="control-group">
+        <label>Phase Z: <span id="phaseZVal">0.00</span></label>
+        <input type="range" id="phaseZ" min="0" max="6.28" step="0.1" value="0">
+      </div>
+      
+      <div class="control-group">
+        <label>Amplitude: <span id="amplitudeVal">2.0</span></label>
+        <input type="range" id="amplitude" min="0.5" max="3" step="0.1" value="2">
+      </div>
+      
+      <div class="control-group">
+        <label>Geschwindigkeit: <span id="speedVal">3</span></label>
+        <input type="range" id="speed" min="0" max="6" step="0.1" value="3">
+      </div>
+      
+      <div class="control-group">
+        <label>Farbverschiebung: <span id="hueShiftVal">0.00</span></label>
+        <input type="range" id="hueShift" min="0" max="1" step="0.01" value="0">
+      </div>
+      
+      <div class="control-group">
+        <label>Kurventyp:</label>
+        <select id="curveType" style="padding: 5px; border-radius: 4px; background: #2a2a2a; color: #fff; border: 1px solid #3b82f6;">
+          <option value="lissajous">Lissajous</option>
+          <option value="cardioid">Kardioide</option>
+          <option value="combined">Beide kombiniert</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label>Kardioide: <span id="cardioidSizeVal">2.0</span></label>
+        <input type="range" id="cardioidSize" min="0.5" max="4" step="0.1" value="2">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Three.js Setup
+    const container = document.getElementById('container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 6;
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+    
+    // Parameters
+    const params = {
+      freqX: 3,
+      freqY: 2,
+      freqZ: 1,
+      phaseX: 0,
+      phaseY: Math.PI / 2,
+      phaseZ: 0,
+      amplitude: 2,
+      segments: 1000,
+      speed: 0.5,
+      hueShift: 0,
+      curveType: 'lissajous',
+      cardioidSize: 2
+    };
+    
+    // Screensaver mode variables
+    let inactivityTimer = null;
+    let screensaverMode = false;
+    let randomAnimationInterval = null;
+    const INACTIVITY_TIMEOUT = 10000; // 10 seconds of inactivity
+    
+    // Create Lissajous curve
+    function createLissajous() {
+      const points = [];
+      for (let i = 0; i <= params.segments; i++) {
+        const t = (i / params.segments) * Math.PI * 2;
+        const x = params.amplitude * Math.sin(params.freqX * t + params.phaseX);
+        const y = params.amplitude * Math.sin(params.freqY * t + params.phaseY);
+        const z = params.amplitude * Math.sin(params.freqZ * t + params.phaseZ);
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      return points;
+    }
+    
+    // Create Cardioid curve
+    function createCardioid() {
+      const points = [];
+      const a = params.cardioidSize;
+      for (let i = 0; i <= params.segments; i++) {
+        const t = (i / params.segments) * Math.PI * 2;
+        const r = a * (1 - Math.cos(t));
+        const x = r * Math.cos(t);
+        const y = r * Math.sin(t);
+        
+        // Add 3D variation
+        const z = a * Math.sin(t * 2) * 0.5;
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      return points;
+    }
+    
+    // Create curve based on type
+    function createCurve() {
+      if (params.curveType === 'cardioid') {
+        return createCardioid();
+      }
+      return createLissajous();
+    }
+    
+    const points = createCurve();
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    // Create gradient colors
+    const colors = new Float32Array(points.length * 3);
+    for (let i = 0; i < points.length; i++) {
+      const hue = (i / points.length + params.hueShift) % 1;
+      const color = new THREE.Color().setHSL(hue, 1, 0.5);
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+    }
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const material = new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 });
+    const curve = new THREE.Line(geometry, material);
+    scene.add(curve);
+    
+    // Create second curve for combined mode
+    const curve2Geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const colors2 = new Float32Array(points.length * 3);
+    for (let i = 0; i < points.length; i++) {
+      const hue = (i / points.length + 0.5) % 1;
+      const color = new THREE.Color().setHSL(hue, 1, 0.5);
+      colors2[i * 3] = color.r;
+      colors2[i * 3 + 1] = color.g;
+      colors2[i * 3 + 2] = color.b;
+    }
+    curve2Geometry.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
+    const material2 = new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 });
+    const curve2 = new THREE.Line(curve2Geometry, material2);
+    scene.add(curve2);
+    curve2.visible = false;
+    
+    // Update curve
+    function updateCurve() {
+      if (params.curveType === 'combined') {
+        // Update first curve (Lissajous)
+        const lissajousPoints = createLissajous();
+        const lissajousGeometry = new THREE.BufferGeometry().setFromPoints(lissajousPoints);
+        
+        const colors1 = new Float32Array(lissajousPoints.length * 3);
+        for (let i = 0; i < lissajousPoints.length; i++) {
+          const hue = (i / lissajousPoints.length + params.hueShift) % 1;
+          const color = new THREE.Color().setHSL(hue, 1, 0.5);
+          colors1[i * 3] = color.r;
+          colors1[i * 3 + 1] = color.g;
+          colors1[i * 3 + 2] = color.b;
+        }
+        lissajousGeometry.setAttribute('color', new THREE.BufferAttribute(colors1, 3));
+        
+        curve.geometry.dispose();
+        curve.geometry = lissajousGeometry;
+        curve.visible = true;
+        
+        // Update second curve (Cardioid)
+        const cardioidPoints = createCardioid();
+        const cardioidGeometry = new THREE.BufferGeometry().setFromPoints(cardioidPoints);
+        
+        const colors2 = new Float32Array(cardioidPoints.length * 3);
+        for (let i = 0; i < cardioidPoints.length; i++) {
+          const hue = (i / cardioidPoints.length + params.hueShift + 0.5) % 1;
+          const color = new THREE.Color().setHSL(hue, 1, 0.5);
+          colors2[i * 3] = color.r;
+          colors2[i * 3 + 1] = color.g;
+          colors2[i * 3 + 2] = color.b;
+        }
+        cardioidGeometry.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
+        
+        curve2.geometry.dispose();
+        curve2.geometry = cardioidGeometry;
+        curve2.visible = true;
+      } else {
+        // Single curve mode
+        const points = createCurve();
+        const newGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        
+        const colors = new Float32Array(points.length * 3);
+        for (let i = 0; i < points.length; i++) {
+          const hue = (i / points.length + params.hueShift) % 1;
+          const color = new THREE.Color().setHSL(hue, 1, 0.5);
+          colors[i * 3] = color.r;
+          colors[i * 3 + 1] = color.g;
+          colors[i * 3 + 2] = color.b;
+        }
+        newGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        curve.geometry.dispose();
+        curve.geometry = newGeometry;
+        curve.visible = true;
+        curve2.visible = false;
+      }
+    }
+    
+    // Animation
+    let time = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      time += 0.01 * params.speed;
+      curve.rotation.x = time * 0.3;
+      curve.rotation.y = time * 0.5;
+      
+      if (curve2.visible) {
+        curve2.rotation.x = time * 0.3;
+        curve2.rotation.y = time * 0.5;
+      }
+      
+      renderer.render(scene, camera);
+    }
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+    
+    // Control handlers
+    const controls = {
+      freqX: { input: document.getElementById('freqX'), display: document.getElementById('freqXVal') },
+      freqY: { input: document.getElementById('freqY'), display: document.getElementById('freqYVal') },
+      freqZ: { input: document.getElementById('freqZ'), display: document.getElementById('freqZVal') },
+      phaseX: { input: document.getElementById('phaseX'), display: document.getElementById('phaseXVal') },
+      phaseY: { input: document.getElementById('phaseY'), display: document.getElementById('phaseYVal') },
+      phaseZ: { input: document.getElementById('phaseZ'), display: document.getElementById('phaseZVal') },
+      amplitude: { input: document.getElementById('amplitude'), display: document.getElementById('amplitudeVal') },
+      speed: { input: document.getElementById('speed'), display: document.getElementById('speedVal') },
+      hueShift: { input: document.getElementById('hueShift'), display: document.getElementById('hueShiftVal') },
+      cardioidSize: { input: document.getElementById('cardioidSize'), display: document.getElementById('cardioidSizeVal') }
+    };
+    
+    Object.keys(controls).forEach(key => {
+      const control = controls[key];
+      control.input.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value);
+        params[key] = value;
+        control.display.textContent = value.toFixed(2);
+        updateCurve();
+      });
+    });
+    
+    // Curve type selector
+    const curveTypeSelect = document.getElementById('curveType');
+    curveTypeSelect.addEventListener('change', (e) => {
+      params.curveType = e.target.value;
+      updateCurve();
+    });
+    
+    // Toggle controls visibility
+    const toggleControlsBtn = document.getElementById('toggleControlsBtn');
+    const controlsPanel = document.getElementById('controls');
+    let controlsVisible = true;
+    
+    function hideControls() {
+      controlsVisible = false;
+      controlsPanel.classList.add('hidden');
+      container.classList.add('fullview');
+      toggleControlsBtn.textContent = 'Steuerung einblenden';
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+    
+    function showControls() {
+      controlsVisible = true;
+      controlsPanel.classList.remove('hidden');
+      container.classList.remove('fullview');
+      toggleControlsBtn.textContent = 'Steuerung ausblenden';
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+    
+    toggleControlsBtn.addEventListener('click', () => {
+      if (controlsVisible) {
+        hideControls();
+      } else {
+        showControls();
+      }
+    });
+    
+    // Screensaver mode functions
+    function startScreensaverMode() {
+      if (screensaverMode) return;
+      screensaverMode = true;
+      hideControls();
+      
+      // Start random parameter animation
+      randomAnimationInterval = setInterval(() => {
+        // Randomly change parameters smoothly
+        const randomChange = Math.random();
+        
+        if (randomChange < 0.3) {
+          // Change frequencies
+          params.freqX = 1 + Math.random() * 9;
+          params.freqY = 1 + Math.random() * 9;
+          params.freqZ = 1 + Math.random() * 9;
+        } else if (randomChange < 0.6) {
+          // Change phases
+          params.phaseX = Math.random() * Math.PI * 2;
+          params.phaseY = Math.random() * Math.PI * 2;
+          params.phaseZ = Math.random() * Math.PI * 2;
+        } else if (randomChange < 0.8) {
+          // Change curve type
+          const types = ['lissajous', 'cardioid', 'combined'];
+          params.curveType = types[Math.floor(Math.random() * types.length)];
+        } else {
+          // Change color
+          params.hueShift = Math.random();
+        }
+        
+        updateCurve();
+        updateControlValues();
+      }, 5000); // Change every 5 seconds
+    }
+    
+    function stopScreensaverMode() {
+      if (!screensaverMode) return;
+      screensaverMode = false;
+      
+      if (randomAnimationInterval) {
+        clearInterval(randomAnimationInterval);
+        randomAnimationInterval = null;
+      }
+      
+      showControls();
+    }
+    
+    function resetInactivityTimer() {
+      if (screensaverMode) {
+        stopScreensaverMode();
+      }
+      
+      if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+      }
+      
+      inactivityTimer = setTimeout(() => {
+        startScreensaverMode();
+      }, INACTIVITY_TIMEOUT);
+    }
+    
+    function updateControlValues() {
+      document.getElementById('freqXVal').textContent = params.freqX.toFixed(2);
+      document.getElementById('freqX').value = params.freqX;
+      document.getElementById('freqYVal').textContent = params.freqY.toFixed(2);
+      document.getElementById('freqY').value = params.freqY;
+      document.getElementById('freqZVal').textContent = params.freqZ.toFixed(2);
+      document.getElementById('freqZ').value = params.freqZ;
+      document.getElementById('phaseXVal').textContent = params.phaseX.toFixed(2);
+      document.getElementById('phaseX').value = params.phaseX;
+      document.getElementById('phaseYVal').textContent = params.phaseY.toFixed(2);
+      document.getElementById('phaseY').value = params.phaseY;
+      document.getElementById('phaseZVal').textContent = params.phaseZ.toFixed(2);
+      document.getElementById('phaseZ').value = params.phaseZ;
+      document.getElementById('hueShiftVal').textContent = params.hueShift.toFixed(2);
+      document.getElementById('hueShift').value = params.hueShift;
+      document.getElementById('cardioidSizeVal').textContent = params.cardioidSize.toFixed(2);
+      document.getElementById('cardioidSize').value = params.cardioidSize;
+      document.getElementById('curveType').value = params.curveType;
+    }
+    
+    // Activity detection
+    document.addEventListener('mousemove', resetInactivityTimer);
+    document.addEventListener('keydown', resetInactivityTimer);
+    document.addEventListener('click', resetInactivityTimer);
+    document.addEventListener('touchstart', resetInactivityTimer);
+    
+    // Start the inactivity timer
+    resetInactivityTimer();
+    
+    // Fullscreen
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const fullscreenText = document.getElementById('fullscreenText');
+    
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
+    
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        fullscreenText.textContent = 'Vollbild beenden';
+      } else {
+        fullscreenText.textContent = 'Vollbild';
+      }
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+  </script>
+</body>
+</html>
