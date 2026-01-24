@@ -1,230 +1,302 @@
 ﻿<!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Link-Sammlung</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 30px;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .add-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        button {
-            padding: 12px 25px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background: #5568d3;
-        }
-        
-        .links-list {
-            list-style: none;
-        }
-        
-        .link-item {
-            background: #f8f9fa;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .link-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .link-item a {
-            color: #667eea;
-            text-decoration: none;
-            flex: 1;
-            font-weight: 500;
-            word-break: break-all;
-        }
-        
-        .link-item a:hover {
-            text-decoration: underline;
-        }
-        
-        .delete-btn {
-            padding: 8px 15px;
-            background: #dc3545;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        
-        .delete-btn:hover {
-            background: #c82333;
-        }
-        
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 Zen Link Manager</title>
+
+<style>
+:root {
+    --bg: linear-gradient(135deg, #667eea, #764ba2);
+    --card: #ffffff;
+    --text: #333;
+    --muted: #888;
+    --box: #f5f6fa;
+    --link: #667eea;
+}
+
+body.dark {
+    --bg: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    --card: #1e1f26;
+    --text: #e6e6e6;
+    --muted: #aaa;
+    --box: #2a2c35;
+    --link: #8ab4f8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    transition: background 0.6s;
+}
+
+.container {
+    width: 100%;
+    max-width: 850px;
+    background: var(--card);
+    border-radius: 22px;
+    padding: 30px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.35);
+    color: var(--text);
+    transition: background 0.4s, color 0.4s;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+h1 { font-size: 1.6rem; }
+
+header button {
+    margin-left: 8px;
+}
+
+.box {
+    background: var(--box);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+    transition: background 0.4s;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--link);
+}
+
+button {
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    background: var(--link);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button.secondary {
+    background: #6c757d;
+}
+
+button.delete {
+    background: #dc3545;
+}
+
+button:hover {
+    filter: brightness(1.1);
+}
+
+ul { list-style: none; }
+
+li {
+    background: var(--box);
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.4s;
+}
+
+a {
+    flex: 1;
+    color: var(--link);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 30px;
+    font-style: italic;
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>🔗 Meine Link-Sammlung</h1>
-        
-        <div class="add-section">
-            <h3 style="margin-bottom: 15px; color: #555;">Neuen Link hinzufügen</h3>
-            <div class="input-group">
-                <input type="text" id="linkName" placeholder="Link-Name (optional)">
-                <input type="text" id="linkUrl" placeholder="URL eingeben">
-                <button onclick="addLink()">Hinzufügen</button>
-            </div>
+
+<div class="container">
+    <header>
+        <h1>🌿 Zen Link Manager</h1>
+        <div>
+            <button onclick="toggleDark()">🌙</button>
+            <button onclick="toggleFullscreen()">⛶</button>
         </div>
-        
-        <h3 style="margin-bottom: 15px; color: #555;">Gespeicherte Links</h3>
-        <ul class="links-list" id="linksList"></ul>
+    </header>
+
+    <div class="box">
+        <div class="row">
+            <input id="name" placeholder="Name (optional)">
+            <input id="url" placeholder="https://…">
+            <button onclick="saveLink()">Speichern</button>
+        </div>
     </div>
 
-    <script>
-        const defaultLinks = [
-            { name: 'Physiker', url: 'https://juppijo.github.io/WRZT/Physiker' },
-            { name: 'Zaminia LisaK', url: 'https://juppijo.github.io/zaminia/LisaK' },
-            { name: 'Aut. Training', url: 'https://juppijo.github.io/zaminia/' },
-            { name: 'WRZT LisaK', url:'https://juppijo.github.io/WRZT/wave_double_slit_f' }
-        ];
+    <div class="box row">
+        <button class="secondary" onclick="exportLinks()">Export JSON</button>
+        <input type="file" accept=".json" onchange="importLinks(event)">
+    </div>
 
-        let links = [];
+    <ul id="list"></ul>
+</div>
 
-        function loadLinks() {
-            const saved = window.fs?.readFile?.('links.json', { encoding: 'utf8' });
-            if (saved) {
-                try {
-                    links = JSON.parse(saved);
-                } catch (e) {
-                    links = [...defaultLinks];
-                    saveLinks();
-                }
-            } else {
-                links = [...defaultLinks];
-                saveLinks();
-            }
+<script>
+const STORAGE_KEY = "zen_links";
+const THEME_KEY = "zen_dark";
+
+const defaultLinks = [
+    { name: "Physiker", url: "https://juppijo.github.io/WRZT/Physiker" },
+    { name: "Zaminia", url: "https://juppijo.github.io/zaminia/LisaK" },
+    { name: "Autogenes Training", url: "https://juppijo.github.io/zaminia/" },
+    { name: "WRZT", url: "https://juppijo.github.io/WRZT/wave_double_slit_f" }
+];
+
+let links = [];
+let editIndex = null;
+
+/* ---------- INIT ---------- */
+function init() {
+    if (localStorage.getItem(THEME_KEY) === "dark") {
+        document.body.classList.add("dark");
+    }
+    const saved = localStorage.getItem(STORAGE_KEY);
+    links = saved ? JSON.parse(saved) : defaultLinks;
+    save();
+    render();
+}
+
+/* ---------- THEME ---------- */
+function toggleDark() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem(
+        THEME_KEY,
+        document.body.classList.contains("dark") ? "dark" : "light"
+    );
+}
+
+/* ---------- FULLSCREEN ---------- */
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+/* ---------- STORAGE ---------- */
+function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+}
+
+/* ---------- RENDER ---------- */
+function render() {
+    const ul = document.getElementById("list");
+    if (!links.length) {
+        ul.innerHTML = `<div class="empty">Noch keine Links 🌱</div>`;
+        return;
+    }
+
+    ul.innerHTML = links.map((l, i) => `
+        <li>
+            <a href="${l.url}" target="_blank">${l.name || l.url}</a>
+            <button onclick="editLink(${i})">Edit</button>
+            <button class="delete" onclick="removeLink(${i})">✕</button>
+        </li>
+    `).join("");
+}
+
+/* ---------- ADD / EDIT ---------- */
+function saveLink() {
+    const name = document.getElementById("name");
+    const url = document.getElementById("url");
+
+    if (!url.value.trim()) return alert("Bitte URL eingeben 🌸");
+
+    const data = { name: name.value.trim(), url: url.value.trim() };
+
+    if (editIndex !== null) {
+        links[editIndex] = data;
+        editIndex = null;
+    } else {
+        links.push(data);
+    }
+
+    name.value = "";
+    url.value = "";
+    save();
+    render();
+}
+
+function editLink(i) {
+    document.getElementById("name").value = links[i].name;
+    document.getElementById("url").value = links[i].url;
+    editIndex = i;
+}
+
+function removeLink(i) {
+    if (confirm("Link löschen?")) {
+        links.splice(i, 1);
+        save();
+        render();
+    }
+}
+
+/* ---------- EXPORT / IMPORT ---------- */
+function exportLinks() {
+    const blob = new Blob(
+        [JSON.stringify(links, null, 2)],
+        { type: "application/json" }
+    );
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "zen-links.json";
+    a.click();
+}
+
+function importLinks(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            links = JSON.parse(ev.target.result);
+            save();
+            render();
+        } catch {
+            alert("Ungültige Datei 🌿");
         }
+    };
+    reader.readAsText(file);
+}
 
-        function saveLinks() {
-            window.fs?.writeFile?.('links.json', JSON.stringify(links, null, 2));
-        }
+init();
+</script>
 
-        function renderLinks() {
-            const linksList = document.getElementById('linksList');
-            
-            if (links.length === 0) {
-                linksList.innerHTML = '<div class="empty-state">Noch keine Links vorhanden. Füge deinen ersten Link hinzu!</div>';
-                return;
-            }
-            
-            linksList.innerHTML = links.map((link, index) => `
-                <li class="link-item">
-                    <a href="${link.url}" target="_blank">${link.name || link.url}</a>
-                    <button class="delete-btn" onclick="deleteLink(${index})">Löschen</button>
-                </li>
-            `).join('');
-        }
-
-        function addLink() {
-            const nameInput = document.getElementById('linkName');
-            const urlInput = document.getElementById('linkUrl');
-            const url = urlInput.value.trim();
-            
-            if (!url) {
-                alert('Bitte gib eine URL ein!');
-                return;
-            }
-            
-            links.push({
-                name: nameInput.value.trim() || url,
-                url: url
-            });
-            
-            nameInput.value = '';
-            urlInput.value = '';
-            saveLinks();
-            renderLinks();
-        }
-
-        function deleteLink(index) {
-            if (confirm('Möchtest du diesen Link wirklich löschen?')) {
-                links.splice(index, 1);
-                saveLinks();
-                renderLinks();
-            }
-        }
-
-        document.getElementById('linkUrl').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addLink();
-            }
-        });
-
-        loadLinks();
-        renderLinks();
-    </script>
 </body>
 </html>
