@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Finales Modell</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background-color: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        #ui { 
+            position: absolute; top: 15px; left: 15px; color: #fff; 
+            background: rgba(15, 15, 15, 0.95); padding: 15px; border-radius: 8px; 
+            border: 1px solid #e67e22; z-index: 100; width: 220px; /* Kürzere Regler */
+        }
+        .math { color: #f1c40f; font-family: 'Courier New', monospace; font-weight: bold; font-size: 0.9em; }
+        input[type=range] { width: 100%; margin: 5px 0; cursor: pointer; accent-color: #e67e22; }
+        label { font-size: 0.8em; display: block; margin-top: 8px; color: #ccc; }
+        h2 { margin: 0 0 5px 0; color: #e67e22; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2>WRZT Labor</h2>
+        
+        <label>v: <span id="vLab" class="math">0.8666</span> c</label>
+        <input type="range" id="vSlider" min="0.0001" max="0.9999" step="0.0001" value="0.8666">
+        
+        <label>Amplitude: <span id="pLab" class="math">100</span></label>
+        <input type="range" id="powSlider" min="10" max="300" step="1" value="100">
+
+        <label>Frequenz: <span id="fLab" class="math">0.18</span></label>
+        <input type="range" id="freqSlider" min="0.01" max="0.3" step="0.01" value="0.18">
+
+        <label>Zeitfluss: <span id="tLab" class="math">8.0</span></label>
+        <input type="range" id="timeSlider" min="1" max="25" step="0.5" value="8.0">
+    </div>
+
+    <script>
+        let scene, camera, renderer, points, lines;
+        const gridSize = 75; 
+        const spacing = 18;
+        let basePositions = [];
+        let timer = 0;
+        
+        let v = 0.866;
+        let wPower = 100;
+        let wFreq = 0.18;
+        let wSpeed = 8.0;
+
+        let rotation = { x: 0.7, y: 0 };
+        let zoom = 1100;
+        let isDragging = false;
+        let prevMouse = { x: 0, y: 0 };
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+            updateCamera();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+            const indices = [];
+
+            for (let x = 0; x < gridSize; x++) {
+                for (let z = 0; z < gridSize; z++) {
+                    let posX = (x - gridSize/2) * spacing;
+                    let posZ = (z - gridSize/2) * spacing;
+                    positions.push(posX, 0, posZ);
+                    basePositions.push(posX, 0, posZ);
+                    colors.push(0.1, 0.2, 0.4);
+
+                    if (x < gridSize - 1) indices.push(x * gridSize + z, (x + 1) * gridSize + z);
+                    if (z < gridSize - 1) indices.push(x * gridSize + z, x * gridSize + (z + 1));
+                }
+            }
+
+            geometry.setIndex(indices);
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            // STÄRKERE PUNKTE
+            points = new THREE.Points(geometry, new THREE.PointsMaterial({ size: 3.5, vertexColors: true }));
+            scene.add(points);
+
+            // STÄRKERE LINIEN
+            lines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5 }));
+            scene.add(lines);
+
+            document.getElementById('vSlider').oninput = (e) => v = parseFloat(e.target.value);
+            document.getElementById('powSlider').oninput = (e) => {
+                wPower = parseFloat(e.target.value);
+                document.getElementById('pLab').innerText = wPower;
+            };
+            document.getElementById('freqSlider').oninput = (e) => {
+                wFreq = parseFloat(e.target.value);
+                document.getElementById('fLab').innerText = wFreq.toFixed(2);
+            };
+            document.getElementById('timeSlider').oninput = (e) => {
+                wSpeed = parseFloat(e.target.value);
+                document.getElementById('tLab').innerText = wSpeed.toFixed(1);
+            };
+
+            window.addEventListener('mousedown', () => isDragging = true);
+            window.addEventListener('mouseup', () => isDragging = false);
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('wheel', (e) => { zoom += e.deltaY * 0.5; updateCamera(); });
+
+            animate();
+        }
+
+        function handleMove(e) {
+            if(isDragging) {
+                rotation.y -= (e.offsetX - prevMouse.x) * 0.01;
+                rotation.x -= (e.offsetY - prevMouse.y) * 0.01;
+                rotation.x = Math.max(0.05, Math.min(Math.PI / 2, rotation.x));
+                updateCamera();
+            }
+            prevMouse = { x: e.offsetX, y: e.offsetY };
+        }
+
+        function updateCamera() {
+            zoom = Math.max(100, Math.min(4000, zoom));
+            camera.position.set(zoom * Math.sin(rotation.y) * Math.cos(rotation.x), zoom * Math.sin(rotation.x), zoom * Math.cos(rotation.y) * Math.cos(rotation.x));
+            camera.lookAt(0, 0, 0);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            timer += 0.01 * wSpeed;
+
+            const alpha = Math.asin(v);
+            const bugAngle = (Math.PI / 2) - alpha;
+            const gamma = 1 / Math.sqrt(1 - v * v);
+
+            document.getElementById('vLab').innerText = v.toFixed(3);
+
+            const posAttr = points.geometry.attributes.position;
+            const colAttr = points.geometry.attributes.color;
+
+            for (let i = 0; i < posAttr.count; i++) {
+                let x = basePositions[i * 3];
+                let z = basePositions[i * 3 + 2];
+                let d = Math.sqrt(x*x + z*z);
+                
+                // Lineare Stauchung in Flugrichtung (WRZT)
+                let stauchungsFaktor = d + (v * z);
+                
+                let wave = Math.sin(stauchungsFaktor * wFreq - timer) * (wPower / (d * 0.02 + 1));
+                
+                let currentAngle = Math.atan2(Math.abs(x), -z);
+                let intensity = Math.exp(-Math.pow(Math.abs(currentAngle - bugAngle) * 20, 2));
+
+                let finalY = wave * (1 + intensity * (gamma - 1));
+
+                posAttr.setXYZ(i, x, finalY, z);
+
+                if (intensity > 0.4 && z < 0) {
+                    colAttr.setXYZ(i, 1.0, 0.85, 0.4); // Kräftiges Gold
+                } else {
+                    let energy = 1.0 - (z / (gridSize * spacing / 2));
+                    colAttr.setXYZ(i, 0.07 * energy, 0.15 * energy, 0.4 + 0.5 * energy);
+                }
+            }
+
+            posAttr.needsUpdate = true;
+            colAttr.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+            init();
+    </script>
+</body>
+</html>
