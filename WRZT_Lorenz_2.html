@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Mathematische Herleitung</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #e6edf3;
+            background-color: #0d1117;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 40px;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+        }
+        h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        h2 { color: #79c0ff; margin-top: 30px; }
+        .formula-box {
+            background: #010409;
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .highlight { color: #ffa657; font-weight: bold; }
+        .info {
+            border-left: 4px solid #d29922;
+            background: rgba(187, 128, 9, 0.1);
+            padding: 15px;
+            margin: 20px 0;
+        }
+        svg { background: white; border-radius: 5px; margin: 20px 0; max-width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+    <p>Die geometrische Interpretation des Lorentz-Faktors als Netz-Verdichtung.</p>
+
+    <div class="info">
+        <strong>Hinweis:</strong> Falls die Formeln nicht sofort erscheinen, bitte die Seite einmal neu laden. Chrome benötigt eine aktive Internetverbindung für die Formelschriftart.
+    </div>
+
+    <h2>1. Der Bugwinkel \(\alpha\)</h2>
+    <p>In der WRZT wird die Geschwindigkeit \(v\) als Projektion der Lichtgeschwindigkeit \(c\) im Raumzeit-Netz verstanden:</p>
+    
+    <div class="formula-box">
+        \[ \sin(\alpha) = \frac{v}{c} \]
+    </div>
+
+    <h2>2. Die Sekans-Identität (\(\gamma\))</h2>
+    <p>Der Lorentz-Faktor \(\gamma\) entspricht exakt dem <strong>Sekans</strong> des Winkels \(\alpha\). Dies beschreibt physikalisch die Verdichtung des Netzes vor dem bewegten Objekt:</p>
+
+    <div class="formula-box">
+        <p>Herleitung:</p>
+        \[ \cos(\alpha) = \sqrt{1 - \sin^2(\alpha)} = \sqrt{1 - \frac{v^2}{c^2}} \]
+        <br>
+        <p>Da \(\gamma = \frac{1}{\cos(\alpha)}\):</p>
+        <span class="highlight" style="font-size: 1.4em;">
+            \[ \gamma = \sec(\alpha) \]
+        </span>
+    </div>
+
+    <h2>3. Geometrische Visualisierung</h2>
+    <div style="text-align: center;">
+        <svg width="400" height="250" viewBox="0 0 400 250">
+            <path d="M 50 200 L 350 200 L 350 50 Z" fill="rgba(88, 166, 255, 0.1)" stroke="#58a6ff" stroke-width="3" />
+            <text x="180" y="220" fill="#333" font-family="Arial">v (Geschwindigkeit)</text>
+            <text x="360" y="130" fill="#333" font-family="Arial">c/γ</text>
+            <text x="140" y="110" fill="#000" font-weight="bold" transform="rotate(-26, 140, 110)">c (Lichtgeschwindigkeit)</text>
+            <path d="M 100 200 A 50 50 0 0 0 95 178" fill="none" stroke="#ffa657" stroke-width="3" />
+            <text x="110" y="190" fill="#ffa657" font-weight="bold" font-size="20">α</text>
+        </svg>
+    </div>
+
+    <h2>4. Bedeutung</h2>
+    <p>Diese Darstellung zeigt, dass die Relativitätstheorie keine abstrakte Zeitkrümmung ist, sondern die <strong>Trigonometrie einer elastischen Raumzeit</strong>. Wenn \(\alpha\) gegen 90° geht (\(v \to c\)), strebt der Sekans gegen Unendlich – die Netzverdichtung wird unüberwindbar.</p>
+
+    <footer style="margin-top: 50px; font-size: 0.8em; color: #8b949e; text-align: center;">
+        WRZT Theorie - Visualisierung für Chrome (MathJax 3.0)
+    </footer>
+</div>
+
+</body>
+</html>
