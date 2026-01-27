@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT – Massen auf Ebene Null</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #010408; font-family: sans-serif; }
+        #ui {
+            position: absolute; bottom: 25px; left: 25px;
+            background: rgba(5, 20, 35, 0.9); padding: 20px;
+            border-radius: 15px; color: #e0f6ff; border: 1px solid #2a5a8a;
+        }
+        label { display: block; font-size: 13px; margin-bottom: 5px; color: #8cdcff; font-weight: bold; }
+        input { width: 220px; margin-bottom: 15px; cursor: pointer; accent-color: #4a90e2; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <label>Rotations-Geschwindigkeit</label>
+    <input id="freq" type="range" min="0" max="10.0" step="0.05" value="3">
+    <label>Orbit-Radius</label>
+    <input id="sep" type="range" min="0" max="180" step="1" value="25">
+    <label>Masse-Tiefe (Wölbung)</label>
+    <input id="intensity" type="range" min="1" max="100" step="1" value="40">
+</div>
+
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1500);
+    camera.position.set(130, 110, 130);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // Gitter-Konstruktion (Quadrate)
+    const size = 300;
+    const divisions = 100;
+    const step = size / divisions;
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+
+    for (let j = 0; j <= divisions; j++) {
+        for (let i = 0; i < divisions; i++) {
+            vertices.push(-size/2 + i*step, 0, -size/2 + j*step);
+            vertices.push(-size/2 + (i+1)*step, 0, -size/2 + j*step);
+        }
+        for (let i = 0; i < divisions; i++) {
+            vertices.push(-size/2 + j*step, 0, -size/2 + i*step);
+            vertices.push(-size/2 + j*step, 0, -size/2 + (i+1)*step);
+        }
+    }
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    const material = new THREE.LineBasicMaterial({ color: 0x4a90e2, transparent: true, opacity: 0.4 });
+    const gridLines = new THREE.LineSegments(geometry, material);
+    scene.add(gridLines);
+
+    // Quellen (Massen)
+    const sGeo = new THREE.SphereGeometry(2.5, 32, 32);
+    const sMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const s1 = new THREE.Mesh(sGeo, sMat);
+    const s2 = new THREE.Mesh(sGeo, sMat);
+    scene.add(s1, s2);
+
+    const fS = document.getElementById("freq");
+    const dS = document.getElementById("sep");
+    const iS = document.getElementById("intensity");
+    let clock = new THREE.Clock();
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+        const omega = parseFloat(fS.value);
+        const dist = parseFloat(dS.value);
+        const massValue = parseFloat(iS.value);
+        const c_speed = 35.0; 
+
+        // 1. Reale Position der Massen auf Ebene 0
+        const x1 = Math.cos(omega * t) * dist;
+        const z1 = Math.sin(omega * t) * dist;
+        const x2 = -x1;
+        const z2 = -z1;
+
+        s1.position.set(x1, 0, z1);
+        s2.position.set(x2, 0, z2);
+
+        const pos = geometry.attributes.position.array;
+        for (let i = 0; i < pos.length; i += 3) {
+            let px = pos[i];
+            let pz = pos[i+2];
+
+            // 2. Retardierung basierend auf der Entfernung zum Zentrum
+            let r_center = Math.sqrt(px*px + pz*pz);
+            let t_ret = t - r_center / c_speed;
+
+            // 3. Wo waren die Trichter-Zentren zu diesem Zeitpunkt?
+            const rx1 = Math.cos(omega * t_ret) * dist;
+            const rz1 = Math.sin(omega * t_ret) * dist;
+            const rx2 = -rx1;
+            const rz2 = -rz1;
+
+            // 4. Abstand des Gitterpunkts zu den retardierten Zentren
+            let d1 = Math.sqrt((px - rx1)**2 + (pz - rz1)**2);
+            let d2 = Math.sqrt((px - rx2)**2 + (pz - rz2)**2);
+
+            // 5. Gravitations-Trichter Form
+            let h1 = -massValue / (1 + Math.pow(d1 * 0.2, 2));
+            let h2 = -massValue / (1 + Math.pow(d2 * 0.2, 2));
+
+            // 6. Globaler Falloff: Welle wird nach außen schwächer
+            let globalFalloff = 1.0 / (1.0 + Math.pow(r_center * 0.015, 2));
+            
+            pos[i+1] = (h1 + h2) * globalFalloff; 
+        }
+        geometry.attributes.position.needsUpdate = true;
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+</script>
+</body>
+</html>
