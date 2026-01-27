@@ -2,27 +2,46 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>WRZT – Massen auf Ebene Null</title>
+    <title>WRZT – Fullscreen Metrik-Labor</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #010408; font-family: sans-serif; }
+        
         #ui {
             position: absolute; bottom: 25px; left: 25px;
             background: rgba(5, 20, 35, 0.9); padding: 20px;
             border-radius: 15px; color: #e0f6ff; border: 1px solid #2a5a8a;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); z-index: 100;
         }
+
+        #fullscreenBtn {
+            position: absolute; top: 25px; right: 25px;
+            background: rgba(5, 20, 35, 0.9); border: 1px solid #2a5a8a;
+            color: #8cdcff; padding: 10px 15px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; transition: 0.3s; z-index: 100;
+        }
+        #fullscreenBtn:hover { background: #2a5a8a; color: #ffffff; }
+
         label { display: block; font-size: 13px; margin-bottom: 5px; color: #8cdcff; font-weight: bold; }
-        input { width: 220px; margin-bottom: 15px; cursor: pointer; accent-color: #4a90e2; }
+        input { width: 220px; margin-bottom: 15px; cursor: pointer; accent-color: #e74c3c; }
+        .val { float: right; color: #ffffff; }
     </style>
 </head>
 <body>
 
+<button id="fullscreenBtn">Vollbild Modus</button>
+
 <div id="ui">
-    <label>Rotations-Geschwindigkeit</label>
-    <input id="freq" type="range" min="0" max="10.0" step="0.05" value="3">
+    <label>Rotations-Tempo (ω)</label>
+    <input id="freq" type="range" min="0" max="10.0" step="0.05" value="0.7">
+    
     <label>Orbit-Radius</label>
-    <input id="sep" type="range" min="0" max="180" step="1" value="25">
-    <label>Masse-Tiefe (Wölbung)</label>
-    <input id="intensity" type="range" min="1" max="100" step="1" value="40">
+    <input id="sep" type="range" min="0" max="100" step="1" value="25">
+    
+    <label>Masse-Tiefe</label>
+    <input id="intensity" type="range" min="0" max="100" step="1" value="40">
+
+    <label>Wellen-Multiplikator (λ)</label>
+    <input id="waveMult" type="range" min="0.1" max="2.0" step="0.1" value="1.0">
 </div>
 
 <script type="importmap">
@@ -49,13 +68,26 @@
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    // Gitter-Konstruktion (Quadrate)
+    // Fullscreen Logik
+    const fsBtn = document.getElementById('fullscreenBtn');
+    fsBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            fsBtn.textContent = "Vollbild verlassen";
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                fsBtn.textContent = "Vollbild Modus";
+            }
+        }
+    });
+
+    // Gitter
     const size = 300;
     const divisions = 100;
     const step = size / divisions;
     const geometry = new THREE.BufferGeometry();
     const vertices = [];
-
     for (let j = 0; j <= divisions; j++) {
         for (let i = 0; i < divisions; i++) {
             vertices.push(-size/2 + i*step, 0, -size/2 + j*step);
@@ -66,13 +98,23 @@
             vertices.push(-size/2 + j*step, 0, -size/2 + (i+1)*step);
         }
     }
-
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    const material = new THREE.LineBasicMaterial({ color: 0x4a90e2, transparent: true, opacity: 0.4 });
+    const material = new THREE.LineBasicMaterial({ color: 0x4a90e2, transparent: true, opacity: 0.3 });
     const gridLines = new THREE.LineSegments(geometry, material);
     scene.add(gridLines);
 
-    // Quellen (Massen)
+    function createIndicator(color) {
+        const geo = new THREE.BufferGeometry();
+        const mat = new THREE.LineBasicMaterial({ color: color, linewidth: 3, depthTest: false });
+        const lines = new THREE.LineSegments(geo, mat);
+        lines.renderOrder = 1;
+        scene.add(lines);
+        return geo;
+    }
+
+    const indicatorGelb = createIndicator(0xf1c40f);
+    const indicatorGruen = createIndicator(0x2ecc71);
+
     const sGeo = new THREE.SphereGeometry(2.5, 32, 32);
     const sMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const s1 = new THREE.Mesh(sGeo, sMat);
@@ -82,7 +124,60 @@
     const fS = document.getElementById("freq");
     const dS = document.getElementById("sep");
     const iS = document.getElementById("intensity");
+    const wS = document.getElementById("waveMult");
+
     let clock = new THREE.Clock();
+
+  function getZValue(px, pz, t, omega, dist, massValue, waveMult) {
+        const c_base = 35.0;
+        const c_effective = c_base / waveMult; 
+        
+        // Wir berechnen die Position der Massen exakt zum aktuellen Zeitpunkt t
+        // Damit die Kugeln und die Vertiefung perfekt übereinander liegen,
+        // darf bei der direkten Vertiefung (Abstand d1, d2) keine Zeitverzögerung sein.
+        
+        // Aktuelle Position der rotierenden Massen
+        const curX1 = Math.cos(omega * t) * dist;
+        const curZ1 = Math.sin(omega * t) * dist;
+        const curX2 = -curX1;
+        const curZ2 = -curZ1;
+
+        // Lokale Vertiefung (Statisch am Ort der Masse)
+        let d1 = Math.sqrt((px - curX1)**2 + (pz - curZ1)**2);
+        let d2 = Math.sqrt((px - curX2)**2 + (pz - curZ2)**2);
+
+        // Wellen-Effekt (Retardierung für die Ausbreitung in den Raum)
+        let r_center = Math.sqrt(px*px + pz*pz);
+        let t_ret = t - r_center / c_effective;
+
+        const waveX1 = Math.cos(omega * t_ret) * dist;
+        const waveZ1 = Math.sin(omega * t_ret) * dist;
+        const waveX2 = -waveX1;
+        const waveZ2 = -waveZ1;
+
+        let dw1 = Math.sqrt((px - waveX1)**2 + (pz - waveZ1)**2);
+        let dw2 = Math.sqrt((px - waveX2)**2 + (pz - waveZ2)**2);
+
+        // Kombination: Nahfeld (Vertiefung) + Fernfeld (Welle)
+        let h_near = -massValue / (1 + Math.pow(d1 * 0.2, 2)) - massValue / (1 + Math.pow(d2 * 0.2, 2));
+        let h_wave = - (massValue * 0.3) * (Math.cos(dw1 * 0.1 * waveMult) + Math.cos(dw2 * 0.1 * waveMult));
+
+        let globalFalloff = 1.0 / (1.0 + Math.pow(r_center * 0.015, 2));
+        return (h_near + h_wave * globalFalloff);
+    }
+
+    function updateIndicator(geo, ox, oz, t, omega, dist, massValue, waveMult) {
+        const vSize = 15;
+        const iv = [];
+        const pts = [[0,0], [vSize,0], [vSize,vSize], [0,vSize], [0,0]];
+        for(let n=0; n<4; n++) {
+            let x1 = ox + pts[n][0], z1 = oz + pts[n][1];
+            let x2 = ox + pts[n+1][0], z2 = oz + pts[n+1][1];
+            iv.push(x1, getZValue(x1, z1, t, omega, dist, massValue, waveMult) + 0.5, z1);
+            iv.push(x2, getZValue(x2, z2, t, omega, dist, massValue, waveMult) + 0.5, z2);
+        }
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(iv, 3));
+    }
 
     function animate() {
         requestAnimationFrame(animate);
@@ -90,46 +185,19 @@
         const omega = parseFloat(fS.value);
         const dist = parseFloat(dS.value);
         const massValue = parseFloat(iS.value);
-        const c_speed = 35.0; 
+        const waveMult = parseFloat(wS.value);
 
-        // 1. Reale Position der Massen auf Ebene 0
-        const x1 = Math.cos(omega * t) * dist;
-        const z1 = Math.sin(omega * t) * dist;
-        const x2 = -x1;
-        const z2 = -z1;
-
-        s1.position.set(x1, 0, z1);
-        s2.position.set(x2, 0, z2);
+        s1.position.set(Math.cos(omega * t) * dist, 0, Math.sin(omega * t) * dist);
+        s2.position.set(-s1.position.x, 0, -s1.position.z);
 
         const pos = geometry.attributes.position.array;
         for (let i = 0; i < pos.length; i += 3) {
-            let px = pos[i];
-            let pz = pos[i+2];
-
-            // 2. Retardierung basierend auf der Entfernung zum Zentrum
-            let r_center = Math.sqrt(px*px + pz*pz);
-            let t_ret = t - r_center / c_speed;
-
-            // 3. Wo waren die Trichter-Zentren zu diesem Zeitpunkt?
-            const rx1 = Math.cos(omega * t_ret) * dist;
-            const rz1 = Math.sin(omega * t_ret) * dist;
-            const rx2 = -rx1;
-            const rz2 = -rz1;
-
-            // 4. Abstand des Gitterpunkts zu den retardierten Zentren
-            let d1 = Math.sqrt((px - rx1)**2 + (pz - rz1)**2);
-            let d2 = Math.sqrt((px - rx2)**2 + (pz - rz2)**2);
-
-            // 5. Gravitations-Trichter Form
-            let h1 = -massValue / (1 + Math.pow(d1 * 0.2, 2));
-            let h2 = -massValue / (1 + Math.pow(d2 * 0.2, 2));
-
-            // 6. Globaler Falloff: Welle wird nach außen schwächer
-            let globalFalloff = 1.0 / (1.0 + Math.pow(r_center * 0.015, 2));
-            
-            pos[i+1] = (h1 + h2) * globalFalloff; 
+            pos[i+1] = getZValue(pos[i], pos[i+2], t, omega, dist, massValue, waveMult);
         }
         geometry.attributes.position.needsUpdate = true;
+
+        updateIndicator(indicatorGelb, -70, -70, t, omega, dist, massValue, waveMult);
+        updateIndicator(indicatorGruen, 55, 55, t, omega, dist, massValue, waveMult);
 
         controls.update();
         renderer.render(scene, camera);
