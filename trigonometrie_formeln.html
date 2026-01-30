@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wichtige Trigonometrie-Formeln</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #d3d2fd 0%, #bbcefb 100%);
+            min-height: 100vh;
+        }
+        h1 {
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th {
+            background-color: #90caf9;
+            color: #0d47a1;
+            padding: 18px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #e3f2fd;
+            font-size: 1.05em;
+            line-height: 1.6;
+        }
+        tr:hover {
+            background-color: #e1f5fe;
+            transition: background-color 0.3s ease;
+        }
+        .category {
+            background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 14px;
+            font-size: 1.15em;
+            letter-spacing: 0.5px;
+        }
+        .formula {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 1.2em;
+            color: #1535f0;
+            background-color: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: inline-block;
+            border-left: 3px solid #64b5f6;
+        }
+        tbody tr:nth-child(even):not(.category) {
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wichtige Trigonometrie-Formeln</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 40%;">Formel-Name</th>
+                <th style="width: 60%;">Formel</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="2" class="category">GRUNDLEGENDE DEFINITIONEN</td>
+            </tr>
+            <tr>
+                <td>Sinus</td>
+                <td class="formula">sin(α) = Gegenkathete / Hypotenuse</td>
+            </tr>
+            <tr>
+                <td>Kosinus</td>
+                <td class="formula">cos(α) = Ankathete / Hypotenuse</td>
+            </tr>
+            <tr>
+                <td>Tangens</td>
+                <td class="formula">tan(α) = Gegenkathete / Ankathete = sin(α) / cos(α)</td>
+            </tr>
+            <tr>
+                <td>Kotangens</td>
+                <td class="formula">cot(α) = Ankathete / Gegenkathete = 1 / tan(α) = cos(α) / sin(α)</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">PYTHAGORÄISCHE IDENTITÄTEN</td>
+            </tr>
+            <tr>
+                <td>Hauptidentität</td>
+                <td class="formula">sin²(α) + cos²(α) = 1</td>
+            </tr>
+            <tr>
+                <td>Tangens-Identität</td>
+                <td class="formula">1 + tan²(α) = 1 / cos²(α)</td>
+            </tr>
+            <tr>
+                <td>Kotangens-Identität</td>
+                <td class="formula">1 + cot²(α) = 1 / sin²(α)</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">ADDITIONSTHEOREME</td>
+            </tr>
+            <tr>
+                <td>Sinus-Addition</td>
+                <td class="formula">sin(α ± β) = sin(α)cos(β) ± cos(α)sin(β)</td>
+            </tr>
+            <tr>
+                <td>Kosinus-Addition</td>
+                <td class="formula">cos(α ± β) = cos(α)cos(β) ∓ sin(α)sin(β)</td>
+            </tr>
+            <tr>
+                <td>Tangens-Addition</td>
+                <td class="formula">tan(α ± β) = (tan(α) ± tan(β)) / (1 ∓ tan(α)tan(β))</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">DOPPELWINKELFORMELN</td>
+            </tr>
+            <tr>
+                <td>Sinus Doppelwinkel</td>
+                <td class="formula">sin(2α) = 2sin(α)cos(α)</td>
+            </tr>
+            <tr>
+                <td>Kosinus Doppelwinkel (1)</td>
+                <td class="formula">cos(2α) = cos²(α) - sin²(α)</td>
+            </tr>
+            <tr>
+                <td>Kosinus Doppelwinkel (2)</td>
+                <td class="formula">cos(2α) = 2cos²(α) - 1</td>
+            </tr>
+            <tr>
+                <td>Kosinus Doppelwinkel (3)</td>
+                <td class="formula">cos(2α) = 1 - 2sin²(α)</td>
+            </tr>
+            <tr>
+                <td>Tangens Doppelwinkel</td>
+                <td class="formula">tan(2α) = 2tan(α) / (1 - tan²(α))</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">HALBWINKELFORMELN</td>
+            </tr>
+            <tr>
+                <td>Sinus Halbwinkel</td>
+                <td class="formula">sin(α/2) = ±√((1 - cos(α)) / 2)</td>
+            </tr>
+            <tr>
+                <td>Kosinus Halbwinkel</td>
+                <td class="formula">cos(α/2) = ±√((1 + cos(α)) / 2)</td>
+            </tr>
+            <tr>
+                <td>Tangens Halbwinkel</td>
+                <td class="formula">tan(α/2) = sin(α) / (1 + cos(α)) = (1 - cos(α)) / sin(α)</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">PRODUKTFORMELN</td>
+            </tr>
+            <tr>
+                <td>Sinus × Kosinus</td>
+                <td class="formula">sin(α)cos(β) = ½[sin(α+β) + sin(α-β)]</td>
+            </tr>
+            <tr>
+                <td>Kosinus × Kosinus</td>
+                <td class="formula">cos(α)cos(β) = ½[cos(α+β) + cos(α-β)]</td>
+            </tr>
+            <tr>
+                <td>Sinus × Sinus</td>
+                <td class="formula">sin(α)sin(β) = ½[cos(α-β) - cos(α+β)]</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">SUMMENFORMELN</td>
+            </tr>
+            <tr>
+                <td>Sinus-Summe</td>
+                <td class="formula">sin(α) + sin(β) = 2sin((α+β)/2)cos((α-β)/2)</td>
+            </tr>
+            <tr>
+                <td>Sinus-Differenz</td>
+                <td class="formula">sin(α) - sin(β) = 2cos((α+β)/2)sin((α-β)/2)</td>
+            </tr>
+            <tr>
+                <td>Kosinus-Summe</td>
+                <td class="formula">cos(α) + cos(β) = 2cos((α+β)/2)cos((α-β)/2)</td>
+            </tr>
+            <tr>
+                <td>Kosinus-Differenz</td>
+                <td class="formula">cos(α) - cos(β) = -2sin((α+β)/2)sin((α-β)/2)</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">SINUSSATZ UND KOSINUSSATZ</td>
+            </tr>
+            <tr>
+                <td>Sinussatz</td>
+                <td class="formula">a/sin(α) = b/sin(β) = c/sin(γ) = 2R</td>
+            </tr>
+            <tr>
+                <td>Kosinussatz</td>
+                <td class="formula">c² = a² + b² - 2ab·cos(γ)</td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" class="category">WICHTIGE WINKELWERTE</td>
+            </tr>
+            <tr>
+                <td>sin(0°) = sin(0)</td>
+                <td class="formula">0</td>
+            </tr>
+            <tr>
+                <td>sin(30°) = sin(π/6)</td>
+                <td class="formula">1/2</td>
+            </tr>
+            <tr>
+                <td>sin(45°) = sin(π/4)</td>
+                <td class="formula">√2/2</td>
+            </tr>
+            <tr>
+                <td>sin(60°) = sin(π/3)</td>
+                <td class="formula">√3/2</td>
+            </tr>
+            <tr>
+                <td>sin(90°) = sin(π/2)</td>
+                <td class="formula">1</td>
+            </tr>
+            <tr>
+                <td>cos(0°) = cos(0)</td>
+                <td class="formula">1</td>
+            </tr>
+            <tr>
+                <td>cos(30°) = cos(π/6)</td>
+                <td class="formula">√3/2</td>
+            </tr>
+            <tr>
+                <td>cos(45°) = cos(π/4)</td>
+                <td class="formula">√2/2</td>
+            </tr>
+            <tr>
+                <td>cos(60°) = cos(π/3)</td>
+                <td class="formula">1/2</td>
+            </tr>
+            <tr>
+                <td>cos(90°) = cos(π/2)</td>
+                <td class="formula">0</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
