@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style type="text/css">
+td, th { border: 1px solid #c3c3c3; padding: 0 3px 0 3px; }
+table { border-collapse: collapse; }
+img { max-width: 100%; }
+</style>
+<meta name="generator" content="ReText 8.1.0">
+<title>Neues Dokument</title>
+<style type="text/css">
+</style>
+
+<script>
+MathJax = {
+  options: {
+    renderActions: {
+      find: [10, function (doc) {
+        for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+          const display = !!node.type.match(/; *mode=display/);
+          const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+          const text = document.createTextNode('');
+          node.parentNode.replaceChild(text, node);
+          math.start = {node: text, delim: '', n: 0};
+          math.end = {node: text, delim: '', n: 0};
+          doc.math.push(math);
+        }
+      }, '']
+    }
+  }
+};
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script></head>
+<body>
+<p>\section*{Trägheit in der Wellenraumzeit-Theorie (WRZT)}</p>
+<p>In der klassischen Mechanik gilt:
+<script type="math/tex; mode=display">
+F = m \cdot a,
+</script>
+wobei die Kraft der zeitlichen Änderung des Impulses entspricht:
+<script type="math/tex; mode=display">
+\vec{F} = \frac{d}{dt}(m \vec{v}).
+</script>
+</p>
+<p>\subsection*{Relativistische Erweiterung}
+In der speziellen Relativitätstheorie wird der Impuls durch den Lorentzfaktor 
+<script type="math/tex">\gamma</script> modifiziert:
+<script type="math/tex; mode=display">
+\vec{p} = \gamma m \vec{v},
+\quad
+\gamma = \frac{1}{\sqrt{1 - v^{2}/c^{2}}}.
+</script>
+</p>
+<p>Damit ergibt sich für die Kraft:
+<script type="math/tex; mode=display">
+\vec{F} = \frac{d}{dt}(\gamma m \vec{v}).
+</script>
+</p>
+<p>\subsection*{WRZT-Erweiterung}
+Die Wellenraumzeit-Theorie berücksichtigt zusätzlich, 
+dass ein Teilchen bei Beschleunigung Energie in Form von Undatronen abstrahlt.
+Diese abgestrahlte Energie sei <script type="math/tex">E_{U}(t)</script>.
+Ihre zeitliche Änderung trägt ebenfalls zur erfahrbaren Trägheitskraft bei:</p>
+<p>
+<script type="math/tex; mode=display">
+\boxed{ \;
+\vec{F}_{\text{Trägheit}}
+= \frac{d}{dt}(\gamma m \vec{v})
++ \frac{1}{c}\frac{dE_{U}}{dt}
+\; }
+</script>
+</p>
+<p>\subsection*{Interpretation der Terme}
+<script type="math/tex; mode=display">\begin{itemize}
+  \item \(\tfrac{d}{dt}(\gamma m \vec{v})\): relativistischer Anteil der Trägheit,
+        bekannt aus der klassischen Relativitätstheorie.
+  \item \(\tfrac{1}{c}\tfrac{dE_{U}}{dt}\): WRZT-Zusatzterm,
+        beschreibt die Rückwirkung der abgestrahlten Wellenenergie 
+        (Undatrone) auf die Bewegung des Teilchens.
+\end{itemize}</script>
+</p>
+<p>\subsection*{Grenzfälle}
+<script type="math/tex; mode=display">\begin{itemize}
+  \item Falls keine Energie abgestrahlt wird \((dE_{U}/dt = 0)\), 
+        reduziert sich die Formel auf die relativistische Standardform.
+  \item Bei kontinuierlicher Abstrahlung verstärkt der zweite Term die
+        erlebte Trägheit, was als Wechselwirkung zwischen Teilchen und 
+        Wellenraum verstanden werden kann.
+\end{itemize}</script>
+</p>
+<p>\subsection*{Beispiel}
+Ein Elektron wird beschleunigt. Neben der Änderung seines relativistischen 
+Impulses emittiert es Photonen (in der WRZT: Undatrone) mit einer 
+Leistungsrate <script type="math/tex">P = dE_{U}/dt</script>.<br>
+Die gesamte wirksame Trägheitskraft ist dann:
+<script type="math/tex; mode=display">
+F_{\text{Trägheit}} = \frac{d}{dt}(\gamma m v) + \frac{P}{c}.
+</script>
+</p>
+<p>Dies zeigt: die Abstrahlungsleistung wirkt wie eine zusätzliche
+Kraft, die mit der Lichtgeschwindigkeit normiert wird.</p>
+
+</body>
+</html>

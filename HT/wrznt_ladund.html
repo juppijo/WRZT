@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WRZNT – Netzwerksimulation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #0f1729;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent-blue: #60a5fa;
+      --accent-cyan: #22d3ee;
+      --accent-purple: #a78bfa;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+      overflow: hidden;
+    }
+    
+    .app {
+      display: flex;
+      height: 100vh;
+      gap: 24px;
+      padding: 24px;
+      position: relative;
+    }
+    
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(10, 14, 39, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 60px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    
+    canvas:active {
+      cursor: grabbing;
+    }
+    
+    .sidebar {
+      width: 380px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(40px);
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 60px var(--shadow);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(96, 165, 250, 0.3);
+      border-radius: 10px;
+    }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    
+    .section {
+      margin-bottom: 28px;
+    }
+    
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 2px;
+    }
+    
+    .control-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .value-display {
+      font-family: 'Courier New', monospace;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(96, 165, 250, 0.4), 0 0 20px rgba(34, 211, 238, 0.3);
+      transition: all 0.2s ease;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 20px rgba(96, 165, 250, 0.6), 0 0 30px rgba(34, 211, 238, 0.5);
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(96, 165, 250, 0.4);
+    }
+    
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      box-shadow: 0 4px 15px rgba(96, 165, 250, 0.3);
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 6px 25px rgba(96, 165, 250, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent-blue);
+    }
+    
+    .btn span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    
+    .preset-btn {
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .preset-btn:hover {
+      background: rgba(96, 165, 250, 0.1);
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+    
+    .stats {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--glass-border);
+    }
+    
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+    
+    .stat-row:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+    }
+    
+    .stat-value {
+      font-weight: 600;
+      color: var(--accent-cyan);
+      font-family: 'Courier New', monospace;
+    }
+    
+    .footer {
+      position: absolute;
+      bottom: 28px;
+      left: 28px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+    
+    .footer:hover {
+      opacity: 1;
+    }
+    
+    .fullscreen-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    .fullscreen-btn:hover {
+      background: rgba(96, 165, 250, 0.2);
+      border-color: var(--accent-blue);
+      transform: scale(1.05);
+    }
+    
+    .fullscreen-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-primary);
+    }
+    
+    @media (max-width: 1024px) {
+      .app {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      
+      .sidebar {
+        width: 100%;
+        max-height: 50vh;
+      }
+      
+      .canvas-container {
+        height: 50vh;
+      }
+    }
+    
+    .tooltip {
+      position: absolute;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--text-primary);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="canvas-container">
+      <canvas id="sim"></canvas>
+      <div class="footer">
+        WRZNT – Interaktive Netzwerksimulation • Jo & Zami 2025
+      </div>
+      <button class="fullscreen-btn" id="fullscreen" title="Vollbild">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+    </div>
+
+    <aside class="sidebar">
+      <h1>WRZNT</h1>
+      <p class="subtitle">Visualisiere ein lebendes Energienetz. Ziehe Knoten, passe Parameter an und beobachte das organische Verhalten.</p>
+      
+      <div class="section">
+        <div class="section-title">Netzwerk-Parameter</div>
+        
+        <div class="control-group">
+          <label>
+            <span>Anzahl Knoten</span>
+            <span class="value-display" id="nodesVal">60</span>
+          </label>
+          <input id="nodes" type="range" min="10" max="300" value="60">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Verbindungsdichte</span>
+            <span class="value-display" id="connVal">0.08</span>
+          </label>
+          <input id="conn" type="range" min="0.01" max="0.3" step="0.01" value="0.08">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Federstärke</span>
+            <span class="value-display" id="kVal">0.02</span>
+          </label>
+          <input id="k" type="range" min="0.002" max="0.12" step="0.002" value="0.02">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Dämpfung</span>
+            <span class="value-display" id="dampVal">0.02</span>
+          </label>
+          <input id="damp" type="range" min="0.0" max="0.2" step="0.005" value="0.02">
+        </div>
+
+        <div class="control-group">
+          <label>
+            <span>Abstoßung</span>
+            <span class="value-display" id="repVal">4000</span>
+          </label>
+          <input id="rep" type="range" min="500" max="10000" step="100" value="4000">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Steuerung</div>
+        <div class="button-group">
+          <button id="reset" class="btn btn-primary"><span>Neu erstellen</span></button>
+          <button id="pause" class="btn btn-secondary"><span>Pause</span></button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Presets</div>
+        <div class="presets">
+          <button class="preset-btn" data-preset="sparse">Spärlich</button>
+          <button class="preset-btn" data-preset="dense">Dicht</button>
+          <button class="preset-btn" data-preset="chaotic">Chaotisch</button>
+          <button class="preset-btn" data-preset="calm">Ruhig</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Statistiken</div>
+        <div class="stats">
+          <div class="stat-row">
+            <span class="stat-label">Knoten</span>
+            <span class="stat-value" id="statNodes">60</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Verbindungen</span>
+            <span class="stat-value" id="statEdges">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">FPS</span>
+            <span class="stat-value" id="statFps">60</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const canvas = document.getElementById('sim');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = canvas.clientWidth;
+    let H = canvas.height = canvas.clientHeight;
+
+    window.addEventListener('resize', () => {
+      W = canvas.width = canvas.clientWidth;
+      H = canvas.height = canvas.clientHeight;
+    });
+
+    const ui = {
+      nodes: document.getElementById('nodes'),
+      conn: document.getElementById('conn'),
+      k: document.getElementById('k'),
+      damp: document.getElementById('damp'),
+      rep: document.getElementById('rep'),
+      reset: document.getElementById('reset'),
+      pause: document.getElementById('pause'),
+      fullscreen: document.getElementById('fullscreen')
+    };
+
+    const displays = {
+      nodesVal: document.getElementById('nodesVal'),
+      connVal: document.getElementById('connVal'),
+      kVal: document.getElementById('kVal'),
+      dampVal: document.getElementById('dampVal'),
+      repVal: document.getElementById('repVal'),
+      statNodes: document.getElementById('statNodes'),
+      statEdges: document.getElementById('statEdges'),
+      statFps: document.getElementById('statFps')
+    };
+
+    function updateDisplays() {
+      displays.nodesVal.textContent = ui.nodes.value;
+      displays.connVal.textContent = Number(ui.conn.value).toFixed(2);
+      displays.kVal.textContent = Number(ui.k.value).toFixed(3);
+      displays.dampVal.textContent = Number(ui.damp.value).toFixed(3);
+      displays.repVal.textContent = ui.rep.value;
+    }
+
+    ['nodes', 'conn', 'k', 'damp', 'rep'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateDisplays);
+    });
+    updateDisplays();
+
+    let nodes = [];
+    let edges = [];
+    let paused = false;
+
+    const presets = {
+      sparse: { nodes: 40, conn: 0.04, k: 0.01, damp: 0.03, rep: 5000 },
+      dense: { nodes: 120, conn: 0.15, k: 0.04, damp: 0.02, rep: 3000 },
+      chaotic: { nodes: 80, conn: 0.12, k: 0.08, damp: 0.005, rep: 2000 },
+      calm: { nodes: 50, conn: 0.06, k: 0.015, damp: 0.1, rep: 6000 }
+    };
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = presets[btn.dataset.preset];
+        ui.nodes.value = preset.nodes;
+        ui.conn.value = preset.conn;
+        ui.k.value = preset.k;
+        ui.damp.value = preset.damp;
+        ui.rep.value = preset.rep;
+        updateDisplays();
+        init();
+      });
+    });
+
+    function init() {
+      nodes = [];
+      edges = [];
+      const N = parseInt(ui.nodes.value);
+      const p = Number(ui.conn.value);
+      
+      for (let i = 0; i < N; i++) {
+        nodes.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          mass: 1,
+          fixed: false,
+          r: 2 + Math.random() * 3
+        });
+      }
+      
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          if (Math.random() < p) {
+            edges.push({ a: i, b: j });
+          }
+        }
+      }
+      
+      displays.statNodes.textContent = N;
+      displays.statEdges.textContent = edges.length;
+    }
+
+    // Hilfsfunktion: Bestimmt die "Ladung" eines Knotens basierend auf Vernetzung
+    function getCharge(nodeIndex) {
+      const degree = edges.filter(e => e.a === nodeIndex || e.b === nodeIndex).length;
+      const strength = Math.min(1, degree / 12);
+      
+      if (strength < 0.33) return 'blue';      // Schwach = Blau
+      else if (strength < 0.66) return 'yellow'; // Mittel = Gelb
+      else return 'red';                        // Stark = Rot
+    }
+
+    function step(dt) {
+      const k = Number(ui.k.value);
+      const damp = Number(ui.damp.value);
+      const repulse = Number(ui.rep.value);
+
+      for (const n of nodes) {
+        n.ax = 0;
+        n.ay = 0;
+      }
+
+      for (const e of edges) {
+        const a = nodes[e.a];
+        const b = nodes[e.b];
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let d = Math.hypot(dx, dy) || 0.0001;
+        const rest = 80;
+        const force = k * (d - rest);
+        const fx = (dx / d) * force;
+        const fy = (dy / d) * force;
+        a.ax += fx / a.mass;
+        a.ay += fy / a.mass;
+        b.ax -= fx / b.mass;
+        b.ay -= fy / b.mass;
+      }
+
+      // Ladungs-basierte Anziehung/Abstoßung (wie Elektron/Positron)
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const A = nodes[i];
+          const B = nodes[j];
+          const chargeA = getCharge(i);
+          const chargeB = getCharge(j);
+          
+          let dx = B.x - A.x;
+          let dy = B.y - A.y;
+          let d2 = dx * dx + dy * dy + 0.01;
+          let d = Math.sqrt(d2);
+          
+          // Gleiche Farbe = Abstoßung, unterschiedliche Farbe = Anziehung
+          let f;
+          if (chargeA === chargeB) {
+            // Abstoßung (wie vorher)
+            f = repulse / d2;
+            const fx = (dx / d) * f;
+            const fy = (dy / d) * f;
+            A.ax -= fx / A.mass;
+            A.ay -= fy / A.mass;
+            B.ax += fx / B.mass;
+            B.ay += fy / B.mass;
+          } else {
+            // Anziehung zwischen unterschiedlichen Farben
+            f = (repulse * 0.3) / d2; // Schwächere Anziehung
+            const fx = (dx / d) * f;
+            const fy = (dy / d) * f;
+            A.ax += fx / A.mass; // Umgekehrte Richtung = Anziehung
+            A.ay += fy / A.mass;
+            B.ax -= fx / B.mass;
+            B.ay -= fy / B.mass;
+          }
+        }
+      }
+
+      for (const n of nodes) {
+        if (n.fixed) continue;
+        n.vx += n.ax * dt;
+        n.vy += n.ay * dt;
+        n.vx *= (1 - damp);
+        n.vy *= (1 - damp);
+        n.x += n.vx * dt * 60;
+        n.y += n.vy * dt * 60;
+
+        if (n.x < 0) { n.x = 0; n.vx *= -0.5; }
+        if (n.x > W) { n.x = W; n.vx *= -0.5; }
+        if (n.y < 0) { n.y = 0; n.vy *= -0.5; }
+        if (n.y > H) { n.y = H; n.vy *= -0.5; }
+      }
+    }
+
+    function render() {
+      ctx.fillStyle = 'rgba(10, 14, 39, 0.15)';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.lineWidth = 1.5;
+      for (const e of edges) {
+        const a = nodes[e.a];
+        const b = nodes[e.b];
+        const d = Math.hypot(b.x - a.x, b.y - a.y);
+        const alpha = Math.max(0, 1 - d / 400);
+
+        const gradient = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        gradient.addColorStop(0, `rgba(96, 165, 250, ${0.3 * alpha})`);
+        gradient.addColorStop(0.5, `rgba(34, 211, 238, ${0.4 * alpha})`);
+        gradient.addColorStop(1, `rgba(167, 139, 250, ${0.3 * alpha})`);
+        
+        ctx.strokeStyle = gradient;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const degree = edges.filter(e => e.a === i || e.b === i).length;
+        const strength = Math.min(1, degree / 12);
+
+        let r, g, b;
+        if (strength < 0.33) {
+          r = 59; g = 130; b = 246; // Intensives Blau
+        } else if (strength < 0.66) {
+          r = 250; g = 204; b = 21; // Leuchtendes Gelb
+        } else {
+          r = 239; g = 68; b = 68; // Kräftiges Rot
+        }
+
+        const rad = 4 + n.r;
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, rad * 4);
+        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 1)`);
+        grad.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, 0.6)`);
+        grad.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, 0.3)`);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, rad * 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Leuchtender Kern
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, Math.max(2.5, n.r), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    let last = performance.now();
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+
+    function loop(t) {
+      const dt = Math.min(0.06, (t - last) / 1000);
+      last = t;
+      
+      if (!paused) {
+        step(dt);
+      }
+      render();
+
+      frameCount++;
+      if (t - lastFpsUpdate > 1000) {
+        displays.statFps.textContent = frameCount;
+        frameCount = 0;
+        lastFpsUpdate = t;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    let dragging = null;
+    canvas.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      let best = null;
+      let bd = 999;
+      
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const d = Math.hypot(n.x - x, n.y - y);
+        if (d < 20 && d < bd) {
+          bd = d;
+          best = i;
+        }
+      }
+      
+      if (best !== null) {
+        dragging = { i: best };
+        nodes[best].fixed = true;
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (dragging !== null) {
+        const rect = canvas.getBoundingClientRect();
+        nodes[dragging.i].x = e.clientX - rect.left;
+        nodes[dragging.i].y = e.clientY - rect.top;
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (dragging !== null) {
+        nodes[dragging.i].fixed = false;
+        dragging = null;
+      }
+    });
+
+    ui.reset.addEventListener('click', () => {
+      init();
+    });
+
+    ui.pause.addEventListener('click', () => {
+      paused = !paused;
+      ui.pause.querySelector('span').textContent = paused ? 'Fortsetzen' : 'Pause';
+    });
+
+    ui.fullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    ['nodes', 'conn'].forEach(id => {
+      document.getElementById(id).addEventListener('change', () => {
+        init();
+      });
+    });
+
+    init();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

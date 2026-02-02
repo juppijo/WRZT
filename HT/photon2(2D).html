@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Annihilation & Undatron-Übergang</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,30,0.9); padding: 20px; 
+            border-radius: 12px; border: 1px solid #4a9eff; width: 310px; z-index: 100;
+        }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: #4a9eff; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .val { float: right; color: #ffcc00; font-family: monospace; }
+        #status { font-weight: bold; transition: all 0.3s; }
+        .annihilated { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2 style="margin-top:0; font-size: 18px; color: #4a9eff;">WRZT: Materie zu Welle</h2>
+        
+        <div class="control-group">
+            <label>Radius (r): <span class="val" id="radVal">120</span></label>
+            <input type="range" id="radiusSlide" min="0" max="250" value="100">
+        </div>
+
+        <div class="control-group">
+            <label>Amplitude: <span class="val" id="ampVal">100</span></label>
+            <input type="range" id="ampSlide" min="1" max="200" value="100">
+        </div>
+
+        <div class="control-group">
+            <label>Zeitlupe: <span class="val" id="speedVal">0.1</span></label>
+            <input type="range" id="speedSlide" min="0" max="0.2" step="0.005" value="0.05">
+        </div>
+
+        <div style="font-size: 12px; border-top: 1px solid #333; padding-top: 10px;">
+            Zustand: <span id="status">Materie-Phase</span><br>
+            <small><i>Bei r=50 erfolgt die Umwandlung in reine Energie.</i></small>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, gridGeo, lineSegs;
+        let electron, positron;
+        let time = 0;
+        let params = { radius: 120, amplitude: 100, timeScale: 0.1 };
+        let pulses = [];
+        let isAnnihilated = false;
+
+        document.getElementById('radiusSlide').addEventListener('input', (e) => {
+            params.radius = parseFloat(e.target.value);
+            document.getElementById('radVal').innerText = params.radius;
+            
+            if (params.radius <= 50 && !isAnnihilated) {
+                isAnnihilated = true;
+                emitUndatron();
+                updateStatus(true);
+            } else if (params.radius > 52 && isAnnihilated) {
+                isAnnihilated = false;
+                updateStatus(false);
+            }
+        });
+
+        document.getElementById('ampSlide').addEventListener('input', (e) => {
+            params.amplitude = parseFloat(e.target.value);
+            document.getElementById('ampVal').innerText = params.amplitude;
+        });
+
+        document.getElementById('speedSlide').addEventListener('input', (e) => {
+            params.timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = params.timeScale;
+        });
+
+        function updateStatus(annihilated) {
+            const s = document.getElementById('status');
+            if(annihilated) {
+                s.innerText = "ANNIHILIERT (Reine Welle)";
+                s.className = "annihilated";
+                electron.visible = false;
+                positron.visible = false;
+            } else {
+                s.innerText = "Materie-Phase";
+                s.className = "";
+                electron.visible = true;
+                positron.visible = true;
+            }
+        }
+
+        function emitUndatron() {
+            pulses.push({ startTime: time, velocity: 5.0, amp: params.amplitude });
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.set(400, 350, 450);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            
+            gridGeo = new THREE.PlaneGeometry(1300, 1300, 110, 110);
+            lineSegs = new THREE.LineSegments(
+                new THREE.WireframeGeometry(gridGeo),
+                new THREE.LineBasicMaterial({ color: 0x0055ff, transparent: true, opacity: 0.4 })
+            );
+            lineSegs.rotation.x = -Math.PI / 2;
+            scene.add(lineSegs);
+
+            const sphere = new THREE.SphereGeometry(7, 24, 24);
+            electron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            scene.add(electron, positron);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += params.timeScale;
+            controls.update();
+
+            let rotSpeed = time * 2; 
+            let px = Math.cos(rotSpeed) * params.radius;
+            let pz = Math.sin(rotSpeed) * params.radius;
+            
+            if(!isAnnihilated) {
+                electron.position.set(-px, -12, pz);
+                positron.position.set(px, 12, -pz);
+            }
+
+            const pos = lineSegs.geometry.attributes.position.array;
+            pulses = pulses.filter(p => (time - p.startTime) < 200);
+
+            for (let i = 0; i < pos.length; i += 3) {
+                let x = pos[i];
+                let z = pos[i + 1];
+                let dCenter = Math.sqrt(x*x + z*z);
+
+                let h = 0;
+
+                // NUR WENN NICHT ANNIHILIERT: Statische Trichter zeigen
+                if (!isAnnihilated) {
+                    let d1 = Math.sqrt((x - px)**2 + (z - pz)**2);
+                    let d2 = Math.sqrt((x + px)**2 + (z + pz)**2);
+                    h = -200 / (d2/7 + 5) + 200 / (d1/7 + 5);
+                }
+
+                // Undatron-Puls (Berg & Tal)
+                pulses.forEach(p => {
+                    let age = (time - p.startTime);
+                    let waveCenter = age * p.velocity;
+                    let distFromFront = dCenter - waveCenter;
+                    let envelope = Math.exp(-(distFromFront**2) / 1500);
+                    let waveCycle = Math.sin(distFromFront * 0.12);
+                    let currentAmp = p.amp * Math.exp(-age * 0.01); 
+                    h += envelope * waveCycle * currentAmp;
+                });
+                
+                pos[i + 2] = h;
+            }
+
+            // Gitterfarbe
+            if(isAnnihilated) {
+                lineSegs.material.color.setHex(0xff00ff);
+                lineSegs.material.opacity = 0.6;
+            } else {
+                lineSegs.material.color.setHex(0x0055ff);
+                lineSegs.material.opacity = 0.4;
+            }
+
+            lineSegs.geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

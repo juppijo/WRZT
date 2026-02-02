@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Interaktive Undatron-Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #020205; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,40,0.85); padding: 20px; 
+            border-radius: 12px; border: 1px solid #4a9eff; 
+            width: 280px; z-index: 100;
+        }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: #4a9eff; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .stats { font-size: 12px; color: #aaa; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; }
+        .red { color: #ff4444; } .blue { color: #4444ff; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2 style="margin-top:0; font-size: 18px;">WRZT Steuerpult</h2>
+        
+        <div class="control-group">
+            <label>Abstand (Radius): <span id="radVal">100</span></label>
+            <input type="range" id="radiusSlide" min="0" max="300" value="120">
+        </div>
+
+        <div class="control-group">
+            <label>Rotations-Geschwindigkeit: <span id="speedVal">1.0</span></label>
+            <input type="range" id="speedSlide" min="0" max="5" step="0.1" value="1.5">
+        </div>
+
+        <div class="stats">
+            Status: <b id="status">Stabil</b><br>
+            Teilchen: <span class="red">Elektron</span> & <span class="blue">Positron</span><br>
+            <small><i>Minimaler Radius r_min = 40</i></small>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, gridGeo, lineSegs;
+        let electron, positron;
+        let time = 0;
+
+        // Parameter
+        const gridSize = 60;
+        const spacing = 12;
+        let params = {
+            radius: 120,
+            speed: 1.5
+        };
+
+        // UI Listener
+        document.getElementById('radiusSlide').addEventListener('input', (e) => {
+            params.radius = parseFloat(e.target.value);
+            document.getElementById('radVal').innerText = params.radius;
+        });
+        document.getElementById('speedSlide').addEventListener('input', (e) => {
+            params.speed = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = params.speed;
+        });
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.set(400, 350, 500);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            // Gitter (WRZNT-Struktur)
+            gridGeo = new THREE.PlaneGeometry(gridSize * spacing, gridSize * spacing, gridSize, gridSize);
+            const wireframe = new THREE.WireframeGeometry(gridGeo);
+            const material = new THREE.LineBasicMaterial({ 
+                color: 0x0088ff, 
+                transparent: true, 
+                opacity: 0.4 
+            });
+            lineSegs = new THREE.LineSegments(wireframe, material);
+            lineSegs.rotation.x = -Math.PI / 2;
+            scene.add(lineSegs);
+
+            // Teilchen (Sichtbare Knoten)
+            const sphere = new THREE.SphereGeometry(8, 24, 24);
+            electron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            scene.add(electron, positron);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02 * params.speed;
+            controls.update();
+
+            // Rotations-Berechnung
+            let px = Math.cos(time * 2) * params.radius;
+            let pz = Math.sin(time * 2) * params.radius;
+            
+            electron.position.set(-px, -15, pz);
+            positron.position.set(px, 15, -pz);
+
+            // Netz-Manipulation
+            const pos = lineSegs.geometry.attributes.position.array;
+            for (let i = 0; i < pos.length; i += 3) {
+                let x = pos[i];
+                let z = pos[i + 1];
+
+                let d1 = Math.sqrt((x - px)**2 + (z - pz)**2);
+                let d2 = Math.sqrt((x + px)**2 + (z + pz)**2);
+                let dCenter = Math.sqrt(x*x + z*z);
+
+                // 1. Lokale Krümmung (Teilchen-Trichter)
+                let h = -250 / (d2/6 + 6) + 250 / (d1/6 + 6);
+
+                // 2. Undatron-Wellen (Emittiert durch Rotation)
+                // Die Frequenz der Welle ist direkt an die Rotationsgeschwindigkeit gekoppelt
+                let waveFreq = 0.15;
+                let waveSpeed = 10;
+                let undatron = Math.sin(dCenter * waveFreq - time * waveSpeed) * (20 * params.speed);
+                
+                // Dämpfung nach außen
+                undatron *= Math.exp(-dCenter * 0.003);
+                
+                pos[i + 2] = h + undatron;
+            }
+
+            lineSegs.geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        init();
+    </script>
+</body>
+</html>

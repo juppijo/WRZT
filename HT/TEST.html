@@ -1,0 +1,479 @@
+
+Alle Projekte
+WRZT (Wellen-Raumzeit-Theorie)
+Entwicklung einer fundamentalen RaumZeit-Theorie
+
+
+
+
+Wave-spacetime theory overview
+Letzte Nachricht vor 3 Monaten
+Anweisungen
+Anweisungen hinzufügen, um Claudes Antworten anzupassen
+
+Dateien
+
+Lichtentstehung durch rotierendes Undatron.html
+452 Zeilen
+
+html
+
+
+
+Lichtentstehung durch rotierendes Undatron.html
+15.62 KB •452 Zeilen
+•
+Die Formatierung kann von der Quelle abweichen
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undatron Lichtentstehung</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #2d1b69 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 40px;
+        }
+
+        .main-visualization {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .rotation-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .rotation-title {
+            font-size: 1.5rem;
+            color: #4ecdc4;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .undatron-system {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent);
+        }
+
+        .orbit-path {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            margin: -100px 0 0 -100px;
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .electron {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ff6b6b, #ff4757);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 90px;
+            animation: orbit 2s linear infinite;
+            box-shadow: 0 0 15px #ff6b6b;
+        }
+
+        .positron {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #4ecdc4, #00d2d3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -110px;
+            animation: orbit 2s linear infinite reverse;
+            box-shadow: 0 0 15px #4ecdc4;
+        }
+
+        .center-point {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            margin: -4px 0 0 -4px;
+            box-shadow: 0 0 10px white;
+        }
+
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .wave-emission {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave-title {
+            font-size: 1.5rem;
+            color: #45b7d1;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .wave-field {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            background: linear-gradient(45deg, rgba(0,0,0,0.3), rgba(255,255,255,0.1));
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .wave-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: expand 3s ease-out infinite;
+        }
+
+        .wave-ring:nth-child(1) { animation-delay: 0s; }
+        .wave-ring:nth-child(2) { animation-delay: 0.5s; }
+        .wave-ring:nth-child(3) { animation-delay: 1s; }
+        .wave-ring:nth-child(4) { animation-delay: 1.5s; }
+        .wave-ring:nth-child(5) { animation-delay: 2s; }
+        .wave-ring:nth-child(6) { animation-delay: 2.5s; }
+
+        @keyframes expand {
+            0% {
+                width: 10px;
+                height: 10px;
+                margin: -5px 0 0 -5px;
+                opacity: 1;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                margin: -200px 0 0 -200px;
+                opacity: 0;
+            }
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .control-group {
+            margin: 15px 0;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #4ecdc4;
+        }
+
+        .slider {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 10px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .energy-equation {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #4ecdc4;
+            text-align: center;
+        }
+
+        .frequency-display {
+            font-size: 1.2rem;
+            color: #45b7d1;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lichtentstehung durch rotierendes Undatron</h1>
+        
+        <div class="main-visualization">
+            <div class="rotation-container">
+                <div class="rotation-title">Rotierendes Elektron-Positron-System</div>
+                <div class="undatron-system">
+                    <div class="orbit-path"></div>
+                    <div class="electron" id="electron"></div>
+                    <div class="positron" id="positron"></div>
+                    <div class="center-point"></div>
+                </div>
+                <div class="frequency-display" id="rotationFreq">
+                    Rotationsfrequenz: 2.0 Hz
+                </div>
+                <div class="energy-equation">
+                    E = ℏω = h·f<br>
+                    ω = Rotationsfrequenz des Undatrons
+                </div>
+            </div>
+
+            <div class="wave-emission">
+                <div class="wave-title">Emittierte Raumzeitwellen (Licht)</div>
+                <div class="wave-field" id="waveField">
+                    <div class="wave-ring"></div>
+                    <div class="wave-ring"></div>
+                    <div class="wave-ring"></div>
+                    <div class="wave-ring"></div>
+                    <div class="wave-ring"></div>
+                    <div class="wave-ring"></div>
+                </div>
+                <div class="frequency-display" id="waveFreq">
+                    Wellenfrequenz: 2.0 Hz
+                </div>
+            </div>
+        </div>
+
+        <div class="process-steps">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Teilchen-Rotation</h3>
+                <p>Elektron und Positron rotieren um ihren gemeinsamen Schwerpunkt. Die Zentripetalkraft hält sie in stabiler Umlaufbahn ohne direkten Kontakt.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Raumzeit-Deformation</h3>
+                <p>Die rotierende Ladungsverteilung erzeugt oszillierende Verformungen im Raumzeit-Gefüge. Diese Deformationen propagieren als Wellen.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Wellenemission</h3>
+                <p>Die Raumzeitwellen breiten sich mit Lichtgeschwindigkeit als Kugelwellen aus. Frequenz entspricht der Rotationsfrequenz des Undatrons.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Photon-Äquivalenz</h3>
+                <p>Diese emittierten Raumzeitwellen haben die gleichen Eigenschaften wie klassische Photonen: Energie E=ℏω, Impuls, und Wellenlänge λ=c/f.</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3>Experimentelle Steuerung</h3>
+            
+            <div class="control-group">
+                <label for="rotationSpeed">Rotationsgeschwindigkeit:</label>
+                <input type="range" id="rotationSpeed" class="slider" min="0.5" max="5" step="0.1" value="2" onchange="updateRotation()">
+            </div>
+
+            <div class="control-group">
+                <label for="orbitalRadius">Bahnradius:</label>
+                <input type="range" id="orbitalRadius" class="slider" min="50" max="150" step="10" value="100" onchange="updateRadius()">
+            </div>
+
+            <button onclick="startStopAnimation()">Animation Start/Stop</button>
+            <button onclick="resetSimulation()">Zurücksetzen</button>
+            <button onclick="showEnergyLevels()">Energieniveaus zeigen</button>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 25px; margin-top: 30px;">
+            <h3>Physikalische Interpretation</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: rgba(255, 107, 107, 0.2); padding: 15px; border-radius: 10px;">
+                    <strong>Klassische Sicht:</strong> Beschleunigte Ladungen strahlen elektromagnetische Wellen ab
+                </div>
+                <div style="background: rgba(78, 205, 196, 0.2); padding: 15px; border-radius: 10px;">
+                    <strong>Undatron-Sicht:</strong> Rotierende Teilchen erzeugen Raumzeitwellen mit identischen Eigenschaften
+                </div>
+                <div style="background: rgba(69, 183, 209, 0.2); padding: 15px; border-radius: 10px;">
+                    <strong>Vereinheitlichung:</strong> Beide Beschreibungen führen zu denselben beobachtbaren Effekten
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let animationPaused = false;
+        let rotationSpeed = 2;
+        let orbitalRadius = 100;
+
+        function updateRotation() {
+            rotationSpeed = document.getElementById('rotationSpeed').value;
+            document.getElementById('rotationFreq').textContent = `Rotationsfrequenz: ${rotationSpeed} Hz`;
+            document.getElementById('waveFreq').textContent = `Wellenfrequenz: ${rotationSpeed} Hz`;
+            
+            if (!animationPaused) {
+                const electron = document.getElementById('electron');
+                const positron = document.getElementById('positron');
+                const duration = 2 / rotationSpeed;
+                
+                electron.style.animationDuration = duration + 's';
+                positron.style.animationDuration = duration + 's';
+                
+                // Update wave emission frequency
+                document.querySelectorAll('.wave-ring').forEach((ring, index) => {
+                    ring.style.animationDuration = (3 / rotationSpeed) + 's';
+                    ring.style.animationDelay = (index * 0.5 / rotationSpeed) + 's';
+                });
+            }
+        }
+
+        function updateRadius() {
+            orbitalRadius = document.getElementById('orbitalRadius').value;
+            const electron = document.getElementById('electron');
+            const positron = document.getElementById('positron');
+            
+            electron.style.marginLeft = orbitalRadius + 'px';
+            positron.style.marginLeft = (-orbitalRadius - 20) + 'px';
+            
+            // Update orbital path
+            const orbitPath = document.querySelector('.orbit-path');
+            const pathRadius = orbitalRadius * 2;
+            orbitPath.style.width = pathRadius + 'px';
+            orbitPath.style.height = pathRadius + 'px';
+            orbitPath.style.marginLeft = (-pathRadius/2) + 'px';
+            orbitPath.style.marginTop = (-pathRadius/2) + 'px';
+        }
+
+        function startStopAnimation() {
+            animationPaused = !animationPaused;
+            const electron = document.getElementById('electron');
+            const positron = document.getElementById('positron');
+            const waveRings = document.querySelectorAll('.wave-ring');
+            
+            if (animationPaused) {
+                electron.style.animationPlayState = 'paused';
+                positron.style.animationPlayState = 'paused';
+                waveRings.forEach(ring => ring.style.animationPlayState = 'paused');
+            } else {
+                electron.style.animationPlayState = 'running';
+                positron.style.animationPlayState = 'running';
+                waveRings.forEach(ring => ring.style.animationPlayState = 'running');
+            }
+        }
+
+        function resetSimulation() {
+            document.getElementById('rotationSpeed').value = 2;
+            document.getElementById('orbitalRadius').value = 100;
+            animationPaused = false;
+            updateRotation();
+            updateRadius();
+            startStopAnimation();
+        }
+
+        function showEnergyLevels() {
+            const energyLevels = [
+                `E₁ = ℏω₁ = ${(6.626e-34 * rotationSpeed / 1e-19).toFixed(2)} × 10⁻¹⁹ J`,
+                `λ = c/f = ${(3e8 / rotationSpeed / 1e6).toFixed(2)} × 10⁶ m`,
+                `p = E/c = ${(6.626e-34 * rotationSpeed / 3e8 / 1e-42).toFixed(2)} × 10⁻⁴² kg⋅m/s`
+            ];
+            
+            alert(`Energieniveaus bei ${rotationSpeed} Hz:\n\n` + energyLevels.join('\n'));
+        }
+
+        // Initialize
+        updateRotation();
+        updateRadius();
+    </script>
+</body>
+</html>

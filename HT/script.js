@@ -1,0 +1,724 @@
+let scene, camera, renderer, grid;
+let waves = [];
+let nodes = [];
+let isPaused = false;
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
+let rotation = { x: 0, y: 0 , z: 0};
+let rotatingSourcesActive = false;
+let rotatingSourcesAngle = 0;
+let source1Marker, source2Marker;
+let barrierActive = false;
+let barrierMesh;
+let screenActive = false;
+let screenMesh;
+let screenLine;
+let screenIntensities = [];
+let wavefrontActive = false;
+let wavefrontTimer = 0;
+let wavepntActive = false;
+let wavepntTimer = 0;
+
+let params = {
+    amplitude: 5,
+    speed: 5,
+    radius: 50,
+    frequency: 5,
+    slitGap: 80,
+    slitWidth: 40,
+    barrierPos: 0,
+    screenPos: 300
+};
+
+function showTime() {
+  document.getElementById('currentTime').innerHTML = new Date().toUTCString();
+}
+
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+    
+    camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        2000
+    );
+    camera.position.set(0, 300, 400);
+    camera.lookAt(0, 0, 0);
+    
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.getElementById('container').appendChild(renderer.domElement);
+    
+    const ambientLight = new THREE.AmbientLight(0x404040, 1);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(100, 200, 100);
+    scene.add(directionalLight);
+    
+    createGrid();
+    createBarrier();
+    createScreen();
+    setupEvents();
+    animate();
+}
+
+function createBarrier() {
+    const barrierGroup = new THREE.Group();
+    
+    const barrierHeight = 60;
+    const barrierDepth = 10;
+    const totalWidth = 900;
+    
+    const barrierMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0xff4444,
+        transparent: true,
+        opacity: 0.6,
+        emissive: 0x440000
+    });
+    
+    const leftGeometry = new THREE.BoxGeometry(
+        (totalWidth - params.slitGap) / 2 - params.slitWidth / 2,
+        barrierHeight,
+        barrierDepth
+    );
+    const leftMesh = new THREE.Mesh(leftGeometry, barrierMaterial);
+    leftMesh.name = 'leftBarrier';
+    
+    const middleGeometry = new THREE.BoxGeometry(
+        params.slitGap - params.slitWidth,
+        barrierHeight,
+        barrierDepth
+    );
+    const middleMesh = new THREE.Mesh(middleGeometry, barrierMaterial);
+    middleMesh.name = 'middleBarrier';
+    
+    const rightGeometry = new THREE.BoxGeometry(
+        (totalWidth - params.slitGap) / 2 - params.slitWidth / 2,
+        barrierHeight,
+        barrierDepth
+    );
+    const rightMesh = new THREE.Mesh(rightGeometry, barrierMaterial);
+    rightMesh.name = 'rightBarrier';
+    
+    barrierGroup.add(leftMesh);
+    barrierGroup.add(middleMesh);
+    barrierGroup.add(rightMesh);
+    
+    barrierGroup.position.z = params.barrierPos;
+    barrierGroup.visible = false;
+    scene.add(barrierGroup);
+    barrierMesh = barrierGroup;
+    
+    updateBarrierPositions();
+}
+
+function createScreen() {
+    const screenGeometry = new THREE.PlaneGeometry(900, 200);
+    const screenMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x44ff44,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.DoubleSide,
+        emissive: 0x004400
+    });
+    
+    screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
+    screenMesh.position.z = params.screenPos;
+    screenMesh.visible = false;
+    scene.add(screenMesh);
+    
+    // Create intensity line
+    const lineGeometry = new THREE.BufferGeometry();
+    const linePositions = new Float32Array(200 * 3);
+    for (let i = 0; i < 200; i++) {
+        linePositions[i * 3] = (i / 199) * 900 - 450;
+        linePositions[i * 3 + 1] = 0;
+        linePositions[i * 3 + 2] = params.screenPos;
+    }
+    lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+    
+    const lineMaterial = new THREE.LineBasicMaterial({ 
+        color: 0xffff00,
+        linewidth: 3,
+        transparent: true,
+        opacity: 1.0
+    });
+    
+    screenLine = new THREE.Line(lineGeometry, lineMaterial);
+    screenLine.visible = false;
+    scene.add(screenLine);
+    
+    // Initialize intensities array
+    for (let i = 0; i < 200; i++) {
+        screenIntensities.push(0);
+    }
+}
+
+function updateBarrierPositions() {
+    const leftMesh = barrierMesh.children[0];
+    const middleMesh = barrierMesh.children[1];
+    const rightMesh = barrierMesh.children[2];
+    
+    const totalWidth = 900;
+    const halfGap = params.slitGap / 2;
+    const halfSlitWidth = params.slitWidth / 2;
+    
+    leftMesh.position.set(-(halfGap + halfSlitWidth + leftMesh.geometry.parameters.width / 2), 0, 0);
+    middleMesh.position.set(0, 0, 0);
+    rightMesh.position.set(halfGap + halfSlitWidth + rightMesh.geometry.parameters.width / 2, 0, 0);
+    
+    const barrierHeight = 60;
+    const barrierDepth = 10;
+    
+    leftMesh.geometry.dispose();
+    leftMesh.geometry = new THREE.BoxGeometry(
+        (totalWidth - params.slitGap) / 2 - params.slitWidth / 2,
+        barrierHeight,
+        barrierDepth
+    );
+    
+    middleMesh.geometry.dispose();
+    middleMesh.geometry = new THREE.BoxGeometry(
+        params.slitGap - params.slitWidth,
+        barrierHeight,
+        barrierDepth
+    );
+    
+    rightMesh.geometry.dispose();
+    rightMesh.geometry = new THREE.BoxGeometry(
+        (totalWidth - params.slitGap) / 2 - params.slitWidth / 2,
+        barrierHeight,
+        barrierDepth
+    );
+    
+    barrierMesh.position.z = params.barrierPos;
+}
+
+function isBlockedByBarrier(x, z) {
+    if (!barrierActive) return false;
+    
+    const barrierZ = params.barrierPos;
+    if (Math.abs(z - barrierZ) > 15) return false;
+    
+    const halfGap = params.slitGap / 2;
+    const halfSlitWidth = params.slitWidth / 2;
+    
+    if (x < -(halfGap + halfSlitWidth)) return true;
+    if (x > (halfGap + halfSlitWidth)) return true;
+    if (x > -halfGap + halfSlitWidth && x < halfGap - halfSlitWidth) return true;
+    
+    return false;
+}
+
+function createGrid() {
+    const spacing = 10;   ////  ------------------15
+    const cols = 160;
+    const rows = 160;
+    
+    const lineGeometry = new THREE.BufferGeometry();
+    const positions = [];
+    const indices = [];
+    nodes = [];
+    
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            const posX = (x - cols / 2) * spacing;
+            const posZ = (y - rows / 2) * spacing;
+            positions.push(posX, 0, posZ);
+            nodes.push({
+                x: posX,
+                z: posZ,
+                baseY: 0,
+                gridX: x,
+                gridY: y
+            });
+        }
+    }
+    
+    for (let y = 0; y < rows - 1; y++) {
+        for (let x = 0; x < cols - 1; x++) {
+            const idx = y * cols + x;
+            indices.push(idx, idx + 1);
+            indices.push(idx, idx + cols);
+        }
+    }
+    
+    for (let y = 0; y < rows - 1; y++) {
+        const idx = y * cols + (cols - 1);
+        indices.push(idx, idx + cols);
+    }
+    
+    for (let x = 0; x < cols - 1; x++) {
+        const idx = (rows - 1) * cols + x;
+        indices.push(idx, idx + 1);
+    }
+    
+    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    lineGeometry.setIndex(indices);
+    
+    const lineMaterial = new THREE.LineBasicMaterial({ 
+        color: 0x2a2a2a,
+        transparent: true,
+        opacity: 0.4
+    });
+    
+    grid = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(grid);
+    
+    const pointGeometry = new THREE.BufferGeometry();
+    pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions.slice(), 3));
+    
+    const colors = new Float32Array(positions.length);
+    for (let i = 0; i < colors.length; i++) {
+        colors[i] = 0.3;
+    }
+    pointGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const pointMaterial = new THREE.PointsMaterial({
+        size: 4,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9
+    });
+    
+    const points = new THREE.Points(pointGeometry, pointMaterial);
+    scene.add(points);
+    
+    grid.points = points;
+    
+    const markerGeometry = new THREE.SphereGeometry(5, 12, 12);
+    const marker1Material = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.8 });
+    const marker2Material = new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true, opacity: 0.8 });
+    
+    source1Marker = new THREE.Mesh(markerGeometry, marker1Material);
+    source2Marker = new THREE.Mesh(markerGeometry, marker2Material);
+    
+    source1Marker.visible = false;
+    source2Marker.visible = false;
+    
+    scene.add(source1Marker);
+    scene.add(source2Marker);
+}
+
+function setupEvents() {
+    const canvas = renderer.domElement;
+    
+    canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+    
+    canvas.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+            
+            rotation.y += deltaX * 0.005;
+            rotation.x += deltaY * 0.005;
+            rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotation.x));
+            
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+    
+    canvas.addEventListener('click', (e) => {
+        if (isDragging) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        
+        const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersectPoint = new THREE.Vector3();
+        raycaster.ray.intersectPlane(plane, intersectPoint);
+        
+        if (intersectPoint) {
+            waves.push({
+                x: intersectPoint.x,
+                z: intersectPoint.z,
+                time: 0,
+                amplitude: params.amplitude
+            });
+        }
+    });
+    
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    document.getElementById('amplitude').addEventListener('input', (e) => {
+        params.amplitude = parseFloat(e.target.value);
+        document.getElementById('amplitudeValue').textContent = params.amplitude;
+    });
+    
+    document.getElementById('frequency').addEventListener('input', (e) => {
+        params.frequency = parseFloat(e.target.value);
+        document.getElementById('frequencyValue').textContent = params.frequency;
+    });
+    
+    document.getElementById('speed').addEventListener('input', (e) => {
+        params.speed = parseFloat(e.target.value);
+        document.getElementById('speedValue').textContent = params.speed;
+    });
+
+    document.getElementById('radius').addEventListener('input', (e) => {
+        params.radius = parseFloat(e.target.value);
+        document.getElementById('radiusValue').textContent = params.radius;
+    });
+    
+    document.getElementById('barrierPos').addEventListener('input', (e) => {
+        params.barrierPos = parseFloat(e.target.value);
+        document.getElementById('barrierPosValue').textContent = params.barrierPos;
+        updateBarrierPositions();
+    });
+    
+    document.getElementById('slitGap').addEventListener('input', (e) => {
+        params.slitGap = parseFloat(e.target.value);
+        document.getElementById('slitGapValue').textContent = params.slitGap;
+        updateBarrierPositions();
+    });
+    
+    document.getElementById('slitWidth').addEventListener('input', (e) => {
+        params.slitWidth = parseFloat(e.target.value);
+        document.getElementById('slitWidthValue').textContent = params.slitWidth;
+        updateBarrierPositions();
+    });
+    
+    document.getElementById('screenPos').addEventListener('input', (e) => {
+        params.screenPos = parseFloat(e.target.value);
+        document.getElementById('screenPosValue').textContent = params.screenPos;
+        screenMesh.position.z = params.screenPos;
+        const linePositions = screenLine.geometry.attributes.position.array;
+        for (let i = 0; i < 200; i++) {
+            linePositions[i * 3 + 2] = params.screenPos;
+        }
+        screenLine.geometry.attributes.position.needsUpdate = true;
+    });
+    
+    document.getElementById('wavefrontBtn').addEventListener('click', () => {
+        wavefrontActive = !wavefrontActive;
+        const btn = document.getElementById('wavefrontBtn');
+        btn.classList.toggle('active');
+    });
+    
+     document.getElementById('wavepntBtn').addEventListener('click', () => {
+        wavepntActive = !wavepntActive;
+        const btn = document.getElementById('wavepntBtn');
+        btn.classList.toggle('active');
+    });
+    
+    
+    document.getElementById('barrierBtn').addEventListener('click', () => {
+        barrierActive = !barrierActive;
+        barrierMesh.visible = barrierActive;
+        const btn = document.getElementById('barrierBtn');
+        btn.classList.toggle('active');
+    });
+    
+    document.getElementById('screenBtn').addEventListener('click', () => {
+        screenActive = !screenActive;
+        screenMesh.visible = screenActive;
+        screenLine.visible = screenActive;
+        const btn = document.getElementById('screenBtn');
+        btn.classList.toggle('active');
+    });
+    
+    document.getElementById('rotatingSourcesBtn').addEventListener('click', () => {
+        rotatingSourcesActive = !rotatingSourcesActive;
+        const btn = document.getElementById('rotatingSourcesBtn');
+        btn.classList.toggle('active');
+        source1Marker.visible = rotatingSourcesActive;
+        source2Marker.visible = rotatingSourcesActive;
+        
+        if (!rotatingSourcesActive) {
+            waves = [];
+        }
+    });
+    
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+        isPaused = !isPaused;
+        const btn = document.getElementById('pauseBtn');
+        btn.textContent = isPaused ? 'Play' : 'Pause';
+        btn.classList.toggle('active');
+    });
+    
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        waves = [];
+        rotatingSourcesActive = false;
+        rotatingSourcesAngle = 0;
+        barrierActive = false;
+        screenActive = false;
+        wavefrontActive = false;
+        wavefrontTimer = 0;
+        wavepntActive = false;
+        wavepntTimer = 0;
+        barrierMesh.visible = false;
+        screenMesh.visible = false;
+        screenLine.visible = false;
+        document.getElementById('wavefrontBtn').classList.remove('active');
+        document.getElementById('rotatingSourcesBtn').classList.remove('active');
+        document.getElementById('barrierBtn').classList.remove('active');
+        document.getElementById('screenBtn').classList.remove('active');
+        source1Marker.visible = false;
+        source2Marker.visible = false;
+        const positions = grid.geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i + 1] = 0;
+        }
+        grid.geometry.attributes.position.needsUpdate = true;
+    });
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    
+    if (!isPaused) {
+        // --- Wellenfront --------------------------------------------------
+        if (wavefrontActive) {
+            wavefrontTimer += params.speed * 0.02;
+
+            // Nur alle 10 Frames einen neuen Ring erzeugen
+            if (wavefrontTimer > 1) {
+                wavefrontTimer = 0;
+
+                // Mittelpunkt der Wellenfront (z.B. ganz unten bei z = -400)
+                const cx = 0;
+                const cz = -400;
+
+                // neue Welle ins Array pushen  ---  !!!   Linie
+                for (let i = -15; i <= 15; i += 3) {
+                    waves.push({
+                        x: i * 15,   // Wellenfront breit
+                        z: -400,
+                        time: 0,
+                        amplitude: params.amplitude
+                    });
+                }
+            }
+        }    
+        if (wavepntActive) {
+            wavepntTimer += params.speed * 0.02;
+
+            //wavepntBtn
+            //Nur alle 10 Frames einen neuen Ring erzeugen
+            if (wavepntTimer > 1) {
+                wavepntTimer = 0;
+
+                // Mittelpunkt der Wellenfront (z.B. ganz unten bei z = -400)
+                const cx = 0;
+                const cz = -400;
+
+                //neue Welle ins Array pushen
+                waves.push({
+                    x: cx,
+                    z: cz,
+                    time: 0,
+                    amplitude: params.amplitude
+                });
+              
+            }
+            
+        }
+
+        if (rotatingSourcesActive) {
+            rotatingSourcesAngle += 0.02 * params.speed;
+            
+            const source1X = Math.cos(rotatingSourcesAngle) * params.radius;
+            const source1Z = Math.sin(rotatingSourcesAngle) * params.radius;
+            
+            const source2X = Math.cos(rotatingSourcesAngle + Math.PI) * params.radius;
+            const source2Z = Math.sin(rotatingSourcesAngle + Math.PI) * params.radius;
+            
+            source1Marker.position.set(source1X, 20, source1Z);
+            source2Marker.position.set(source2X, 20, source2Z);
+            
+            waves.push({
+                x: source1X,
+                z: source1Z,
+                time: 0,
+                amplitude: params.amplitude
+            });
+            
+            waves.push({
+                x: source2X,
+                z: source2Z,
+                time: 0,
+                amplitude: -params.amplitude
+            });
+        }
+        
+        waves = waves.filter(wave => {
+            wave.time += params.speed * 0.01;
+            wave.amplitude *= 0.99;
+            return wave.amplitude > 0.1;
+        });
+        
+        document.getElementById('waveCount').textContent = waves.length;
+        
+        const positions = grid.geometry.attributes.position.array;
+        const pointPositions = grid.points.geometry.attributes.position.array;
+        const colors = grid.points.geometry.attributes.color.array;
+        
+        for (let i = 0; i < nodes.length; i++) {
+            const node = nodes[i];
+            let totalY = 0;
+            
+            if (isBlockedByBarrier(node.x, node.z)) {
+                totalY = 0;
+            } else {
+                for (const wave of waves) {
+                    const dx = node.x - wave.x;
+                    const dz = node.z - wave.z;
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+                    
+                    let blocked = false;
+                    if (barrierActive) {
+                        const waveZ = wave.z;
+                        const nodeZ = node.z;
+                        const barrierZ = params.barrierPos;
+                        
+                        if ((waveZ < barrierZ - 15 && nodeZ > barrierZ + 15) || 
+                            (waveZ > barrierZ + 15 && nodeZ < barrierZ - 15)) {
+                            const t = (barrierZ - waveZ) / (nodeZ - waveZ);
+                            const crossX = wave.x + t * (node.x - wave.x);
+                            
+                            if (isBlockedByBarrier(crossX, barrierZ)) {
+                                blocked = true;
+                            }
+                        }
+                    }
+                    
+                    if (!blocked) {
+                        const pulseWidth = 50;
+                        const center = wave.time * 50;
+                        const waveValue = Math.sin((dist - center) * 0.15 * params.frequency / 5) * 
+                                         wave.amplitude * 
+                                         Math.exp(-Math.pow(dist - center, 2) / (2 * pulseWidth * pulseWidth));
+                        
+                        totalY += waveValue;
+                    }
+                }
+            }
+            
+            positions[i * 3 + 1] = totalY;
+            pointPositions[i * 3 + 1] = totalY;
+            
+            const intensity = Math.abs(totalY) / params.amplitude;
+            if (intensity > 0.01) {
+                const hue = (1 - intensity) * 240;
+                const rgb = hslToRgb(hue / 360, 1, 0.5);
+                colors[i * 3] = rgb[0];
+                colors[i * 3 + 1] = rgb[1];
+                colors[i * 3 + 2] = rgb[2];
+            } else {
+                colors[i * 3] = 0.3;
+                colors[i * 3 + 1] = 0.3;
+                colors[i * 3 + 2] = 0.3;
+            }
+        }
+        
+        grid.geometry.attributes.position.needsUpdate = true;
+        grid.points.geometry.attributes.position.needsUpdate = true;
+        grid.points.geometry.attributes.color.needsUpdate = true;
+        
+        // Update screen intensity line
+        if (screenActive) {
+            const linePositions = screenLine.geometry.attributes.position.array;
+            const screenZ = params.screenPos;
+            
+            // Smooth decay of old intensities
+            for (let i = 0; i < screenIntensities.length; i++) {
+                screenIntensities[i] *= 0.95;
+            }
+            
+            // Sample intensities at screen position
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                if (Math.abs(node.z - screenZ) < 10) {
+                    const xIndex = Math.floor(((node.x + 450) / 900) * 199);
+                    if (xIndex >= 0 && xIndex < 200) {
+       
+                        screenIntensities[xIndex] = positions[i * 3 + 1];
+                    }
+                }
+            }
+            
+            // Update line positions with intensities
+            const maxIntensity = Math.max(...screenIntensities, 0.1);
+            
+
+            const smoothingRadius = 4; // je größer, desto ruhiger (4–10 ist gut)
+
+            for (let i = 0; i < 200; i++) {
+                let sum = 0;
+                let count = 0;
+
+                for (let j = -smoothingRadius; j <= smoothingRadius; j++) {
+                    const idx = i + j;
+                    if (idx >= 0 && idx < 200) {
+                        sum += screenIntensities[idx];
+                        count++;
+                    }
+                }
+
+                const averaged = sum / count;
+                const normalized = averaged / maxIntensity;
+
+                linePositions[i * 3 + 1] = normalized * 80;
+            }
+
+            screenLine.geometry.attributes.position.needsUpdate = true;
+        }
+    }
+    
+    const radius_c = 800;
+    camera.position.x = Math.sin(rotation.y) * Math.cos(rotation.x) * radius_c;
+    camera.position.y = Math.sin(rotation.x) * radius_c + 800;
+    camera.position.z = Math.cos(rotation.y) * Math.cos(rotation.x) * radius_c;
+    camera.lookAt(0, 0, 0);
+    
+    renderer.render(scene, camera);
+}
+
+function hslToRgb(h, s, l) {
+    let r, g, b;
+    
+    if (s === 0) {
+        r = g = b = l;
+    } else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+        
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+    
+    return [r, g, b];
+}
+
+
+
+    
+

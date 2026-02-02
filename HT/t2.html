@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+div.parent {
+  position: relative;
+  height: 700px ;
+}
+div.absolute {
+  position: absolute;
+  width: 100%;
+  bottom: 1px;
+} 
+</style>
+</head>
+<body>
+    <div class="parent">
+        <div class="absolute" >
+        <img src="http://192.168.129.33/data/Paint/{{msg.fileName}}" alt="CameraJo Picture" style="width:80%"><br>
+        {{msg.fileName}} {{msg.affSlideIndex}}/{{msg.numSlides}} 
+        </div>
+    </div>
+</body>
+</html>
+<!--EXPLICATION  :  https://www.w3schools.com/cssref/tryit.asp?filename=trycss_position_bottom -->
+
+<!-- ////// SIMPLE VERSION //////////
+<style>        
+img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    border:1px solid blue;
+}
+</style>
+<body>
+<div >
+<img src= "/camAlerte/{{msg.fileName}}" alt="Camera Picture"   ><br>
+</div>
+</body>
+</html>

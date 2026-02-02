@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Undatron Labor (Amplitudensteuerung)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #010105; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,30,0.9); padding: 20px; 
+            border-radius: 12px; border: 1px solid #4a9eff; 
+            width: 300px; z-index: 100;
+        }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: #4a9eff; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .highlight { color: #00ffcc; font-weight: bold; }
+        .value-display { float: right; color: #ffcc00; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2 style="margin-top:0; font-size: 18px; color: #ffcc00;">WRZT Labor</h2>
+        
+        <div class="control-group">
+            <label>Abstand (Radius): <span class="value-display" id="radVal">120</span></label>
+            <input type="range" id="radiusSlide" min="0" max="250" value="120">
+        </div>
+
+        <div class="control-group">
+            <label>Amplitude (Wellenstärke): <span class="value-display" id="ampVal">50</span></label>
+            <input type="range" id="ampSlide" min="2" max="200" value="50">
+        </div>
+
+        <div class="control-group">
+            <label>Zeitlupe (Simulationstempo): <span class="value-display" id="speedVal">0.15</span></label>
+            <input type="range" id="speedSlide" min="0.01" max="0.5" step="0.01" value="0.15">
+        </div>
+
+        <div style="font-size: 12px; line-height: 1.6; border-top: 1px solid #333; padding-top: 10px;">
+            Status: <span id="status">Warten auf r_min (50)</span><br>
+            <small><i>Hinweis: Bei r_min wird ein Energiepaket (Undatron) in das Netz emittiert.</i></small>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, gridGeo, lineSegs;
+        let electron, positron;
+        let time = 0;
+        let params = { radius: 120, amplitude: 50, timeScale: 0.15 };
+        let pulses = [];
+
+        // UI Event Listener
+        document.getElementById('radiusSlide').addEventListener('input', (e) => {
+            let oldRad = params.radius;
+            params.radius = parseFloat(e.target.value);
+            document.getElementById('radVal').innerText = params.radius;
+            if (params.radius <= 50 && oldRad > 55) emitUndatron();
+        });
+
+        document.getElementById('ampSlide').addEventListener('input', (e) => {
+            params.amplitude = parseFloat(e.target.value);
+            document.getElementById('ampVal').innerText = params.amplitude;
+        });
+
+        document.getElementById('speedSlide').addEventListener('input', (e) => {
+            params.timeScale = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = params.timeScale;
+        });
+
+        function emitUndatron() {
+            pulses.push({ startTime: time, life: 0, velocity: 6.5, amp: params.amplitude });
+            document.getElementById('status').innerHTML = "<span class='highlight'>Undatron emittiert!</span>";
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.set(350, 450, 550);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            
+            gridGeo = new THREE.PlaneGeometry(1600, 1600, 80, 80);
+            lineSegs = new THREE.LineSegments(
+                new THREE.WireframeGeometry(gridGeo),
+                new THREE.LineBasicMaterial({ color: 0x0066ff, transparent: true, opacity: 0.4 })
+            );
+            lineSegs.rotation.x = -Math.PI / 2;
+            scene.add(lineSegs);
+
+            const sphere = new THREE.SphereGeometry(8, 24, 24);
+            electron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            scene.add(electron, positron);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.1 * params.timeScale;
+            controls.update();
+
+            let rotSpeed = time * (400 / (params.radius + 10)); 
+            let px = Math.cos(rotSpeed) * params.radius;
+            let pz = Math.sin(rotSpeed) * params.radius;
+            electron.position.set(-px, -15, pz);
+            positron.position.set(px, 15, -pz);
+
+            const pos = lineSegs.geometry.attributes.position.array;
+            pulses = pulses.filter(p => (time - p.startTime) < 80);
+
+            for (let i = 0; i < pos.length; i += 3) {
+                let x = pos[i];
+                let z = pos[i + 1];
+                let d1 = Math.sqrt((x - px)**2 + (z - pz)**2);
+                let d2 = Math.sqrt((x + px)**2 + (z + pz)**2);
+                let dCenter = Math.sqrt(x*x + z*z);
+
+                // Krümmung der Teilchen
+                let h = -180 / (d2/6 + 6) + 180 / (d1/6 + 6);
+
+                // Emission der Wellenfront
+                pulses.forEach(p => {
+                    let age = (time - p.startTime);
+                    let waveFrontPos = age * p.velocity;
+                    let distFromFront = Math.abs(dCenter - waveFrontPos);
+                    
+                    // Wellenpaket-Formel
+                    let waveWidth = 25;
+                    let decay = Math.exp(-age * 0.03);
+                    let waveEffect = Math.exp(-(distFromFront**2) / (2 * waveWidth**2)) * p.amp * decay;
+                    h += waveEffect * Math.sin((dCenter - waveFrontPos) * 0.4);
+                });
+                
+                pos[i + 2] = h;
+            }
+
+            // Visuelles Feedback
+            lineSegs.material.opacity = pulses.length > 0 ? 0.7 : 0.3;
+            if(pulses.length > 0) lineSegs.material.color.setHex(0x00ffff);
+            else lineSegs.material.color.setHex(0x0066ff);
+
+            lineSegs.geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

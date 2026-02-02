@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Annäherung & Undatron Emission</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #020205; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #ui { position: absolute; top: 20px; left: 20px; background: rgba(0,0,30,0.8); padding: 15px; border-radius: 10px; border: 1px solid #4a9eff; pointer-events: none; }
+        .red { color: #ff4444; } .blue { color: #4444ff; } .gold { color: #ffcc00; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2>WRZT: Undatron-Entstehung</h2>
+        <p>Phase: <span id="status" class="gold">Annäherung...</span></p>
+        <p><span class="red">●</span> Elektron | <span class="blue">●</span> Positron</p>
+        <p>Radius: <span id="radius">--</span></p>
+        <small>Die Rotation bei r_min erzeugt die Undatron-Welle.</small>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, gridGeometry, lineSegments;
+        let electron, positron;
+        let time = 0;
+        let currentRadius = 250;
+        const r_min = 60; 
+        const gridSize = 50; 
+        const spacing = 12;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.set(400, 300, 500);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            // Raumzeit-Gitter
+            gridGeometry = new THREE.PlaneGeometry(gridSize * spacing, gridSize * spacing, gridSize, gridSize);
+            const wireframe = new THREE.WireframeGeometry(gridGeometry);
+            const material = new THREE.LineBasicMaterial({ color: 0x1133aa, transparent: true, opacity: 0.5 });
+            lineSegments = new THREE.LineSegments(wireframe, material);
+            lineSegments.rotation.x = -Math.PI / 2;
+            scene.add(lineSegments);
+
+            // Teilchen
+            const sphereGeo = new THREE.SphereGeometry(7, 24, 24);
+            electron = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            scene.add(electron, positron);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.04;
+            controls.update();
+
+            // 1. Logik der Annäherung
+            if (currentRadius > r_min) {
+                currentRadius -= 0.5; // Spiralförmige Annäherung
+                document.getElementById('status').innerText = "Annäherung (Inspirale)";
+            } else {
+                currentRadius = r_min;
+                document.getElementById('status').innerText = "Undatron-Emission (Licht)";
+            }
+            document.getElementById('radius').innerText = currentRadius.toFixed(1);
+
+            // Positionen berechnen (Rotation)
+            let speed = currentRadius > r_min ? time * 1.5 : time * 4; // Schneller bei r_min
+            let px1 = Math.cos(speed) * currentRadius;
+            let pz1 = Math.sin(speed) * currentRadius;
+            let px2 = -px1;
+            let pz2 = -pz1;
+
+            electron.position.set(-px1, -10, pz1);
+            positron.position.set(-px2, 10, pz2);
+
+            // 2. Netz-Deformation und Wellen-Emission
+            const positions = lineSegments.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                let x = positions[i];
+                let z = positions[i + 1];
+
+                let dist1 = Math.sqrt((x - px1)**2 + (z - pz1)**2);
+                let dist2 = Math.sqrt((x - px2)**2 + (z - pz2)**2);
+                let distCenter = Math.sqrt(x*x + z*z);
+
+                let elevation = 0;
+
+                // Teilchen-Krümmung (statisch am Ort des Teilchens)
+                elevation += -200 / (dist2 / 5 + 5); 
+                elevation += 200 / (dist1 / 5 + 5);
+
+                // Undatron-Welle (entsteht besonders stark bei r_min Rotation)
+                if (currentRadius <= r_min + 5) {
+                    let wave = Math.sin(distCenter * 0.1 - time * 8) * 15 * Math.exp(-distCenter * 0.005);
+                    elevation += wave;
+                }
+
+                positions[i + 2] = elevation;
+            }
+
+            lineSegments.geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

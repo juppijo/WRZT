@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZNT - Helikales Undatron (Spiralwelle)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,30,0.95); padding: 20px; 
+            border: 2px solid #00f2ff; border-radius: 12px; color: #fff; width: 300px; z-index: 100;
+        }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00f2ff; margin: 10px 0; }
+        .val { float: right; color: #ffcc00; font-weight: bold; }
+        #status { font-weight: bold; text-align: center; color: #00ffcc; display: block; margin-top: 10px; border: 1px solid #333; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2 style="margin:0; font-size: 16px; color: #00f2ff;">WRZNT: Helikale Welle</h2>
+        <div>Radius: <span class="val" id="radVal">150</span></div>
+        <input type="range" id="radiusSlide" min="40" max="250" value="150">
+        
+        <div>Wellen-Drall (Amp): <span class="val" id="ampVal">180</span></div>
+        <input type="range" id="ampSlide" min="20" max="400" value="180">
+        
+        <span id="status">MATERIE-ROTATION</span>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, nodes;
+        let electron, positron;
+        let time = 0, pulses = [], isAnnihilated = false;
+        let params = { radius: 150, amplitude: 180 };
+
+        const gridSize = 14, spacing = 55;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
+            camera.position.set(600, 500, 600);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            const nodeGeo = new THREE.BufferGeometry();
+            const positions = [], colors = [];
+            for (let x = -gridSize/2; x <= gridSize/2; x++) {
+                for (let y = -gridSize/2; y <= gridSize/2; y++) {
+                    for (let z = -gridSize/2; z <= gridSize/2; z++) {
+                        positions.push(x * spacing, y * spacing, z * spacing);
+                        colors.push(0, 0.2, 0.5);
+                    }
+                }
+            }
+            nodeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+            nodeGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            nodes = new THREE.Points(nodeGeo, new THREE.PointsMaterial({ size: 6, vertexColors: true }));
+            scene.add(nodes);
+
+            electron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0x0055ff }));
+            scene.add(electron, positron);
+
+            document.getElementById('radiusSlide').oninput = (e) => {
+                let oldR = params.radius;
+                params.radius = +e.target.value;
+                document.getElementById('radVal').innerText = params.radius;
+                if(params.radius <= 40 && !isAnnihilated) {
+                    isAnnihilated = true;
+                    // Wir speichern den aktuellen Rotationswinkel für den Spiral-Start
+                    pulses.push({ t: time, amp: params.amplitude, startAngle: time % (Math.PI * 2) });
+                    document.getElementById('status').innerText = "SPIRAL-UNDATRON";
+                    document.getElementById('status').style.color = "#ffff00";
+                } else if(params.radius > 45) {
+                    isAnnihilated = false;
+                    document.getElementById('status').innerText = "MATERIE-ROTATION";
+                    document.getElementById('status').style.color = "#00ffcc";
+                }
+            };
+            document.getElementById('ampSlide').oninput = (e) => {
+                params.amplitude = +e.target.value;
+                document.getElementById('ampVal').innerText = params.amplitude;
+            };
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            let rotSpeed = 800 / (params.radius + 15);
+            time += 0.01 * rotSpeed;
+            controls.update();
+
+            let px = Math.cos(time) * params.radius;
+            let pz = Math.sin(time) * params.radius;
+
+            electron.visible = positron.visible = !isAnnihilated;
+            if(!isAnnihilated) {
+                electron.position.set(px, 0, pz);
+                positron.position.set(-px, 0, -pz);
+            }
+
+            const posArr = nodes.geometry.attributes.position.array;
+            const colArr = nodes.geometry.attributes.color.array;
+            pulses = pulses.filter(p => (time - p.t) < 400);
+
+            for (let i = 0; i < posArr.length; i += 3) {
+                let idx = i/3;
+                let ix = (Math.floor(idx / ((gridSize+1)*(gridSize+1))) - gridSize/2) * spacing;
+                let iy = (Math.floor((idx / (gridSize+1)) % (gridSize+1)) - gridSize/2) * spacing;
+                let iz = ((idx % (gridSize+1)) - gridSize/2) * spacing;
+
+                let dx = ix, dy = iy, dz = iz;
+                let energy = 0;
+
+                // 1. Materie-Rotation (Knoten-Zerrung)
+                if(!isAnnihilated) {
+                    let d1 = Math.sqrt((ix-px)**2 + iy**2 + (iz-pz)**2);
+                    let d2 = Math.sqrt((ix+px)**2 + iy**2 + (iz+pz)**2);
+                    let f = (-180 / (d1/10 + 5)) + (180 / (d2/10 + 5));
+                    dy += f;
+                    energy = Math.abs(f) * 0.04;
+                }
+
+                // 2. Das SPIRAL-UNDATRON
+                let distC = Math.sqrt(ix*ix + iy*iy + iz*iz);
+                let angle = Math.atan2(iz, ix); // Der Winkel dieses Netzpunkts
+
+                pulses.forEach(p => {
+                    let age = time - p.t;
+                    let waveR = age * 12; // Ausbreitung nach außen
+                    let d = distC - waveR;
+                    let env = Math.exp(-(d*d) / 3000);
+                    
+                    // SPIRAL-LOGIK: Die Phase hängt vom Winkel und der Distanz ab
+                    // age*0.2 simuliert die Rotation des Pakets während des Flugs
+                    let spiralPhase = angle - (distC * 0.08) + p.startAngle + age * 0.2;
+                    let wave = Math.sin(spiralPhase) * Math.sin(d * 0.15) * p.amp * Math.exp(-age * 0.005);
+                    
+                    let factor = 1 + (env * wave) / 200;
+                    dx *= factor; dy *= factor; dz *= factor;
+                    energy += Math.abs(env * wave) * 0.03;
+                });
+
+                posArr[i] = dx; posArr[i+1] = dy; posArr[i+2] = dz;
+
+                // Heatmap-Farben
+                colArr[i] = Math.min(1, 0.1 + energy * 2.5);
+                colArr[i+1] = Math.min(1, 0.3 + energy * 5);
+                colArr[i+2] = Math.max(0.2, 1.0 - energy);
+            }
+
+            nodes.geometry.attributes.position.needsUpdate = true;
+            nodes.geometry.attributes.color.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+        init();
+    </script>
+</body>
+</html>

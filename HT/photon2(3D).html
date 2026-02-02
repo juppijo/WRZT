@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZNT - 3D Heatmap-Netz</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,30,0.95); padding: 20px; 
+            border-radius: 12px; border: 2px solid #4a9eff; width: 300px; z-index: 100;
+        }
+        input[type=range] { width: 100%; cursor: pointer; margin: 10px 0; }
+        .val { float: right; color: #ffcc00; font-weight: bold; }
+        #status { font-size: 14px; margin-top: 10px; color: #00ffcc; text-align: center; border: 1px dashed #4a9eff; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2 style="margin:0; font-size: 18px; color: #4a9eff;">WRZNT Energiedichte</h2>
+        
+        <div>Radius (r): <span class="val" id="radVal">120</span></div>
+        <input type="range" id="radiusSlide" min="20" max="200" value="100">
+        
+        <div>Intensität (Amp): <span class="val" id="ampVal">50</span></div>
+        <input type="range" id="ampSlide" min="0" max="100" value="50">
+
+        <div id="status">MATERIE AKTIV</div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, gridLines, nodes;
+        let electron, positron;
+        let time = 0;
+        let params = { radius: 100, amplitude: 100 };
+        let pulses = [];
+        let isAnnihilated = false;
+
+        const size = 20; 
+        const spacing = 80;
+        let initialPos = [];
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
+            camera.position.set(500, 500, 700);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            // Gitter-Linien
+            const lineGeo = new THREE.BufferGeometry();
+            const points = [];
+            for (let i = -size/2; i <= size/2; i++) {
+                for (let j = -size/2; j <= size/2; j++) {
+                    points.push(-size/2*spacing, i*spacing, j*spacing, size/2*spacing, i*spacing, j*spacing);
+                    points.push(i*spacing, -size/2*spacing, j*spacing, i*spacing, size/2*spacing, j*spacing);
+                    points.push(i*spacing, j*spacing, -size/2*spacing, i*spacing, j*spacing, size/2*spacing);
+                }
+            }
+            initialPos = new Float32Array(points);
+            lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
+            gridLines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0x000088, transparent: true, opacity: 0.3 }));
+            scene.add(gridLines);
+
+            // Knotenpunkte mit Farbattribut
+            const nodeGeo = new THREE.BufferGeometry();
+            const nodePos = [];
+            const nodeColors = [];
+            for (let x = -size/2; x <= size/2; x++) {
+                for (let y = -size/2; y <= size/2; y++) {
+                    for (let z = -size/2; z <= size/2; z++) {
+                        nodePos.push(x * spacing, y * spacing, z * spacing);
+                        nodeColors.push(0, 0.5, 1); // Startfarbe Blau
+                    }
+                }
+            }
+            nodeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nodePos), 3));
+            nodeGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nodeColors), 3));
+            
+            const nodeMat = new THREE.PointsMaterial({ size: 3, vertexColors: true });
+            nodes = new THREE.Points(nodeGeo, nodeMat);
+            scene.add(nodes);
+
+            // Teilchen
+            electron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            scene.add(electron, positron);
+
+            // Events
+            document.getElementById('radiusSlide').addEventListener('input', (e) => {
+                let oldR = params.radius;
+                params.radius = parseFloat(e.target.value);
+                document.getElementById('radVal').innerText = params.radius;
+                if(params.radius <= 40 && !isAnnihilated) {
+                    isAnnihilated = true;
+                    pulses.push({ startTime: time, velocity: 7, amp: params.amplitude });
+                    document.getElementById('status').innerText = "UNDATRON-EMISSION";
+                    document.getElementById('status').style.color = "#ffff00";
+                } else if(params.radius > 45) isAnnihilated = false;
+            });
+            document.getElementById('ampSlide').addEventListener('input', (e) => {
+                params.amplitude = parseFloat(e.target.value);
+                document.getElementById('ampVal').innerText = params.amplitude;
+            });
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.1;
+            controls.update();
+
+            let px = Math.cos(time*2) * params.radius;
+            let pz = Math.sin(time*2) * params.radius;
+            electron.visible = positron.visible = !isAnnihilated;
+            if(!isAnnihilated) { electron.position.set(px, 0, pz); positron.position.set(-px, 0, -pz); }
+
+            const nodePosArr = nodes.geometry.attributes.position.array;
+            const nodeColArr = nodes.geometry.attributes.color.array;
+            pulses = pulses.filter(p => (time - p.startTime) < 180);
+
+            for (let i = 0; i < nodePosArr.length; i += 3) {
+                // Initialkoordinaten basierend auf Index i
+                let ix = (Math.floor(i/3 / ((size+1)*(size+1))) - size/2) * spacing;
+                let iy = (Math.floor((i/3 / (size+1)) % (size+1)) - size/2) * spacing;
+                let iz = ((i/3 % (size+1)) - size/2) * spacing;
+
+                let dx = ix, dy = iy, dz = iz;
+                let intensity = 0;
+
+                // 1. Materie-Verzerrung
+                if(!isAnnihilated) {
+                    let d1 = Math.sqrt((ix-px)**2 + iy**2 + (iz-pz)**2);
+                    let d2 = Math.sqrt((ix+px)**2 + iy**2 + (iz+pz)**2);
+                    let f1 = -160 / (d1/10 + 5);
+                    let f2 = 160 / (d2/10 + 5);
+                    dy += (f1 + f2);
+                    intensity = (Math.abs(f1) + Math.abs(f2)) * 0.02;
+                }
+
+                // 2. Undatron-Welle
+                let distC = Math.sqrt(ix*ix + iy*iy + iz*iz);
+                pulses.forEach(p => {
+                    let age = time - p.startTime;
+                    let waveR = age * p.velocity;
+                    let dist = distC - waveR;
+                    let envelope = Math.exp(-(dist**2) / 1800);
+                    let waveVal = Math.sin(dist * 0.15) * p.amp * Math.exp(-age * 0.01);
+                    
+                    let factor = 1 + (envelope * waveVal) / 100;
+                    dx *= factor; dy *= factor; dz *= factor;
+                    intensity += Math.abs(envelope * waveVal) * 0.015;
+                });
+
+                nodePosArr[i] = dx; nodePosArr[i+1] = dy; nodePosArr[i+2] = dz;
+
+                // 3. Farbe basierend auf Intensität (Blau -> Türkis -> Gelb -> Weiß)
+                nodeColArr[i] = Math.min(1, 0.1 + intensity * 2);     // R
+                nodeColArr[i+1] = Math.min(1, 0.4 + intensity * 4);   // G
+                nodeColArr[i+2] = Math.min(1, 1.0);                   // B
+            }
+
+            nodes.geometry.attributes.position.needsUpdate = true;
+            nodes.geometry.attributes.color.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

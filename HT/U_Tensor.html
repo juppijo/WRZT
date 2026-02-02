@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensorstruktur von \( U_{\mu\nu}(z, t) \)</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .formula {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1em;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tensorstruktur von \( U_{\mu\nu}(z, t) \) in der Wellenraumzeit-Theorie (WRZT)</h1>
+
+    <div class="section">
+        <h2>1. Einführung</h2>
+        <p>
+            Der Tensor \( U_{\mu\nu}(z, t) \) ist ein <strong>4-dimensionaler Tensor</strong>, der die physikalischen Eigenschaften des <strong>Undatrons</strong> in der <strong>Wellenraumzeit-Theorie (WRZT)</strong> beschreibt. Er kombiniert die <strong>Ruheenergie</strong>, den <strong>Impuls</strong>, die <strong>elektrische Energie</strong> und die <strong>magnetische Energie</strong> in einer konsistenten mathematischen Struktur.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>2. Allgemeine Struktur des Tensors</h2>
+        <p>
+            Der Tensor \( U_{\mu\nu}(z, t) \) hat die folgende Form:
+        </p>
+        <div class="formula">
+            \[
+            U_{\mu\nu}(z, t) = \begin{pmatrix}
+            U_{00} & U_{01} & U_{02} & U_{03} \\
+            U_{10} & U_{11} & U_{12} & U_{13} \\
+            U_{20} & U_{21} & U_{22} & U_{23} \\
+            U_{30} & U_{31} & U_{32} & U_{33}
+            \end{pmatrix}
+            \]
+        </div>
+        <p>
+            Dabei sind:
+        </p>
+        <ul>
+            <li>\(\mu, \nu = 0, 1, 2, 3\) die Indizes für die Raumzeit-Koordinaten (\( t, x, y, z \)),</li>
+            <li>\( U_{\mu\nu} \) die Komponenten des Tensors.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Spezifische Komponenten für das Undatron</h2>
+        <p>
+            Für das Undatron hat der Tensor \( U_{\mu\nu}(z, t) \) die folgende diagonale Form:
+        </p>
+        <div class="formula">
+            \[
+            U_{\mu\nu}(z, t) = \begin{pmatrix}
+            E_0 & 0 & 0 & 0 \\
+            0 & p \cdot c & 0 & 0 \\
+            0 & 0 & E_{\text{elektrisch}}(z, t) & 0 \\
+            0 & 0 & 0 & E_{\text{magnetisch}}(z, t)
+            \end{pmatrix}
+            \]
+        </div>
+
+        <h3>3.1 Zeitachse (\( t \)) – \( U_{00} \)</h3>
+        <p>
+            <strong>Bedeutung:</strong> Die Komponente \( U_{00} \) repräsentiert die <strong>Ruheenergie \( E_0 \)</strong> des Undatrons.
+        </p>
+        <div class="formula">
+            \[
+            E_0 = m_0 c^2
+            \]
+        </div>
+        <p>
+            Dabei ist:
+        </p>
+        <ul>
+            <li>\( m_0 \): Ruhemasse des Teilchens (z. B. eines Elektrons),</li>
+            <li>\( c \): Lichtgeschwindigkeit.</li>
+        </ul>
+
+        <h3>3.2 x-Achse – \( U_{11} \)</h3>
+        <p>
+            <strong>Bedeutung:</strong> Die Komponente \( U_{11} \) repräsentiert den <strong>Impuls \( p \cdot c \)</strong> des Undatrons in der x-Richtung.
+        </p>
+        <div class="formula">
+            \[
+            p \cdot c = \gamma m_0 c^2
+            \]
+        </div>
+        <p>
+            Dabei ist:
+        </p>
+        <ul>
+            <li>\( \gamma \): Lorentz-Faktor,</li>
+            <li>\( v = c \): Geschwindigkeit des Undatrons (Lichtgeschwindigkeit).</li>
+        </ul>
+
+        <h3>3.3 y-Achse – \( U_{22} \)</h3>
+        <p>
+            <strong>Bedeutung:</strong> Die Komponente \( U_{22} \) repräsentiert die <strong>elektrische Energie \( E_{\text{elektrisch}}(z, t) \)</strong>.
+        </p>
+        <div class="formula">
+            \[
+            E_{\text{elektrisch}}(z, t) = \frac{1}{2} \epsilon_0 E_0^2 \cos^2(k(z - ct))
+            \]
+        </div>
+        <p>
+            Dabei ist:
+        </p>
+        <ul>
+            <li>\( \epsilon_0 \): Elektrische Feldkonstante,</li>
+            <li>\( E_0 \): Amplitude des elektrischen Feldes,</li>
+            <li>\( k \): Wellenzahl,</li>
+            <li>\( z \): Ortskoordinate,</li>
+            <li>\( t \): Zeit.</li>
+        </ul>
+
+        <h3>3.4 z-Achse – \( U_{33} \)</h3>
+        <p>
+            <strong>Bedeutung:</strong> Die Komponente \( U_{33} \) repräsentiert die <strong>magnetische Energie \( E_{\text{magnetisch}}(z, t) \)</strong>.
+        </p>
+        <div class="formula">
+            \[
+            E_{\text{magnetisch}}(z, t) = \frac{1}{2 \mu_0} B_0^2 \cos^2(k(z - ct))
+            \]
+        </div>
+        <p>
+            Dabei ist:
+        </p>
+        <ul>
+            <li>\( \mu_0 \): Magnetische Feldkonstante,</li>
+            <li>\( B_0 \): Amplitude des magnetischen Feldes.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Eigenschaften des Tensors</h2>
+        <ol>
+            <li>
+                <strong>Diagonalform:</strong> Der Tensor \( U_{\mu\nu}(z, t) \) ist diagonal, d. h., alle nicht-diagonalen Elemente sind null. Dies bedeutet, dass die verschiedenen Komponenten (Ruheenergie, Impuls, elektrische Energie, magnetische Energie) sich nicht gegenseitig beeinflussen.
+            </li>
+            <li>
+                <strong>Orts- und Zeitabhängigkeit:</strong> Die elektrische und magnetische Energie sind orts- und zeitabhängig, während die Ruheenergie und der Impuls konstant sind.
+            </li>
+            <li>
+                <strong>Physikalische Bedeutung:</strong> Der Tensor beschreibt die <strong>Energieverteilung</strong> des Undatrons in der Raumzeit. Er verbindet die klassischen Konzepte der Energie und des Impulses mit den elektromagnetischen Feldern.
+            </li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>5. Zusammenfassung</h2>
+        <p>
+            Der Tensor \( U_{\mu\nu}(z, t) \) hat die folgende Form:
+        </p>
+        <div class="formula">
+            \[
+            U_{\mu\nu}(z, t) = \begin{pmatrix}
+            E_0 & 0 & 0 & 0 \\
+            0 & p \cdot c & 0 & 0 \\
+            0 & 0 & E_{\text{elektrisch}}(z, t) & 0 \\
+            0 & 0 & 0 & E_{\text{magnetisch}}(z, t)
+            \end{pmatrix}
+            \]
+        </div>
+        <ul>
+            <li><strong>\( U_{00} \):</strong> Ruheenergie \( E_0 = m_0 c^2 \).</li>
+            <li><strong>\( U_{11} \):</strong> Impuls \( p \cdot c = \gamma m_0 c^2 \).</li>
+            <li><strong>\( U_{22} \):</strong> Elektrische Energie \( E_{\text{elektrisch}}(z, t) \).</li>
+            <li><strong>\( U_{33} \):</strong> Magnetische Energie \( E_{\text{magnetisch}}(z, t) \).</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6. Fazit</h2>
+        <p>
+            Der Tensor \( U_{\mu\nu}(z, t) \) ist ein mächtiges Werkzeug, um die physikalischen Eigenschaften des Undatrons in der WRZT zu beschreiben. Er kombiniert Energie, Impuls und elektromagnetische Felder in einer konsistenten mathematischen Struktur. 😊
+        </p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Labor: Undatron & r_min</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; background: #010105; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,30,0.9); padding: 20px; 
+            border-radius: 12px; border: 1px solid #4a9eff; 
+            width: 280px; z-index: 100; box-shadow: 0 0 15px rgba(74,158,255,0.3);
+        }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: #4a9eff; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .stats { font-size: 12px; color: #aaa; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; }
+        .active { color: #00ffcc; text-shadow: 0 0 10px #00ffcc; font-weight: bold; }
+        .red { color: #ff4444; } .blue { color: #4444ff; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h2 style="margin-top:0; font-size: 18px; color: #ffcc00;">WRZT Steuerpult</h2>
+        
+        <div class="control-group">
+            <label>Abstand (Radius): <span id="radVal">120</span></label>
+            <input type="range" id="radiusSlide" min="0" max="250" value="120">
+        </div>
+
+        <div class="control-group">
+            <label>Rotations-Geschwindigkeit: <span id="speedVal">1.5</span></label>
+            <input type="range" id="speedSlide" min="0.1" max="10" step="0.1" value="1.5">
+        </div>
+
+        <div class="stats">
+            Status: <span id="status">Sub-kritisch</span><br>
+            Undatron-Welle: <b id="waveStatus" style="color: #ff4400;">INAKTIV</b><br>
+            <small><i>Emission erfolgt nur bei r_min (50)</i></small>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls, gridGeo, lineSegs;
+        let electron, positron;
+        let time = 0;
+        let params = { radius: 120, speed: 1.5 };
+
+        // UI Event Listener
+        document.getElementById('radiusSlide').addEventListener('input', (e) => {
+            params.radius = parseFloat(e.target.value);
+            document.getElementById('radVal').innerText = params.radius;
+        });
+        document.getElementById('speedSlide').addEventListener('input', (e) => {
+            params.speed = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = params.speed.toFixed(1);
+        });
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.set(400, 350, 500);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            // Gitter (WRZNT-Struktur)
+            gridGeo = new THREE.PlaneGeometry(2000, 2000, 70, 70);
+            const wireframe = new THREE.WireframeGeometry(gridGeo);
+            const material = new THREE.LineBasicMaterial({ color: 0x0066ff, transparent: true, opacity: 0.4 });
+            lineSegs = new THREE.LineSegments(wireframe, material);
+            lineSegs.rotation.x = -Math.PI / 2;
+            scene.add(lineSegs);
+
+            // Teilchen (Knoten)
+            const sphere = new THREE.SphereGeometry(8, 24, 24);
+            electron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+            positron = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            scene.add(electron, positron);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02 * params.speed;
+            controls.update();
+
+            let px = Math.cos(time * 2) * params.radius;
+            let pz = Math.sin(time * 2) * params.radius;
+            
+            electron.position.set(-px, -15, pz);
+            positron.position.set(px, 15, -pz);
+
+            const pos = lineSegs.geometry.attributes.position.array;
+            const isAtRmin = params.radius <= 51;
+            
+            // UI Update
+            const statusEl = document.getElementById('status');
+            const waveEl = document.getElementById('waveStatus');
+            if(isAtRmin) {
+                statusEl.innerText = "KRITISCH (r_min)";
+                statusEl.className = "active";
+                waveEl.innerText = "AKTIV";
+                waveEl.style.color = "#00ffcc";
+            } else {
+                statusEl.innerText = "Sub-kritisch";
+                statusEl.className = "";
+                waveEl.innerText = "INAKTIV";
+                waveEl.style.color = "#ff4444";
+            }
+
+            for (let i = 0; i < pos.length; i += 3) {
+                let x = pos[i];
+                let z = pos[i + 1];
+                let d1 = Math.sqrt((x - px)**2 + (z - pz)**2);
+                let d2 = Math.sqrt((x + px)**2 + (z + pz)**2);
+                let dCenter = Math.sqrt(x*x + z*z);
+
+                // Lokale Raumzeit-Deformation
+                let h = -220 / (d2/6 + 5) + 220 / (d1/6 + 5);
+
+                // Undatron-Welle nur bei minimalem Radius
+                if (isAtRmin) {
+                    // Die Frequenz der Welle ist proportional zur Geschwindigkeit
+                    let waveFreq = 0.1 + (params.speed * 0.02);
+                    let wave = Math.sin(dCenter * waveFreq - time * 10) * (15 * params.speed) * Math.exp(-dCenter * 0.003);
+                    h += wave;
+                }
+                
+                pos[i + 2] = h;
+            }
+
+            // Gitterfarbe anpassen
+            if(isAtRmin) {
+                lineSegs.material.color.setHex(0x888800);
+                lineSegs.material.opacity = 0.6;
+            } else {
+                lineSegs.material.color.setHex(0x0066ff);
+                lineSegs.material.opacity = 0.4;
+            }
+
+            lineSegs.geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>
