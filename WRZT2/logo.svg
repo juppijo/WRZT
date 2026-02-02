@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="200"
+   height="200"
+   version="1.1"
+   id="svg10"
+   sodipodi:docname="Logo.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs14" />
+  <sodipodi:namedview
+     id="namedview12"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="3.805"
+     inkscape:cx="95.532194"
+     inkscape:cy="100"
+     inkscape:window-width="1680"
+     inkscape:window-height="1026"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg10" />
+  <!-- Hintergrundkreis für Raumzeit -->
+  <circle
+     cx="100"
+     cy="100"
+     r="90"
+     fill="none"
+     stroke="#1e90ff"
+     stroke-width="4"
+     id="circle2" />
+  <!-- Symbol für Wellen (sine wave) -->
+  <path
+     d="M 10 100 Q 40 50, 70 100 T 130 100 T 190 100"
+     stroke="#32cd32"
+     stroke-width="3"
+     fill="none"
+     id="path4" />
+  <!-- Kreis im Zentrum als Symbol für einen Photonpunkt -->
+  <circle
+     cx="100"
+     cy="100"
+     r="5"
+     fill="#ff4500"
+     id="circle6" />
+  <circle
+     cx="40.462357"
+     cy="98.919289"
+     r="5"
+     fill="#ff4500"
+     id="circle6-5"
+     style="fill:#0000ff" />
+  <!-- Textbeschriftung -->
+  <text
+     x="31.315166"
+     y="59.740921"
+     font-family="Arial"
+     font-size="16.9359px"
+     fill="#1e90ff"
+     id="text8"
+     transform="scale(0.8377543,1.1936674)"
+     style="stroke-width:1.05849">Wellenraumzeit-Theorie</text>
+</svg>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>WRZT – Tangens-Modell und Lorentz-Faktor</title>
+
+<!-- MathJax für LaTeX-Formeln -->
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+body {
+    background:#0f1318;
+    color:#e6e6e6;
+    font-family:Segoe UI, sans-serif;
+    display:flex;
+    justify-content:center;
+}
+.container {
+    max-width:900px;
+    padding:30px;
+}
+h1, h2 {
+    text-align:center;
+    font-weight:300;
+}
+svg {
+    width:100%;
+    height:420px;
+    background:#151a21;
+    border-radius:18px;
+}
+.control, .values {
+    text-align:center;
+    margin-top:20px;
+}
+.highlight { color:#8fd3ff; }
+.explanation {
+    margin-top:30px;
+    line-height:1.6;
+    font-size:1rem;
+    opacity:0.9;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>WRZT – Tangens-Modell der Bugwelle</h1>
+
+<svg viewBox="0 0 600 400">
+
+    <!-- Achsen -->
+    <line x1="80" y1="320" x2="520" y2="320" stroke="#555"/>
+    <line x1="80" y1="320" x2="80" y2="60" stroke="#555"/>
+    <text x="525" y="325" fill="#aaa">Raum</text>
+    <text x="60" y="55" fill="#aaa">Zeit</text>
+
+    <!-- Dreieck -->
+    <line id="base" stroke="#8fd3ff" stroke-width="3"/>
+    <line id="vertical" stroke="#9effc6" stroke-width="3"/>
+    <line id="hyp" stroke="#ffd28f" stroke-width="3"/>
+
+    <!-- Tangente -->
+    <line id="tanLine" stroke="#ff6f91" stroke-width="3"/>
+    <text id="tanLabel" fill="#ff6f91">tan(α)</text>
+
+    <!-- Winkelbogen -->
+    <path id="arc" fill="none" stroke="#ffd28f" stroke-width="2"/>
+    <text id="alphaLabel" fill="#ffd28f">α</text>
+</svg>
+
+<div class="control">
+v / c<br>
+<input type="range" min="0" max="0.99" step="0.01" value="0.4" id="speed">
+</div>
+
+<div class="values" id="values"></div>
+
+<div class="explanation">
+<h2>Herleitung des Lorentz-Faktors \(\gamma\)</h2>
+
+<p>
+Das Dreieck entsteht als Schnitt durch den <strong>Wellenkegel eines bewegten Teilchens</strong> im Raum-Netz.
+</p>
+
+<ul>
+<li><span class="highlight">Hypotenuse \(c\)</span>: maximale Wellenausbreitung des Raums</li>
+<li><span class="highlight">Gegenkathete \(v\)</span>: Vorwärtsbewegung des Teilchens</li>
+<li><span class="highlight">Ankathete \(\sqrt{c^2 - v^2}\)</span>: verbleibende Raum-/Zeit-Kapazität</li>
+</ul>
+
+<p>
+Aus dem Dreieck folgt direkt:
+</p>
+
+<p>
+<b>1. Winkel \(\alpha\) berechnen:</b><br>
+\[
+\sin(\alpha) = \frac{v}{c} \quad \Rightarrow \quad \alpha = \arcsin\frac{v}{c}
+\]
+</p>
+
+<p>
+<b>2. Tangens des Winkels:</b><br>
+\[
+\tan(\alpha) = \frac{v}{\sqrt{c^2 - v^2}}
+\]
+Diese Tangente beschreibt die Steilheit der Bugwelle.
+</p>
+
+<p>
+<b>3. Lorentz-Faktor \(\gamma\):</b><br>
+\[
+\gamma = \frac{\text{Hypotenuse}}{\text{Ankathete}} = \frac{c}{\sqrt{c^2 - v^2}} = \frac{1}{\sqrt{1 - (v/c)^2}}
+\]
+</p>
+
+<p>
+Physikalisch bedeutet \(\gamma\) in der WRZT:  
+<em>„Wie stark der Raum vor dem Wellenpaket verdichtet werden muss, um die Bewegung zu tragen.“</em>
+</p>
+
+<p>
+Zeitdilatation und Längenkontraktion folgen direkt als Projektionen der Bugwelle.
+</p>
+
+</div>
+
+<script>
+const speed = document.getElementById("speed");
+const base = document.getElementById("base");
+const vertical = document.getElementById("vertical");
+const hyp = document.getElementById("hyp");
+const tanLine = document.getElementById("tanLine");
+const tanLabel = document.getElementById("tanLabel");
+const arc = document.getElementById("arc");
+const alphaLabel = document.getElementById("alphaLabel");
+const values = document.getElementById("values");
+
+function update() {
+    const v = parseFloat(speed.value);
+    const c = 1;
+
+    // 1️⃣ Sin zuerst
+    const alpha = Math.asin(v / c);
+    const rest = Math.sqrt(c*c - v*v);  // Ankathete
+    const tan = v / rest;
+    const gamma = c / rest;
+
+    const scale = 220;
+    const ox = 80;
+    const oy = 320;
+
+    const bx = ox + v * scale;
+    const vy = oy - rest * scale;
+
+    // Dreieck
+    base.setAttribute("x1", ox);
+    base.setAttribute("y1", oy);
+    base.setAttribute("x2", bx);
+    base.setAttribute("y2", oy);
+
+    vertical.setAttribute("x1", ox);
+    vertical.setAttribute("y1", oy);
+    vertical.setAttribute("x2", ox);
+    vertical.setAttribute("y2", vy);
+
+    hyp.setAttribute("x1", ox);
+    hyp.setAttribute("y1", vy);
+    hyp.setAttribute("x2", bx);
+    hyp.setAttribute("y2", oy);
+
+    // Tangente sichtbar
+    const tx = ox + rest * scale;
+    const ty = oy - v * scale;
+    tanLine.setAttribute("x1", ox);
+    tanLine.setAttribute("y1", oy);
+    tanLine.setAttribute("x2", tx);
+    tanLine.setAttribute("y2", ty);
+    tanLabel.setAttribute("x", tx + 5);
+    tanLabel.setAttribute("y", ty - 5);
+
+    // Winkelbogen
+    const r = 40;
+    arc.setAttribute(
+        "d",
+        `M ${ox+r} ${oy} A ${r} ${r} 0 0 0 ${ox+r*Math.cos(alpha)} ${oy-r*Math.sin(alpha)}`
+    );
+    alphaLabel.setAttribute("x", ox + 30);
+    alphaLabel.setAttribute("y", oy - 10);
+
+    // Werte anzeigen
+    values.innerHTML = `
+        \\(\\sin(\\alpha) = v/c = ${(v/c).toFixed(2)}\\)<br>
+        \\(\\alpha = ${(alpha*180/Math.PI).toFixed(1)}^\\circ\\)<br>
+        \\(\\tan(\\alpha) = ${tan.toFixed(3)}\\)<br>
+        \\(\\gamma = ${gamma.toFixed(3)}\\)
+    `;
+    MathJax.typesetPromise(); // Formeln rendern
+}
+
+speed.addEventListener("input", update);
+update();
+</script>
+
+</div>
+</body>
+</html>
