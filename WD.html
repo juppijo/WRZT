@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DFRT & WRZT – Feld, Raumzeit und Licht</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --hue-main: 210;
+      --hue-accent: 280;
+      --bg: hsl(var(--hue-main), 40%, 8%);
+      --card: hsl(var(--hue-main), 35%, 14%);
+      --text: hsl(var(--hue-main), 20%, 90%);
+      --muted: hsl(var(--hue-main), 15%, 65%);
+      --accent: hsl(var(--hue-accent), 70%, 65%);
+      --glow: hsla(var(--hue-accent), 80%, 70%, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, hsl(var(--hue-main),40%,12%), var(--bg));
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(120deg, var(--accent), #7fd7ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    details {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      transition: all 0.4s ease;
+    }
+
+    details[open] {
+      box-shadow: 0 0 35px var(--glow);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--accent);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    summary::marker { display: none; }
+
+    summary::before {
+      content: "✦";
+      font-size: 1.1rem;
+      transition: transform 0.4s ease;
+    }
+
+    details[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .content {
+      margin-top: 1rem;
+      color: var(--text);
+    }
+
+    .content p {
+      margin: 0.6rem 0;
+    }
+
+    .highlight {
+      color: #aee7ff;
+      font-weight: 500;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 2rem; }
+      body { padding: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['\\(','\\)'], ['$', '$']] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <h1>DFRT & WRZT</h1>
+  <p>
+    Eine zusammenhängende Darstellung der <span class="highlight">Dynamischen Feld‑Relaxations‑Theorie</span>
+    und der <span class="highlight">Wellen‑Raumzeit‑Theorie</span> –
+    zwei Perspektiven auf dasselbe Phänomen: Licht als Antwort auf extreme Dynamik.
+  </p>
+</header>
+
+<div class="container">
+
+  <details>
+    <summary>1 · Ausgangsfrage</summary>
+    <div class="content">
+      <p>
+        Was geschieht wirklich, wenn sich Elektron und Positron extrem annähern?
+        Verschwindet Materie – oder entspannt sich eine zuvor gespeicherte Struktur?
+      </p>
+      <p>
+        Diese Frage bildet den gemeinsamen Ursprung von DFRT und WRZT.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>2 · Dynamische Feld‑Relaxations‑Theorie (DFRT)</summary>
+    <div class="content">
+      <p>
+        In der DFRT sind Elektron und Positron keine Punktobjekte, sondern
+        <span class="highlight">stabile Feldkonfigurationen</span>.
+      </p>
+      <p>
+        Ihre Masse entspricht gespeicherter Feldspannung. Bei kritischer Annäherung
+        kollabiert diese Struktur dynamisch – ohne Berührung, ohne Vernichtung.
+      </p>
+      <p>
+        Die entstehende Energie erscheint als <span class="highlight">zwei Photonen</span>,
+        hervorgebracht durch Feld‑Relaxation und Symmetrie.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>3 · Wellen‑Raumzeit‑Theorie (WRZT)</summary>
+    <div class="content">
+      <p>
+        Die WRZT verlagert den Fokus auf die <span class="highlight">Raumzeit selbst</span>.
+        Teilchen regen durch Beschleunigung, Rotation oder Annäherung hochfrequente
+        Raumzeitmoden an.
+      </p>
+      <p>
+        Diese Moden – die <span class="highlight">Undatronen</span> – werden als Licht
+        wahrgenommen. Licht ist damit keine elektromagnetische Grundgröße,
+        sondern eine Raumzeitantwort auf extreme Dynamik.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>4 · Vergleich: DFRT vs. WRZT</summary>
+    <div class="content">
+      <p><span class="highlight">DFRT:</span> Energie sitzt primär im Feld. Photonen sind Relaxationsmoden.</p>
+      <p><span class="highlight">WRZT:</span> Energie sitzt primär in der Raumzeit. Undatronen sind Wellen der Krümmung.</p>
+      <p>
+        Beide Theorien lehnen echte Vernichtung ab und ersetzen sie durch
+        <span class="highlight">Umschichtung von Struktur</span>.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>5 · Gemeinsame Deutung</summary>
+    <div class="content">
+      <p>
+        Ein Photon der DFRT und ein Undatron der WRZT können als
+        <span class="highlight">zwei Beschreibungen desselben Ereignisses</span>
+        verstanden werden – einmal feldintern, einmal geometrisch.
+      </p>
+      <p>
+        Feld entspannt sich. Raum antwortet. Licht entsteht.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>6 · Kernaussage</summary>
+    <div class="content">
+      <p>
+        Materie ist keine feste Substanz, sondern gehaltene Spannung.
+        Licht ist kein Teilchenfluss, sondern freigesetzte Ordnung.
+      </p>
+      <p class="highlight">
+        Nichts verschwindet – alles wandelt seine Form.
+      </p>
+    </div>
+  </details>
+
+</div>
+
+<details>
+  <summary>7 · Mathematischer Kern (Formeln)</summary>
+  <div class="content">
+
+    <p><span class="highlight">Coulomb-Kraft</span> zwischen Elektron und Positron:</p>
+    <p>
+      \[
+      F(r) = \frac{1}{4\pi\varepsilon_0}\,\frac{e^2}{r^2}
+      \]
+    </p>
+
+    <p><span class="highlight">Relativistische Bewegungsgleichung:</span></p>
+    <p>
+      \[
+      \frac{d}{dt}(\gamma m v) = F(r),
+      \qquad
+      \gamma = \frac{1}{\sqrt{1 - v^2/c^2}}
+      \]
+    </p>
+
+    <p><span class="highlight">Relativistische Entschleunigung:</span></p>
+    <p>
+      \[
+      a = \frac{F}{\gamma^3 m}
+      \]
+    </p>
+
+    <p><span class="highlight">Abgestrahlte Leistung</span> (Larmor, relativistisch):</p>
+    <p>
+      \[
+      P = \frac{e^2}{6\pi\varepsilon_0 c^3}\,\gamma^6 a^2
+      \]
+    </p>
+
+    <p>
+      Daraus folgt für reine Coulomb-Entschleunigung:
+    </p>
+    <p>
+      \[
+      E_{\text{rad}} \ll m c^2
+      \]
+    </p>
+
+    <p><span class="highlight">DFRT-Postulat:</span></p>
+    <p>
+      \[
+      E_{\text{Feld}} = m c^2
+      \]
+    </p>
+
+    <p>
+      Beim dynamischen Feldkollaps:
+    </p>
+    <p>
+      \[
+      2 h \nu = 2 m c^2
+      \]
+    </p>
+
+    <p><span class="highlight">WRZT-Sicht:</span></p>
+    <p>
+      \[
+      \Box g_{\mu\nu} \sim \mathcal{U}_{\mu\nu}
+      \]
+    </p>
+
+    <p class="highlight">
+      Gleiche Energie – zwei Ebenen der Beschreibung.
+    </p>
+
+  </div>
+</details>
+
+<footer>
+  <p>DFRT · WRZT · Feld · Raumzeit · Licht</p>
+</footer>
+
+</body>
+</html>

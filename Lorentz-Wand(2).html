@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>LWT Labor v6 - Multi-Teilchen Interaktion</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Segoe UI', sans-serif; }
+        #ui {
+            position: absolute; top: 20px; left: 20px; color: #00ffcc;
+            background: rgba(0, 10, 20, 0.9); padding: 20px; border-radius: 12px;
+            border: 1px solid #00ffcc; z-index: 100; width: 280px; pointer-events: auto;
+        }
+        h1 { margin: 0 0 10px 0; font-size: 16px; text-transform: uppercase; color: #ffcc00; }
+        button { width: 100%; padding: 8px; margin-top: 5px; cursor: pointer; font-weight: bold; background: #00ffcc; border: none; border-radius: 4px; }
+        .stat { font-family: monospace; font-size: 12px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; }
+        #hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #00ffcc; font-size: 14px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 1px solid #00ffcc; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h1>LWT - Multi-Knoten</h1>
+    <button id="pauseBtn" style="background: #ffcc00;">PAUSE</button>
+    <button id="clearBtn">ALLE TEILCHEN LÖSCHEN</button>
+    <div class="stat">
+        Teilchen im Netz: <span id="count" style="color:white">1</span><br>
+        Status: <span id="eventLog" style="color:#00ffcc">Labor bereit</span>
+    </div>
+</div>
+
+<div id="hint">Doppelklick: Neues Teilchen platzieren | Maus: Kamera</div>
+
+<script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    camera.position.set(40, 40, 40);
+
+    // RAUMZEIT-NETZ
+    const divisions = 100;
+    const geo = new THREE.PlaneGeometry(70, 70, divisions, divisions);
+    geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count * 3), 3));
+    const mat = new THREE.MeshStandardMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.4 });
+    const net = new THREE.Mesh(geo, mat);
+    net.rotation.x = -Math.PI / 2;
+    scene.add(net);
+    scene.add(new THREE.AmbientLight(0x444444));
+    const light = new THREE.PointLight(0xffffff, 2000); light.position.set(0,40,0); scene.add(light);
+
+    // LWT VARIABLEN
+    let time = 0, dist = 30, phase = "ANFLUG", isPaused = false;
+    let waves = [];
+    let particles = [{ x: 15, y: 0, vX: 0, vY: 0, active: true }];
+
+    // DOPPELKLICK INTERAKTION
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    window.addEventListener('dblclick', (event) => {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(net);
+        if (intersects.length > 0) {
+            const p = intersects[0].point;
+            // Wir wandeln 3D Welt-Koord zurück in 2D Netz-Koord (da Netz rotiert ist)
+            particles.push({ x: p.x, y: -p.z, vX: 0, vY: 0, active: true });
+            document.getElementById('count').innerText = particles.length;
+        }
+    });
+
+    document.getElementById('pauseBtn').onclick = () => { isPaused = !isPaused; document.getElementById('pauseBtn').innerText = isPaused ? "PLAY" : "PAUSE"; };
+    document.getElementById('clearBtn').onclick = () => { particles = []; document.getElementById('count').innerText = "0"; };
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if (isPaused) return;
+
+        time += 0.015;
+        const pos = geo.attributes.position;
+        const col = geo.attributes.color;
+
+        // LWT: Anflug & Wand
+        if (phase === "ANFLUG") {
+            dist -= 0.12;
+            if (dist <= 1.5) {
+                phase = "WAND";
+                waves.push({ r: 1.5, life: 6.0 });
+                document.getElementById('eventLog').innerText = "WAND-AUFPRALL!";
+                setTimeout(() => { phase = "FREI"; }, 600);
+            }
+        }
+
+        // Teilchen-Wellen Interaktion
+        particles.forEach(p => {
+            waves.forEach(w => {
+                const distToCenter = Math.sqrt(p.x*p.x + p.y*p.y);
+                const dToWave = Math.abs(distToCenter - w.r);
+                if (dToWave < 0.6 && p.active) {
+                    // Impulsübertrag: Teilchen wird nach außen gestoßen
+                    const angle = Math.atan2(p.y, p.x);
+                    p.vX = Math.cos(angle) * 0.2;
+                    p.vY = Math.sin(angle) * 0.2;
+                    p.active = false; // "Gezündet"
+                    w.life *= 0.85; // Energieverlust der Welle
+                }
+            });
+            p.x += p.vX; p.y += p.vY;
+        });
+
+        // Netz-Deformation
+        for (let i = 0; i < pos.count; i++) {
+            let px = pos.getX(i), py = pos.getY(i), z = 0;
+            
+            // Ur-Teilchen an der Wand
+            if (phase !== "FREI") {
+                const d1 = Math.sqrt((px - dist)**2 + py**2);
+                const d2 = Math.sqrt((px + dist)**2 + py**2);
+                z -= 5.0 / (d1 + 1.5); // Elektron (-)
+                z += 5.0 / (d2 + 1.5); // Positron (+)
+            }
+
+            // Alle platzierten Teilchen (Materie-Knoten)
+            particles.forEach(p => {
+                const dp = Math.sqrt((px - p.x)**2 + (py - p.y)**2);
+                z -= 4.0 / (dp + 1.2);
+            });
+
+            // Undatron Wellen
+            waves.forEach(w => {
+                const dc = Math.sqrt(px*px + py*py);
+                const env = Math.exp(-Math.pow(dc - w.r, 2) * 0.4);
+                z += Math.sin(dc * 10 - time * 40) * env * w.life;
+            });
+
+            pos.setZ(i, z);
+            
+            // Farbe
+            let r=0.1, g=0.2, b=0.4;
+            if (z < -0.5) { b += Math.abs(z)*0.2; } else if (z > 0.5) { r += z*0.2; }
+            if (Math.abs(z) > 1.5) { r += 0.2; g += 0.2; }
+            col.setXYZ(i, r, g, b);
+        }
+
+        waves.forEach(w => { w.r += 0.28; w.life *= 0.995; });
+        if (waves.length > 0 && waves[0].life < 0.05) { 
+            waves = []; dist = 30; phase = "ANFLUG"; 
+            particles.forEach(p => p.active = true); // Sensor-Reset
+        }
+
+        pos.needsUpdate = true; col.needsUpdate = true;
+        renderer.render(scene, camera);
+    }
+    animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZNT - Labor v4 (Pause & Dualität)</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Segoe UI', sans-serif; }
+        #ui {
+            position: absolute; top: 20px; left: 20px; color: #00ffcc;
+            background: rgba(0, 10, 20, 0.9); padding: 20px; border-radius: 12px;
+            border: 1px solid #00ffcc; box-shadow: 0 0 20px rgba(0,255,204,0.3);
+            z-index: 100; width: 280px; pointer-events: auto;
+        }
+        h1 { margin: 0 0 10px 0; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #00ffcc; padding-bottom: 5px; }
+        .control-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; margin-bottom: 3px; color: #aaa; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00ffcc; }
+        .btn-row { display: flex; gap: 5px; margin-top: 10px; }
+        button { 
+            flex: 1; padding: 10px; background: #00ffcc; border: none; border-radius: 5px; 
+            color: #000; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        button:hover { background: #fff; box-shadow: 0 0 15px #00ffcc; }
+        #pauseBtn { background: #ffcc00; }
+        .stat { font-family: monospace; font-size: 13px; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; line-height: 1.5; }
+        #hint { position: absolute; bottom: 10px; right: 10px; color: #777; font-size: 12px; }
+        .e-minus { color: #0088ff; } .e-plus { color: #ff4444; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h1>WRZNT Labor v4</h1>
+    <div style="font-size: 11px; margin-bottom: 10px;">
+        <span class="e-minus">● Elektron (-)</span> | <span class="e-plus">● Positron (+)</span>
+    </div>
+
+    <div class="control-group">
+        <label>Anflug-Winkel</label>
+        <input type="range" id="angleRange" min="0" max="90" value="90">
+    </div>
+
+    <div class="control-group">
+        <label>Geschwindigkeit (v/c)</label>
+        <input type="range" id="speedRange" min="1" max="15" value="7">
+    </div>
+
+    <div class="control-group">
+        <label>Netz-Steifigkeit</label>
+        <input type="range" id="tensionRange" min="5" max="100" value="40">
+    </div>
+
+    <div class="btn-row">
+        <button id="pauseBtn">PAUSE</button>
+        <button id="fullscreenBtn">FS</button>
+    </div>
+
+    <div class="stat">
+        Phase: <span id="phase" style="color:white">-</span><br>
+        Abstand: <span id="radius" style="color:#00ffcc">0</span> r_min
+    </div>
+</div>
+
+<div id="hint">Orbit: Links drehen | Rechts schieben | Rad zoomen</div>
+
+<script type="importmap">
+    { 
+        "imports": { 
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        } 
+    }
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    const divisions = 100;
+    const geometry = new THREE.PlaneGeometry(60, 60, divisions, divisions);
+    geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(geometry.attributes.position.count * 3), 3));
+    const material = new THREE.MeshStandardMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+    const net = new THREE.Mesh(geometry, material);
+    net.rotation.x = -Math.PI / 2;
+    scene.add(net);
+
+    scene.add(new THREE.AmbientLight(0x333333));
+    const light = new THREE.PointLight(0xffffff, 2000);
+    light.position.set(0, 40, 0);
+    scene.add(light);
+
+    camera.position.set(40, 30, 40);
+
+    let time = 0;
+    let dist = 25;
+    let phase = "ANFLUG";
+    let waves = [];
+    let isPaused = false;
+    
+    const pauseBtn = document.getElementById('pauseBtn');
+    pauseBtn.addEventListener('click', () => {
+        isPaused = !isPaused;
+        pauseBtn.innerText = isPaused ? "PLAY" : "PAUSE";
+        pauseBtn.style.background = isPaused ? "#00ffcc" : "#ffcc00";
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+
+        if (isPaused) {
+            renderer.render(scene, camera);
+            return;
+        }
+
+        let moveSpeed = document.getElementById('speedRange').value / 100;
+        let angleRad = (document.getElementById('angleRange').value * Math.PI) / 180;
+        let tension = document.getElementById('tensionRange').value / 10;
+        
+        time += (phase === "AUFPRALL") ? 0.003 : 0.015;
+
+        const pos = geometry.attributes.position;
+        const col = geometry.attributes.color;
+
+        if (phase === "ANFLUG") {
+            dist -= moveSpeed;
+            document.getElementById('phase').innerText = "Kontraktion";
+            if (dist <= 1.5) phase = "AUFPRALL";
+        } else if (phase === "AUFPRALL") {
+            document.getElementById('phase').innerText = "Lorentz-Wand";
+            if (waves.length === 0) {
+                waves.push({ r: 1.5, life: 5.0, angle: angleRad });
+                setTimeout(() => { if(!isPaused) phase = "RELAX"; }, 600);
+            }
+        }
+        document.getElementById('radius').innerText = (dist / 1.5).toFixed(2);
+
+        for (let i = 0; i < pos.count; i++) {
+            let px = pos.getX(i); let py = pos.getY(i);
+            let tx = dist * Math.cos(angleRad); let ty = dist * Math.sin(angleRad);
+
+            let z = 0;
+            const d1 = Math.sqrt((px - tx)**2 + (py - ty)**2);
+            const d2 = Math.sqrt((px + tx)**2 + (py + ty)**2);
+            const dCenter = Math.sqrt(px*px + py*py);
+
+            if (phase !== "RELAX") {
+                z -= 6.0 / (d1 + 1.5); // Elektron (-)
+                z += 6.0 / (d2 + 1.5); // Positron (+)
+                z += 2.0 * Math.exp(-Math.pow(d1 - 0.5, 2) * 4); // Bugwelle -
+                z -= 2.0 * Math.exp(-Math.pow(d2 - 0.5, 2) * 4); // Bugwelle +
+            }
+
+            let waveZ = 0;
+            waves.forEach(w => {
+                let distortX = 1.0 + Math.abs(Math.cos(w.angle));
+                let distortY = 1.0 + Math.abs(Math.sin(w.angle));
+                const dEllipse = Math.sqrt((px/distortX)**2 + (py/distortY)**2);
+                const envelope = Math.exp(-Math.pow(dEllipse - w.r, 2) * (tension/15));
+                waveZ += Math.sin(dEllipse * 12 - time * 40) * envelope * w.life;
+            });
+            z += waveZ;
+
+            pos.setZ(i, z);
+            let r = 0.1, g = 0.2, b = 0.5;
+            if (phase !== "RELAX") {
+                if (d1 < 4) b += (1 - d1/4) * 0.5;
+                if (d2 < 4) r += (1 - d2/4) * 0.8;
+            }
+            let intensity = Math.abs(waveZ) * 0.6;
+            r += intensity * 1.5; g += intensity * 1.2; b -= intensity * 0.5;
+            col.setXYZ(i, r, g, b);
+        }
+
+        waves.forEach(w => { w.r += 0.28; w.life *= 0.99; });
+        if (waves.length > 0 && waves[0].life < 0.05) {
+            waves = []; dist = 25; phase = "ANFLUG";
+        }
+
+        pos.needsUpdate = true; col.needsUpdate = true;
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+    });
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
+</body>
+</html>

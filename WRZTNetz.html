@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>WRZT – Zusammenfassung</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: #fdf6e3;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #b58900;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #cb4b16;
+    }
+    pre {
+      background-color: #eee8d5;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    .equation {
+      text-align: center;
+      margin: 1rem 0;
+      font-size: 1.1rem;
+    }
+    canvas {
+      display: block;
+      margin: 2rem auto;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>WRZT – Mechanik des Raum-Netzes</h1>
+</header>
+<main>
+  <section>
+    <h2>1. Raum als elastisches Netz</h2>
+    <p>In der WRZT wird der Raum als elastisches Netz betrachtet. Jede lokale Auslenkung wird durch ein Feld \\(\psi(\vec x,t)\\) beschrieben. Die Energie des Raums lautet:</p>
+    <div class="equation"> 
+      $$\mathcal{E}(\psi) = \frac{1}{2}\rho_\text{Raum}(\psi)\left(\frac{\partial \psi}{\partial t}\right)^2 + \frac{1}{2}K_\text{Raum}(\psi)\left(\nabla \psi\right)^2$$
+    </div>
+    <p>Die Wellengeschwindigkeit im Netz:</p>
+    <div class="equation">
+      $$c = \sqrt{\frac{K_\text{Raum}}{\rho_\text{Raum}}}$$
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Impedanz des Raums</h2>
+    <p>Die Impedanz beschreibt den Widerstand des Netzes gegen Schwingungen:</p>
+    <div class="equation">
+      $$Z_\text{Raum} = \rho_\text{Raum} c = \sqrt{K_\text{Raum}\rho_\text{Raum}}$$
+    </div>
+    <p>Proportional zur Raumwölbung \\(\mathcal{U}\\):</p>
+    <div class="equation">
+      $$Z(\mathcal{U}) = Z_0 e^{\alpha \mathcal{U}}$$
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Dynamik von Teilchen und Licht</h2>
+    <p>Impulsänderung durch Impedanzgradient:</p>
+    <div class="equation">
+      $$\frac{d\vec p}{dt} = -E \nabla \Phi, \quad \Phi = \ln \frac{Z}{Z_0} = \alpha \mathcal{U}$$
+    </div>
+    <p>Für langsame Teilchen:</p>
+    <div class="equation">
+      $$\vec a = -c^2 \alpha \nabla \mathcal{U}$$
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Feldgleichung</h2>
+    <p>Materie erzeugt die Raumwölbung:</p>
+    <div class="equation">
+      $$\nabla^2 \mathcal{U} = \frac{4 \pi G}{c^2 \alpha} \rho_m$$
+    </div>
+    <p>Punktmasse \(M\) ergibt:</p>
+    <div class="equation">
+      $$\mathcal{U}(r) = -\frac{GM}{c^2 \alpha r}$$
+    </div>
+  </section>
+
+  <section>
+    <h2>5. Lichtablenkung um eine Masse</h2>
+    <p>Gradient des Impedanzfeldes:</p>
+    <div class="equation">
+      $$\nabla \Phi = \frac{GM}{c^2 r^2} \hat r$$
+    </div>
+    <p>Ablenkung eines Strahls mit minimalem Abstand \(b\):</p>
+    <div class="equation">
+      $$\delta \theta = \frac{2 GM}{c^2 b}$$
+    </div>
+    <p>Die Geschwindigkeit bleibt konstant, nur die Richtung ändert sich.</p>
+  </section>
+
+  <section>
+    <h2>6. Visualisierung</h2>
+    <canvas id="wrztCanvas" width="600" height="400"></canvas>
+    <script>
+      const canvas = document.getElementById('wrztCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Hintergrund
+      ctx.fillStyle = '#fdf6e3';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      // Masse in der Mitte
+      const cx = canvas.width/2;
+      const cy = canvas.height/2;
+      const massRadius = 10;
+      ctx.fillStyle = '#b58900';
+      ctx.beginPath();
+      ctx.arc(cx,cy,massRadius,0,Math.PI*2);
+      ctx.fill();
+
+      // Lichtstrahlen
+      ctx.strokeStyle = '#268bd2';
+      ctx.lineWidth = 2;
+      for(let i=-150; i<=150; i+=30){
+        let x0 = 0;
+        let y0 = cy+i;
+        ctx.beginPath();
+        ctx.moveTo(x0,y0);
+
+        // einfache Ablenkung simulieren
+        for(let x=x0; x<=canvas.width; x+=5){
+          let dx = cx - x;
+          let dy = cy - (y0+(x-x0)/5);
+          let r = Math.sqrt(dx*dx + dy*dy);
+          let theta = 0.4*(massRadius/r);
+          y0 += theta;
+          ctx.lineTo(x,y0+i/10);
+        }
+        ctx.stroke();
+      }
+
+      // Beschriftung
+      ctx.fillStyle = '#cb4b16';
+      ctx.font = '16px sans-serif';
+      ctx.fillText('Masse', cx-20, cy-15);
+    </script>
+  </section>
+
+  <footer style="text-align:center; margin-top:2rem; color:#586e75;">
+    &copy; WRZT – Visualisierung für Buchprojekt
+  </footer>
+</main>
+</body>
+</html>
