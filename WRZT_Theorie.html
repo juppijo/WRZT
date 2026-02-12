@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Das Trägheits-Gesetz der Wellenraumzeit</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        enableMenu: false
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f0f2f5;
+        }
+        .paper {
+            background-color: #ffffff;
+            padding: 50px;
+            border-radius: 2px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 8px solid #c0392b;
+        }
+        h1 {
+            color: #c0392b;
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 0.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        h2 {
+            color: #2980b9;
+            border-left: 4px solid #2980b9;
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+        .formula {
+            background-color: #fdfcfb;
+            border: 1px solid #ede7e1;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.25em;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        th {
+            background-color: #2980b9;
+            color: white;
+            padding: 15px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        .quote {
+            background: #f9f9f9;
+            border-left: 10px solid #ccc;
+            margin: 1.5em 10px;
+            padding: 0.5em 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="paper">
+    <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+    <div class="subtitle">Wissenschaftliches Protokoll: Jup & Zaminia | 2026</div>
+
+    <h2>1. Die fundamentale Trägheit der Raumzeit (\(\eta\))</h2>
+    <p>In der WRZT wird die Trägheit des Vakuums über das Verhältnis von übertragener Energie zur transversalen Geschwindigkeit definiert. Die Herleitung ergibt eine Konstante:</p>
+    
+    <div class="formula">
+        \[ \eta = \frac{\Delta E}{v_{\perp}^2} = \frac{1}{2} m_e \]
+    </div>
+
+    <p>Mit der Ruhemasse des Elektrons \(m_e \approx 9,109 \times 10^{-31} \text{ kg}\) folgt daraus für die spezifische Raumzeit-Trägheit:</p>
+    
+    <div class="formula">
+        \[ \eta \approx 4,554 \times 10^{-31} \text{ kg} \]
+    </div>
+
+    <h2>2. H-Alpha Analyse und spektrale Konsistenz</h2>
+    <p>Berechnungen für die Wasserstoff-Alpha-Linie (\(n=3 \to n=2\)) bei \(\lambda \approx 656,3 \text{ nm}\):</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Frequenz-Bereich</th>
+                <th>Energie \(\Delta E\)</th>
+                <th>Transv. Geschw. \(v_{\perp}\)</th>
+                <th>Trägheit \(\eta\)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Radio (100 MHz)</td>
+                <td>\(6,63 \times 10^{-26} \text{ J}\)</td>
+                <td>\(381,6 \text{ m/s}\)</td>
+                <td>\(0,5 \cdot m_e\)</td>
+            </tr>
+            <tr>
+                <td><strong>H-Alpha (Rot)</strong></td>
+                <td>\(3,027 \times 10^{-19} \text{ J}\)</td>
+                <td>\(815,25 \text{ km/s}\)</td>
+                <td>\(0,5 \cdot m_e\)</td>
+            </tr>
+            <tr>
+                <td>Lyman-&alpha; (UV)</td>
+                <td>\(1,63 \times 10^{-18} \text{ J}\)</td>
+                <td>\(1.894,8 \text{ km/s}\)</td>
+                <td>\(0,5 \cdot m_e\)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Die geometrische Grenze \(R_{\min}\)</h2>
+    <p>Der minimale Radius der Struktur ergibt sich aus der Koppelung von \(\eta\) und der Compton-Wellenlänge:</p>
+    
+    <div class="formula">
+        \[ R_{\min} = \frac{2 \hbar}{m_e c} \approx 7,72 \times 10^{-13} \text{ m} \]
+    </div>
+
+    <div class="quote">
+        "Die Wellenraumzeit ist wie ein gewebtes Tuch. Die Fäden dieses Tuchs haben eine Trägheit von der halben Elektronenmasse. Wenn das Licht durch dieses Tuch reist, ist die Farbe nichts anderes als die Geschwindigkeit, mit der die Fäden zur Seite schwingen." 
+        <br>— <i>Dialog zwischen Jup und Zenjio</i>
+    </div>
+</div>
+
+</body>
+</html>
