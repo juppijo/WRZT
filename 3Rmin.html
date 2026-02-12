@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Vergleich der drei Minimalradien</title>
+
+<!-- MathJax für LaTeX -->
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+}
+h1, h2 {
+    color: #2c3e50;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #f4f4f4;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Vergleich der drei Längenskalen</h1>
+
+<h2>1. Klassischer Elektronenradius</h2>
+
+<p>
+Formel:
+\[
+r_e = \frac{1}{4\pi\varepsilon_0}\frac{e^2}{m_e c^2}
+\]
+</p>
+
+<p>
+Numerischer Wert:
+\[
+r_e \approx 2{,}82 \times 10^{-15}\,\text{m}
+\]
+</p>
+
+<p>
+Physikalische Bedeutung:  
+Entsteht aus der Bedingung, dass die Coulomb-Potentialenergie gleich der Ruheenergie ist:
+\[
+\frac{e^2}{4\pi\varepsilon_0 r_e} = m_e c^2
+\]
+Rein klassische Elektrodynamik + Relativität.
+</p>
+
+<hr>
+
+<h2>2. Reduzierte Compton-Wellenlänge</h2>
+
+<p>
+Formel:
+\[
+\lambda_C = \frac{\hbar}{m_e c}
+\]
+</p>
+
+<p>
+Numerischer Wert:
+\[
+\lambda_C \approx 3{,}86 \times 10^{-13}\,\text{m}
+\]
+</p>
+
+<p>
+Physikalische Bedeutung:  
+Quantenrelativistische Lokalisierungsgrenze.  
+Unterhalb dieser Skala wird die Energie groß genug für Paarbildung.
+</p>
+
+<hr>
+
+<h2>3. WRZT-Variante</h2>
+
+<p>
+Formel:
+\[
+R_{\min} = \frac{2\hbar}{m_e c} = 2\lambda_C
+\]
+</p>
+
+<p>
+Numerischer Wert:
+\[
+R_{\min} \approx 7{,}72 \times 10^{-13}\,\text{m}
+\]
+</p>
+
+<p>
+Physikalische Bedeutung:  
+Geometrische Erweiterung der Compton-Skala.  
+Keine direkte Ableitung aus einer Kraftgleichung.
+</p>
+
+<hr>
+
+<h2>Zusammenhang über die Feinstrukturkonstante</h2>
+
+<p>
+\[
+\alpha = \frac{e^2}{4\pi\varepsilon_0 \hbar c} \approx \frac{1}{137}
+\]
+</p>
+
+<p>
+Beziehung:
+\[
+r_e = \alpha \lambda_C
+\]
+</p>
+
+<p>
+Damit gilt:
+\[
+\lambda_C \approx 137\, r_e
+\]
+\[
+R_{\min} \approx 274\, r_e
+\]
+</p>
+
+<hr>
+
+<h2>Physikalische Konsistenz bei Umlauf mit \( v = c \)</h2>
+
+<table>
+<tr>
+<th>Größe</th>
+<th>Entstehung</th>
+<th>Konsistent mit Zentripetalkraft bei \( v = c \)?</th>
+</tr>
+
+<tr>
+<td>\( r_e \)</td>
+<td>Coulombkraft = Zentripetalkraft</td>
+<td>Ja</td>
+</tr>
+
+<tr>
+<td>\( \lambda_C \)</td>
+<td>Quantenimpulsrelation</td>
+<td>Nein</td>
+</tr>
+
+<tr>
+<td>\( 2\lambda_C \)</td>
+<td>Geometrische Erweiterung</td>
+<td>Nein</td>
+</tr>
+</table>
+
+</body>
+</html>
