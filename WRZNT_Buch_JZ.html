@@ -175,12 +175,20 @@
             height: 100%;
             top: 0;
             left: 0;
-            background: #0d1930; 
+            /*background: linear-gradient(to bottom, var(--paper) 90%, rgba(56, 189, 248, 0.05) 100%) !important;*/
+            background: rgba(13, 25, 48, 0.99) !important; /* Etwas transparenter */
+            backdrop-filter: blur(12px); /* Verstärkt den Milchglas-Effekt */
+            -webkit-backdrop-filter: blur(12px);
             padding: 40px;
             box-sizing: border-box;
             border: 1px solid rgba(56, 189, 248, 0.3);
             border-radius: 15px;
-            
+
+            line-height: 1.6; /* Mehr Platz zwischen den Zeilen */
+            font-size: 1.1rem;
+            color: rgba(226, 232, 240, 0.9); /* Etwas weicheres Weiß */
+            text-align: justify; /* Blocksatz sieht bei Büchern edler aus */
+                    
             transform-origin: left center;
             /* ZEIT AUF 1.5s GEÄNDERT */
             transition: transform 1.9s cubic-bezier(0.4, 0, 0.2, 1);
@@ -193,7 +201,7 @@
             box-shadow: 0 0 0px rgba(56, 189, 248, 0);
 
             /* ... SmartPhones ... */
-            overflow-y: auto; /* Erlaubt vertikales Scrollen */
+            overflow-y: auto  !important; /* Erlaubt vertikales Scrollen */
             -webkit-overflow-scrolling: touch; /* Macht das Scrollen auf SmartPhones flüssiger */
         }
 
@@ -202,6 +210,31 @@
             pointer-events: none;
             /* LEUCHTEN BEIM UMBLÄTTERN */
             box-shadow: 15px 0 30px rgba(56, 189, 248, 0.4);
+        }
+        /* In den <style> Bereich */
+        .page::-webkit-scrollbar {
+            width: 6px;
+        }
+        .page::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .page::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--accent);
+        }
+        .page h2 {
+            font-family: 'Courier New', monospace; /* Technischer Look */
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            margin-top: 0;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
         /* Fullscreen Button Design */
@@ -244,9 +277,100 @@
         .quote { font-style: italic; color: var(--gold); border-left: 3px solid var(--gold); padding-left: 20px; margin: 30px 0; font-size: 1.1em; }
         
         .nav-bar { padding: 20px 50px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .quick-nav { padding: 20px 50px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        
         .btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn:hover:not(:disabled) { background: var(--accent); color: #000; }
         .btn:disabled { opacity: 0.2; }
+
+        .MathJax {
+            max-width: 100% !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        /* Macht die Formeln etwas "leuchtender" und schützt das Layout auf Handys */
+        .mjx-chtml {
+            color: var(--accent);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+            font-size: 1.1em !important;
+        }
+
+        /* Verhindert, dass lange Formeln den Rahmen sprengen (wichtig für Mobile!) */
+        .MathJax_Display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0;
+        }
+
+        .table-of-contents {
+            margin-top: 30px;
+            background: rgba(56, 189, 248, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            width: 90%;
+            margin: 20px 0;
+            z-index: 10; /* Sicherstellen, dass es über dem Bild-Overlay liegt */
+        }
+
+        .table-of-contents h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 Spalten */
+            gap: 10px;
+        }
+
+        .toc-item {
+            padding: 10px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .toc-item span {
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 10px;
+            font-family: monospace;
+        }
+
+        .toc-item:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent);
+            transform: translateX(5px);
+            box-shadow: -5px 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Mobile Anpassung für das Inhaltsverzeichnis */
+        @media (max-width: 600px) {
+            .toc-grid {
+                grid-template-columns: 1fr; /* Nur 1 Spalte auf Handys */
+            }
+        }
+
+        .cover-image-container {
+            height: 150px; /* Vorher 300px */
+            width: 60%;
+        }
+
+        .title-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100%; /* Sorgt dafür, dass der Inhalt den Platz nutzt */
+            padding-bottom: 50px; /* Platz am Ende für den Button */
+        }
 
         table { width: 100%; border-collapse: collapse; margin: 20px 0; background: rgba(255,255,255,0.03); }
         th, td { padding: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: left; }
@@ -273,10 +397,20 @@
                         <div class="image-overlay"></div>
                     </div>
 
+                    <div class="table-of-contents">
+                        <h3>Schnellzugriff</h3>
+                        <div class="toc-grid">
+                            <div class="toc-item" onclick="jumpToPage(1)"><span>01</span> Einleitung</div>
+                            <div class="toc-item" onclick="jumpToPage(5)"><span>05</span> Trägheit</div>
+                            <div class="toc-item" onclick="jumpToPage(10)"><span>10</span> Zeitraum</div>
+                            <div class="toc-item" onclick="jumpToPage(19)"><span>19</span> Ende</div>
+                        </div>
+                    </div>
+
                     <div class="author-info">
                         <p>Universal-Manifest</p>
                         <p class="version-tag">Version 4.2.1-beta</p>
-                    </div>
+                    </div>            
 
                     <button class="start-read-btn" onclick="movePage(1)">Manifest öffnen ➔</button>
                 </div>
@@ -1176,8 +1310,7 @@
                         </p>
                     </div>
                 </section> 
-         </div>    
-
+            </div>    
 
         </div>
 
@@ -1186,6 +1319,7 @@
             <span id="pageIndicator" style="color: var(--dim);">Kapitel 1 / 19</span>
             <button class="btn" id="nextBtn" onclick="movePage(1)">Weiter</button>
         </div>
+
     </div>
 </div>
 
@@ -1196,6 +1330,11 @@
 
     let touchstartX = 0;
     let touchendX = 0;
+
+    // ANIMATION: DAS WECHSELWIRKENDE NETZ
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h, time = 0;
 
 
     function movePage(delta) {
@@ -1227,11 +1366,6 @@
         let displayLabel = currentPage === 0 ? "Titelseite" : `Kapitel ${currentPage}`;
         document.getElementById('pageIndicator').innerText = displayLabel;
     }
-
-    // ANIMATION: DAS WECHSELWIRKENDE NETZ
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let w, h, time = 0;
 
     function init() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
 
@@ -1285,6 +1419,69 @@
             }
         }
     }
+
+    function checkDirection() {
+        if (touchendX < touchstartX - 50) movePage(1);  // Wisch nach links -> Vorwärts
+        if (touchendX > touchstartX + 50) movePage(-1); // Wisch nach rechts -> Zurück
+    }
+
+    function jumpToPage(targetNum) {
+        // 1. Alle Seiten bis zum Ziel umklappen
+        for (let i = 0; i < targetNum; i++) {
+            const p = document.getElementById(`p${i}`);
+            if (p) {
+                p.classList.add('flipped');
+            }
+        }
+        
+        // 2. Falls wir rückwärts springen (vom Menü aus), Seiten wieder aufklappen
+        for (let i = targetNum; i <= totalPages; i++) {
+            const p = document.getElementById(`p${i}`);
+            if (p) {
+                p.classList.remove('flipped');
+            }
+        }
+
+        // 3. Den Zähler aktualisieren
+        currentPage = targetNum;
+        
+        // 4. Anzeige und Buttons aktualisieren
+        updateUI(); // Falls du die UI-Updates in eine Funktion ausgelagert hast
+        // Ansonsten direkt:
+        document.getElementById('pageIndicator').innerText = `Kapitel ${currentPage} / ${totalPages}`;
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+        
+        if (window.MathJax) { MathJax.typesetPromise(); }
+
+        updateUI(); // Hier wird alles aktualisiert!
+    }
+
+    function updateUI() {
+        // Buttons aktivieren/deaktivieren
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
+        document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+        
+        // Textanzeige aktualisieren
+        const indicator = document.getElementById('pageIndicator');
+        if (currentPage === 0) {
+            indicator.innerText = "Titelseite";
+        } else {
+            indicator.innerText = `Kapitel ${currentPage} / ${totalPages}`;
+        }
+        
+        // MathJax neu rendern, damit Formeln auf der neuen Seite schick sind
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
+        
+        // WICHTIG: Seite nach oben scrollen, wenn man umblättert
+        const activePage = document.getElementById(`p${currentPage}`);
+        if (activePage) {
+            activePage.scrollTop = 0;
+        }
+    }
+
     // TASTATUR-STEUERUNG
     document.addEventListener('keydown', (e) => {
         if (e.key === "ArrowRight") {
@@ -1296,11 +1493,6 @@
         }
     });
 
-    function checkDirection() {
-        if (touchendX < touchstartX - 50) movePage(1);  // Wisch nach links -> Vorwärts
-        if (touchendX > touchstartX + 50) movePage(-1); // Wisch nach rechts -> Zurück
-    }
-
     document.addEventListener('touchstart', e => {
         touchstartX = e.changedTouches[0].screenX;
     });
@@ -1311,7 +1503,9 @@
     });
 
     window.addEventListener('resize', init);
-    init(); draw();
+    init(); 
+    draw();
+
 </script>
 
 </body>
