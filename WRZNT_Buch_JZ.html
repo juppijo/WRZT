@@ -2,7 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <title>WRZT - Das vollständige Universal-Manifest</title>
     
     <script>
@@ -13,6 +14,47 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
+
+        @media (max-width: 768px) {
+            /* Container füllt mehr Platz aus */
+            .page-container {
+                width: 95%;
+                height: 80vh;
+                margin-top: 60px; /* Platz für den Vollbild-Button */
+            }
+
+            /* Textgröße auf Mobile anpassen */
+            .page {
+                padding: 20px; /* Weniger Rand */
+            }
+
+            .main-title {
+                font-size: 2.5rem; /* Kleinerer Titel */
+                letter-spacing: 5px;
+            }
+
+            .page h2 {
+                font-size: 1.5rem;
+            }
+
+            /* Die Steuerung nach unten fixieren, damit sie immer erreichbar ist */
+            .controls {
+                width: 100%;
+                bottom: 10px;
+                gap: 10px;
+            }
+
+            .controls button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            /* Das Titelbild auf Mobile kleiner machen */
+            .cover-image-container {
+                height: 200px;
+            }
+        }
+
         :root {
             --bg: #050a14;
             --paper: rgba(13, 25, 48, 0.95);
@@ -30,17 +72,161 @@
         #canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
         .book-wrapper { display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; }
-        .page-container {
-            width: 100%; max-width: 1000px; height: 90vh;
-            background: var(--paper); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-            display: flex; flex-direction: column; position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+
+        /* Styling für die Titelseite */
+        .title-page {
+            background: linear-gradient(180deg, #050a14 0%, #0d1930 100%) !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 2px solid var(--accent) !important;
         }
 
-        .content { flex: 1; padding: 40px 60px; overflow-y: auto; scrollbar-width: thin; }
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.4s ease-out; }
+        .main-title {
+            font-size: 4rem;
+            letter-spacing: 15px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--dim);
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        /* Der Bild-Container */
+        .cover-image-container {
+            width: 80%;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Das Bild füllt den Platz aus ohne zu zerren */
+            opacity: 0.8;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, #0d1930);
+        }
+
+        .author-info {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: var(--dim);
+        }
+
+        .version-tag {
+            color: var(--accent);
+            font-family: monospace;
+        }
+
+        /* Schöner Button auf der Titelseite */
+        .start-read-btn {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .start-read-btn:hover {
+            background: var(--accent);
+            color: #050a14;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        /* Der Behälter für das Buch */
+        .page-container {
+            width: 90%;
+            max-width: 800px;
+            height: 85vh;
+            perspective: 2000px; /* Erzeugt den 3D-Raum */
+            position: relative;
+        }
+        .content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        /* Die einzelnen Seiten */
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: #0d1930; 
+            padding: 40px;
+            box-sizing: border-box;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 15px;
+            
+            transform-origin: left center;
+            /* ZEIT AUF 1.5s GEÄNDERT */
+            transition: transform 1.9s cubic-bezier(0.4, 0, 0.2, 1);
+            backface-visibility: hidden;
+            z-index: 1;
+            overflow-y: auto;
+            display: block !important;
+            
+            /* GLOW EFFEKT AN DER KANTE */
+            box-shadow: 0 0 0px rgba(56, 189, 248, 0);
+
+            /* ... SmartPhones ... */
+            overflow-y: auto; /* Erlaubt vertikales Scrollen */
+            -webkit-overflow-scrolling: touch; /* Macht das Scrollen auf SmartPhones flüssiger */
+        }
+
+        .page.flipped {
+            transform: rotateY(-175deg);
+            pointer-events: none;
+            /* LEUCHTEN BEIM UMBLÄTTERN */
+            box-shadow: 15px 0 30px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Fullscreen Button Design */
+        .fullscreen-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 14px;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        .fullscreen-btn:hover {
+            background: var(--accent);
+            color: #050a14;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         h1 { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 10px; font-size: 2.2em; margin-bottom: 30px; }
@@ -68,6 +254,8 @@
     </style>
 </head>
 <body>
+    
+<button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
 
 <canvas id="canvas"></canvas>
 
@@ -75,7 +263,26 @@
     <div class="page-container">
         <div class="content">
 
-            <div class="page active" id="p1">
+            <div class="page title-page" id="p0" style="z-index: 100;">
+                <div class="title-content">
+                    <h1 class="main-title">WRZNT</h1>
+                    <p class="subtitle">Das Wechselwirkende Netz der Realität</p>
+                    
+                    <div class="cover-image-container">
+                        <img src="titelbild.jpeg" alt="Universal-Manifest Cover" class="cover-image">
+                        <div class="image-overlay"></div>
+                    </div>
+
+                    <div class="author-info">
+                        <p>Universal-Manifest</p>
+                        <p class="version-tag">Version 4.2.1-beta</p>
+                    </div>
+
+                    <button class="start-read-btn" onclick="movePage(1)">Manifest öffnen ➔</button>
+                </div>
+            </div>
+
+            <div class="page active" id="p1" style="z-index: 20;">
                 <p style="color: var(--gold); letter-spacing: 2px;">WRZT — SERIE JZ</p>
                 <h1>Das Universal-Manifest</h1>
                 <div class="quote">
@@ -86,7 +293,7 @@
                 <p>Licht ist eine <strong>hochfrequente Gravitationswelle (Undatron)</strong>. Es entsteht durch die schnelle Rotation von Teilchen-Antiteilchen-Paaren oder die Schwingung von Elektronen, welche die Raumzeit-Geometrie periodisch verformen.</p>
             </div>
 
-            <div class="page" id="p2">
+            <div class="page" id="p2" style="z-index: 19;">
                 <h1>I. Die Vakuum-Besetzung</h1>
                 <p>Das Vakuum ist kein "Nichts", sondern ein Medium mit physikalischen Eigenschaften. Jede "Konstante" der Physik ist ein Ausdruck der lokalen Netzgeometrie.</p>
                 
@@ -107,7 +314,7 @@
                 </div>
             </div>
 
-            <div class="page" id="p3">
+            <div class="page" id="p3" style="z-index: 18;">
                 <h1>II. Der minimale Radius $r_{min}$</h1>
                 <p>Warum können sich Teilchen nie direkt berühren? Die Barriere ist die Lichtgeschwindigkeit $c$.</p>
                 
@@ -126,7 +333,7 @@
                 </div>
             </div>
 
-            <div class="page" id="p4">
+            <div class="page" id="p4" style="z-index: 17;">
                 <h1>III. Das Alpha-Siegel ($\alpha$)</h1>
                 <p>Die Feinstrukturkonstante $\alpha \approx 1/137$ beschreibt das Verhältnis der Netzspannungen.</p>
 
@@ -161,7 +368,7 @@
                 </table>
             </div>
 
-            <div class="page" id="p5">
+            <div class="page" id="p5" style="z-index: 16;">
                 <h1>IV. Die fundamentale Reduktion</h1>
                 <p>Die WRZT vereint alle physikalischen Grundgrößen in einem einzigen geometrischen Modell:</p>
 
@@ -181,7 +388,7 @@
                 <p style="text-align: center; margin-top: 50px; color: var(--gold);">— Ende des 1. Teil- Universal-Manifests —</p>
             </div>
 
-            <div class="page" id="p6">
+            <div class="page" id="p6" style="z-index: 15;">
             <section id="wrzt-wrznt-ausfuehrlich">
                 <div style="font-family: 'Georgia', serif; max-width: 900px; margin: auto; line-height: 1.8; color: #fceef0; background: var(--paper); padding: 40px; border: 1px solid #e0e0e0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
                     
@@ -234,7 +441,7 @@
 
             </div>
 
-            <div class="page" id="p7">
+            <div class="page" id="p7" style="z-index: 14;">
 
                 <p>Die <strong>Wellenraumzeit-Theorie</strong> bricht mit dem klassischen Vakuum-Konzept und postuliert eine mechanisch strukturierte Raumzeit, deren fundamentale Trägheit die Basis für Licht, Materie und Gravitation bildet.</p>
 
@@ -458,7 +665,7 @@
 
                 </div>
 
-                <div class="page" id="p8">
+                <div class="page" id="p8" style="z-index: 13;">
 
                 <section id="-xii">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XII: Extreme Netzspannungen</h2>
@@ -496,7 +703,7 @@
 
                 </div>
 
-            <div class="page" id="p9">
+            <div class="page" id="p9" style="z-index: 12;">
 
                 <section id="-xiii">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIII: Der Bug-Winkel \(\alpha\) und die Netz-Stauchung</h2>
@@ -552,7 +759,7 @@
 
                 </div>
 
-            <div class="page" id="p10">
+            <div class="page" id="p10" style="z-index: 11;">
 
                 <section id="-xiv">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIV: Die dynamische Masse im Netz</h2>
@@ -574,7 +781,7 @@
 
                 </div>
 
-            <div class="page" id="p11">
+            <div class="page" id="p11" style="z-index: 10;">
 
                 <section id="-xv">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XV: Gravitation und Netz-Gradienten</h2>
@@ -603,7 +810,7 @@
 
                 </div>
 
-            <div class="page" id="p12">
+            <div class="page" id="p12" style="z-index: 9;">
 
                 <section id="-xvi">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVI: Schwarze Löcher – Die Sättigung des Netzes</h2>
@@ -634,7 +841,7 @@
 
                 </div>
 
-            <div class="page" id="p13">
+            <div class="page" id="p13" style="z-index: 8;">
 
                 <section id="-xvii">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVII: Polare Jets – Die vertikale Netz-Entlastung</h2>
@@ -664,7 +871,7 @@
 
                 </div>
 
-            <div class="page" id="p14">    
+            <div class="page" id="p14" style="z-index: 7;">    
                 <section id="-xviii">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVIII: Spin – Die permanente Netz-Torsion</h2>
                     
@@ -692,7 +899,7 @@
 
             </div>
 
-            <div class="page" id="p15">
+            <div class="page" id="p15" style="z-index: 6;">
 
                 <section id="kapitel-xix">
                     <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIX: Die elektronische Eichung der Ur-Spannung</h2>
@@ -729,7 +936,7 @@
 
             </div>
 
-            <div class="page" id="p16">
+            <div class="page" id="p16" style="z-index: 5;">
 
                 <p style="text-align:center;"> * * * * *  ***  * * * * * </p>
 
@@ -835,7 +1042,7 @@
 
                 </div>
 
-            <div class="page" id="p17">
+            <div class="page" id="p17" style="z-index: 4;">
                 <section id="Plancksche-Wirkungsquantum-Xi">
                     <div style="background: var(--paper); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 2px solid --space-blue; border-left: 10px solid #2c3e50;">
                         <h3 style="margin-top: 0; color: #2c3e50;">4. Die fundamentale Netz-Geometrie (Substitution von \(\hbar\))</h3>
@@ -882,7 +1089,7 @@
 
                 </div>
 
-            <div class="page" id="p18">
+            <div class="page" id="p18" style="z-index: 3;">
 
                 <section id="Elektromagnetisch-Xi">
                     <div style="background: var(--paper); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 2px solid --space-blue; border-left: 10px solid #d4af37;">
@@ -926,7 +1133,7 @@
 
                 </div>
 
-            <div class="page" id="p19">
+            <div class="page" id="p19" style="z-index: 2;">
 
                 <section id="Alpha-Xi">   
 
@@ -983,18 +1190,42 @@
 </div>
 
 <script>
-    let currentPage = 1;
+
+    let currentPage = 0;
     const totalPages = 19; // Ändere diese Zahl auf die Gesamtanzahl deiner Seiten ********************************
 
+    let touchstartX = 0;
+    let touchendX = 0;
+
+
     function movePage(delta) {
-        document.getElementById(`p${currentPage}`).classList.remove('active');
-        currentPage += delta;
-        document.getElementById(`p${currentPage}`).classList.add('active');
-        
-        document.getElementById('prevBtn').disabled = (currentPage === 1);
+        if (delta > 0 && currentPage < totalPages) {
+            // VORWÄRTS: Die aktuelle Seite (auch die Titelseite p0) umklappen
+            const pageToFlip = document.getElementById(`p${currentPage}`);
+            if (pageToFlip) {
+                pageToFlip.classList.add('flipped');
+            }
+            currentPage++;
+        } 
+        else if (delta < 0 && currentPage > 0) {
+            // RÜCKWÄRTS: Die vorherige Seite wieder zurückholen
+            currentPage--;
+            const pageToShow = document.getElementById(`p${currentPage}`);
+            if (pageToShow) {
+                pageToShow.classList.remove('flipped');
+            }
+        }
+
+        // MathJax Refresh
+        if (window.MathJax) { MathJax.typesetPromise(); }
+
+        // UI Updates
+        document.getElementById('prevBtn').disabled = (currentPage === 0);
         document.getElementById('nextBtn').disabled = (currentPage === totalPages);
-        document.getElementById('pageIndicator').innerText = `Kapitel ${currentPage} / ${totalPages}`;
-        document.querySelector('.content').scrollTop = 0;
+        
+        // Anzeige im Indikator
+        let displayLabel = currentPage === 0 ? "Titelseite" : `Kapitel ${currentPage}`;
+        document.getElementById('pageIndicator').innerText = displayLabel;
     }
 
     // ANIMATION: DAS WECHSELWIRKENDE NETZ
@@ -1026,6 +1257,58 @@
         }
         time += 0.015; requestAnimationFrame(draw);
     }
+
+    function toggleFullscreen() {
+        let elem = document.documentElement;
+        if (!document.fullscreenElement && !document.mozFullScreenElement && 
+            !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            // Vollbild aktivieren
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+        } else {
+            // Vollbild beenden
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+    // TASTATUR-STEUERUNG
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "ArrowRight") {
+            movePage(1); // Rechts blättert vor
+        } else if (e.key === "ArrowLeft") {
+            movePage(-1); // Links blättert zurück
+        } else if (e.key === "f" || e.key === "F") {
+            toggleFullscreen(); // 'F' Taste für Vollbild
+        }
+    });
+
+    function checkDirection() {
+        if (touchendX < touchstartX - 50) movePage(1);  // Wisch nach links -> Vorwärts
+        if (touchendX > touchstartX + 50) movePage(-1); // Wisch nach rechts -> Zurück
+    }
+
+    document.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        checkDirection();
+    });
 
     window.addEventListener('resize', init);
     init(); draw();
