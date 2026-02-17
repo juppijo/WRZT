@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Physik Taschenrechner</title>
+  <link rel="icon" type="image" href="logo.png">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+
+      <div class="header-left">
+        <h1>
+          <i class="fas fa-atom logo-icon"></i>
+          Physik<span>Rechner.</span>
+        </h1>
+
+        <p class="subtitle">
+          Präzise Formeln · SI-Einheiten · Eigene Formeln
+        </p>
+      </div>
+
+      <img src="Physik.jpeg" alt="Physik Bild" class="header-image">
+
+      <button class="btn-fullscreen" id="btnFullscreen" title="Vollbild">
+        <i class="fas fa-expand" id="fsIcon"></i> Vollbild
+      </button>
+
+    </div>
+  </header>
+
+  <main>
+
+    <!-- KONSTANTEN LEISTE -->
+    <section class="constants-bar">
+      <h2><i class="fas fa-infinity"></i> Physikalische Konstanten</h2>
+      <div class="constants-grid" id="constantsGrid"></div>
+    </section>
+
+    <!-- KATEGORIE AUSWAHL -->
+    <section class="category-section">
+      <h2><i class="fas fa-th-large"></i> Kategorie wählen</h2>
+      <div class="category-tabs" id="categoryTabs"></div>
+    </section>
+
+    <!-- FORMEL AUSWAHL -->
+    <section class="formula-section">
+      <h2><i class="fas fa-function"></i> Formel wählen</h2>
+      <div class="formula-grid" id="formulaGrid"></div>
+    </section>
+
+    <!-- RECHNER -->
+    <section class="calculator-section" id="calculatorSection" style="display:none;">
+      <div class="calc-card">
+        <div class="calc-header">
+          <div>
+            <h3 id="calcTitle">Formelname</h3>
+            <p id="calcDescription" class="calc-desc"></p>
+          </div>
+          <button class="btn-icon" id="btnInfo" title="Formelinfo">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+
+        <!-- Formel Anzeige -->
+        <div class="formula-display" id="formulaDisplay"></div>
+
+        <!-- Eingaben -->
+        <div class="inputs-grid" id="inputsGrid"></div>
+
+        <!-- Berechnen -->
+        <div class="calc-actions">
+          <button class="btn-calc" id="btnCalc">
+            <i class="fas fa-equals"></i> Berechnen
+          </button>
+          <button class="btn-reset" id="btnReset">
+            <i class="fas fa-undo"></i> Zurücksetzen
+          </button>
+        </div>
+
+        <!-- Ergebnis -->
+        <div class="result-box" id="resultBox" style="display:none;">
+          <div class="result-label">Ergebnis</div>
+          <div class="result-value" id="resultValue"></div>
+          <div class="result-unit" id="resultUnit"></div>
+          <div class="result-sci" id="resultSci"></div>
+          <div class="result-steps" id="resultSteps"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EIGENE FORMEL HINZUFÜGEN -->
+    <section class="custom-section">
+      <div class="custom-card">
+        <h2><i class="fas fa-plus-circle"></i> Eigene Formel hinzufügen</h2>
+        <p class="custom-hint">
+          Definiere deine eigene Formel mit Variablen und Einheiten.<br>
+          Erlaubte Operatoren: <code>+ - * / ^ ( ) sqrt() cbrt()</code><br>
+          Trigonometrie: <code>sin() cos() tan() arcsin() arccos() arctan() atan2()</code><br>
+          Hyperbolisch: <code>sinh() cosh() tanh()</code><br>
+          Logarithmus: <code>log() log2() ln() exp()</code><br>
+          Sonstige: <code>abs() PI pi E</code><br><br>
+          Griechische Großbuchstaben: <code>Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</code><br>
+          Griechische Kleinbuchstaben: <code>α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω</code><br><br>
+          Sonderzeichen &amp; Physik-Symbole:<br>
+          Hochgestellt Zahlen: <code>⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ⁺ ⁻ ⁼ ⁽ ⁾ ⁿ</code><br>
+          Hochgestellt Buchstaben: <code>ᵃ ᵇ ᶜ ᵈ ᵉ ᶠ ᵍ ʰ ⁱ ʲ ᵏ ˡ ᵐ ⁿ ᵒ ᵖ ʳ ˢ ᵗ ᵘ ᵛ ʷ ˣ ʸ ᶻ</code><br>
+          Tiefgestellt Zahlen: <code>₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉ ₊ ₋ ₌ ₍ ₎</code><br>
+          Tiefgestellt Buchstaben: <code>ₐ ₑ ₒ ᵢ ᵣ ᵤ ᵥ ₓ ₙ ₘ ₖ ₗ ₛ ₜ ₚ ₕ ⱼ</code><br>
+          Mathematik: <code>× ÷ ± ∓ √ ∛ ∜ ∞ ≈ ≠ ≤ ≥ ∝ ∂ ∇ ∆ ∑ ∏ ∫ ∮ ℏ ħ ½ ⅓ ¼</code><br>
+          Einheiten &amp; Pfeile: <code>° · ⊥ ∥ → ← ↑ ↓ ↔ ⇒ ⇔ ℓ Å μ Ω</code>
+        </p>
+
+        <div class="custom-form">
+          <div class="custom-row">
+            <div class="custom-field">
+              <label>Formelname *</label>
+              <input type="text" id="customName" placeholder="z.B. Meine Energie-Formel" />
+            </div>
+            <div class="custom-field">
+              <label>Kategorie</label>
+              <input type="text" id="customCategory" placeholder="z.B. Mechanik" />
+            </div>
+          </div>
+
+          <div class="custom-field full">
+            <label>Formelausdruck * <span class="hint">(Ergebnisvariable = Ausdruck)</span></label>
+            <input type="text" id="customFormula" placeholder="z.B. E = m * c^2" />
+          </div>
+
+          <div class="custom-field full">
+            <label>Beschreibung</label>
+            <input type="text" id="customDesc" placeholder="z.B. Äquivalenz von Masse und Energie" />
+          </div>
+
+          <div class="variables-builder">
+            <div class="vars-header">
+              <label>Variablen definieren</label>
+              <button class="btn-add-var" id="btnAddVar">
+                <i class="fas fa-plus"></i> Variable hinzufügen
+              </button>
+            </div>
+            <div id="variablesContainer"></div>
+          </div>
+
+          <div class="custom-field full">
+            <label>Ergebniseinheit</label>
+            <input type="text" id="customResultUnit" placeholder="z.B. J, m/s, kg·m/s²" />
+          </div>
+
+          <div class="custom-actions">
+            <button class="btn-save" id="btnSaveFormula">
+              <i class="fas fa-save"></i> Formel speichern
+            </button>
+            <button class="btn-test" id="btnTestFormula">
+              <i class="fas fa-vial"></i> Testen
+            </button>
+          </div>
+
+          <div class="custom-feedback" id="customFeedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GESPEICHERTE FORMELN -->
+    <section class="saved-section" id="savedSection" style="display:none;">
+      <div class="custom-card">
+        <div class="saved-header">
+          <h2><i class="fas fa-bookmark"></i> Benutzerdefinierte Formeln</h2>
+          <div class="saved-io-btns">
+            <button class="btn-export" id="btnExport">
+              <i class="fas fa-file-export"></i> Exportieren
+            </button>
+            <button class="btn-import" id="btnImport">
+              <i class="fas fa-file-import"></i> Importieren
+            </button>
+            <input type="file" id="importFile" accept=".json" style="display:none;" />
+          </div>
+        </div>
+        <div id="savedFormulasList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>PhysikRechner &copy; 2025 · SI-Einheiten · Alle Konstanten nach CODATA 2018</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+[
+  {
+    "id": "custom_1771336154681_evzo",
+    "cat": "Wellen",
+    "name": "Raumzeit Trägheit",
+    "expr": "η = 1/2 * mₑ",
+    "displayExpr": "η = 1/2 * mₑ",
+    "desc": "Trägheit ( η )",
+    "vars": [
+      {
+        "sym": "mₑ",
+        "name": "Elektronen Masse",
+        "unit": "kg"
+      }
+    ],
+    "formula": "1/2 * mₑ",
+    "resultUnit": "kg",
+    "resultName": "Raumzeit Trägheit",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_dsir",
+    "cat": "Wellen",
+    "name": "Minimaler Radius",
+    "expr": "Rmin = 2 * h / ( 2 * PI * mₑ * c )",
+    "displayExpr": "Rmin = 2 * h / ( 2 * PI * mₑ * c )",
+    "desc": "Minimaler Radius (Rmin )",
+    "vars": [
+      {
+        "sym": "mₑ",
+        "name": "Elektronen Masse",
+        "unit": "kg"
+      },
+      {
+        "sym": "h",
+        "name": "Plank Konstante",
+        "unit": "J * s"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m / s"
+      }
+    ],
+    "formula": "2 * h / ( 2 * PI * mₑ * c )",
+    "resultUnit": "m",
+    "resultName": "Minimaler Radius",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_tv7t",
+    "cat": "Benutzerdefiniert",
+    "name": "Raumzeit-Spannung",
+    "expr": "Ξ  =  η / Rmin",
+    "displayExpr": "Ξ  =  η / Rmin",
+    "desc": "Raumzeit-Spannung Xi :  Ξ",
+    "vars": [
+      {
+        "sym": "η",
+        "name": "Trägheit Raumzeit",
+        "unit": "kg"
+      },
+      {
+        "sym": "Rmin",
+        "name": "Minimaler Radius",
+        "unit": "m"
+      }
+    ],
+    "formula": "η / Rmin",
+    "resultUnit": "kg/m",
+    "resultName": "Raumzeit-Spannung",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_egn2",
+    "cat": "Wellen",
+    "name": "Kraft-Spannung",
+    "expr": "FΞ  = Ξ  * c ^ 2",
+    "displayExpr": "FΞ  = Ξ  * c ^ 2",
+    "desc": "Kraft-Spannung",
+    "vars": [
+      {
+        "sym": "Ξ",
+        "name": "Statische Raumzeit-Spannung",
+        "unit": "kg/m"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s"
+      }
+    ],
+    "formula": "Ξ  * c ^ 2",
+    "resultUnit": "N",
+    "resultName": "Kraft-Spannung",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_qrzl",
+    "cat": "Benutzerdefiniert",
+    "name": "Minimaler Radius",
+    "expr": "Rmin = 2 * ℏ / ( mₑ * c )",
+    "displayExpr": "Rmin = 2 * ℏ / ( mₑ * c )",
+    "desc": "Minimaler Radius (Rmin )",
+    "vars": [
+      {
+        "sym": "ℏ",
+        "name": "Reduz. Plank Konstante",
+        "unit": "J·s"
+      },
+      {
+        "sym": "mₑ",
+        "name": "Elektronenmasse",
+        "unit": "kg"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s"
+      }
+    ],
+    "formula": "2 * ℏ / ( mₑ * c )",
+    "resultUnit": "",
+    "resultName": "Minimaler Radius",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_uhmw",
+    "cat": "Benutzerdefiniert",
+    "name": "Bugwelle α",
+    "expr": "sin(α) = (v/c)",
+    "displayExpr": "sin(α) = (v/c)",
+    "desc": "Bugwelle α",
+    "vars": [
+      {
+        "sym": "v",
+        "name": "Geschwindigkeit",
+        "unit": "m/s"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s"
+      }
+    ],
+    "formula": "(v/c)",
+    "resultUnit": "keine einheit.",
+    "resultName": "Bugwelle α",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_jfu6",
+    "cat": "Benutzerdefiniert",
+    "name": "Bugwelle α",
+    "expr": "α= arcsin(v/c)",
+    "displayExpr": "α= arcsin(v/c)",
+    "desc": "Bugwelle α",
+    "vars": [
+      {
+        "sym": "v",
+        "name": "Geschwindigkeit",
+        "unit": "m/s oder c"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s oder c=1"
+      }
+    ],
+    "formula": "arcsin(v/c)",
+    "resultUnit": "keine Einheit.",
+    "resultName": "Bugwelle α",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771336154681_9spe",
+    "cat": "Benutzerdefiniert",
+    "name": "Lorenz factor mit α",
+    "expr": "γ = 1/ cos( arcsin(v/c))",
+    "displayExpr": "γ = 1/ cos( arcsin(v/c))",
+    "desc": "Lorenz factor mit α",
+    "vars": [
+      {
+        "sym": "v",
+        "name": "Geschwindigkeit",
+        "unit": "m/s oder c"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s oder c=1"
+      }
+    ],
+    "formula": "1/ cos( arcsin(v/c))",
+    "resultUnit": "Keine Einheit.",
+    "resultName": "Lorenz factor mit α",
+    "isCustom": true
+  }
+]
