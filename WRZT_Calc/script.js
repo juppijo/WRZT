@@ -31,9 +31,9 @@ const CONSTANTS = [
   { symbol: 'F',    name: 'Faraday-Konstante',         value: 96485.33212,        unit: 'C/mol',            desc: 'NA·e' },
   { symbol: 'atm',  name: 'Standardatmosphäre',        value: 101325,             unit: 'Pa',               desc: 'exakt' },
   { symbol: 'c²',   name: 'Lichtgeschw. zum Quadrat',  value: 8.98755179e16,      unit: 'm²/s²',            desc: 'für E=mc²' },
-  { symbol: 'Ξ',    name: 'Raumzeit-Spannung',         value: 5.899e-19,          unit: 'kg/m',             desc: 'Raumzeit-Spannung' },
-  { symbol: 'η',    name: 'Raumzeit-Trägheit',         value: 4.554e-31,          unit: 'kg',               desc: 'Trägheit' },
-  { symbol: 'Rmin', name: 'Minimaler Radius',          value: 7.716e-13,          unit: 'm',                desc: 'Minimaler Radius' },
+  { symbol: 'Ξ',    name: 'Raumzeit-Spannung',         value: 5.8974265691e-19,   unit: 'kg/m',             desc: 'Raumzeit-Spannung' },
+  { symbol: 'η',    name: 'Raumzeit-Trägheit',         value: 4.5546918508e-31,   unit: 'kg',               desc: 'Trägheit' },
+  { symbol: 'Rmin', name: 'Minimaler Radius',          value: 7.7231853545e-13,   unit: 'm',                desc: 'Minimaler Radius' },
 ];
 
 /* ============================================================
@@ -46,6 +46,20 @@ const FORMULAS = [
     id: 'f_newton', cat: 'Mechanik', name: "Newton's 2. Gesetz",
     expr: 'F = m · a', displayExpr: 'F = m · a',
     desc: 'Kraft ist Masse mal Beschleunigung',
+    info: `<h4>Bedeutung</h4>
+<p>Das zweite Newton'sche Gesetz beschreibt den Zusammenhang zwischen Kraft, Masse und Beschleunigung. Es ist eines der fundamentalsten Gesetze der klassischen Mechanik.</p>
+<h4>Herleitung</h4>
+<p>Die Kraft <code>F</code> ist definiert als die zeitliche Änderung des Impulses:</p>
+<p><code>F = dp/dt = d(m·v)/dt</code></p>
+<p>Für konstante Masse folgt:</p>
+<p><code>F = m · dv/dt = m · a</code></p>
+<h4>Anwendung</h4>
+<p>Mit diesem Gesetz kann man berechnen:</p>
+<ul>
+<li>Welche Kraft nötig ist, um einen Körper zu beschleunigen</li>
+<li>Wie stark ein Körper beschleunigt wird bei gegebener Kraft</li>
+<li>Die Masse eines Körpers aus Kraft und Beschleunigung</li>
+</ul>`,
     vars: [
       { sym: 'm', name: 'Masse',           unit: 'kg',  desc: 'Körpermasse' },
       { sym: 'a', name: 'Beschleunigung',  unit: 'm/s²',desc: 'Beschleunigung' }
@@ -57,6 +71,20 @@ const FORMULAS = [
     id: 'f_ekin', cat: 'Mechanik', name: 'Kinetische Energie',
     expr: 'E = ½·m·v²', displayExpr: 'E_kin = ½ · m · v²',
     desc: 'Bewegungsenergie eines Körpers',
+    info: `<h4>Bedeutung</h4>
+<p>Die kinetische Energie ist die Energie, die ein Körper aufgrund seiner Bewegung besitzt.</p>
+<h4>Herleitung</h4>
+<p>Arbeit ist Kraft mal Weg: <code>W = F · s</code></p>
+<p>Mit <code>F = m·a</code> und der kinematischen Beziehung <code>v² = v₀² + 2·a·s</code> für <code>v₀ = 0</code>:</p>
+<p><code>s = v²/(2a)</code></p>
+<p><code>W = m·a · v²/(2a) = ½·m·v²</code></p>
+<p>Die verrichtete Arbeit entspricht der kinetischen Energie: <code>E_kin = ½·m·v²</code></p>
+<h4>Anwendung</h4>
+<ul>
+<li>Berechnung der Bewegungsenergie von Fahrzeugen</li>
+<li>Bremsweg-Bestimmung (E_kin wird in Reibungsarbeit umgewandelt)</li>
+<li>Energiebilanz bei Stößen und Kollisionen</li>
+</ul>`,
     vars: [
       { sym: 'm', name: 'Masse',       unit: 'kg',  desc: 'Körpermasse' },
       { sym: 'v', name: 'Geschwindigkeit', unit: 'm/s', desc: 'Betrag der Geschwindigkeit' }
@@ -189,6 +217,27 @@ const FORMULAS = [
     id: 't_ideal', cat: 'Thermodynamik', name: 'Ideales Gasgesetz',
     expr: 'p·V = n·R·T', displayExpr: 'p · V = n · R · T',
     desc: 'R = 8.314462618 J/(mol·K) — löst nach p',
+    info: `<h4>Bedeutung</h4>
+<p>Das ideale Gasgesetz beschreibt das Verhalten von Gasen unter der Annahme, dass die Gasteilchen punktförmig sind und nur elastisch stoßen.</p>
+<h4>Herleitung</h4>
+<p>Das Gesetz kombiniert drei historische Gesetze:</p>
+<ul>
+<li><strong>Boyle-Mariotte</strong>: <code>p·V = const.</code> (bei T = const.)</li>
+<li><strong>Gay-Lussac</strong>: <code>V/T = const.</code> (bei p = const.)</li>
+<li><strong>Avogadro</strong>: <code>V ∝ n</code> (bei p, T = const.)</li>
+</ul>
+<p>Zusammengefasst ergibt sich:</p>
+<p><code>p·V = n·R·T</code></p>
+<p>wobei <code>R = 8.314462618 J/(mol·K)</code> die universelle Gaskonstante ist.</p>
+<h4>Mikroskopische Deutung</h4>
+<p>Druck entsteht durch Stöße der Gasmoleküle an die Wand. Die kinetische Energie ist proportional zur Temperatur:</p>
+<p><code>½·m·v̄² = (3/2)·k_B·T</code></p>
+<h4>Anwendung</h4>
+<ul>
+<li>Berechnung von Zustandsänderungen in Gasen</li>
+<li>Ballons, Motoren, Atmosphärenphysik</li>
+<li>Abweichungen bei hohem Druck → Van-der-Waals-Gleichung</li>
+</ul>`,
     vars: [
       { sym: 'n', name: 'Stoffmenge n', unit: 'mol', desc: 'Menge in Mol' },
       { sym: 'T', name: 'Temperatur T', unit: 'K',   desc: 'Absolute Temperatur' },
@@ -262,6 +311,28 @@ const FORMULAS = [
     id: 'e_coulomb', cat: 'Elektrizität', name: 'Coulomb-Kraft',
     expr: 'F = k·q₁·q₂/r²', displayExpr: 'F = (1/4πε₀) · q₁ · q₂ / r²',
     desc: 'k = 8.9875517923×10⁹ N·m²/C²',
+    info: `<h4>Bedeutung</h4>
+<p>Das Coulomb-Gesetz beschreibt die elektrostatische Kraft zwischen zwei Ladungen. Es ist das elektrische Analogon zum Newton'schen Gravitationsgesetz.</p>
+<h4>Herleitung</h4>
+<p>Charles-Augustin de Coulomb stellte 1785 experimentell fest:</p>
+<p><code>F ∝ q₁·q₂/r²</code></p>
+<p>Die Proportionalitätskonstante ist:</p>
+<p><code>k = 1/(4πε₀) = 8.9875517923 × 10⁹ N·m²/C²</code></p>
+<p>wobei <code>ε₀ = 8.854187817 × 10⁻¹² F/m</code> die elektrische Feldkonstante (Permittivität des Vakuums) ist.</p>
+<h4>Vorzeichen</h4>
+<ul>
+<li>Gleichnamige Ladungen (++ oder --): <code>F > 0</code> → Abstoßung</li>
+<li>Ungleichnamige Ladungen (+- oder -+): <code>F < 0</code> → Anziehung</li>
+</ul>
+<h4>Vergleich zur Gravitation</h4>
+<p>Form identisch: <code>F_grav = G·m₁·m₂/r²</code></p>
+<p>Aber: Coulomb-Kraft ist ~10³⁶× stärker!</p>
+<h4>Anwendung</h4>
+<ul>
+<li>Elektrostatik: Aufladung, Entladung, Blitze</li>
+<li>Atomaufbau: Kern hält Elektronen durch Coulomb-Kraft</li>
+<li>Chemische Bindungen basieren auf elektrostatischer Anziehung</li>
+</ul>`,
     vars: [
       { sym: 'q1', name: 'Ladung q₁', unit: 'C',  desc: 'Erste Ladung' },
       { sym: 'q2', name: 'Ladung q₂', unit: 'C',  desc: 'Zweite Ladung' },
@@ -363,6 +434,23 @@ const FORMULAS = [
     id: 'r_emc2', cat: 'Relativität', name: 'Masse-Energie-Äquivalenz',
     expr: 'E = m·c²', displayExpr: 'E = m · c²',
     desc: 'c = 299792458 m/s',
+    info: `<h4>Bedeutung</h4>
+<p>Einstein's berühmteste Gleichung zeigt, dass Masse und Energie äquivalent sind. Masse kann in Energie umgewandelt werden und umgekehrt.</p>
+<h4>Herleitung (vereinfacht)</h4>
+<p>Aus der speziellen Relativitätstheorie folgt für die Gesamtenergie eines Teilchens:</p>
+<p><code>E² = (pc)² + (m₀c²)²</code></p>
+<p>Für ein ruhendes Teilchen (<code>p = 0</code>) vereinfacht sich dies zu:</p>
+<p><code>E = m₀c²</code></p>
+<p>wobei <code>m₀</code> die Ruhemasse ist. Dies ist die Ruheenergie des Teilchens.</p>
+<h4>Bedeutung der Konstanten</h4>
+<p><code>c² = 8.98755179 × 10¹⁶ m²/s²</code> — ein enormer Faktor!</p>
+<p>Selbst kleinste Massen entsprechen riesigen Energiemengen.</p>
+<h4>Anwendung</h4>
+<ul>
+<li>Kernenergie: Bei Kernspaltung/-fusion wird Masse in Energie umgewandelt</li>
+<li>Teilchenphysik: Massedefekt bei der Bindungsenergie von Atomkernen</li>
+<li>Paar-Erzeugung: Energie → Teilchen + Antiteilchen (z.B. Elektron + Positron)</li>
+</ul>`,
     vars: [
       { sym: 'm', name: 'Masse m', unit: 'kg', desc: 'Ruhemasse' }
     ],
@@ -374,6 +462,26 @@ const FORMULAS = [
     id: 'r_lorentz', cat: 'Relativität', name: 'Lorentz-Faktor',
     expr: 'γ = 1/√(1−v²/c²)', displayExpr: 'γ = 1 / √(1 − v²/c²)',
     desc: 'c = 299792458 m/s',
+    info: `<h4>Bedeutung</h4>
+<p>Der Lorentz-Faktor γ (Gamma) beschreibt, wie stark relativistische Effekte bei einer gegebenen Geschwindigkeit sind.</p>
+<h4>Herleitung</h4>
+<p>Aus den Lorentz-Transformationen der speziellen Relativitätstheorie folgt für die Zeitdilatation und Längenkontraktion der Faktor:</p>
+<p><code>γ = 1/√(1 − β²)</code> mit <code>β = v/c</code></p>
+<p>Dies ergibt sich aus der Invarianz des Raum-Zeit-Intervalls:</p>
+<p><code>(cΔt)² − (Δx)² = (cΔt')² − (Δx')²</code></p>
+<h4>Interpretation</h4>
+<ul>
+<li><code>v ≪ c</code>: <code>γ ≈ 1</code> — keine relativistischen Effekte</li>
+<li><code>v = 0.5c</code>: <code>γ ≈ 1.155</code> — 15.5% Zeitdilatation</li>
+<li><code>v = 0.9c</code>: <code>γ ≈ 2.294</code> — Zeit läuft ~2.3× langsamer</li>
+<li><code>v → c</code>: <code>γ → ∞</code> — Zeit steht still, Länge wird 0</li>
+</ul>
+<h4>Anwendung</h4>
+<ul>
+<li>Zeitdilatation: <code>Δt = γ · Δτ</code></li>
+<li>Längenkontraktion: <code>L = L₀/γ</code></li>
+<li>Relativistische Masse: <code>m = γ · m₀</code></li>
+</ul>`,
     vars: [
       { sym: 'v', name: 'Geschwindigkeit v', unit: 'm/s', desc: 'Geschwindigkeit des Körpers' }
     ],
@@ -381,7 +489,7 @@ const FORMULAS = [
     resultUnit: '(dimensionslos)', resultName: 'Lorentz-Faktor γ',
     steps: v => {
       const beta = v.v / 299792458;
-      return [`γ = 1 / √(1 − β²)`, `β = v/c = ${v.v} / 299792458 = ${beta.toFixed(8)}`, `β² = ${(beta*beta).toFixed(12)}`, `γ = 1 / √(${1 - beta*beta})`, `γ = ${1 / Math.sqrt(1 - beta*beta)}`];
+      return [`γ = 1 / √(1 − β²)`, `β = v/c = ${v.v} / 299792458 = ${beta.toFixed(10)}`, `β² = ${(beta*beta).toFixed(12)}`, `γ = 1 / √(${1 - beta*beta})`, `γ = ${1 / Math.sqrt(1 - beta*beta)}`];
     }
   },
   {
@@ -405,6 +513,23 @@ const FORMULAS = [
     id: 'q_photon', cat: 'Quantenphysik', name: 'Photonenenergie',
     expr: 'E = h·f', displayExpr: 'E = h · f',
     desc: 'h = 6.62607015×10⁻³⁴ J·s',
+    info: `<h4>Bedeutung</h4>
+<p>Die Energie eines Photons ist proportional zu seiner Frequenz. Dies ist eine der Grundlagen der Quantenphysik.</p>
+<h4>Herleitung</h4>
+<p>Max Planck postulierte 1900, dass Energie nur in diskreten Portionen ("Quanten") auftreten kann:</p>
+<p><code>E = n·h·f</code> mit <code>n = 1, 2, 3, ...</code></p>
+<p>Einstein erweiterte dies 1905 (Photoelektrischer Effekt): Licht besteht aus Teilchen (Photonen), jedes mit der Energie:</p>
+<p><code>E = h·f</code></p>
+<p>Mit <code>c = λ·f</code> folgt auch: <code>E = h·c/λ</code></p>
+<h4>Die Planck-Konstante</h4>
+<p><code>h = 6.62607015 × 10⁻³⁴ J·s</code> (exakt seit 2019)</p>
+<p>Dies ist die fundamentale Konstante der Quantenmechanik.</p>
+<h4>Anwendung</h4>
+<ul>
+<li>Photoelektrischer Effekt: Elektronen werden aus Metall herausgeschlagen</li>
+<li>Spektroskopie: Analyse von Licht zur Bestimmung von Atomstrukturen</li>
+<li>Lasertechnologie, Solarzellen, Photosynthese</li>
+</ul>`,
     vars: [
       { sym: 'f', name: 'Frequenz f', unit: 'Hz', desc: 'Photonenfrequenz' }
     ],
@@ -494,13 +619,99 @@ const FORMULAS = [
     resultUnit: 's', resultName: 'Periodendauer T',
     steps: v => [`T = 2π × √(l / g)`, `g = 9.80665 m/s²`, `T = 2π × √(${v.l} / 9.80665)`, `T = 2π × √(${v.l / 9.80665})`, `T = ${2 * Math.PI * Math.sqrt(v.l / 9.80665)} s`]
   },
+
+  /* ── WRZT (Wellenraumzeit-Theorie) ──────────────────────── */
+  {
+    id: 'wrzt_eta', cat: 'WRZT', name: 'Raumzeit-Trägheit',
+    expr: 'η = ½·mₑ', displayExpr: 'η = ½ · mₑ',
+    desc: 'Trägheit der Raumzeit (η)',
+    vars: [
+      { sym: 'mₑ', name: 'Elektronenmasse', unit: 'kg', desc: 'Ruhemasse des Elektrons' }
+    ],
+    calc: v => 0.5 * v.mₑ, resultUnit: 'kg', resultName: 'Raumzeit-Trägheit η',
+    steps: v => [`η = ½ × mₑ`, `η = 0.5 × ${v.mₑ}`, `η = ${0.5 * v.mₑ} kg`]
+  },
+  {
+    id: 'wrzt_rmin', cat: 'WRZT', name: 'Minimaler Radius',
+    expr: 'Rmin = 2·ℏ/(mₑ·c)', displayExpr: 'Rmin = 2·ℏ / (mₑ · c)',
+    desc: 'Minimaler Radius der Raumzeit (Rmin)',
+    vars: [
+      { sym: 'mₑ', name: 'Elektronenmasse', unit: 'kg', desc: 'Ruhemasse des Elektrons' },
+      { sym: 'ℏ', name: 'Reduz. Planck-Konstante', unit: 'J·s', desc: 'ℏ = h/(2π)' },
+      { sym: 'c', name: 'Lichtgeschwindigkeit', unit: 'm/s', desc: 'Vakuumlichtgeschwindigkeit' }
+    ],
+    calc: v => (2 * v.ℏ) / (v.mₑ * v.c),
+    resultUnit: 'm', resultName: 'Minimaler Radius Rmin',
+    steps: v => [`Rmin = 2·ℏ / (mₑ·c)`, `Rmin = 2 × ${v.ℏ} / (${v.mₑ} × ${v.c})`, `Rmin = ${(2 * v.ℏ) / (v.mₑ * v.c)} m`]
+  },
+  {
+    id: 'wrzt_xi', cat: 'WRZT', name: 'Raumzeit-Spannung',
+    expr: 'Ξ = η/Rmin', displayExpr: 'Ξ = η / Rmin',
+    desc: 'Raumzeit-Spannung (Ξ)',
+    vars: [
+      { sym: 'η', name: 'Raumzeit-Trägheit', unit: 'kg', desc: 'Trägheit η' },
+      { sym: 'Rmin', name: 'Minimaler Radius', unit: 'm', desc: 'Minimaler Radius' }
+    ],
+    calc: v => v.η / v.Rmin, resultUnit: 'kg/m', resultName: 'Raumzeit-Spannung Ξ',
+    steps: v => [`Ξ = η / Rmin`, `Ξ = ${v.η} / ${v.Rmin}`, `Ξ = ${v.η / v.Rmin} kg/m`]
+  },
+  {
+    id: 'wrzt_fxi', cat: 'WRZT', name: 'Kraft-Spannung',
+    expr: 'F_Ξ = Ξ·c²', displayExpr: 'F_Ξ = Ξ · c²',
+    desc: 'Kraft-Spannung aus Raumzeit-Spannung',
+    vars: [
+      { sym: 'Ξ', name: 'Raumzeit-Spannung', unit: 'kg/m', desc: 'Statische Raumzeit-Spannung' },
+      { sym: 'c', name: 'Lichtgeschwindigkeit', unit: 'm/s', desc: 'Vakuumlichtgeschwindigkeit' }
+    ],
+    calc: v => v.Ξ * v.c * v.c, resultUnit: 'N', resultName: 'Kraft-Spannung F_Ξ',
+    steps: v => [`F_Ξ = Ξ × c²`, `F_Ξ = ${v.Ξ} × ${v.c}²`, `F_Ξ = ${v.Ξ * v.c**2} N`]
+  },
+  {
+    id: 'wrzt_alpha', cat: 'WRZT', name: 'Bugwelle α',
+    expr: 'α = arcsin(v/c)', displayExpr: 'α = arcsin(v / c)',
+    desc: 'Bugwellen-Winkel α',
+    vars: [
+      { sym: 'v', name: 'Geschwindigkeit', unit: 'm/s', desc: 'Geschwindigkeit des Objekts' },
+      { sym: 'c', name: 'Lichtgeschwindigkeit', unit: 'm/s', desc: 'c = 299792458 m/s' }
+    ],
+    calc: v => {
+      const ratio = v.v / v.c;
+      if (ratio > 1) throw new Error('v/c > 1: Überlichtgeschwindigkeit nicht möglich');
+      return Math.asin(ratio) * 180 / Math.PI;
+    },
+    resultUnit: '°', resultName: 'Bugwelle α',
+    steps: v => {
+      const ratio = v.v / v.c;
+      return [`α = arcsin(v / c)`, `v/c = ${v.v} / ${v.c} = ${ratio.toFixed(8)}`, `α = arcsin(${ratio.toFixed(8)})`, `α = ${(Math.asin(ratio) * 180 / Math.PI).toFixed(6)}°`];
+    }
+  },
+  {
+    id: 'wrzt_gamma', cat: 'WRZT', name: 'Lorentz-Faktor mit α',
+    expr: 'γ = 1/cos(arcsin(v/c))', displayExpr: 'γ = 1 / cos(arcsin(v/c))',
+    desc: 'Lorentz-Faktor über Bugwellen-Winkel',
+    vars: [
+      { sym: 'v', name: 'Geschwindigkeit', unit: 'm/s', desc: 'Geschwindigkeit des Objekts' },
+      { sym: 'c', name: 'Lichtgeschwindigkeit', unit: 'm/s', desc: 'c = 299792458 m/s' }
+    ],
+    calc: v => {
+      const ratio = v.v / v.c;
+      if (ratio >= 1) throw new Error('v/c ≥ 1: Lorentz-Faktor nicht definiert');
+      return 1 / Math.cos(Math.asin(ratio));
+    },
+    resultUnit: '(dimensionslos)', resultName: 'Lorentz-Faktor γ',
+    steps: v => {
+      const ratio = v.v / v.c;
+      const alpha = Math.asin(ratio);
+      return [`γ = 1 / cos(arcsin(v/c))`, `v/c = ${ratio.toFixed(8)}`, `α = arcsin(${ratio.toFixed(8)}) = ${(alpha * 180/Math.PI).toFixed(6)}°`, `cos(α) = ${Math.cos(alpha).toFixed(8)}`, `γ = 1 / ${Math.cos(alpha).toFixed(8)} = ${(1/Math.cos(alpha)).toFixed(8)}`];
+    }
+  },
 ];
 
 /* Kategorie-Icons */
 const CAT_ICONS = {
   'Mechanik': 'fa-cogs', 'Thermodynamik': 'fa-fire', 'Elektrizität': 'fa-bolt',
   'Optik': 'fa-glasses', 'Relativität': 'fa-rocket', 'Quantenphysik': 'fa-atom',
-  'Wellen': 'fa-wave-square', 'Benutzerdefiniert': 'fa-star'
+  'Wellen': 'fa-wave-square', 'WRZT': 'fa-project-diagram', 'Benutzerdefiniert': 'fa-star'
 };
 
 /* ============================================================
@@ -688,8 +899,53 @@ $('btnReset').addEventListener('click', () => {
   resultBox.style.display = 'none';
 });
 
+$('btnInfo').addEventListener('click', () => {
+  if (!activeFormula) return;
+  showFormulaInfo(activeFormula);
+});
+
 /* ============================================================
-   11. ERGEBNIS ANZEIGEN
+   11A. FORMEL-INFO MODAL
+   ============================================================ */
+function showFormulaInfo(f) {
+  const modal = $('modalOverlay');
+  const title = $('modalTitle');
+  const content = $('modalContent');
+  
+  title.textContent = f.name;
+  
+  if (f.info) {
+    content.innerHTML = f.info;
+  } else {
+    content.innerHTML = `
+      <h4>Formel</h4>
+      <p><code>${f.displayExpr || f.expr}</code></p>
+      <h4>Beschreibung</h4>
+      <p>${f.desc || 'Keine weitere Beschreibung verfügbar.'}</p>
+      <h4>Variablen</h4>
+      <ul>
+        ${f.vars.map(v => `<li><code>${v.sym}</code> — ${v.name} [${v.unit}]${v.desc ? ': ' + v.desc : ''}</li>`).join('')}
+      </ul>
+      <h4>Ergebnis</h4>
+      <p>${f.resultName} in <code>${f.resultUnit}</code></p>
+    `;
+  }
+  
+  modal.style.display = 'flex';
+}
+
+$('modalClose').addEventListener('click', () => {
+  $('modalOverlay').style.display = 'none';
+});
+
+$('modalOverlay').addEventListener('click', e => {
+  if (e.target === $('modalOverlay')) {
+    $('modalOverlay').style.display = 'none';
+  }
+});
+
+/* ============================================================
+   12. ERGEBNIS ANZEIGEN
    ============================================================ */
 function showResult({ value, unit, name, steps, error }) {
   resultBox.style.display = 'block';
@@ -724,9 +980,13 @@ function formatNumber(n) {
   if (n === undefined || n === null) return '—';
   const abs = Math.abs(n);
   if (abs === 0) return '0';
-  if (abs >= 1e-4 && abs < 1e9) {
-    // Normale Darstellung mit max 10 signifikante Stellen
-    let s = parseFloat(n.toPrecision(10)).toString();
+  
+  // Bis zu 10 Nachkommastellen, aber ohne unnötige Nullen
+  if (abs >= 1e-10 && abs < 1e10) {
+    // Formatierung mit bis zu 10 signifikanten Stellen
+    let s = n.toFixed(10);
+    // Entferne trailing zeros
+    s = s.replace(/\.?0+$/, '');
     return s;
   }
   return formatSci(n);
@@ -736,10 +996,19 @@ function formatSci(n) {
   if (n === undefined || n === null) return '—';
   if (n === 0) return '0';
   const abs = Math.abs(n);
-  if (abs >= 0.001 && abs < 1e6) return parseFloat(n.toPrecision(8)).toString();
+  
+  // Normale Darstellung für moderate Zahlen
+  if (abs >= 0.0001 && abs < 1e7) {
+    let s = n.toFixed(10);
+    s = s.replace(/\.?0+$/, '');
+    return s;
+  }
+  
+  // Wissenschaftliche Notation mit 10 signifikanten Stellen
   const exp = Math.floor(Math.log10(abs));
   const mant = n / Math.pow(10, exp);
-  return `${parseFloat(mant.toPrecision(7))} × 10^${exp}`;
+  const mantStr = mant.toFixed(10).replace(/\.?0+$/, '');
+  return `${mantStr} × 10^${exp}`;
 }
 
 /* ============================================================
