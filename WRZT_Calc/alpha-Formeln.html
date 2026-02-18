@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; padding: 20px; background-color: #fcfcfc; }
+    h1 { color: #2c3e50; border-bottom: 3px solid #2c3e50; padding-bottom: 10px; text-align: center; }
+    h2 { color: #2980b9; margin-top: 40px; border-left: 5px solid #2980b9; padding-left: 15px; background-color: #f0f4f8; padding-top: 5px; padding-bottom: 5px; }
+    h3 { color: #e67e22; margin-top: 25px; border-left: 4px solid #e67e22; padding-left: 10px; }
+    
+    .formula-box { background-color: #f4f7f6; border: 1px solid #d1d8d7; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: "serif"; font-size: 1.2em; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+    .highlight { color: #c0392b; font-weight: bold; }
+    .concept { font-weight: bold; color: #2c3e50; }
+    
+    .proof-step { margin-bottom: 15px; padding-left: 20px; border-left: 2px solid #bdc3c7; background-color: #fff; padding-top: 5px; padding-bottom: 5px; }
+    .mechanism-step { margin-bottom: 20px; padding: 20px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
+    
+    .conclusion { background-color: #fdf2e9; border: 1px solid #f5b041; padding: 25px; border-radius: 8px; margin-top: 30px; }
+    .law-box { background-color: #2c3e50; color: #ecf0f1; padding: 25px; border-radius: 8px; margin-top: 30px; font-style: italic; border-left: 10px solid #e67e22; }
+    
+    .code-block { display: block; white-space: pre; background: #272822; color: #f8f8f2; padding: 15px; border-radius: 5px; font-family: 'Consolas', monospace; font-size: 0.9em; overflow-x: auto; }
+    
+    .summary-table { width: 100%; border-collapse: collapse; margin: 25px 0; background-color: #fff; }
+    .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 15px; text-align: left; }
+    .summary-table th { background-color: #2c3e50; color: white; }
+</style>
+</head>
+<body>
+
+    <h1>WRZT: Die mechanische Identität der Feinstrukturkonstante</h1>
+    
+    <p>In der Standardphysik ist die Feinstrukturkonstante &alpha; eine abstrakte Zahl. In der <strong>Wellenraumzeit-Theorie (WRZT)</strong> hingegen ist sie das fundamentale mechanische Kopplungsverhältnis der Raumzeit-Geometrie.</p>
+
+    <h2>1. Mathematischer Vergleich der Identitäten</h2>
+    <p>Wir vergleichen die traditionelle Definition mit der WRZT-Herleitung über das Kraftverhältnis am Radius <span class="concept">r<sub>min</sub></span>.</p>
+
+    <h3>A. Der traditionelle Weg (Elektromagnetisch)</h3>
+    <div class="formula-box">
+        &alpha;<sub>trad</sub> = e² / (4&pi;&epsilon;<sub>0</sub> &hbar; c)
+    </div>
+
+    <h3>B. Der WRZT-Weg (Mechanisches Kraftverhältnis)</h3>
+    <p>Hier ist &alpha; das Verhältnis der Coulomb-Kraft (F<sub>C</sub>) zur totalen Zentrifugalkraft (F<sub>Z</sub>) am kritischen Punkt <span class="concept">r<sub>min</sub> = &hbar; / (m<sub>e</sub>c)</span>:</p>
+    <div class="formula-box">
+        &alpha;<sub>WRZT</sub> = F<sub>C</sub> / F<sub>Z</sub> = [ e² / (4&pi;&epsilon;<sub>0</sub> r<sub>min</sub>²) ] / [ m<sub>e</sub> c² / r<sub>min</sub> ]
+    </div>
+
+    <div class="proof-step">
+        <strong>Der mathematische Beweis der Identität:</strong><br>
+        1. Vereinfachung des Doppelbruchs: &alpha;<sub>WRZT</sub> = e² / (4&pi;&epsilon;<sub>0</sub> r<sub>min</sub> m<sub>e</sub> c²)<br>
+        2. Einsetzen von r<sub>min</sub> = &hbar; / (m<sub>e</sub>c): &alpha;<sub>WRZT</sub> = e² / (4&pi;&epsilon;<sub>0</sub> [&hbar; / (m<sub>e</sub>c)] m<sub>e</sub> c²)<br>
+        3. <strong>Die Kürzung:</strong> Masse m<sub>e</sub> und c kürzen sich heraus. Es bleibt: <br>
+        <span class="highlight">&alpha;<sub>WRZT</sub> = e² / (4&pi;&epsilon;<sub>0</sub> &hbar; c)</span>
+    </div>
+
+    
+
+    <h2>2. Numerischer Beweis (SciPy-Verifikation)</h2>
+    <p>Um die absolute Exaktheit zu demonstrieren, wurde die Berechnung mit hochpräzisen Naturkonstanten (CODATA) durchgeführt:</p>
+    
+    <div class="code-block">
+# Ergebnis der Python-Berechnung (SciPy)
+Alpha (Traditionell):  0.007297352569311
+Alpha (WRZT Mechanik): 0.007297352569311
+Differenz:             0.000000000000000
+1 / Alpha (Kehrwert):  137.0359990836958
+    </div>
+
+    <h2>3. Die geometrische Notwendigkeit der Rotation</h2>
+    <div class="mechanism-step">
+        <strong>Feld-Retardierung:</strong> Da sich Raumzeit-Änderungen maximal mit <em>c</em> ausbreiten, reagieren Teilchen auf verzögerte Positionen. Dies erzeugt bei jeder Annäherung ein Drehmoment – den mechanischen Hebelarm der Rotation.
+    </div>
+    <div class="mechanism-step">
+        <strong>Energie-Sperre:</strong> Da <em>v = c</em> nicht überschritten werden kann, wird die Anziehungsenergie bei <span class="concept">r<sub>min</sub></span> vollständig in die Bahnkrümmung investiert. Die Kreisbahn ist die einzige stabile Lösung.
+    </div>
+
+    
+
+    <div class="law-box">
+        <strong>Zusammenfassende Erkenntnis:</strong><br>
+        Die Feinstrukturkonstante &alpha; ist das Maß für das Defizit der elektrischen Kraft gegenüber der totalen Raumzeit-Bindung. Der 𝒰-Tensor füllt dieses Defizit (Faktor 137) exakt auf, um Materie bei r<sub>min</sub> stabil zu halten.
+    </div>
+
+    <h2>Kennzahlen im Überblick</h2>
+    <table class="summary-table">
+        <tr>
+            <th>Parameter</th>
+            <th>Formel / Wert</th>
+            <th>Bedeutung in der WRZT</th>
+        </tr>
+        <tr>
+            <td><span class="concept">r<sub>min</sub></span></td>
+            <td>&hbar; / (m<sub>e</sub> c)</td>
+            <td>Stabilisierungsradius des Teilchenknotens.</td>
+        </tr>
+        <tr>
+            <td><span class="concept">&alpha;</span></td>
+            <td>F<sub>C</sub> / F<sub>Z</sub></td>
+            <td>Mechanisches Lastverhältnis (1/137).</td>
+        </tr>
+        <tr>
+            <td><span class="concept">Vortizität</span></td>
+            <td>&omega; = c / r<sub>min</sub></td>
+            <td>Zwingende Rotationsfrequenz vor der Undatron-Bildung.</td>
+        </tr>
+    </table>
+
+</body>
+</html>
