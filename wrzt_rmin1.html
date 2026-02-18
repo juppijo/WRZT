@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 850px; margin: auto; padding: 20px; }
+    h1 { color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
+    h2 { color: #e67e22; margin-top: 30px; border-left: 4px solid #e67e22; padding-left: 10px; }
+    .formula-box { background-color: #f4f7f6; border: 1px solid #d1d8d7; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: "serif"; font-size: 1.2em; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+    .highlight { color: #c0392b; font-weight: bold; }
+    .concept { font-weight: bold; color: #2980b9; }
+    .proof-step { margin-bottom: 15px; padding-left: 20px; border-left: 2px solid #bdc3c7; }
+    .conclusion { background-color: #fdf2e9; border: 1px solid #f5b041; padding: 20px; border-radius: 8px; margin-top: 30px; }
+    .summary-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    .summary-table th { background-color: #2c3e50; color: white; }
+</style>
+</head>
+<body>
+
+    <h1>Die mechanische Invarianz und Existenzbedingung von r<sub>min</sub></h1>
+    
+    <p>In der <strong>Wellenraumzeit-Theorie (WRZT)</strong> ist der minimale Radius <span class="concept">r<sub>min</sub></span> das Ergebnis eines perfekten mechanischen Gleichgewichts. Der entscheidende Beweis zeigt, wie die Raumzeitkrümmung das Defizit der klassischen Kräfte ausgleicht.</p>
+
+    <h2>1. Das Defizit der Coulomb-Kraft</h2>
+    <p>Berechnungen zeigen, dass die klassische elektrische Anziehung bei <span class="concept">r<sub>min</sub></span> um den Faktor 137 zu schwach ist (<span class="highlight">&alpha; &approx; 1/137</span>), um die Zentrifugalkraft bei Lichtgeschwindigkeit zu halten. In der WRZT ist dies die „Geburtsstunde der Materie“: Die fehlende Bindungsenergie wird durch die geometrische Deformation der Raumzeit – den <span class="concept">𝒰-Tensor</span> – bereitgestellt.</p>
+
+    <h2>2. Die Anpassung des 𝒰-Tensors</h2>
+    <p>Damit ein Teilchen stabil rotieren kann, muss die totale Kraft <span class="concept">F<sub>Total</sub></span> der Zentrifugalkraft entsprechen. Der 𝒰-Tensor liefert die zusätzliche geometrische Energie:</p>
+    <div class="formula-box">
+        F<sub>Z</sub> = F<sub>Elektrostatisch</sub> + F<sub>Raumzeitkrümmung</sub> <br>
+        <small>Effektive WRZT-Kraft:</small> <strong>F<sub>WRZT</sub> = (1/&alpha;) · F<sub>Coulomb</sub></strong>
+    </div>
+
+    <h2>3. Der mathematische Beweis (Der "Heureka"-Moment)</h2>
+    <p>Setzt man die WRZT-Kraftformel in die Gleichgewichtsbedingung ein, offenbart sich die tiefere Ordnung:</p>
+    
+    <div class="proof-step">
+        <strong>Schritt A: Einsetzen der Kraftformel</strong><br>
+        (m<sub>0</sub>c²) / r = (1/&alpha;) · (e²) / (4&pi;&epsilon;<sub>0</sub>r²)
+    </div>
+
+    <div class="proof-step">
+        <strong>Schritt B: Ersetzen von &alpha; durch die Definition (&alpha; = e² / 4&pi;&epsilon;<sub>0</sub>&hbar;c)</strong><br>
+        (m<sub>0</sub>c²) / r = [ (4&pi;&epsilon;<sub>0</sub>&hbar;c) / e² ] · [ e² / (4&pi;&epsilon;<sub>0</sub>r²) ]
+    </div>
+
+    <div class="proof-step">
+        <strong>Schritt C: Die finale Kürzung</strong><br>
+        Beobachte, wie sich 4&pi;&epsilon;<sub>0</sub> und e² vollständig neutralisieren. Es bleibt eine rein mechanische Relation: <br>
+        <strong>(m<sub>0</sub>c²) / r = (&hbar;c) / r²</strong>
+    </div>
+
+    <div class="formula-box" style="border: 2px solid #27ae60; color: #27ae60;">
+        <strong>r = (&hbar;c) / (m<sub>0</sub>c²) &xrarr; r<sub>min</sub> = &hbar; / (m<sub>0</sub>c)</strong>
+    </div>
+
+    <div class="conclusion">
+        <h3>Fazit des Beweises</h3>
+        <ul>
+            <li><strong>Geometrische Einheit:</strong> <span class="concept">r<sub>min</sub></span> ist der Punkt, an dem Quantenmechanik (&hbar;), Relativität (c) und Trägheit (m<sub>0</sub>) verschmelzen.</li>
+            <li><strong>Die Rolle von &alpha;:</strong> Die Feinstrukturkonstante ist das Verhältnis zwischen elektrischer Energie und der totalen Raumzeit-Energie des Teilchenknotens.</li>
+            <li><strong>Stabilität:</strong> Das Teilchen ist bei <span class="concept">r<sub>min</sub></span> „gefangen“, weil die Raumzeitkrümmung exakt die nötige Stärke annimmt, um die Fliehkraft zu kompensieren.</li>
+        </ul>
+        <p>Jede Abweichung von diesem Radius würde das System zerstören: Materie würde entweder kollabieren oder sich als freie Welle (<strong>Undatron</strong>) auflösen.</p>
+    </div>
+
+    <h2>Zusammenfassung der Kennzahlen</h2>
+    <table class="summary-table">
+        <tr>
+            <th>Größe</th>
+            <th>Definition</th>
+            <th>Bedeutung in der WRZT</th>
+        </tr>
+        <tr>
+            <td><span class="concept">r<sub>min</sub></span></td>
+            <td>&hbar; / (m<sub>0</sub> · c)</td>
+            <td>Mechanische Existenzbedingung für Materie.</td>
+        </tr>
+        <tr>
+            <td><span class="concept">&alpha;</span></td>
+            <td>e² / (4&pi;&epsilon;<sub>0</sub>&hbar;c)</td>
+            <td>Skalierungsfaktor zwischen Coulomb-Kraft und 𝒰-Tensor.</td>
+        </tr>
+        <tr>
+            <td><span class="concept">𝒰-Tensor</span></td>
+            <td>Geometrische Kraft</td>
+            <td>Gleicht das Kraftdefizit der Elektrostatik aus.</td>
+        </tr>
+    </table>
+
+</body>
+</html>

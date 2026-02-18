@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; padding: 20px; background-color: #fcfcfc; }
+    h1 { color: #2c3e50; border-bottom: 3px solid #2c3e50; padding-bottom: 10px; text-align: center; }
+    h2 { color: #2980b9; margin-top: 40px; border-left: 5px solid #2980b9; padding-left: 15px; background-color: #f0f4f8; padding-top: 5px; padding-bottom: 5px; }
+    h3 { color: #e67e22; margin-top: 25px; border-left: 4px solid #e67e22; padding-left: 10px; }
+    
+    .formula-box { background-color: #f4f7f6; border: 1px solid #d1d8d7; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: "serif"; font-size: 1.2em; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+    .highlight { color: #c0392b; font-weight: bold; }
+    .concept { font-weight: bold; color: #2c3e50; }
+    
+    .proof-step { margin-bottom: 15px; padding-left: 20px; border-left: 2px solid #bdc3c7; background-color: #fff; padding-top: 5px; padding-bottom: 5px; }
+    .mechanism-step { margin-bottom: 20px; padding: 20px; background: #fff; border: 1px solid #eee; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+    
+    .conclusion { background-color: #fdf2e9; border: 1px solid #f5b041; padding: 25px; border-radius: 8px; margin-top: 30px; }
+    .law-box { background-color: #2c3e50; color: #ecf0f1; padding: 25px; border-radius: 8px; margin-top: 30px; font-style: italic; border-left: 10px solid #e67e22; }
+    
+    .summary-table { width: 100%; border-collapse: collapse; margin: 25px 0; background-color: #fff; }
+    .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 15px; text-align: left; }
+    .summary-table th { background-color: #2c3e50; color: white; }
+    
+    .intro-text { font-size: 1.1em; color: #444; margin-bottom: 30px; }
+</style>
+</head>
+<body>
+
+    <h1>WRZT: Die mechanische Invarianz und geometrische Notwendigkeit von r<sub>min</sub></h1>
+    
+    <div class="intro-text">
+        In der <strong>Wellenraumzeit-Theorie (WRZT)</strong> ist der minimale Radius <span class="concept">r<sub>min</sub></span> (entsprechend der Compton-Wellenlänge) keine willkürliche Naturkonstante. Er ist das Ergebnis eines stabilen mechanischen Gleichgewichts der Raumzeit-Geometrie und die einzige mathematisch erlaubte Lösung für die Annäherung von Materie und Antimaterie.
+    </div>
+
+    <h2>1. Das Prinzip der &gamma;-Aufhebung (Invarianz)</h2>
+    <p>Ein zentraler Beweis der WRZT liegt in der Erkenntnis, dass sich der Lorentz-Faktor <span class="highlight">&gamma;</span> bei der Betrachtung der internen Dynamik aufhebt. Dies geschieht, weil sowohl die Trägheit als auch die feldtheoretische Anziehung gleichermaßen relativistisch skalieren:</p>
+
+    <div class="formula-box">
+        <strong>Zentrifugalkraft (Trägheit):</strong> F<sub>Z</sub> = (&gamma; · m<sub>0</sub> · v²) / r <br>
+        <strong>Anziehung (Raumzeit-Krümmung):</strong> F<sub>A</sub> = &gamma; · F<sub>Coulomb</sub>
+    </div>
+
+    <p>Durch Gleichsetzen von F<sub>Z</sub> = F<sub>A</sub> kürzt sich <span class="highlight">&gamma;</span> sofort heraus. Die geometrische Struktur eines Teilchenknotens bleibt somit invariant gegenüber seiner energetischen Aufladung. Die Grenze der materiellen Existenz wird erreicht, wenn die interne Rotation Lichtgeschwindigkeit <span class="highlight">c</span> annimmt und der Drehimpuls dem Wirkungsquantum entspricht:</p>
+    
+    <div class="formula-box">
+        L = r · p = r · (&gamma; · m<sub>0</sub> · c) = &hbar;
+    </div>
+
+    <h2>2. Der Beweis der Raumzeitkrümmung (𝒰-Tensor)</h2>
+    <p>Berechnungen zeigen, dass die klassische elektrische Anziehung bei <span class="concept">r<sub>min</sub></span> um den Faktor 137 zu schwach ist (<span class="highlight">&alpha; &approx; 1/137</span>), um die Zentrifugalkraft bei Lichtgeschwindigkeit zu halten. Die fehlende Bindungsenergie wird durch die geometrische Deformation der Raumzeit – den <span class="concept">𝒰-Tensor</span> – bereitgestellt.</p>
+
+    <h3>Die Anpassung und der "Heureka"-Moment</h3>
+    <p>Damit ein Teilchen stabil rotieren kann, muss die totale Kraft <span class="concept">F<sub>Total</sub></span> der Zentrifugalkraft entsprechen:</p>
+    <div class="formula-box">
+        F<sub>Z</sub> = F<sub>Elektrostatisch</sub> + F<sub>Raumzeitkrümmung</sub> <br>
+        <small>Effektive WRZT-Kraft:</small> <strong>F<sub>WRZT</sub> = (1/&alpha;) · F<sub>Coulomb</sub></strong>
+    </div>
+
+    <div class="proof-step">
+        <strong>Schritt A:</strong> (m<sub>0</sub>c²) / r = (1/&alpha;) · (e²) / (4&pi;&epsilon;<sub>0</sub>r²)
+    </div>
+    <div class="proof-step">
+        <strong>Schritt B:</strong> Ersetzen von &alpha; durch e² / (4&pi;&epsilon;<sub>0</sub>&hbar;c) führt zu: <br>
+        (m<sub>0</sub>c²) / r = [ (4&pi;&epsilon;<sub>0</sub>&hbar;c) / e² ] · [ e² / (4&pi;&epsilon;<sub>0</sub>r²) ]
+    </div>
+    <div class="proof-step">
+        <strong>Schritt C (Die finale Kürzung):</strong> 4&pi;&epsilon;<sub>0</sub> und e² neutralisieren sich vollständig. <br>
+        Es bleibt: <strong>(m<sub>0</sub>c²) / r = (&hbar;c) / r²</strong>
+    </div>
+
+    <div class="formula-box" style="border: 2px solid #27ae60; color: #27ae60;">
+        <strong>r = (&hbar;c) / (m<sub>0</sub>c²) &xrarr; r<sub>min</sub> = &hbar; / (m<sub>0</sub>c)</strong>
+    </div>
+
+    <h2>3. Der Zwang zur Kreisbahn (Vortizität)</h2>
+    <p>Eine punktförmige Kollision (r=0) ist mechanisch ausgeschlossen. Drei Faktoren zwingen das Elektron-Positron-Paar auf eine Kreisbahn:</p>
+
+    <div class="mechanism-step">
+        <strong>A. Feld-Retardierung:</strong> Informationen reisen maximal mit <span class="highlight">c</span>. Teilchen A reagiert auf die verzögerte Position von B. Bei Stoßparametern b > 0 entsteht ein asymmetrisches Kraftfeld, das wie ein <strong>mechanischer Hebelarm</strong> wirkt und ein Drehmoment erzeugt.
+    </div>
+
+    <div class="mechanism-step">
+        <strong>B. Schranke der Lichtgeschwindigkeit:</strong> Da <span class="highlight">v = c</span> die Obergrenze ist, kann die Anziehungskraft die Geschwindigkeit nicht weiter steigern. Die Energie wird stattdessen vollständig in die <strong>Bahnkrümmung</strong> investiert.
+    </div>
+
+    <div class="mechanism-step">
+        <strong>C. Topologische Sperre (WRZNT):</strong> Teilchen sind Gitterknoten. Zwei Knoten können nicht denselben Platz einnehmen. Bei <span class="concept">r<sub>min</sub></span> ist der maximale Verdichtungsgrad erreicht; die Teilchen "rollen" umeinander ab.
+    </div>
+
+    <div class="law-box">
+        <strong>Das Gesetz der zwangsläufigen Vortizität:</strong><br>
+        "Die Kreisbahn ist die finale Geometrie jeder hochenergetischen Annäherung. Durch die Kopplung von Feldverzögerung und der Grenzgeschwindigkeit c transformiert die Raumzeit jede lineare Kraft in einen Wirbel. Bei r<sub>min</sub> friert dieses System in einer stabilen Rotation ein, bis die gesamte Energie als Undatron-Welle abgestrahlt wird."
+    </div>
+
+    <div class="conclusion">
+        <h3>Fazit des Beweises</h3>
+        <ul>
+            <li><strong>Geometrische Einheit:</strong> <span class="concept">r<sub>min</sub></span> verschmilzt Quantenmechanik (&hbar;), Relativität (c) und Trägheit (m<sub>0</sub>).</li>
+            <li><strong>Die Rolle von &alpha;:</strong> Die Feinstrukturkonstante ist das Verhältnis zwischen elektrischer Energie und totaler Raumzeit-Energie.</li>
+            <li><strong>Stabilität:</strong> Das Teilchen ist bei <span class="concept">r<sub>min</sub></span> „gefangen“, da die Raumzeitkrümmung (𝒰-Tensor) die Fliehkraft exakt kompensiert.</li>
+        </ul>
+    </div>
+
+    <h2>Zusammenfassung der Kennzahlen</h2>
+    <table class="summary-table">
+        <tr>
+            <th>Größe</th>
+            <th>Definition</th>
+            <th>Bedeutung in der WRZT</th>
+        </tr>
+        <tr>
+            <td><span class="concept">r<sub>min</sub></span></td>
+            <td>&hbar; / (m<sub>0</sub> · c)</td>
+            <td>Minimaler Radius; mechanische Existenzbedingung für Materie.</td>
+        </tr>
+        <tr>
+            <td><span class="concept">&lambda;<sub>c</sub></span></td>
+            <td>2&pi; · r<sub>min</sub></td>
+            <td>Abrollumfang der Raumzeit-Welle (Compton-Wellenlänge).</td>
+        </tr>
+        <tr>
+            <td><span class="concept">&alpha;</span></td>
+            <td>e² / (4&pi;&epsilon;<sub>0</sub>&hbar;c)</td>
+            <td>Mechanisches Kopplungsverhältnis; Faktor 137 zwischen Coulomb und 𝒰-Tensor.</td>
+        </tr>
+        <tr>
+            <td><span class="concept">𝒰-Tensor</span></td>
+            <td>Geometrische Kraft</td>
+            <td>Gleicht das Kraftdefizit der Elektrostatik aus.</td>
+        </tr>
+    </table>
+
+    <p style="text-align: center; color: #7f8c8d; margin-top: 50px;"><i>Materie ist in der WRZT "gefangene" und rotierende Raumzeit-Energie.</i></p>
+
+</body>
+</html>
