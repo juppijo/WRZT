@@ -2,183 +2,264 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LWT - Das offizielle Manifest der Lorentz-Wand-Theorie</title>
-    
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-
+    <title>LWT Labor v10 - Unified Theory</title>
     <style>
-        :root {
-            --primary: #00f2ff;
-            --secondary: #7000ff;
-            --bg: #020204;
-            --card-bg: rgba(10, 15, 25, 0.8);
-            --text-main: #d1d5db;
-            --text-bright: #ffffff;
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Segoe UI', sans-serif; }
+        #ui {
+            position: absolute; top: 15px; left: 15px; color: #00ffcc;
+            background: rgba(0, 10, 20, 0.9); padding: 15px; border-radius: 12px;
+            border: 1px solid #00ffcc; z-index: 100; width: 280px; max-height: 90vh; overflow-y: auto;
         }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'EB Garamond', serif;
-            font-size: 1.25rem;
-            line-height: 1.7;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.03) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(112, 0, 255, 0.03) 0%, transparent 20%);
-        }
-
-        .container {
-            max-width: 850px;
-            padding: 80px 25px;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 100px;
-        }
-
-        h1 {
-            font-family: 'Inter', sans-serif;
-            font-size: 5rem;
-            font-weight: 900;
-            margin: 0;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -3px;
-        }
-
-        .tagline {
-            font-family: 'Inter', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.6rem;
-            font-size: 0.9rem;
-            color: #4b5563;
-            margin-top: 10px;
-        }
-
-        h2 {
-            font-family: 'Inter', sans-serif;
-            font-size: 2rem;
-            font-weight: 300;
-            color: var(--primary);
-            margin-top: 80px;
-            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-            padding-bottom: 10px;
-        }
-
-        p { margin-bottom: 1.5rem; text-align: justify; }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 24px;
-            margin: 30px 0;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-        }
-
-        .formula-container {
-            background: rgba(0, 0, 0, 0.4);
-            border-left: 2px solid var(--primary);
-            padding: 25px;
-            margin: 35px 0;
-            font-size: 1.4rem;
-            color: var(--text-bright);
-            overflow-x: auto;
-        }
-
-        .accent-text {
-            color: var(--primary);
-            font-style: italic;
-        }
-
-        footer {
-            margin-top: 120px;
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.8rem;
-            color: #374151;
-            padding-bottom: 50px;
-        }
-
-        .dropcap {
-            float: left;
-            font-family: 'Inter', sans-serif;
-            font-size: 4rem;
-            line-height: 1;
-            font-weight: 900;
-            margin-right: 10px;
-            color: var(--secondary);
-        }
+        h1 { margin: 0 0 10px 0; font-size: 15px; text-transform: uppercase; color: #ffcc00; border-bottom: 1px solid #333; }
+        label { display: block; font-size: 10px; color: #aaa; margin-top: 8px; }
+        input[type=range] { width: 100%; accent-color: #00ffcc; cursor: pointer; }
+        button { width: 100%; padding: 8px; margin-top: 8px; cursor: pointer; font-weight: bold; border-radius: 4px; border:none; background: #00ffcc; color: #000; }
+        .stat { font-family: monospace; font-size: 11px; margin-top: 10px; border-top: 1px solid #333; padding-top: 8px; line-height: 1.4; }
+        #hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); color: #ffcc00; text-align: center; pointer-events: none; font-size: 12px; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px;}
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>LWT</h1>
-        <div class="tagline">The Lorentz Wall Theory</div>
-    </header>
+<div id="ui">
+    <h1>LWT Unified Lab v10</h1>
+    
+    <label>Ur-Anflug Tempo</label>
+    <input type="range" id="speedIn" min="5" max="40" value="15">
 
-    <section>
-        <h2>I. Das Medium: Die Wellenraumzeit</h2>
-        <div class="card">
-            <span class="dropcap">D</span>ie Lorentz-Wand-Theorie (LWT) bricht mit der Vorstellung des "leeren" Vakuums. Sie postuliert ein fundamentales, elastisches Gewebe — die <span class="accent-text">Wellenraumzeit (WRZNT)</span>. Materielle Teilchen sind keine fremden Objekte innerhalb dieses Mediums, sondern <span class="highlight">lokale topologische Knoten</span>. 
-            <br><br>
-            Ein Elektron ist eine tiefgehende Senke im Netz, während das Positron eine spiegelbildliche Aufwölbung darstellt. Die Wechselwirkung zwischen ihnen erfolgt nicht durch "Geisterkräfte", sondern durch die mechanische Spannung des Netzes selbst:
-            <div class="formula-container">
-                \[ \nabla^2 \Psi - \frac{1}{c^2} \frac{\partial^2 \Psi}{\partial t^2} = \kappa \cdot T_{\mu\nu} \]
-            </div>
-            Hierbei beschreibt \( \Psi \) die lokale Auslenkung des Netzes aus dem Nullpunkt der 4. Dimension.
-        </div>
-    </section>
+    <label>Wellen-Frequenz (Undatron)</label>
+    <input type="range" id="freqIn" min="2" max="25" value="10">
 
-    <section>
-        <h2>II. Die Lorentz-Wand: Die Barriere bei \( c \)</h2>
-        <div class="card">
-            Das Herzstück der Theorie ist die <span class="accent-text">Lorentz-Wand</span>. Wenn sich ein Teilchenknoten durch das Netz bewegt, muss das Medium vor ihm gestaucht und hinter ihm gedehnt werden. Bei Annäherung an die Lichtgeschwindigkeit \( v \to c \) verfestigt sich das Netz aufgrund seiner elastischen Grenze zu einer unüberwindbaren mechanischen Wand.
-            <br><br>
-            Die Kraft, die benötigt wird, um die letzten Nanometer zwischen zwei Teilchen zu überbrücken, divergiert durch den Lorentz-Faktor \( \gamma \):
-            <div class="formula-container">
-                \[ F(r, v) = \frac{e^2}{4\pi\varepsilon_0 \cdot r^2} \cdot \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} \]
-            </div>
-            In diesem Moment der maximalen Kompression bei \( r_{min} \) wirkt die Raumzeit wie eine physische Barriere. Es ist die Geburtsstunde der <span class="highlight">Wandkraft</span> \( F_{max} \approx 15,5 \, \text{N} \).
-        </div>
-    </section>
+    <label>Knoten-Masse (Gravitation)</label>
+    <input type="range" id="massIn" min="1" max="150" value="40">
 
-    <section>
-        <h2>III. Das Undatron: Die Entladung der Spannung</h2>
-        <div class="card">
-            Prallen Teilchen an dieser Wand ab oder löschen sie sich gegenseitig aus (Annihilation), bricht die lokale Krümmung schlagartig zusammen. Das gespannte Netz schnellt wie eine losgelassene Bogensehne zurück. Diese mechanische Energie kann nicht verschwinden und wird als <span class="accent-text">Undatron</span> emittiert — ein Wellenpaket, das wir als Photon wahrnehmen.
-            <br><br>
-            Die Transformation von kinetischer Energie und Ruhemasse in Wellenenergie folgt der LWT-Resonanzbedingung:
-            <div class="formula-container">
-                \[ E_{kin} + \Delta m c^2 \Rightarrow \oint_{\text{Wand}} \hbar \cdot \omega \, dt \]
-            </div>
-            Das Undatron ist somit keine abstrakte Wahrscheinlichkeit, sondern eine <span class="highlight">transversale Erschütterung</span> des WRZNT-Mediums.
-        </div>
-    </section>
+    <label>Interaktions-Kraft (G-Kraft)</label>
+    <input type="range" id="forceIn" min="0" max="150" value="60">
+    
+    <button id="pauseBtn">PAUSE PHYSIK</button>
+    <button id="clearBtn" style="background:#555; color:white;">MANUELLE KNOTEN LÖSCHEN</button>
+    <button id="fsBtn" style="background:#ff4444; color:white;">VOLLBILD</button>
 
-    <section>
-        <h2>IV. Verschränkung: Die mechanische Brücke</h2>
-        <div class="card">
-            Verschränkung wird in der LWT trivial: Da zwei Undatronen bei einer Annihilation gleichzeitig an derselben Lorentz-Wand entstehen, teilen sie sich denselben mechanischen Impuls des "Zurückschnellens". Sie sind über die gemeinsame Spannung des Netzes verbunden. Eine Messung an einem Teilchen ist ein physischer Eingriff in das Netz, der sich instantan über die elastische Kopplung auf das Partnertreilchen auswirkt.
-        </div>
-    </section>
-
-    <footer>
-        <p>Erstellt für das LWT-Archiv &copy; 2026</p>
-        <p>Manifest der Wellenraumzeit-Mechanik</p>
-    </footer>
+    <div class="stat">
+        Ur-Phase: <span id="phaseVal" style="color:white">-</span><br>
+        Manuelle Teilchen: <span id="pCount" style="color:white">0</span><br>
+        Status: <span id="status" style="color:#00ffcc">Feld stabil</span>
+    </div>
 </div>
 
+<div id="hint">Links-DblClick: Berg (+) | Rechts-DblClick: Tal (-) | Maus: 3D Ansicht</div>
+
+<script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // SCENE & RENDERER
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    camera.position.set(0, 110, 120);
+    controls.enableDamping = true;
+
+    // RAUMZEIT-NETZ
+    const gridSize = 160, divisions = 110;
+    const geo = new THREE.PlaneGeometry(gridSize, gridSize, divisions, divisions);
+    geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count * 3), 3));
+    const mat = new THREE.MeshStandardMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.25 });
+    const net = new THREE.Mesh(geo, mat);
+    net.rotation.x = -Math.PI / 2;
+    scene.add(net);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const light = new THREE.PointLight(0xffffff, 3000); light.position.set(0,80,0); scene.add(light);
+
+    // SEKTOR-MARKER
+    const markers = [
+        { type: 'circle', color: 0x0088ff, x: -55, z: -55 },
+        { type: 'triangle', color: 0xffff00, x: 55, z: -55 },
+        { type: 'square', color: 0xff0000, x: -55, z: 55 },
+        { type: 'cross', color: 0x00ff00, x: 55, z: 55 }
+    ];
+
+    markers.forEach(m => {
+        let pts = [];
+        if(m.type === 'circle') for(let a=0; a<=Math.PI*2; a+=0.25) pts.push(new THREE.Vector3(Math.cos(a)*7+m.x, 0, Math.sin(a)*7+m.z));
+        if(m.type === 'triangle') [ [0,8], [-7,-6], [7,-6], [0,8] ].forEach(p => pts.push(new THREE.Vector3(p[0]+m.x, 0, p[1]+m.z)));
+        if(m.type === 'square') [ [-7,-7], [7,-7], [7,7], [-7,7], [-7,-7] ].forEach(p => pts.push(new THREE.Vector3(p[0]+m.x, 0, p[1]+m.z)));
+        if(m.type === 'cross') [ [-9,0], [9,0], [0,0], [0,-9], [0,9] ].forEach(p => pts.push(new THREE.Vector3(p[0]+m.x, 0, p[1]+m.z)));
+        const lGeo = new THREE.BufferGeometry().setFromPoints(pts);
+        m.line = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: m.color, linewidth: 2 }));
+        scene.add(m.line);
+        m.basePoints = pts.map(p => p.clone());
+    });
+
+    // VARIABLEN
+    let particles = [], waves = [], time = 0, isPaused = false;
+    let orbitRadius = 40, orbitAngle = 0, phase = "ANFLUG";
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // INPUTS
+    const ui = {
+        speed: document.getElementById('speedIn'),
+        freq: document.getElementById('freqIn'),
+        mass: document.getElementById('massIn'),
+        force: document.getElementById('forceIn'),
+        phase: document.getElementById('phaseVal'),
+        pCount: document.getElementById('pCount')
+    };
+
+    // INTERAKTION
+    function handleSpawn(event, type) {
+        event.preventDefault();
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(net);
+        if (intersects.length > 0) {
+            particles.push({ x: intersects[0].point.x, z: intersects[0].point.z, vx: 0, vz: 0, type: type });
+            ui.pCount.innerText = particles.length;
+        }
+    }
+
+    window.addEventListener('dblclick', (e) => handleSpawn(e, 1));
+    window.addEventListener('contextmenu', (e) => handleSpawn(e, -1));
+    document.getElementById('clearBtn').onclick = () => { particles = []; ui.pCount.innerText = "0"; };
+    document.getElementById('pauseBtn').onclick = () => { isPaused = !isPaused; document.getElementById('pauseBtn').innerText = isPaused ? "PLAY" : "PAUSE PHYSIK"; };
+    document.getElementById('fsBtn').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+
+    function calculateZ(x, z) {
+        let val = 0;
+        const currentMass = ui.mass.value / 6;
+        const currentFreq = ui.freq.value / 10;
+
+        // 1. UR-TEILCHEN (ANFLUG)
+        if (phase !== "RELAX") {
+            let x1 = Math.cos(orbitAngle)*orbitRadius, z1 = Math.sin(orbitAngle)*orbitRadius;
+            let x2 = Math.cos(orbitAngle+Math.PI)*orbitRadius, z2 = Math.sin(orbitAngle+Math.PI)*orbitRadius;
+            val -= 8 / (Math.sqrt((x-x1)**2 + (z-z1)**2) + 1.8);
+            val += 8 / (Math.sqrt((x-x2)**2 + (z-z2)**2) + 1.8);
+        }
+
+        // 2. MANUELLE KNOTEN
+        particles.forEach(p => {
+            let d = Math.sqrt((x-p.x)**2 + (z-p.z)**2);
+            val += (p.type * currentMass) / (d + 2.0);
+        });
+
+        // 3. WELLEN
+        waves.forEach(w => {
+            let d = Math.sqrt(x*x + z*z);
+            let env = Math.exp(-Math.pow(d - w.r, 2) * 0.3);
+            val += Math.sin(d * currentFreq - time * 40) * env * w.life;
+        });
+        return val;
+    }
+
+    function updatePhysics() {
+        const fScale = ui.force.value / 1500;
+        
+        // Ur-Prozess Logik
+        if (phase === "ANFLUG") {
+            let speed = ui.speed.value / 150;
+            orbitAngle += 0.05 + (1/orbitRadius)*0.4;
+            orbitRadius -= speed;
+            if (orbitRadius <= 1.8) {
+                phase = "WAND";
+                waves.push({ r: 1.8, life: 12 });
+                setTimeout(() => { if(phase==="WAND") phase = "RELAX"; }, 800);
+            }
+        }
+        ui.phase.innerText = phase;
+
+        // Teilchen-Interaktion
+        for (let i = 0; i < particles.length; i++) {
+            let p1 = particles[i];
+            for (let j = i + 1; j < particles.length; j++) {
+                let p2 = particles[j];
+                let dx = p2.x - p1.x, dz = p2.z - p1.z;
+                let d2 = dx*dx + dz*dz, d = Math.sqrt(d2);
+
+                if (d < 3.0) { // Annihilation
+                    waves.push({ x: (p1.x+p2.x)/2, z: (p1.z+p2.z)/2, r: 0, life: 8 });
+                    particles.splice(j, 1); particles.splice(i, 1);
+                    ui.pCount.innerText = particles.length;
+                    return;
+                }
+                if (d < 110) {
+                    let f = fScale / (d2 + 1);
+                    let dir = (p1.type === p2.type) ? -1 : 1;
+                    if (dir === 1) { // LWT Spin-Attraction
+                        p1.vx += (dx/d)*f + (dz/d)*f*0.5; p1.vz += (dz/d)*f - (dx/d)*f*0.5;
+                        p2.vx -= (dx/d)*f + (dz/d)*f*0.5; p2.vz -= (dz/d)*f - (dx/d)*f*0.5;
+                    } else {
+                        p1.vx -= (dx/d)*f; p1.vz -= (dz/d)*f;
+                        p2.vx += (dx/d)*f; p2.vz += (dz/d)*f;
+                    }
+                }
+            }
+            p1.x += p1.vx; p1.z += p1.vz;
+            p1.vx *= 0.97; p1.vz *= 0.97;
+        }
+
+        waves.forEach(w => { w.r += 0.45; w.life *= 0.99; });
+        if(waves.length > 0 && waves[0].life < 0.1 && phase === "RELAX") { 
+            waves = []; orbitRadius = 40; phase = "ANFLUG"; 
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        if (!isPaused) {
+            time += 0.02;
+            updatePhysics();
+        }
+
+        const pos = geo.attributes.position;
+        const col = geo.attributes.color;
+
+        for (let i = 0; i < pos.count; i++) {
+            let px = pos.getX(i), pz = pos.getY(i);
+            let z = calculateZ(px, pz);
+            pos.setZ(i, z);
+
+            let r=0.05, g=0.08, b=0.25;
+            if (z > 0.4) r += z * 0.25; if (z < -0.4) b += Math.abs(z) * 0.25;
+            
+            // Wellen-Glow
+            waves.forEach(w => {
+                let d = Math.sqrt((px-w.x || 0)**2 + (pz-w.z || 0)**2);
+                if (Math.abs(d - w.r) < 2.2) { r += 0.4; g += 0.35; b *= 0.4; }
+            });
+            col.setXYZ(i, r, g, b);
+        }
+
+        markers.forEach(m => {
+            const lp = m.line.geometry.attributes.position;
+            for (let j = 0; j < m.basePoints.length; j++) {
+                let bp = m.basePoints[j];
+                lp.setXYZ(j, bp.x, calculateZ(bp.x, bp.z) + 0.6, bp.z);
+            }
+            lp.needsUpdate = true;
+        });
+
+        pos.needsUpdate = true; col.needsUpdate = true;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
 </body>
 </html>
