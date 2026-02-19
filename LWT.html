@@ -222,12 +222,22 @@
     }
 
     function updatePhysics() {
+
+        // Diese Zeilen müssen am Anfang der Funktion stehen:
+        const massInput = document.getElementById('massIn');
+        const currentMass = massInput ? massInput.value / 6 : 5; // Fallback auf 5, falls massIn nicht gefunden wird
         const fScale = document.getElementById('forceIn').value / 1500;
         
         // 1. UR-PROZESS LOGIK (Anflug der Knoten)
         if (phase === "ANFLUG") {
-            orbitAngle += 0.05;
-            orbitRadius -= 0.15; // Geschwindigkeit des Zusammenziehens
+            // Die Rotation wird schneller, wenn der Radius kleiner wird
+            orbitAngle += 0.05 + (1 / orbitRadius * 0.5);
+
+            // orbitRadius -= 0.15; // Geschwindigkeit des Zusammenziehens
+            // In updatePhysics bei phase === "ANFLUG"
+            // Die Einfallgeschwindigkeit skaliert jetzt mit der Masse
+            orbitRadius -= 0.1 + (currentMass * 0.02);
+            
             if (orbitRadius < 1.8) {
                 phase = "WAND"; // Übergang zur Wellenentstehung
                 // Erzeuge die Hauptwelle (Das Undatron)
