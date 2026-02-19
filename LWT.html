@@ -165,7 +165,7 @@
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObject(net);
         if (intersects.length > 0) {
-            particles.push({ x: intersects[0].point.x, z: intersects[0].point.z, vx: 0, vz: 0, type: type });
+            particles.push({ x: intersects[0].point.x, z: -intersects[0].point.z, vx: 0, vz: 0, type: type });
             ui.pCount.innerText = particles.length;
         }
     }
