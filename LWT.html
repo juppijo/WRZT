@@ -22,6 +22,9 @@
 
 <div id="ui">
     <h1>LWT Unified Lab v10</h1>
+
+    <label>Raster-Detail (Auflösung)</label>
+    <input type="range" id="resIn" min="20" max="200" value="100">
     
     <label>Ur-Anflug Tempo</label>
     <input type="range" id="speedIn" min="1" max="100" value="20">
@@ -34,6 +37,9 @@
 
     <label>Interaktions-Kraft (G-Kraft)</label>
     <input type="range" id="forceIn" min="1" max="300" value="60">
+
+    <label>Wellenring-Breite (Paket)</label>
+    <input type="range" id="ringWidthIn" min="1" max="100" value="20">
     
     <button id="pauseBtn">PAUSE PHYSIK</button>
     <button id="clearBtn" style="background:#555; color:white;">MANUELLE KNOTEN LÖSCHEN</button>
@@ -60,6 +66,15 @@
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    // 2. In der Funktion calculateZ änderst du die Zeile wie folgt:
+    const ringSharpness = document.getElementById('ringWidthIn').value / 100; 
+    // Wir teilen durch 100, damit 30 zu 0.3 wird. 
+    // Ein kleinerer Wert im Regler macht den Ring JETZT breiter.
+
+    // 3. WELLEN
+    const ringWidthFactor = document.getElementById('ringWidthIn') ? (1.05 - document.getElementById('ringWidthIn').value / 100) : 0.3;
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -67,14 +82,41 @@
     camera.position.set(0, 110, 120);
     controls.enableDamping = true;
 
-    // RAUMZEIT-NETZ
-    const gridSize = 160, divisions = 110;
+    // RAUMZEIT-NETZ DYNAMISCH
+    const gridSize = 200;
+    let divisions = 100; // parseInt(document.getElementById('resIn').value);
+
+    let geo, net;
+
+    function buildNet(res) {
+        if (net) {
+            scene.remove(net);
+            geo.dispose();
+        }
+        divisions = res;
+        geo = new THREE.PlaneGeometry(gridSize, gridSize, divisions, divisions);
+        geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count * 3), 3));
+        const mat = new THREE.MeshStandardMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.25 });
+        net = new THREE.Mesh(geo, mat);
+        net.rotation.x = -Math.PI / 2;
+        scene.add(net);
+    }
+
+    // Initialer Aufruf
+    buildNet(divisions);
+
+    // Event Listener für den Schieber
+    document.getElementById('resIn').oninput = (e) => buildNet(parseInt(e.target.value));
+
+    /*
     const geo = new THREE.PlaneGeometry(gridSize, gridSize, divisions, divisions);
     geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count * 3), 3));
     const mat = new THREE.MeshStandardMaterial({ vertexColors: true, wireframe: true, transparent: true, opacity: 0.25 });
     const net = new THREE.Mesh(geo, mat);
     net.rotation.x = -Math.PI / 2;
     scene.add(net);
+    */
+
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const light = new THREE.PointLight(0xffffff, 3000); light.position.set(0,80,0); scene.add(light);
 
@@ -136,15 +178,15 @@
 
     function calculateZ(x, z) {
         let val = 0;
-        const currentMass = ui.mass.value / 6;
+        const currentMass = ui.mass.value / 4;
         const currentFreq = ui.freq.value / 10;
 
         // 1. UR-TEILCHEN (ANFLUG)
         if (phase !== "RELAX") {
             let x1 = Math.cos(orbitAngle)*orbitRadius, z1 = Math.sin(orbitAngle)*orbitRadius;
             let x2 = Math.cos(orbitAngle+Math.PI)*orbitRadius, z2 = Math.sin(orbitAngle+Math.PI)*orbitRadius;
-            val -= 8 / (Math.sqrt((x-x1)**2 + (z-z1)**2) + 1.8);
-            val += 8 / (Math.sqrt((x-x2)**2 + (z-z2)**2) + 1.8);
+            val -= currentMass / (Math.sqrt((x-x1)**2 + (z-z1)**2) + 5);
+            val += currentMass/ (Math.sqrt((x-x2)**2 + (z-z2)**2) + 5);
         }
 
         // 2. MANUELLE KNOTEN
@@ -155,10 +197,19 @@
 
         // 3. WELLEN
         waves.forEach(w => {
+            let jz = 2;
+            let d = Math.sqrt(x * x + z * z);
+            //let env = Math.exp(-Math.pow(d - w.r, 2) * 2);
+            let env = Math.exp(-Math.pow(d - w.r, 2) * (1.1 - ringSharpness));
+            // Der ringWidthFactor bestimmt, wie breit das Paket ist
+            //let env = Math.exp(-Math.pow(d - w.r, 2) * ringWidthFactor);
+            val += Math.sin(d * currentFreq - time * 40) * jz * env * w.life;
+        });
+        /*waves.forEach(w => {
             let d = Math.sqrt(x*x + z*z);
             let env = Math.exp(-Math.pow(d - w.r, 2) * 0.3);
             val += Math.sin(d * currentFreq - time * 40) * env * w.life;
-        });
+        });*/
         return val;
     }
 
@@ -253,6 +304,7 @@
         pos.needsUpdate = true; col.needsUpdate = true;
         renderer.render(scene, camera);
     }
+
     animate();
 
     window.addEventListener('resize', () => {
