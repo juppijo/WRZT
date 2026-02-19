@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LWT - Das offizielle Manifest der Lorentz-Wand-Theorie</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --bg: #020204;
+            --card-bg: rgba(10, 15, 25, 0.8);
+            --text-main: #d1d5db;
+            --text-bright: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'EB Garamond', serif;
+            font-size: 1.25rem;
+            line-height: 1.7;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(112, 0, 255, 0.03) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 850px;
+            padding: 80px 25px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            margin: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -3px;
+        }
+
+        .tagline {
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.6rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-top: 10px;
+        }
+
+        h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--primary);
+            margin-top: 80px;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        p { margin-bottom: 1.5rem; text-align: justify; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 24px;
+            margin: 30px 0;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .formula-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 2px solid var(--primary);
+            padding: 25px;
+            margin: 35px 0;
+            font-size: 1.4rem;
+            color: var(--text-bright);
+            overflow-x: auto;
+        }
+
+        .accent-text {
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        footer {
+            margin-top: 120px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #374151;
+            padding-bottom: 50px;
+        }
+
+        .dropcap {
+            float: left;
+            font-family: 'Inter', sans-serif;
+            font-size: 4rem;
+            line-height: 1;
+            font-weight: 900;
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>LWT</h1>
+        <div class="tagline">The Lorentz Wall Theory</div>
+    </header>
+
+    <section>
+        <h2>I. Das Medium: Die Wellenraumzeit</h2>
+        <div class="card">
+            <span class="dropcap">D</span>ie Lorentz-Wand-Theorie (LWT) bricht mit der Vorstellung des "leeren" Vakuums. Sie postuliert ein fundamentales, elastisches Gewebe — die <span class="accent-text">Wellenraumzeit (WRZNT)</span>. Materielle Teilchen sind keine fremden Objekte innerhalb dieses Mediums, sondern <span class="highlight">lokale topologische Knoten</span>. 
+            <br><br>
+            Ein Elektron ist eine tiefgehende Senke im Netz, während das Positron eine spiegelbildliche Aufwölbung darstellt. Die Wechselwirkung zwischen ihnen erfolgt nicht durch "Geisterkräfte", sondern durch die mechanische Spannung des Netzes selbst:
+            <div class="formula-container">
+                \[ \nabla^2 \Psi - \frac{1}{c^2} \frac{\partial^2 \Psi}{\partial t^2} = \kappa \cdot T_{\mu\nu} \]
+            </div>
+            Hierbei beschreibt \( \Psi \) die lokale Auslenkung des Netzes aus dem Nullpunkt der 4. Dimension.
+        </div>
+    </section>
+
+    <section>
+        <h2>II. Die Lorentz-Wand: Die Barriere bei \( c \)</h2>
+        <div class="card">
+            Das Herzstück der Theorie ist die <span class="accent-text">Lorentz-Wand</span>. Wenn sich ein Teilchenknoten durch das Netz bewegt, muss das Medium vor ihm gestaucht und hinter ihm gedehnt werden. Bei Annäherung an die Lichtgeschwindigkeit \( v \to c \) verfestigt sich das Netz aufgrund seiner elastischen Grenze zu einer unüberwindbaren mechanischen Wand.
+            <br><br>
+            Die Kraft, die benötigt wird, um die letzten Nanometer zwischen zwei Teilchen zu überbrücken, divergiert durch den Lorentz-Faktor \( \gamma \):
+            <div class="formula-container">
+                \[ F(r, v) = \frac{e^2}{4\pi\varepsilon_0 \cdot r^2} \cdot \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} \]
+            </div>
+            In diesem Moment der maximalen Kompression bei \( r_{min} \) wirkt die Raumzeit wie eine physische Barriere. Es ist die Geburtsstunde der <span class="highlight">Wandkraft</span> \( F_{max} \approx 15,5 \, \text{N} \).
+        </div>
+    </section>
+
+    <section>
+        <h2>III. Das Undatron: Die Entladung der Spannung</h2>
+        <div class="card">
+            Prallen Teilchen an dieser Wand ab oder löschen sie sich gegenseitig aus (Annihilation), bricht die lokale Krümmung schlagartig zusammen. Das gespannte Netz schnellt wie eine losgelassene Bogensehne zurück. Diese mechanische Energie kann nicht verschwinden und wird als <span class="accent-text">Undatron</span> emittiert — ein Wellenpaket, das wir als Photon wahrnehmen.
+            <br><br>
+            Die Transformation von kinetischer Energie und Ruhemasse in Wellenenergie folgt der LWT-Resonanzbedingung:
+            <div class="formula-container">
+                \[ E_{kin} + \Delta m c^2 \Rightarrow \oint_{\text{Wand}} \hbar \cdot \omega \, dt \]
+            </div>
+            Das Undatron ist somit keine abstrakte Wahrscheinlichkeit, sondern eine <span class="highlight">transversale Erschütterung</span> des WRZNT-Mediums.
+        </div>
+    </section>
+
+    <section>
+        <h2>IV. Verschränkung: Die mechanische Brücke</h2>
+        <div class="card">
+            Verschränkung wird in der LWT trivial: Da zwei Undatronen bei einer Annihilation gleichzeitig an derselben Lorentz-Wand entstehen, teilen sie sich denselben mechanischen Impuls des "Zurückschnellens". Sie sind über die gemeinsame Spannung des Netzes verbunden. Eine Messung an einem Teilchen ist ein physischer Eingriff in das Netz, der sich instantan über die elastische Kopplung auf das Partnertreilchen auswirkt.
+        </div>
+    </section>
+
+    <footer>
+        <p>Erstellt für das LWT-Archiv &copy; 2026</p>
+        <p>Manifest der Wellenraumzeit-Mechanik</p>
+    </footer>
+</div>
+
+</body>
+</html>
