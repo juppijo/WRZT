@@ -27,19 +27,19 @@
     <input type="range" id="resIn" min="20" max="200" value="100">
     
     <label>Ur-Anflug Tempo</label>
-    <input type="range" id="speedIn" min="1" max="100" value="20">
+    <input type="range" id="speedIn" min="1" max="200" value="40">
 
     <label>Wellen-Frequenz (Undatron)</label>
-    <input type="range" id="freqIn" min="1" max="100" value="20">
+    <input type="range" id="freqIn" min="0.1" max="100" value="4">
 
     <label>Knoten-Masse (Gravitation)</label>
-    <input type="range" id="massIn" min="1" max="300" value="60">
+    <input type="range" id="massIn" min="1" max="400" value="80">
 
     <label>Interaktions-Kraft (G-Kraft)</label>
-    <input type="range" id="forceIn" min="1" max="300" value="60">
+    <input type="range" id="forceIn" min="1" max="400" value="80">
 
     <label>Wellenring-Breite (Paket)</label>
-    <input type="range" id="ringWidthIn" min="1" max="100" value="20">
+    <input type="range" id="ringWidthIn" min="1" max="800" value="100">
     
     <button id="pauseBtn">PAUSE PHYSIK</button>
     <button id="clearBtn" style="background:#555; color:white;">MANUELLE KNOTEN LÖSCHEN</button>
@@ -175,61 +175,69 @@
     document.getElementById('clearBtn').onclick = () => { particles = []; ui.pCount.innerText = "0"; };
     document.getElementById('pauseBtn').onclick = () => { isPaused = !isPaused; document.getElementById('pauseBtn').innerText = isPaused ? "PLAY" : "PAUSE PHYSIK"; };
     document.getElementById('fsBtn').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
-
+    
     function calculateZ(x, z) {
         let val = 0;
-        const currentMass = ui.mass.value / 4;
-        const currentFreq = ui.freq.value / 10;
+        
+        // Parameter vom UI holen
+        const currentMass = document.getElementById('massIn').value / 6;
+        const currentFreq = document.getElementById('freqIn').value / 10;
+        
+        // DIESER WERT VERKNÜPFT DEN REGLER:
+        // Wir rechnen den Schieber (1-100) in einen physikalischen Faktor um.
+        // Ein kleinerer Faktor macht die Welle LONGITUDINAL BREITER.
+        const ringWidth = 1 / (document.getElementById('ringWidthIn').value * 0.5);
 
-        // 1. UR-TEILCHEN (ANFLUG)
-        if (phase !== "RELAX") {
-            let x1 = Math.cos(orbitAngle)*orbitRadius, z1 = Math.sin(orbitAngle)*orbitRadius;
-            let x2 = Math.cos(orbitAngle+Math.PI)*orbitRadius, z2 = Math.sin(orbitAngle+Math.PI)*orbitRadius;
-            val -= currentMass / (Math.sqrt((x-x1)**2 + (z-z1)**2) + 5);
-            val += currentMass/ (Math.sqrt((x-x2)**2 + (z-z2)**2) + 5);
-        }
-
-        // 2. MANUELLE KNOTEN
+        // 1. Manuelle Knoten
         particles.forEach(p => {
-            let d = Math.sqrt((x-p.x)**2 + (z-p.z)**2);
+            let d = Math.sqrt((x - p.x)**2 + (z - p.z)**2);
             val += (p.type * currentMass) / (d + 2.0);
         });
 
-        // 3. WELLEN
+        // 2. Wellen (Das Undatron)
         waves.forEach(w => {
-            let jz = 2;
-            let d = Math.sqrt(x * x + z * z);
-            //let env = Math.exp(-Math.pow(d - w.r, 2) * 2);
-            let env = Math.exp(-Math.pow(d - w.r, 2) * (1.1 - ringSharpness));
-            // Der ringWidthFactor bestimmt, wie breit das Paket ist
-            //let env = Math.exp(-Math.pow(d - w.r, 2) * ringWidthFactor);
-            val += Math.sin(d * currentFreq - time * 40) * jz * env * w.life;
+            let d = Math.sqrt((x - (w.x || 0))**2 + (z - (w.z || 0))**2);
+
+            // Die neue longitudinale Kopplung:
+            // (d - w.r) ist der Abstand zur Wellenfront
+            let phase = (d - w.r) * currentFreq;
+            
+            // Der 'ringWidth' Faktor vom Schieberegler bestimmt jetzt die Paketlänge
+            let env = Math.exp(-Math.pow(d - w.r, 2) * ringWidth); 
+
+            val += Math.sin(phase) * env * w.life;
         });
-        /*waves.forEach(w => {
-            let d = Math.sqrt(x*x + z*z);
-            let env = Math.exp(-Math.pow(d - w.r, 2) * 0.3);
-            val += Math.sin(d * currentFreq - time * 40) * env * w.life;
-        });*/
+
+        // 3. Ur-Prozess (falls vorhanden)
+        if (typeof phase !== 'undefined' && phase !== "RELAX") {
+            let x1 = Math.cos(orbitAngle)*orbitRadius, z1 = Math.sin(orbitAngle)*orbitRadius;
+            let x2 = Math.cos(orbitAngle+Math.PI)*orbitRadius, z2 = Math.sin(orbitAngle+Math.PI)*orbitRadius;
+            
+            // Wir nutzen currentMass * 2, da die Ur-Knoten oft massiver dargestellt werden
+            val -= (currentMass * 2) / (Math.sqrt((x-x1)**2 + (z-z1)**2) + 1.8);
+            val += (currentMass * 2) / (Math.sqrt((x-x2)**2 + (z-z2)**2) + 1.8);
+        }
+
         return val;
     }
 
     function updatePhysics() {
-        const fScale = ui.force.value / 1500;
+        const fScale = document.getElementById('forceIn').value / 1500;
         
-        // Ur-Prozess Logik
+        // 1. UR-PROZESS LOGIK (Anflug der Knoten)
         if (phase === "ANFLUG") {
-            let speed = ui.speed.value / 150;
-            orbitAngle += 0.05 + (1/orbitRadius)*0.4;
-            orbitRadius -= speed;
-            if (orbitRadius <= 1.8) {
-                phase = "WAND";
-                waves.push({ r: 1.8, life: 12 });
-                setTimeout(() => { if(phase==="WAND") phase = "RELAX"; }, 800);
+            orbitAngle += 0.05;
+            orbitRadius -= 0.15; // Geschwindigkeit des Zusammenziehens
+            if (orbitRadius < 1.8) {
+                phase = "WAND"; // Übergang zur Wellenentstehung
+                // Erzeuge die Hauptwelle (Das Undatron)
+                waves.push({ x: 0, z: 0, r: 0, life: 15 }); 
             }
+        } else if (phase === "WAND") {
+            phase = "RELAX"; // Kurze Pause nach dem Knall
         }
-        ui.phase.innerText = phase;
 
-        // Teilchen-Interaktion
+        // 2. TEILCHEN-PHYSIK (Manuelle Knoten)
         for (let i = 0; i < particles.length; i++) {
             let p1 = particles[i];
             for (let j = i + 1; j < particles.length; j++) {
@@ -237,37 +245,47 @@
                 let dx = p2.x - p1.x, dz = p2.z - p1.z;
                 let d2 = dx*dx + dz*dz, d = Math.sqrt(d2);
 
-                if (d < 3.0) { // Annihilation
-                    waves.push({ x: (p1.x+p2.x)/2, z: (p1.z+p2.z)/2, r: 0, life: 8 });
-                    particles.splice(j, 1); particles.splice(i, 1);
-                    ui.pCount.innerText = particles.length;
+                if (d < 3.0) { // Annihilation bei Kontakt
+                    waves.push({ x: (p1.x+p2.x)/2, z: (p1.z+p2.z)/2, r: 0, life: 10 });
+                    particles.splice(j, 1);
+                    particles.splice(i, 1);
+                    document.getElementById('pCount').innerText = particles.length;
                     return;
                 }
+
                 if (d < 110) {
                     let f = fScale / (d2 + 1);
                     let dir = (p1.type === p2.type) ? -1 : 1;
-                    if (dir === 1) { // LWT Spin-Attraction
-                        p1.vx += (dx/d)*f + (dz/d)*f*0.5; p1.vz += (dz/d)*f - (dx/d)*f*0.5;
-                        p2.vx -= (dx/d)*f + (dz/d)*f*0.5; p2.vz -= (dz/d)*f - (dx/d)*f*0.5;
-                    } else {
-                        p1.vx -= (dx/d)*f; p1.vz -= (dz/d)*f;
-                        p2.vx += (dx/d)*f; p2.vz += (dz/d)*f;
-                    }
+                    p1.vx += (dx/d)*f*dir; p1.vz += (dz/d)*f*dir;
+                    p2.vx -= (dx/d)*f*dir; p2.vz -= (dz/d)*f*dir;
                 }
             }
             p1.x += p1.vx; p1.z += p1.vz;
             p1.vx *= 0.97; p1.vz *= 0.97;
         }
 
-        waves.forEach(w => { w.r += 0.45; w.life *= 0.99; });
-        if(waves.length > 0 && waves[0].life < 0.1 && phase === "RELAX") { 
-            waves = []; orbitRadius = 40; phase = "ANFLUG"; 
+        // 3. WELLEN-PHYSIK (Hier ist die Änderung!)
+        waves.forEach(w => { 
+            w.r += 0.6;         // Longitudinaler Vorschub (Ausbreitung nach außen)
+            w.life *= 0.99;    // Sehr schwache Dämpfung - Welle bleibt lange sichtbar
+        });
+
+        // BEREINIGUNG: Löscht Wellen erst, wenn sie wirklich keine Energie mehr haben
+        // Das verhindert das plötzliche Verschwinden
+        waves = waves.filter(w => w.life > 0.05);
+
+        // RESET DES UR-ZYKLUS
+        // Startet erst neu, wenn alle Wellen den Raum verlassen haben oder abgeklungen sind
+        if (phase === "RELAX" && waves.length === 0) {
+            orbitRadius = 40;
+            phase = "ANFLUG";
         }
     }
 
     function animate() {
         requestAnimationFrame(animate);
         controls.update();
+
         if (!isPaused) {
             time += 0.02;
             updatePhysics();
@@ -276,32 +294,55 @@
         const pos = geo.attributes.position;
         const col = geo.attributes.color;
 
+        // Aktuelle Breite für den optischen Glow vom Schieber abrufen
+        // Je kleiner der Schieber-Wert, desto breiter das Leuchten
+        let glowWidth = 150 / (document.getElementById('ringWidthIn').value || 20);
+
         for (let i = 0; i < pos.count; i++) {
             let px = pos.getX(i), pz = pos.getY(i);
-            let z = calculateZ(px, pz);
+            
+            // Physikalische Höhe berechnen
+            let z = calculateZ(px, pz); 
             pos.setZ(i, z);
 
-            let r=0.05, g=0.08, b=0.25;
-            if (z > 0.4) r += z * 0.25; if (z < -0.4) b += Math.abs(z) * 0.25;
+            // Basis-Farbe (Dunkelblau)
+            let r = 0.05, g = 0.08, b = 0.25;
+
+            // Färbung durch Krümmung (Berge = Rot, Täler = Blau-Hell)
+            if (z > 0.4) r += z * 0.25; 
+            if (z < -0.4) b += Math.abs(z) * 0.25;
             
-            // Wellen-Glow
+            // Optischer WELLEN-GLOW
             waves.forEach(w => {
-                let d = Math.sqrt((px-w.x || 0)**2 + (pz-w.z || 0)**2);
-                if (Math.abs(d - w.r) < 2.2) { r += 0.4; g += 0.35; b *= 0.4; }
+                let dx = px - (w.x || 0);
+                let dz = pz - (w.z || 0);
+                let d = Math.sqrt(dx*dx + dz*dz);
+                
+                // Wenn der Punkt innerhalb des Glow-Bereichs der Wellenfront liegt
+                if (Math.abs(d - w.r) < glowWidth) { 
+                    r += 0.4; 
+                    g += 0.35; 
+                    b *= 0.4; 
+                }
             });
+
             col.setXYZ(i, r, g, b);
         }
 
+        // Three.js mitteilen, dass sich Positionen und Farben geändert haben
+        pos.needsUpdate = true;
+        col.needsUpdate = true;
+
+        // Markierungs-Linien (Sektoren) aktualisieren
         markers.forEach(m => {
             const lp = m.line.geometry.attributes.position;
             for (let j = 0; j < m.basePoints.length; j++) {
                 let bp = m.basePoints[j];
-                lp.setXYZ(j, bp.x, calculateZ(bp.x, bp.z) + 0.6, bp.z);
+                lp.setXYZ(j, bp.x, calculateZ(bp.x, bp.z), bp.z);
             }
             lp.needsUpdate = true;
         });
 
-        pos.needsUpdate = true; col.needsUpdate = true;
         renderer.render(scene, camera);
     }
 
