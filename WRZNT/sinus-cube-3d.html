@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WRZT · 3D</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;overflow:hidden;height:100dvh;width:100vw;font-family:'Courier New',monospace;touch-action:none;user-select:none;}
+canvas{display:block;position:fixed;top:0;left:0;}
+
+#title{position:fixed;top:12px;left:50%;transform:translateX(-50%);color:rgba(180,210,255,0.7);font-size:10px;letter-spacing:4px;text-transform:uppercase;pointer-events:none;z-index:10;white-space:nowrap;}
+
+#btnFS{position:fixed;top:9px;right:12px;z-index:30;background:rgba(180,210,255,0.07);border:1px solid rgba(180,210,255,0.3);border-radius:7px;color:rgba(180,210,255,0.85);font-size:18px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+#btnFS:active{background:rgba(180,210,255,0.2);}
+
+/* Export button */
+#btnCSV{position:fixed;top:9px;left:12px;z-index:30;background:rgba(100,255,180,0.07);border:1px solid rgba(100,255,180,0.3);border-radius:7px;color:rgba(100,255,180,0.85);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:0 8px;height:38px;display:flex;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+#btnCSV:active{background:rgba(100,255,180,0.2);}
+#csvFlash{display:none;position:fixed;top:55px;left:12px;z-index:30;background:rgba(100,255,180,0.15);border:1px solid rgba(100,255,180,0.4);border-radius:5px;color:rgba(100,255,180,0.9);font-size:8px;letter-spacing:1px;padding:4px 8px;}
+
+/* Panel */
+#panel{position:fixed;bottom:0;left:0;right:0;z-index:20;background:linear-gradient(to top,rgba(0,0,10,0.97) 85%,transparent);display:flex;flex-direction:column;gap:0;max-height:72vh;overflow-y:auto;padding-bottom:8px;}
+#panel::-webkit-scrollbar{display:none;}
+
+/* Formula */
+#formula{margin:7px 12px 3px;background:rgba(180,210,255,0.04);border:1px solid rgba(180,210,255,0.15);border-radius:7px;padding:6px 11px 7px;pointer-events:none;flex-shrink:0;}
+.f-title{color:rgba(180,210,255,0.4);font-size:7px;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;}
+.f-line{font-size:10px;line-height:1.5;color:rgba(200,225,255,0.8);}
+.fv{color:rgba(100,210,255,0.95);font-style:italic;}.feq{color:rgba(255,255,255,0.28);}.fn{color:rgba(200,130,255,0.95);}.fk{color:rgba(255,200,70,0.95);}.fpi{color:rgba(255,110,110,0.9);}.sup{font-size:7px;vertical-align:super;}
+
+/* Tabs */
+.tab-section{display:flex;align-items:center;gap:4px;margin:3px 12px 2px;flex-shrink:0;}
+.tab-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;padding:2px 4px;border-radius:3px;white-space:nowrap;}
+.tab-label.qm{color:rgba(100,210,255,0.6);background:rgba(100,210,255,0.07);border:1px solid rgba(100,210,255,0.2);}
+.tab-label.wrzt{color:rgba(255,180,80,0.65);background:rgba(255,180,80,0.07);border:1px solid rgba(255,180,80,0.22);}
+.tab-label.extra{color:rgba(200,160,255,0.65);background:rgba(200,160,255,0.07);border:1px solid rgba(200,160,255,0.22);}
+.tab-row{display:flex;gap:3px;flex:1;}
+.modeBtn{flex:1;border-radius:5px;font-family:'Courier New',monospace;font-size:7px;letter-spacing:0;text-transform:uppercase;padding:5px 1px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;line-height:1.25;transition:all 0.15s;background:rgba(180,210,255,0.04);border:1px solid rgba(180,210,255,0.12);color:rgba(180,210,255,0.38);}
+.modeBtn.qm.active{background:rgba(100,210,255,0.18);border-color:rgba(100,210,255,0.6);color:rgba(200,240,255,0.95);}
+.modeBtn.wrzt.active{background:rgba(255,180,80,0.18);border-color:rgba(255,180,80,0.6);color:rgba(255,230,180,0.95);}
+.modeBtn.extra.active{background:rgba(200,160,255,0.18);border-color:rgba(200,160,255,0.6);color:rgba(230,210,255,0.95);}
+
+/* Sections */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin:4px 12px 2px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 8px;border-radius:5px;background:rgba(180,210,255,0.04);border:1px solid rgba(180,210,255,0.1);flex-shrink:0;}
+.section-header:active{background:rgba(180,210,255,0.1);}
+.sec-title{color:rgba(180,210,255,0.5);font-size:8px;letter-spacing:2px;text-transform:uppercase;}
+.sec-arrow{color:rgba(180,210,255,0.4);font-size:10px;transition:transform 0.2s;display:inline-block;}
+.sec-arrow.open{transform:rotate(180deg);}
+.section-body{margin:0 12px;display:flex;flex-direction:column;gap:5px;overflow:hidden;transition:max-height 0.25s ease;}
+.section-body.collapsed{max-height:0!important;}
+
+/* Sliders */
+.ctrl-row{display:flex;align-items:center;gap:8px;padding:1px 0;}
+.ctrl-label{color:rgba(180,210,255,0.5);font-size:8px;letter-spacing:1px;text-transform:uppercase;width:56px;flex-shrink:0;}
+.ctrl-val{font-size:9px;width:36px;text-align:right;flex-shrink:0;font-weight:bold;}
+.ctrl-val.qm-col{color:rgba(100,210,255,0.9);}.ctrl-val.wrzt-col{color:rgba(255,200,80,0.9);}.ctrl-val.vis-col{color:rgba(180,255,180,0.9);}.ctrl-val.cam-col{color:rgba(255,160,200,0.9);}
+
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:2px;border-radius:2px;outline:none;cursor:pointer;}
+input[type=range].qm-sl{background:rgba(100,210,255,0.18);}
+input[type=range].wrzt-sl{background:rgba(255,180,80,0.18);}
+input[type=range].vis-sl{background:rgba(180,255,180,0.18);}
+input[type=range].cam-sl{background:rgba(255,160,200,0.18);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;cursor:pointer;}
+input[type=range].qm-sl::-webkit-slider-thumb{background:rgba(100,210,255,0.9);box-shadow:0 0 8px rgba(100,210,255,0.5);}
+input[type=range].wrzt-sl::-webkit-slider-thumb{background:rgba(255,180,80,0.9);box-shadow:0 0 8px rgba(255,180,80,0.5);}
+input[type=range].vis-sl::-webkit-slider-thumb{background:rgba(180,255,180,0.9);box-shadow:0 0 8px rgba(180,255,180,0.5);}
+input[type=range].cam-sl::-webkit-slider-thumb{background:rgba(255,160,200,0.9);box-shadow:0 0 8px rgba(255,160,200,0.5);}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;border:none;cursor:pointer;}
+input[type=range].qm-sl::-moz-range-thumb{background:rgba(100,210,255,0.9);}
+input[type=range].wrzt-sl::-moz-range-thumb{background:rgba(255,180,80,0.9);}
+input[type=range].vis-sl::-moz-range-thumb{background:rgba(180,255,180,0.9);}
+input[type=range].cam-sl::-moz-range-thumb{background:rgba(255,160,200,0.9);}
+
+/* Color scheme buttons */
+.color-row{display:flex;gap:4px;flex-wrap:wrap;}
+.colorBtn{flex:1;min-width:50px;padding:5px 3px;border-radius:5px;font-family:'Courier New',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);transition:all 0.15s;}
+.colorBtn.active{border-color:rgba(255,255,255,0.6);color:rgba(255,255,255,0.95);background:rgba(255,255,255,0.12);}
+#cBtnPlasma.active{border-color:rgba(255,100,200,0.7);background:rgba(255,100,200,0.15);color:rgba(255,180,230,0.95);}
+#cBtnRainbow.active{border-color:rgba(100,255,100,0.6);background:rgba(100,255,100,0.1);color:rgba(180,255,180,0.95);}
+#cBtnMono.active{border-color:rgba(200,200,200,0.6);background:rgba(200,200,200,0.1);color:rgba(230,230,230,0.95);}
+#cBtnFire.active{border-color:rgba(255,160,50,0.7);background:rgba(255,160,50,0.15);color:rgba(255,200,130,0.95);}
+#cBtnOcean.active{border-color:rgba(50,180,255,0.7);background:rgba(50,180,255,0.12);color:rgba(150,220,255,0.95);}
+
+/* Toggles */
+.toggle-row{display:flex;align-items:center;gap:8px;}
+.toggle-label{color:rgba(180,210,255,0.5);font-size:8px;letter-spacing:1px;text-transform:uppercase;flex:1;}
+.toggle{position:relative;width:36px;height:18px;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;border-radius:9px;background:rgba(180,210,255,0.1);border:1px solid rgba(180,210,255,0.18);transition:background 0.2s;}
+.toggle input:checked+.toggle-track{background:rgba(180,255,180,0.3);border-color:rgba(180,255,180,0.5);}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:rgba(180,210,255,0.4);transition:transform 0.2s,background 0.2s;}
+.toggle input:checked~.toggle-thumb{transform:translateX(18px);background:rgba(180,255,180,0.9);}
+
+/* Readout */
+#readout{display:flex;flex-wrap:wrap;gap:3px 8px;margin:3px 12px 2px;pointer-events:none;}
+.ro-item{display:flex;gap:2px;align-items:baseline;}
+.ro-key{color:rgba(180,210,255,0.3);font-size:7px;letter-spacing:1px;}
+.ro-val{color:rgba(255,220,100,0.85);font-size:8px;font-weight:bold;}
+
+#hint{text-align:center;color:rgba(180,210,255,0.18);font-size:7.5px;letter-spacing:2px;text-transform:uppercase;margin:2px 0 0;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="title">WRZT · SCHRÖDINGER · 3D</div>
+<button id="btnFS">⛶</button>
+<button id="btnCSV">↓ CSV</button>
+<div id="csvFlash">✓ Gespeichert</div>
+
+<div id="panel">
+  <div id="formula">
+    <div class="f-title" id="fTitle">…</div>
+    <div class="f-line"  id="fLine1">…</div>
+    <div class="f-line"  id="fLine2">…</div>
+  </div>
+
+  <!-- QM Modes -->
+  <div class="tab-section">
+    <span class="tab-label qm">QM</span>
+    <div class="tab-row">
+      <button class="modeBtn qm active" data-mode="0">Wellen-<br>paket</button>
+      <button class="modeBtn qm"        data-mode="1">Super-<br>position</button>
+      <button class="modeBtn qm"        data-mode="2">Stehende<br>Welle</button>
+      <button class="modeBtn qm"        data-mode="3">Tunneling</button>
+    </div>
+  </div>
+  <!-- WRZT Modes -->
+  <div class="tab-section">
+    <span class="tab-label wrzt">WRZT</span>
+    <div class="tab-row">
+      <button class="modeBtn wrzt" data-mode="4">Raumzeit-<br>Welle</button>
+      <button class="modeBtn wrzt" data-mode="5">Materie-<br>Knoten</button>
+      <button class="modeBtn wrzt" data-mode="6">Licht-<br>Puls</button>
+      <button class="modeBtn wrzt" data-mode="7">Kopplung</button>
+    </div>
+  </div>
+  <!-- Extra Modes -->
+  <div class="tab-section">
+    <span class="tab-label extra">NEU</span>
+    <div class="tab-row">
+      <button class="modeBtn extra" data-mode="8">Harm.<br>Oszillator</button>
+      <button class="modeBtn extra" data-mode="9">Dirac-<br>Spinor</button>
+    </div>
+  </div>
+
+  <!-- Readout -->
+  <div id="readout">
+    <div class="ro-item"><span class="ro-key">k=</span><span class="ro-val" id="roK">3</span></div>
+    <div class="ro-item"><span class="ro-key">ω=</span><span class="ro-val" id="roW">9</span></div>
+    <div class="ro-item"><span class="ro-key">A=</span><span class="ro-val" id="roA">1.00</span></div>
+    <div class="ro-item"><span class="ro-key">φ=</span><span class="ro-val" id="roPh">0°</span></div>
+    <div class="ro-item"><span class="ro-key">γ=</span><span class="ro-val" id="roGamma">0.0</span></div>
+    <div class="ro-item"><span class="ro-key">Ξ=</span><span class="ro-val" id="roXi">5.90</span></div>
+    <div class="ro-item"><span class="ro-key">η=</span><span class="ro-val" id="roEta">4.55</span></div>
+    <div class="ro-item"><span class="ro-key">c̃=</span><span class="ro-val" id="roC">1.14</span></div>
+    <div class="ro-item"><span class="ro-key">FOV=</span><span class="ro-val" id="roFOV">3.5</span></div>
+    <div class="ro-item"><span class="ro-key">n=</span><span class="ro-val" id="roN">0</span></div>
+  </div>
+
+  <!-- Section: Grundparameter -->
+  <div class="section-header" data-sec="s0"><span class="sec-title">⚙ Grundparameter</span><span class="sec-arrow open" id="a0">▲</span></div>
+  <div class="section-body" id="s0" style="max-height:300px;">
+    <div class="ctrl-row"><span class="ctrl-label">Wellenz. k</span><input type="range" id="slK" class="qm-sl" min="1" max="10" step="0.5" value="3"><span class="ctrl-val qm-col" id="vK">3</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Geschw.</span><input type="range" id="slSpeed" class="qm-sl" min="0" max="100" step="1" value="35"><span class="ctrl-val qm-col" id="vSpeed">35</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Amplitude</span><input type="range" id="slAmp" class="qm-sl" min="0.1" max="2" step="0.05" value="1"><span class="ctrl-val qm-col" id="vAmp">1.00</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Phase φ₀</span><input type="range" id="slPhase" class="qm-sl" min="0" max="360" step="5" value="0"><span class="ctrl-val qm-col" id="vPhase">0°</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Dämpfung γ</span><input type="range" id="slDamp" class="qm-sl" min="0" max="5" step="0.1" value="0"><span class="ctrl-val qm-col" id="vDamp">0.0</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Mix α</span><input type="range" id="slMix" class="qm-sl" min="0" max="1" step="0.05" value="0.5"><span class="ctrl-val qm-col" id="vMix">0.50</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Quanten n</span><input type="range" id="slN" class="qm-sl" min="0" max="6" step="1" value="0"><span class="ctrl-val qm-col" id="vN">0</span></div>
+  </div>
+
+  <!-- Section: WRZT -->
+  <div class="section-header" data-sec="s1"><span class="sec-title">Ξ WRZT-Konstanten</span><span class="sec-arrow open" id="a1">▲</span></div>
+  <div class="section-body" id="s1" style="max-height:220px;">
+    <div class="ctrl-row"><span class="ctrl-label">Ur-Span. Ξ</span><input type="range" id="slXi" class="wrzt-sl" min="1" max="12" step="0.1" value="5.9"><span class="ctrl-val wrzt-col" id="vXi">5.90</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Trägheit η</span><input type="range" id="slEta" class="wrzt-sl" min="1" max="10" step="0.1" value="4.55"><span class="ctrl-val wrzt-col" id="vEta">4.55</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">R_min</span><input type="range" id="slRmin" class="wrzt-sl" min="0.5" max="5" step="0.05" value="1.3"><span class="ctrl-val wrzt-col" id="vRmin">1.30</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Kopplung κ</span><input type="range" id="slKopp" class="wrzt-sl" min="0" max="2" step="0.05" value="0.5"><span class="ctrl-val wrzt-col" id="vKopp">0.50</span></div>
+  </div>
+
+  <!-- Section: Kamera -->
+  <div class="section-header" data-sec="s2"><span class="sec-title">◎ Kamera</span><span class="sec-arrow" id="a2">▲</span></div>
+  <div class="section-body collapsed" id="s2" style="max-height:0;">
+    <div class="ctrl-row"><span class="ctrl-label">FOV / Tiefe</span><input type="range" id="slFOV" class="cam-sl" min="1.5" max="8" step="0.1" value="3.5"><span class="ctrl-val cam-col" id="vFOV">3.5</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Zoom</span><input type="range" id="slZoom" class="cam-sl" min="80" max="600" step="10" value="260"><span class="ctrl-val cam-col" id="vZoom">260</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Auto-Rot.</span><input type="range" id="slAutorot" class="cam-sl" min="0" max="20" step="1" value="3"><span class="ctrl-val cam-col" id="vAutorot">3</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Neigung X</span><input type="range" id="slRotX" class="cam-sl" min="-180" max="180" step="1" value="23"><span class="ctrl-val cam-col" id="vRotX">23°</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Drehung Y</span><input type="range" id="slRotY" class="cam-sl" min="-180" max="180" step="1" value="34"><span class="ctrl-val cam-col" id="vRotY">34°</span></div>
+  </div>
+
+  <!-- Section: Darstellung -->
+  <div class="section-header" data-sec="s3"><span class="sec-title">◈ Darstellung</span><span class="sec-arrow" id="a3">▲</span></div>
+  <div class="section-body collapsed" id="s3" style="max-height:0;">
+    <!-- Color schemes -->
+    <div class="color-row">
+      <button class="colorBtn active" id="cBtnAuto" data-cs="auto">Auto</button>
+      <button class="colorBtn" id="cBtnPlasma"   data-cs="plasma">Plasma</button>
+      <button class="colorBtn" id="cBtnRainbow"  data-cs="rainbow">Regenbogen</button>
+      <button class="colorBtn" id="cBtnMono"     data-cs="mono">Mono</button>
+      <button class="colorBtn" id="cBtnFire"     data-cs="fire">Feuer</button>
+      <button class="colorBtn" id="cBtnOcean"    data-cs="ocean">Ozean</button>
+    </div>
+    <div class="ctrl-row"><span class="ctrl-label">Linienstärke</span><input type="range" id="slLine" class="vis-sl" min="0.5" max="5" step="0.25" value="2.5"><span class="ctrl-val vis-col" id="vLine">2.5</span></div>
+    <div class="ctrl-row"><span class="ctrl-label">Glow</span><input type="range" id="slGlow" class="vis-sl" min="0" max="1" step="0.05" value="0.35"><span class="ctrl-val vis-col" id="vGlow">0.35</span></div>
+    <div class="toggle-row"><span class="toggle-label">|ψ|² Wahrscheinlichkeit</span><label class="toggle"><input type="checkbox" id="togPsi" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="toggle-row"><span class="toggle-label">Zweite Kurve (k×2)</span><label class="toggle"><input type="checkbox" id="togCurve2"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+  </div>
+
+  <div id="hint">Ziehen · Drehen · 2 Finger Zoomen</div>
+</div>
+
+<script>
+// ── Fullscreen ─────────────────────────────────────────────────────────────
+document.getElementById('btnFS').addEventListener('click',()=>{
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+});
+document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFS').textContent=document.fullscreenElement?'✕':'⛶';});
+
+// ── Canvas ─────────────────────────────────────────────────────────────────
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+// ── Collapsible ────────────────────────────────────────────────────────────
+document.querySelectorAll('.section-header').forEach(hdr=>{
+  hdr.addEventListener('click',()=>{
+    const id=hdr.dataset.sec,body=document.getElementById(id),arr=document.getElementById('a'+id.slice(1));
+    const col=body.classList.toggle('collapsed');
+    body.style.maxHeight=col?'0':(body.scrollHeight+20)+'px';
+    arr.classList.toggle('open',!col);
+  });
+  hdr.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+});
+
+// ── Parameters ─────────────────────────────────────────────────────────────
+let K=3,SPEED=0.022,AMP=1,PHASE=0,DAMP=0,MIX=0.5,QN=0;
+let XI=5.9,ETA=4.55,RMIN=1.3,KOPP=0.5;
+let FOV_DIST=3.5,ZOOM=260,AUTO_SPEED=3;
+let LINE_W=2.5,GLOW_A=0.35,SHOW_PSI2=true,SHOW_CURVE2=false;
+let COLOR_SCHEME='auto';
+let MODE=0;
+let rotX=0.4,rotY=0.6;
+
+function stopProp(id){
+  const el=document.getElementById(id);
+  el.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+  el.addEventListener('touchmove', e=>e.stopPropagation(),{passive:true});
+  el.addEventListener('mousedown', e=>e.stopPropagation());
+}
+
+function sl(id,cb){document.getElementById(id).addEventListener('input',cb);stopProp(id);}
+
+sl('slK',e=>{K=parseFloat(e.target.value);document.getElementById('vK').textContent=Number.isInteger(K)?K:K.toFixed(1);updateReadout();});
+sl('slSpeed',e=>{const v=parseInt(e.target.value);document.getElementById('vSpeed').textContent=v;SPEED=v===0?0:0.001+(v/100)*0.06;});
+sl('slAmp',e=>{AMP=parseFloat(e.target.value);document.getElementById('vAmp').textContent=AMP.toFixed(2);updateReadout();});
+sl('slPhase',e=>{PHASE=parseInt(e.target.value);document.getElementById('vPhase').textContent=PHASE+'°';updateReadout();});
+sl('slDamp',e=>{DAMP=parseFloat(e.target.value);document.getElementById('vDamp').textContent=DAMP.toFixed(1);updateReadout();});
+sl('slMix',e=>{MIX=parseFloat(e.target.value);document.getElementById('vMix').textContent=MIX.toFixed(2);});
+sl('slN',e=>{QN=parseInt(e.target.value);document.getElementById('vN').textContent=QN;document.getElementById('roN').textContent=QN;});
+sl('slXi',e=>{XI=parseFloat(e.target.value);document.getElementById('vXi').textContent=XI.toFixed(2);updateReadout();});
+sl('slEta',e=>{ETA=parseFloat(e.target.value);document.getElementById('vEta').textContent=ETA.toFixed(2);updateReadout();});
+sl('slRmin',e=>{RMIN=parseFloat(e.target.value);document.getElementById('vRmin').textContent=RMIN.toFixed(2);});
+sl('slKopp',e=>{KOPP=parseFloat(e.target.value);document.getElementById('vKopp').textContent=KOPP.toFixed(2);});
+sl('slFOV',e=>{FOV_DIST=parseFloat(e.target.value);document.getElementById('vFOV').textContent=FOV_DIST.toFixed(1);document.getElementById('roFOV').textContent=FOV_DIST.toFixed(1);});
+sl('slZoom',e=>{ZOOM=parseInt(e.target.value);document.getElementById('vZoom').textContent=ZOOM;});
+sl('slAutorot',e=>{AUTO_SPEED=parseInt(e.target.value);document.getElementById('vAutorot').textContent=AUTO_SPEED;});
+sl('slRotX',e=>{rotX=parseInt(e.target.value)*(Math.PI/180);document.getElementById('vRotX').textContent=e.target.value+'°';});
+sl('slRotY',e=>{rotY=parseInt(e.target.value)*(Math.PI/180);document.getElementById('vRotY').textContent=e.target.value+'°';});
+sl('slLine',e=>{LINE_W=parseFloat(e.target.value);document.getElementById('vLine').textContent=LINE_W.toFixed(2);});
+sl('slGlow',e=>{GLOW_A=parseFloat(e.target.value);document.getElementById('vGlow').textContent=GLOW_A.toFixed(2);});
+
+document.getElementById('togPsi').addEventListener('change',e=>{SHOW_PSI2=e.target.checked;});
+document.getElementById('togCurve2').addEventListener('change',e=>{SHOW_CURVE2=e.target.checked;});
+['togPsi','togCurve2'].forEach(id=>{
+  document.getElementById(id).parentElement.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+  document.getElementById(id).parentElement.addEventListener('mousedown',e=>e.stopPropagation());
+});
+
+// Color scheme buttons
+document.querySelectorAll('.colorBtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    COLOR_SCHEME=btn.dataset.cs;
+    document.querySelectorAll('.colorBtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+  btn.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+  btn.addEventListener('mousedown',e=>e.stopPropagation());
+});
+
+function updateReadout(){
+  const cTilde=Math.sqrt(Math.max(0.01,XI/ETA));
+  document.getElementById('roK').textContent=Number.isInteger(K)?K:K.toFixed(1);
+  document.getElementById('roW').textContent=(K*K).toFixed(1);
+  document.getElementById('roA').textContent=AMP.toFixed(2);
+  document.getElementById('roPh').textContent=PHASE+'°';
+  document.getElementById('roGamma').textContent=DAMP.toFixed(1);
+  document.getElementById('roXi').textContent=XI.toFixed(2);
+  document.getElementById('roEta').textContent=ETA.toFixed(2);
+  document.getElementById('roC').textContent=cTilde.toFixed(3);
+}
+updateReadout();
+
+// ── Mode tabs ──────────────────────────────────────────────────────────────
+const FORMULAS=[
+  {title:'Wellenpaket (Gauß)',y:'<span class="fv">y</span><span class="feq">=</span>A·<span class="fn">exp</span>(−σx²−γt)·<span class="fn">cos</span>(<span class="fk">k</span>x−ωt+φ₀)',z:'<span class="fv">z</span><span class="feq">=</span>A·<span class="fn">exp</span>(−σx²−γt)·<span class="fn">sin</span>(<span class="fk">k</span>x−ωt+φ₀)'},
+  {title:'Superposition ψ₁+α·ψ₂',y:'<span class="fv">y</span><span class="feq">=</span>(1−α)·<span class="fn">cos</span>(<span class="fk">k</span>x−ωt)+α·<span class="fn">cos</span>(<span class="fk">2k</span>x−4ωt)',z:'<span class="fv">z</span><span class="feq">=</span>(1−α)·<span class="fn">sin</span>(<span class="fk">k</span>x−ωt)+α·<span class="fn">sin</span>(<span class="fk">2k</span>x−4ωt)'},
+  {title:'Stehende Welle',y:'<span class="fv">y</span><span class="feq">=</span>A·<span class="fn">cos</span>(<span class="fk">k</span>x+φ₀)·<span class="fn">cos</span>(ωt)·e<span class="sup">−γt</span>',z:'<span class="fv">z</span><span class="feq">=</span>A·<span class="fn">sin</span>(<span class="fk">k</span>x+φ₀)·<span class="fn">sin</span>(ωt)·e<span class="sup">−γt</span>'},
+  {title:'Quantum Tunneling',y:'<span class="fv">y</span><span class="feq">=</span>A·<span class="fn">exp</span>(−κ|x|)·<span class="fn">cos</span>(<span class="fk">k</span>x−ωt+φ₀)',z:'<span class="fv">z</span><span class="feq">=</span>A·<span class="fn">exp</span>(−κ|x|)·<span class="fn">sin</span>(<span class="fk">k</span>x−ωt+φ₀)'},
+  {title:'WRZT · Raumzeit-Welle  c̃=√(Ξ/η)',y:'<span class="fv">y</span><span class="feq">=</span>A·<span class="fn">cos</span>(<span class="fk">k</span>x−<span class="fpi">c̃</span>kt+φ₀)·<span class="fn">cos</span>(<span class="fpi">Ξ</span>/η·x)',z:'<span class="fv">z</span><span class="feq">=</span>A·<span class="fn">sin</span>(<span class="fk">k</span>x−<span class="fpi">c̃</span>kt+φ₀)·<span class="fn">sin</span>(<span class="fpi">Ξ</span>/η·x)'},
+  {title:'WRZT · Materie-Knoten (R_min)',y:'<span class="fv">y</span><span class="feq">=</span>A·<span class="fn">exp</span>(−ηx²)·<span class="fn">sin</span>(πx/R̃)·<span class="fn">cos</span>(ωt+φ₀)',z:'<span class="fv">z</span><span class="feq">=</span>A·<span class="fn">exp</span>(−ηx²)·<span class="fn">cos</span>(πx/R̃)·<span class="fn">sin</span>(ωt+φ₀)'},
+  {title:'WRZT · Lichtpuls (Soliton)',y:'<span class="fv">y</span><span class="feq">=</span>A·<span class="fn">sech</span>(k(x−c̃t))·<span class="fn">cos</span>(kx−c̃kt+φ₀)',z:'<span class="fv">z</span><span class="feq">=</span>A·<span class="fn">sech</span>(k(x−c̃t))·<span class="fn">sin</span>(kx−c̃kt+φ₀)'},
+  {title:'WRZT · Materie↔Licht-Kopplung',y:'<span class="fv">y</span><span class="feq">=</span><span class="fn">Re</span>[ψᴹ] + κ·<span class="fn">Re</span>[ψᴸ]·<span class="fn">cos</span>(Ξt)',z:'<span class="fv">z</span><span class="feq">=</span><span class="fn">Im</span>[ψᴹ] + κ·<span class="fn">Im</span>[ψᴸ]·<span class="fn">sin</span>(Ξt)'},
+  {title:'Harmonischer Oszillator  ψₙ(x)',y:'<span class="fv">y</span><span class="feq">=</span>A·Hₙ(x)·<span class="fn">exp</span>(−x²/2)·<span class="fn">cos</span>(Eₙt+φ₀)',z:'<span class="fv">z</span><span class="feq">=</span>A·Hₙ(x)·<span class="fn">exp</span>(−x²/2)·<span class="fn">sin</span>(Eₙt+φ₀)'},
+  {title:'Dirac-Spinor  ψ = (φ, χ)ᵀ',y:'<span class="fv">y</span><span class="feq">=</span><span class="fn">Re</span>[φ]+<span class="fn">Re</span>[χ] — obere/untere Spinorkomp.',z:'<span class="fv">z</span><span class="feq">=</span><span class="fn">Im</span>[φ]+<span class="fn">Im</span>[χ] · mc²-Kopplung'},
+];
+
+function updateFormula(){const f=FORMULAS[MODE];document.getElementById('fTitle').innerHTML=f.title;document.getElementById('fLine1').innerHTML=f.y;document.getElementById('fLine2').innerHTML=f.z;}
+
+document.querySelectorAll('.modeBtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    MODE=parseInt(btn.dataset.mode);
+    document.querySelectorAll('.modeBtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    updateFormula();
+  });
+  btn.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+});
+updateFormula();
+
+// ── Hermite polynomials (physicist's) ─────────────────────────────────────
+function hermite(n,x){
+  if(n===0)return 1;
+  if(n===1)return 2*x;
+  let h0=1,h1=2*x,h2;
+  for(let i=2;i<=n;i++){h2=2*x*h1-2*(i-1)*h0;h0=h1;h1=h2;}
+  return h1;
+}
+
+// ── Camera ─────────────────────────────────────────────────────────────────
+let zoom=ZOOM;
+let isDragging=false,lastX=0,lastY=0,lpd=null;
+const BASE_AR=0.003;let autoRot=BASE_AR;
+
+canvas.addEventListener('mousedown',e=>{isDragging=true;lastX=e.clientX;lastY=e.clientY;});
+canvas.addEventListener('mousemove',e=>{if(!isDragging)return;rotY+=(e.clientX-lastX)*0.007;rotX+=(e.clientY-lastY)*0.007;lastX=e.clientX;lastY=e.clientY;autoRot=0;});
+canvas.addEventListener('mouseup',()=>{isDragging=false;autoRot=BASE_AR*(AUTO_SPEED/3);});
+canvas.addEventListener('mouseleave',()=>{isDragging=false;autoRot=BASE_AR*(AUTO_SPEED/3);});
+canvas.addEventListener('wheel',e=>{zoom*=e.deltaY>0?0.93:1.07;zoom=Math.max(80,Math.min(zoom,700));document.getElementById('slZoom').value=Math.round(zoom);document.getElementById('vZoom').textContent=Math.round(zoom);},{passive:true});
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){isDragging=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}if(e.touches.length===2){isDragging=false;lpd=pd(e);}},{passive:true});
+canvas.addEventListener('touchmove',e=>{if(e.touches.length===1&&isDragging){rotY+=(e.touches[0].clientX-lastX)*0.008;rotX+=(e.touches[0].clientY-lastY)*0.008;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;autoRot=0;}if(e.touches.length===2){const d=pd(e);if(lpd){zoom*=d/lpd;zoom=Math.max(80,Math.min(zoom,700));}lpd=d;}},{passive:true});
+canvas.addEventListener('touchend',e=>{if(e.touches.length<2)lpd=null;if(e.touches.length===0){isDragging=false;autoRot=BASE_AR*(AUTO_SPEED/3);}},{passive:true});
+function pd(e){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+
+// ── 3D ────────────────────────────────────────────────────────────────────
+function rxr(p,a){const c=Math.cos(a),s=Math.sin(a);return[p[0],c*p[1]-s*p[2],s*p[1]+c*p[2]];}
+function ryr(p,a){const c=Math.cos(a),s=Math.sin(a);return[c*p[0]+s*p[2],p[1],-s*p[0]+c*p[2]];}
+function project(p){const z=p[2]+FOV_DIST,f=zoom/z;return[W/2+p[0]*f,H/2+p[1]*f,p[2]];}
+function transform(p){return project(ryr(rxr(p,rotX),rotY));}
+
+// ── Color schemes ──────────────────────────────────────────────────────────
+// Auto palette per mode
+const AUTO_PAL=[[160,220],[270,320],[120,180],[20,60],[30,80],[300,360],[180,220],[60,140],[200,280],[0,60]];
+
+function getColor(frac,depth,scheme,modeFallback){
+  const [h0,h1]=AUTO_PAL[modeFallback];
+  const a=0.38+depth*0.62;
+  switch(scheme){
+    case'plasma':{const hue=280+frac*80;return`hsla(${hue},100%,${50+frac*25}%,${a})`;}
+    case'rainbow':{return`hsla(${frac*360},100%,65%,${a})`;}
+    case'mono':{const l=Math.round(40+frac*45+depth*15);return`hsla(220,20%,${l}%,${a})`;}
+    case'fire':{const hue=frac*60;return`hsla(${hue},100%,${50+frac*20}%,${a})`;}
+    case'ocean':{const hue=180+frac*60;return`hsla(${hue},100%,${45+frac*25}%,${a})`;}
+    default:{const hue=h0+(h1-h0)*frac;return`hsla(${hue},100%,68%,${a})`;}
+  }
+}
+function getGlowColor(scheme,modeFallback){
+  const GLOW=['rgba(100,210,255,0.85)','rgba(200,130,255,0.85)','rgba(100,255,180,0.85)','rgba(255,180,80,0.85)','rgba(255,200,60,0.85)','rgba(255,120,180,0.85)','rgba(80,240,240,0.85)','rgba(180,255,120,0.85)','rgba(180,160,255,0.85)','rgba(255,140,80,0.85)'];
+  switch(scheme){
+    case'plasma':return'rgba(255,100,200,0.9)';
+    case'rainbow':return'rgba(100,255,100,0.9)';
+    case'mono':return'rgba(200,220,255,0.9)';
+    case'fire':return'rgba(255,200,60,0.9)';
+    case'ocean':return'rgba(50,220,255,0.9)';
+    default:return GLOW[modeFallback];
+  }
+}
+
+// ── Wave functions ─────────────────────────────────────────────────────────
+const N=500;
+const SIGMA_G=3.5,KAPPA_QM=2.5;
+function sech(x){return 2/(Math.exp(x)+Math.exp(-x));}
+
+function getWave(t,kMult=1){
+  const pts=[];
+  const k=K*kMult,omega=k*k,phOff=PHASE*(Math.PI/180);
+  const cTilde=Math.sqrt(Math.max(0.01,XI/ETA));
+  const etaScale=ETA*2.5,rminFreq=(1/RMIN)*kMult*0.8;
+  const dampEnv=Math.exp(-DAMP*t*0.1);
+
+  for(let i=0;i<N;i++){
+    const s=i/(N-1),x=s*2-1;
+    let y=0,z=0;
+
+    if(MODE===0){
+      const env=Math.exp(-SIGMA_G*x*x)*dampEnv;
+      const ph=k*Math.PI*2*x-omega*t+phOff;
+      y=env*Math.cos(ph);z=env*Math.sin(ph);
+    }else if(MODE===1){
+      const k2=k*2,w2=k2*k2,ph1=k*Math.PI*2*x-omega*t+phOff,ph2=k2*Math.PI*2*x-w2*t;
+      y=dampEnv*((1-MIX)*Math.cos(ph1)+MIX*Math.cos(ph2))*1.1;
+      z=dampEnv*((1-MIX)*Math.sin(ph1)+MIX*Math.sin(ph2))*1.1;
+    }else if(MODE===2){
+      y=dampEnv*Math.cos(k*Math.PI*x+phOff)*Math.cos(omega*t);
+      z=dampEnv*Math.sin(k*Math.PI*x+phOff)*Math.sin(omega*t);
+    }else if(MODE===3){
+      const bw=0.25,env=Math.abs(x)>bw?1:Math.exp(-KAPPA_QM*(bw-Math.abs(x)));
+      const trans=x>bw?Math.exp(-KAPPA_QM*bw*1.5):1,ph=k*Math.PI*2*x-omega*t+phOff;
+      y=dampEnv*env*trans*Math.cos(ph);z=dampEnv*env*trans*Math.sin(ph);
+    }else if(MODE===4){
+      const medFreq=XI/ETA*0.3,carrier=k*Math.PI*2*x-cTilde*k*t+phOff,mod=Math.cos(medFreq*x)*dampEnv;
+      y=mod*Math.cos(carrier);z=mod*Math.sin(carrier);
+    }else if(MODE===5){
+      const env=Math.exp(-etaScale*x*x)*dampEnv;
+      y=env*Math.sin(rminFreq*Math.PI*2*x)*Math.cos(omega*t+phOff);
+      z=env*Math.cos(rminFreq*Math.PI*2*x)*Math.sin(omega*t+phOff);
+    }else if(MODE===6){
+      const pulseX=x-cTilde*0.4*t,env=sech(k*pulseX*2)*dampEnv,ph=k*Math.PI*2*x-cTilde*k*t+phOff;
+      y=env*Math.cos(ph);z=env*Math.sin(ph);
+    }else if(MODE===7){
+      const xiFreq=XI*0.15,mEnv=Math.exp(-SIGMA_G*0.6*x*x)*dampEnv;
+      const mPh=k*Math.PI*2*x-omega*t+phOff,lEnv=sech(k*(x-cTilde*0.35*t)*1.5)*dampEnv;
+      const lPh=k*Math.PI*2*x-cTilde*k*t+phOff,coup=Math.cos(xiFreq*t);
+      y=0.7*((1-KOPP*0.5)*mEnv*Math.cos(mPh)+KOPP*lEnv*Math.cos(lPh)*coup);
+      z=0.7*((1-KOPP*0.5)*mEnv*Math.sin(mPh)+KOPP*lEnv*Math.sin(lPh)*coup);
+    }else if(MODE===8){
+      // Harmonic Oscillator: ψₙ(x) = Hₙ(αx)·exp(−α²x²/2)·e^(−iEₙt)
+      // Eₙ = ℏω(n+½), here E = (QN+0.5)
+      const alpha=Math.sqrt(K*0.8); // effective oscillator freq
+      const scaledX=alpha*x*2.5;   // scale to fit nicely
+      const Hn=hermite(QN,scaledX);
+      const gaussEnv=Math.exp(-scaledX*scaledX/2)*dampEnv;
+      const En=(QN+0.5)*omega*0.5; // energy eigenvalue
+      const phase=En*t+phOff;
+      // Normalize roughly
+      const norm=Math.max(1,Math.abs(Hn)*0.15);
+      y=gaussEnv*(Hn/norm)*Math.cos(phase);
+      z=gaussEnv*(Hn/norm)*Math.sin(phase);
+    }else if(MODE===9){
+      // Dirac free-particle spinor ψ = (φ, χ)ᵀ
+      // Upper component φ: positive energy solution
+      // Lower component χ: small component ~ (p/mc)·φ (relativistic correction)
+      // mc² term (rest mass) creates mixing between upper/lower via KOPP as mass
+      const mass=KOPP*2+0.5;   // effective mc² (KOPP slider)
+      const energy=Math.sqrt(k*k+mass*mass); // relativistic E = √(p²+m²)
+      const ratio=k/(energy+mass);           // |χ|/|φ| ≈ p/(E+m) — Zitterbewegung factor
+
+      const ph=k*Math.PI*2*x-energy*t+phOff;
+      // Upper (large) component
+      const reUp= Math.cos(ph)*dampEnv;
+      const imUp= Math.sin(ph)*dampEnv;
+      // Lower (small) component — shifted by π/2 (Zitterbewegung)
+      const phLo=ph+Math.PI/2;
+      const reLo= ratio*Math.cos(phLo)*dampEnv;
+      const imLo= ratio*Math.sin(phLo)*dampEnv;
+      // Combine both spinor components
+      y=0.7*(reUp+reLo);
+      z=0.7*(imUp+imLo);
+    }
+
+    y*=AMP;z*=AMP;
+    const bEnv=Math.sin(s*Math.PI),scale=0.82*bEnv;
+    const mag=Math.sqrt(y*y+z*z)||1,clamp=Math.min(1,1/mag);
+    pts.push([x,scale*y*clamp,scale*z*clamp]);
+  }
+  return pts;
+}
+
+// ── CSV Export ─────────────────────────────────────────────────────────────
+document.getElementById('btnCSV').addEventListener('click',()=>{
+  const pts=getWave(time,1);
+  const modeNames=['Wellenpaket','Superposition','Stehende_Welle','Tunneling','WRZT_Raumzeit','WRZT_Materie','WRZT_Licht','WRZT_Kopplung','Harm_Oszillator','Dirac_Spinor'];
+  let csv=`# WRZT 3D Wellenfunktion Export\n# Modus: ${modeNames[MODE]}\n# k=${K}, A=${AMP}, phase=${PHASE}deg, gamma=${DAMP}, Xi=${XI}, eta=${ETA}, Rmin=${RMIN}, kappa=${KOPP}, QN=${QN}\n# Zeit t=${time.toFixed(4)}\n`;
+  csv+='s,x,y,z,psi2\n';
+  pts.forEach((p,i)=>{
+    const s=(i/(N-1)).toFixed(6);
+    const psi2=(p[1]*p[1]+p[2]*p[2]).toFixed(8);
+    csv+=`${s},${p[0].toFixed(6)},${p[1].toFixed(8)},${p[2].toFixed(8)},${psi2}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`WRZT_${modeNames[MODE]}_k${K}_n${QN}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  const flash=document.getElementById('csvFlash');
+  flash.style.display='block';
+  setTimeout(()=>flash.style.display='none',2000);
+});
+document.getElementById('btnCSV').addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+
+// ── Cube ──────────────────────────────────────────────────────────────────
+const CV=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+const CE=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+
+function glowDot(px,py,r,c1){
+  const g=ctx.createRadialGradient(px,py,0,px,py,r);
+  g.addColorStop(0,'rgba(255,255,255,0.98)');
+  g.addColorStop(0.25,c1);
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();ctx.arc(px,py,r+2,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+}
+
+function drawCurve(proj,pts,dim=false){
+  // Glow
+  ctx.lineWidth=LINE_W*2.5+1;
+  for(let i=1;i<proj.length;i++){
+    const frac=i/proj.length,depth=(proj[i][2]+1.5)/3;
+    const col=getColor(frac,depth,COLOR_SCHEME,MODE);
+    ctx.strokeStyle=col.replace(/[\d.]+\)$/,`${GLOW_A*(dim?0.4:1)})`);
+    ctx.beginPath();ctx.moveTo(proj[i-1][0],proj[i-1][1]);ctx.lineTo(proj[i][0],proj[i][1]);ctx.stroke();
+  }
+  // Main
+  ctx.lineWidth=LINE_W*(dim?0.7:1)+1;
+  for(let i=1;i<proj.length;i++){
+    const frac=i/proj.length,depth=(proj[i][2]+1.5)/3;
+    ctx.strokeStyle=getColor(frac,depth,COLOR_SCHEME,MODE);
+    ctx.beginPath();ctx.moveTo(proj[i-1][0],proj[i-1][1]);ctx.lineTo(proj[i][0],proj[i][1]);ctx.stroke();
+  }
+  // |ψ|²
+  if(SHOW_PSI2&&!dim){
+    ctx.lineWidth=3;
+    for(let i=1;i<proj.length;i++){
+      const r=pts[i]+2,prob=Math.min(1,(r[1]*r[1]+r[2]*r[2]))*4;
+      if(prob<0.05)continue;
+      ctx.strokeStyle=`rgba(255,255,255,${prob*0.14})`;
+      ctx.beginPath();ctx.moveTo(proj[i-1][0],proj[i-1][1]);ctx.lineTo(proj[i][0],proj[i][1]);ctx.stroke();
+    }
+  }
+}
+
+// ── Draw loop ─────────────────────────────────────────────────────────────
+let time=0,frame=0;
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  if(!isDragging) rotY+=autoRot*(AUTO_SPEED/3);
+  time+=SPEED; frame++;
+  zoom=ZOOM; // sync zoom from slider if not pinching
+
+  ctx.lineCap='round';ctx.lineJoin='round';
+
+  const isWRZT=MODE>=4&&MODE<=7,isExtra=MODE>=8;
+  const cubeC=isWRZT?'rgba(255,180,80,0.12)':isExtra?'rgba(200,160,255,0.12)':'rgba(140,180,255,0.12)';
+  const cornerC=isWRZT?'rgba(255,180,80,0.35)':isExtra?'rgba(200,160,255,0.35)':'rgba(140,180,255,0.35)';
+  const faceC=isWRZT?'rgba(255,200,80,0.8)':isExtra?'rgba(200,160,255,0.8)':'rgba(140,180,255,0.8)';
+
+  // Cube
+  ctx.strokeStyle=cubeC;ctx.lineWidth=4;
+  for(const [a,b] of CE){const p1=transform(CV[a]),p2=transform(CV[b]);ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();}
+  for(const v of CV){const p=transform(v);ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fillStyle=cornerC;ctx.fill();}
+
+  // Face centers
+  for(const fc of [[-1,0,0],[1,0,0]]){
+    const fp=transform(fc),cs=9;
+    ctx.strokeStyle='rgba(255,255,255,0.38)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(fp[0]-cs,fp[1]);ctx.lineTo(fp[0]+cs,fp[1]);ctx.moveTo(fp[0],fp[1]-cs);ctx.lineTo(fp[0],fp[1]+cs);ctx.stroke();
+    glowDot(fp[0],fp[1],6+2*Math.sin(frame*0.09),faceC);
+  }
+
+  // Curves
+  const pts1=getWave(time,1),proj1=pts1.map(p=>transform(p));
+  if(SHOW_CURVE2){
+    const pts2=getWave(time,2),proj2=pts2.map(p=>transform(p));
+    drawCurve(proj2,pts2,true);
+  }
+  drawCurve(proj1,pts1,false);
+
+  // Moving dot
+  const di=Math.floor((frame*1.8)%N),dp=proj1[di];
+  glowDot(dp[0],dp[1],13,getGlowColor(COLOR_SCHEME,MODE));
+
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
