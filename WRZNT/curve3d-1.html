@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>3D Kurve im Kubus</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: #050a14;
+    color: #e0f0ff;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #canvas-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+
+  #controls {
+    background: rgba(5, 15, 30, 0.95);
+    border-top: 1px solid rgba(0, 180, 255, 0.2);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .label {
+    font-size: 11px;
+    color: #4ab8ff;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 68px;
+    white-space: nowrap;
+  }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    background: rgba(0,180,255,0.2);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #00b4ff;
+    box-shadow: 0 0 8px #00b4ff;
+    cursor: pointer;
+  }
+
+  .val {
+    font-size: 12px;
+    color: #fff;
+    min-width: 22px;
+    text-align: right;
+  }
+
+  .formula-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .formula-row input[type=text] {
+    flex: 1;
+    background: rgba(0,180,255,0.08);
+    border: 1px solid rgba(0,180,255,0.25);
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    outline: none;
+  }
+  .formula-row input[type=text]:focus {
+    border-color: #00b4ff;
+    box-shadow: 0 0 6px rgba(0,180,255,0.3);
+  }
+
+  #fullscreen-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,30,60,0.8);
+    border: 1px solid rgba(0,180,255,0.3);
+    color: #4ab8ff;
+    font-size: 18px;
+    width: 38px; height: 38px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+    z-index: 10;
+  }
+  #fullscreen-btn:active { background: rgba(0,100,200,0.4); }
+
+  #error-msg {
+    font-size: 10px;
+    color: #ff4466;
+    min-height: 14px;
+    padding: 0 2px;
+  }
+
+  .preset-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #preset-select {
+    flex: 1;
+    background: rgba(0,180,255,0.1);
+    border: 1px solid rgba(0,180,255,0.35);
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300b4ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  #preset-select:focus { border-color: #00b4ff; box-shadow: 0 0 6px rgba(0,180,255,0.3); }
+  #preset-select option { background: #0a1a30; color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="canvas-wrapper">
+  <canvas id="c"></canvas>
+  <button id="fullscreen-btn" title="Vollbild">⛶</button>
+</div>
+
+<div id="controls">
+  <div class="row">
+    <span class="label">Schwingungen</span>
+    <input type="range" id="waves" min="1" max="10" step="1" value="3">
+    <span class="val" id="waves-val">3</span>
+  </div>
+  <div class="row">
+    <span class="label">Geschwindigkeit</span>
+    <input type="range" id="speed" min="0" max="5" step="0.1" value="1">
+    <span class="val" id="speed-val">1.0</span>
+  </div>
+
+  <div class="preset-row">
+    <span class="label">Vorlage</span>
+    <select id="preset-select">
+      <option value="">— Beispiel wählen —</option>
+      <optgroup label="── Klassische Kurven ──">
+        <option value="helix">🐚 Spirale (Helix)</option>
+        <option value="butterfly">🎀 Schmetterling</option>
+        <option value="lissajous">🌀 Lissajous</option>
+        <option value="wave">🌊 Welle mit Drift</option>
+        <option value="rose">🌸 Rosenform</option>
+        <option value="pulse">💫 Pulsierend</option>
+        <option value="trefoil">🎵 Trefoil-Knoten</option>
+        <option value="torus">🔮 Torus-Knoten</option>
+      </optgroup>
+      <optgroup label="── Fourier-Reihen ──">
+        <option value="fourier_basic">🎼 Fourier Grundform</option>
+        <option value="fourier_square">📐 Rechteckwelle</option>
+        <option value="fourier_saw">🦷 Sägezahnwelle</option>
+        <option value="fourier_tri">△ Dreieckwelle</option>
+        <option value="fourier_3d">🌀 3D Fourier-Spirale</option>
+      </optgroup>
+      <optgroup label="── Schrödinger ──">
+        <option value="schro_free">⚛️ Freies Teilchen</option>
+        <option value="schro_box">🎯 Teilchen im Kasten</option>
+        <option value="schro_packet">🌊 Wellenpaket (Gauß)</option>
+        <option value="schro_osc">💫 Harmonischer Oszillator</option>
+        <option value="schro_super">🔮 Superposition</option>
+        <option value="schro_hydrogen">🌀 Wasserstoffatom</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="formula-row">
+    <span class="label">X(t)</span>
+    <input type="text" id="fx" value="Math.sin(n*t + phase)">
+  </div>
+  <div class="formula-row">
+    <span class="label">Y(t)</span>
+    <input type="text" id="fy" value="Math.cos(n*t + phase)">
+  </div>
+  <div class="formula-row">
+    <span class="label">Z(t)</span>
+    <input type="text" id="fz" value="t / Math.PI - 1">
+  </div>
+  <div id="error-msg"></div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// State
+let rotX = 0.35, rotY = -0.6;
+let zoom = 1;
+let phase = 0;
+let animId;
+
+const sliderWaves = document.getElementById('waves');
+const sliderSpeed = document.getElementById('speed');
+const valWaves = document.getElementById('waves-val');
+const valSpeed = document.getElementById('speed-val');
+const fxInput = document.getElementById('fx');
+const fyInput = document.getElementById('fy');
+const fzInput = document.getElementById('fz');
+const errorMsg = document.getElementById('error-msg');
+
+// Presets
+const PRESETS = {
+  // Klassische Kurven
+  helix:     { fx: "Math.sin(n*t + phase)", fy: "Math.cos(n*t + phase)", fz: "t / Math.PI - 1", n: 3 },
+  butterfly: { fx: "Math.sin(n*t + phase) * Math.pow(Math.sin(t/2), 2)", fy: "Math.cos(n*t + phase) * Math.pow(Math.sin(t/2), 2)", fz: "t / Math.PI - 1", n: 4 },
+  lissajous: { fx: "Math.sin(2*t + phase)", fy: "Math.cos(3*t + phase)", fz: "t / Math.PI - 1", n: 3 },
+  wave:      { fx: "Math.sin(n*t + phase) * 0.8", fy: "Math.sin(2*t + phase) * 0.5", fz: "t / Math.PI - 1", n: 3 },
+  rose:      { fx: "Math.sin(n*t) * Math.cos(t + phase)", fy: "Math.sin(n*t) * Math.sin(t + phase)", fz: "t / Math.PI - 1", n: 4 },
+  pulse:     { fx: "Math.sin(n*t + phase) * (0.5 + 0.5*Math.sin(t))", fy: "Math.cos(n*t + phase) * (0.5 + 0.5*Math.sin(t))", fz: "t / Math.PI - 1", n: 5 },
+  trefoil:   { fx: "Math.sin(t + phase) + 2*Math.sin(2*t)", fy: "Math.cos(t + phase) - 2*Math.cos(2*t)", fz: "-Math.sin(3*t) * 0.5", n: 3 },
+  torus:     { fx: "Math.cos(t + phase) * (1 + 0.5*Math.cos(n*t))", fy: "Math.sin(t + phase) * (1 + 0.5*Math.cos(n*t))", fz: "0.5 * Math.sin(n*t)", n: 3 },
+  // Fourier-Reihen
+  fourier_basic:  { fx: "Math.sin(t + phase)", fy: "Math.sin(2*t+phase)*0.5 + Math.sin(3*t+phase)*0.33 + Math.sin(4*t+phase)*0.25", fz: "t / Math.PI - 1", n: 3 },
+  fourier_square: { fx: "Math.sin(t + phase)", fy: "Math.sin(t) + Math.sin(3*t)*0.333 + Math.sin(5*t)*0.2 + Math.sin(7*t)*0.143", fz: "t / Math.PI - 1", n: 3 },
+  fourier_saw:    { fx: "Math.sin(t + phase)", fy: "Math.sin(t) - Math.sin(2*t)*0.5 + Math.sin(3*t)*0.333 - Math.sin(4*t)*0.25", fz: "t / Math.PI - 1", n: 3 },
+  fourier_tri:    { fx: "Math.sin(t + phase)", fy: "Math.sin(t) - Math.sin(3*t)*0.111 + Math.sin(5*t)*0.04 - Math.sin(7*t)*0.02", fz: "t / Math.PI - 1", n: 3 },
+  fourier_3d:     { fx: "Math.sin(t+phase) + Math.sin(3*t+phase)*0.33 + Math.sin(5*t+phase)*0.2", fy: "Math.cos(t+phase) + Math.cos(3*t+phase)*0.33 + Math.cos(5*t+phase)*0.2", fz: "t / Math.PI - 1", n: 3 },
+  // Schrödinger
+  schro_free:     { fx: "Math.cos(n*t - phase)", fy: "Math.sin(n*t - phase)", fz: "t / Math.PI - 1", n: 3 },
+  schro_box:      { fx: "Math.sin(n*t) * Math.cos(phase)", fy: "Math.sin(n*t) * Math.sin(phase)", fz: "t / Math.PI - 1", n: 3 },
+  schro_packet:   { fx: "Math.exp(-Math.pow(t - Math.PI, 2) * 0.5) * Math.cos(n*t - phase)", fy: "Math.exp(-Math.pow(t - Math.PI, 2) * 0.5) * Math.sin(n*t - phase)", fz: "t / Math.PI - 1", n: 5 },
+  schro_osc:      { fx: "Math.exp(-Math.pow(t - Math.PI, 2) * 0.3) * Math.cos(phase + n*t)", fy: "Math.sin(t) * Math.exp(-Math.pow(t - Math.PI, 2) * 0.3)", fz: "t / Math.PI - 1", n: 4 },
+  schro_super:    { fx: "Math.sin(t)*Math.cos(phase) + Math.sin(2*t)*Math.cos(2*phase)*0.5", fy: "Math.sin(t)*Math.sin(phase) + Math.sin(2*t)*Math.sin(2*phase)*0.5", fz: "t / Math.PI - 1", n: 3 },
+  schro_hydrogen: { fx: "t * Math.exp(-t/2) * Math.cos(n*t - phase)", fy: "t * Math.exp(-t/2) * Math.sin(n*t - phase)", fz: "t / Math.PI - 1", n: 3 },
+};
+
+document.getElementById('preset-select').addEventListener('change', function() {
+  const p = PRESETS[this.value];
+  if (!p) return;
+  fxInput.value = p.fx;
+  fyInput.value = p.fy;
+  fzInput.value = p.fz;
+  sliderWaves.value = p.n;
+  valWaves.textContent = p.n;
+  this.value = ''; // reset so same item can be re-selected
+});
+
+
+sliderWaves.addEventListener('input', () => valWaves.textContent = sliderWaves.value);
+sliderSpeed.addEventListener('input', () => valSpeed.textContent = parseFloat(sliderSpeed.value).toFixed(1));
+
+// Touch / Mouse drag
+let pointers = {};
+let lastDist = null;
+let lastMid = null;
+let dragging = false;
+let lastMouse = null;
+
+function getN() { return parseInt(sliderWaves.value); }
+function getSpeed() { return parseFloat(sliderSpeed.value); }
+
+// Build curve points
+function buildCurve(n, ph) {
+  const pts = [];
+  const steps = 300;
+  for (let i = 0; i <= steps; i++) {
+    const t = (i / steps) * 2 * Math.PI;
+    let x, y, z;
+    try {
+      x = evalFormula(fxInput.value, t, n, ph);
+      y = evalFormula(fyInput.value, t, n, ph);
+      z = evalFormula(fzInput.value, t, n, ph);
+      errorMsg.textContent = '';
+    } catch(e) {
+      errorMsg.textContent = 'Formel Fehler: ' + e.message;
+      x = 0; y = 0; z = t / Math.PI - 1;
+    }
+    pts.push([
+      clamp(x, -1, 1),
+      clamp(y, -1, 1),
+      clamp(z, -1, 1)
+    ]);
+  }
+  return pts;
+}
+
+function evalFormula(expr, t, n, phase) {
+  // Safe eval with math context
+  const fn = new Function('t','n','phase','Math', `"use strict"; return (${expr});`);
+  return fn(t, n, phase, Math);
+}
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+// 3D -> 2D projection
+function project(x, y, z, cx, cy, size) {
+  // Apply rotations
+  let [rx, ry, rz] = rotateXY(x, y, z);
+  // Simple perspective
+  const fov = 2.5 * zoom;
+  const scale = fov / (fov + rz + 1.5) * size;
+  return [cx + rx * scale, cy - ry * scale, rz];
+}
+
+function rotateXY(x, y, z) {
+  // Rotate around Y axis
+  let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
+  let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+  // Rotate around X axis
+  let y2 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+  let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+  return [x1, y2, z2];
+}
+
+// Draw cube edges
+const CUBE_VERTS = [
+  [-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],
+  [-1,-1, 1],[1,-1, 1],[1,1, 1],[-1,1, 1]
+];
+const CUBE_EDGES = [
+  [0,1],[1,2],[2,3],[3,0],
+  [4,5],[5,6],[6,7],[7,4],
+  [0,4],[1,5],[2,6],[3,7]
+];
+
+function resize() {
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+  canvas.width = w * devicePixelRatio;
+  canvas.height = h * devicePixelRatio;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+}
+
+function draw() {
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const size = Math.min(W, H) * 0.32 * zoom;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background subtle grid feel
+  ctx.fillStyle = '#050a14';
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw cube
+  ctx.strokeStyle = 'rgba(0,180,255,0.18)';
+  ctx.lineWidth = 1 * devicePixelRatio;
+  for (const [a, b] of CUBE_EDGES) {
+    const [ax, ay] = project(...CUBE_VERTS[a], cx, cy, size);
+    const [bx, by] = project(...CUBE_VERTS[b], cx, cy, size);
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(bx, by);
+    ctx.stroke();
+  }
+
+  // Cube face centers (start/end points)
+  const centers = [[0,0,-1],[0,0,1]];
+  for (const c of centers) {
+    const [px, py] = project(...c, cx, cy, size);
+    ctx.beginPath();
+    ctx.arc(px, py, 5 * devicePixelRatio, 0, Math.PI * 2);
+    ctx.fillStyle = '#00ffcc';
+    ctx.shadowColor = '#00ffcc';
+    ctx.shadowBlur = 14;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // Draw curve
+  const n = getN();
+  const pts = buildCurve(n, phase);
+
+  // Gradient along curve
+  const numSeg = pts.length - 1;
+  for (let i = 0; i < numSeg; i++) {
+    const t = i / numSeg;
+    const [ax, ay, az] = project(...pts[i], cx, cy, size);
+    const [bx, by] = project(...pts[i+1], cx, cy, size);
+    const hue = 200 + t * 80;
+    const bright = 0.5 + 0.5 * az;
+    ctx.strokeStyle = `hsla(${hue},100%,${55 + bright*15}%,0.9)`;
+    ctx.lineWidth = 2.5 * devicePixelRatio;
+    ctx.shadowColor = `hsla(${hue},100%,70%,0.6)`;
+    ctx.shadowBlur = 6 * devicePixelRatio;
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(bx, by);
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+}
+
+function animate() {
+  phase += getSpeed() * 0.02;
+  draw();
+  animId = requestAnimationFrame(animate);
+}
+
+// --- Touch handling ---
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  for (const t of e.changedTouches) pointers[t.identifier] = {x: t.clientX, y: t.clientY};
+}, {passive: false});
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const ids = Object.keys(pointers);
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    const prev = pointers[t.identifier];
+    if (prev) {
+      rotY += (t.clientX - prev.x) * 0.008;
+      rotX += (t.clientY - prev.y) * 0.008;
+    }
+    pointers[t.identifier] = {x: t.clientX, y: t.clientY};
+  } else if (e.touches.length === 2) {
+    const [t0, t1] = e.touches;
+    const dist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+    if (lastDist !== null) {
+      zoom *= dist / lastDist;
+      zoom = Math.max(0.3, Math.min(4, zoom));
+    }
+    lastDist = dist;
+    for (const t of e.touches) pointers[t.identifier] = {x: t.clientX, y: t.clientY};
+  }
+}, {passive: false});
+
+canvas.addEventListener('touchend', e => {
+  for (const t of e.changedTouches) delete pointers[t.identifier];
+  if (e.touches.length < 2) lastDist = null;
+}, {passive: false});
+
+// Mouse
+canvas.addEventListener('mousedown', e => { dragging = true; lastMouse = {x: e.clientX, y: e.clientY}; });
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  rotY += (e.clientX - lastMouse.x) * 0.007;
+  rotX += (e.clientY - lastMouse.y) * 0.007;
+  lastMouse = {x: e.clientX, y: e.clientY};
+});
+window.addEventListener('mouseup', () => dragging = false);
+canvas.addEventListener('wheel', e => {
+  zoom *= e.deltaY > 0 ? 0.92 : 1.08;
+  zoom = Math.max(0.3, Math.min(4, zoom));
+  e.preventDefault();
+}, {passive: false});
+
+// Fullscreen
+document.getElementById('fullscreen-btn').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+});
+
+window.addEventListener('resize', () => { resize(); });
+resize();
+animate();
+</script>
+</body>
+</html>

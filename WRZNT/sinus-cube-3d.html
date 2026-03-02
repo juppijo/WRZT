@@ -14,6 +14,40 @@ canvas{display:block;position:fixed;top:0;left:0;}
 #btnFS{position:fixed;top:9px;right:12px;z-index:30;background:rgba(180,210,255,0.07);border:1px solid rgba(180,210,255,0.3);border-radius:7px;color:rgba(180,210,255,0.85);font-size:18px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 #btnFS:active{background:rgba(180,210,255,0.2);}
 
+#btnPause{
+  position:fixed;top:9px;left:50%;transform:translateX(-50%);z-index:30;
+  background:rgba(180,210,255,0.07);border:1px solid rgba(180,210,255,0.3);
+  border-radius:7px;color:rgba(180,210,255,0.85);font-size:18px;
+  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background 0.15s;
+}
+#btnPause:active{background:rgba(180,210,255,0.2);}
+#btnPause.paused{
+  background:rgba(255,200,80,0.15);
+  border-color:rgba(255,200,80,0.6);
+  color:rgba(255,220,120,0.95);
+}
+
+/* Hide all UI in fullscreen — only canvas visible */
+:fullscreen #title,
+:fullscreen #btnCSV,
+:fullscreen #csvFlash,
+:fullscreen #panel,
+:-webkit-full-screen #title,
+:-webkit-full-screen #btnCSV,
+:-webkit-full-screen #csvFlash,
+:-webkit-full-screen #panel { display:none !important; }
+
+/* Keep FS button visible but dimmed */
+:fullscreen #btnFS,
+:-webkit-full-screen #btnFS {
+  opacity:0; transition:opacity 0.3s;
+}
+:fullscreen #btnFS:hover,
+:fullscreen #btnFS:active,
+:-webkit-full-screen #btnFS:hover,
+:-webkit-full-screen #btnFS:active { opacity:1; }
+
 /* Export button */
 #btnCSV{position:fixed;top:9px;left:12px;z-index:30;background:rgba(100,255,180,0.07);border:1px solid rgba(100,255,180,0.3);border-radius:7px;color:rgba(100,255,180,0.85);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:0 8px;height:38px;display:flex;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
 #btnCSV:active{background:rgba(100,255,180,0.2);}
@@ -105,6 +139,7 @@ input[type=range].cam-sl::-moz-range-thumb{background:rgba(255,160,200,0.9);}
 <canvas id="c"></canvas>
 <div id="title">WRZT · SCHRÖDINGER · 3D</div>
 <button id="btnFS">⛶</button>
+<button id="btnPause" title="Pause">⏸</button>
 <button id="btnCSV">↓ CSV</button>
 <div id="csvFlash">✓ Gespeichert</div>
 
@@ -211,7 +246,17 @@ input[type=range].cam-sl::-moz-range-thumb{background:rgba(255,160,200,0.9);}
 </div>
 
 <script>
-// ── Fullscreen ─────────────────────────────────────────────────────────────
+// ── Pause ──────────────────────────────────────────────────────────────────
+let paused = false;
+const btnPause = document.getElementById('btnPause');
+btnPause.addEventListener('click', () => {
+  paused = !paused;
+  btnPause.textContent = paused ? '▶' : '⏸';
+  btnPause.classList.toggle('paused', paused);
+});
+btnPause.addEventListener('touchstart', e => e.stopPropagation(), {passive:true});
+
+
 document.getElementById('btnFS').addEventListener('click',()=>{
   if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
@@ -510,12 +555,12 @@ function glowDot(px,py,r,c1){
   g.addColorStop(0,'rgba(255,255,255,0.98)');
   g.addColorStop(0.25,c1);
   g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.beginPath();ctx.arc(px,py,r+2,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
 }
 
 function drawCurve(proj,pts,dim=false){
   // Glow
-  ctx.lineWidth=LINE_W*2.5+1;
+  ctx.lineWidth=LINE_W*2.5;
   for(let i=1;i<proj.length;i++){
     const frac=i/proj.length,depth=(proj[i][2]+1.5)/3;
     const col=getColor(frac,depth,COLOR_SCHEME,MODE);
@@ -523,7 +568,7 @@ function drawCurve(proj,pts,dim=false){
     ctx.beginPath();ctx.moveTo(proj[i-1][0],proj[i-1][1]);ctx.lineTo(proj[i][0],proj[i][1]);ctx.stroke();
   }
   // Main
-  ctx.lineWidth=LINE_W*(dim?0.7:1)+1;
+  ctx.lineWidth=LINE_W*(dim?0.7:1);
   for(let i=1;i<proj.length;i++){
     const frac=i/proj.length,depth=(proj[i][2]+1.5)/3;
     ctx.strokeStyle=getColor(frac,depth,COLOR_SCHEME,MODE);
@@ -531,9 +576,9 @@ function drawCurve(proj,pts,dim=false){
   }
   // |ψ|²
   if(SHOW_PSI2&&!dim){
-    ctx.lineWidth=3;
+    ctx.lineWidth=1;
     for(let i=1;i<proj.length;i++){
-      const r=pts[i]+2,prob=Math.min(1,(r[1]*r[1]+r[2]*r[2]))*4;
+      const r=pts[i],prob=Math.min(1,(r[1]*r[1]+r[2]*r[2]))*4;
       if(prob<0.05)continue;
       ctx.strokeStyle=`rgba(255,255,255,${prob*0.14})`;
       ctx.beginPath();ctx.moveTo(proj[i-1][0],proj[i-1][1]);ctx.lineTo(proj[i][0],proj[i][1]);ctx.stroke();
@@ -547,7 +592,7 @@ let time=0,frame=0;
 function draw(){
   ctx.clearRect(0,0,W,H);
   if(!isDragging) rotY+=autoRot*(AUTO_SPEED/3);
-  time+=SPEED; frame++;
+  if(!paused){ time+=SPEED; frame++; }
   zoom=ZOOM; // sync zoom from slider if not pinching
 
   ctx.lineCap='round';ctx.lineJoin='round';
@@ -558,14 +603,26 @@ function draw(){
   const faceC=isWRZT?'rgba(255,200,80,0.8)':isExtra?'rgba(200,160,255,0.8)':'rgba(140,180,255,0.8)';
 
   // Cube
-  ctx.strokeStyle=cubeC;ctx.lineWidth=4;
+  ctx.strokeStyle=cubeC;ctx.lineWidth=1;
   for(const [a,b] of CE){const p1=transform(CV[a]),p2=transform(CV[b]);ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();}
-  for(const v of CV){const p=transform(v);ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fillStyle=cornerC;ctx.fill();}
+  for(const v of CV){const p=transform(v);ctx.beginPath();ctx.arc(p[0],p[1],2,0,Math.PI*2);ctx.fillStyle=cornerC;ctx.fill();}
+
+  // X axis (center line through cube)
+  {
+    const xL=transform([-1,0,0]), xR=transform([1,0,0]);
+    ctx.save();
+    ctx.setLineDash([3,5]);
+    ctx.strokeStyle=isWRZT?'rgba(255,200,80,0.3)':isExtra?'rgba(200,160,255,0.3)':'rgba(140,180,255,0.3)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(xL[0],xL[1]);ctx.lineTo(xR[0],xR[1]);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
 
   // Face centers
   for(const fc of [[-1,0,0],[1,0,0]]){
     const fp=transform(fc),cs=9;
-    ctx.strokeStyle='rgba(255,255,255,0.38)';ctx.lineWidth=3;
+    ctx.strokeStyle='rgba(255,255,255,0.38)';ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(fp[0]-cs,fp[1]);ctx.lineTo(fp[0]+cs,fp[1]);ctx.moveTo(fp[0],fp[1]-cs);ctx.lineTo(fp[0],fp[1]+cs);ctx.stroke();
     glowDot(fp[0],fp[1],6+2*Math.sin(frame*0.09),faceC);
   }
@@ -578,8 +635,100 @@ function draw(){
   }
   drawCurve(proj1,pts1,false);
 
-  // Moving dot
+  // ── Perpendicular vectors from X-axis to curve points ──────────────────
+  const VSTEP=Math.max(1,Math.floor(N/25));
+  for(let i=0;i<pts1.length;i+=VSTEP){
+    const p=pts1[i];
+    const foot=[p[0],0,0]; // foot on x-axis
+    const pProj=proj1[i];
+    const footProj=transform(foot);
+    const len=Math.sqrt((pProj[0]-footProj[0])**2+(pProj[1]-footProj[1])**2);
+    if(len<2)continue;
+
+    const frac=i/pts1.length;
+    const hue=(frac*210+time*22)%360;
+
+    // Dashed line foot → curve
+    ctx.setLineDash([3,4]);
+    ctx.lineWidth=0.8;
+    ctx.strokeStyle=`hsla(${hue},100%,70%,0.45)`;
+    ctx.beginPath();ctx.moveTo(footProj[0],footProj[1]);ctx.lineTo(pProj[0],pProj[1]);ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Dot on x-axis foot
+    ctx.beginPath();ctx.arc(footProj[0],footProj[1],2,0,Math.PI*2);
+    ctx.fillStyle=`hsla(${hue},100%,80%,0.5)`;ctx.fill();
+
+    // Arrowhead at curve point
+    const dx=pProj[0]-footProj[0],dy=pProj[1]-footProj[1];
+    const angle=Math.atan2(dy,dx),aLen=6;
+    ctx.beginPath();
+    ctx.moveTo(pProj[0],pProj[1]);
+    ctx.lineTo(pProj[0]-aLen*Math.cos(angle-0.45),pProj[1]-aLen*Math.sin(angle-0.45));
+    ctx.moveTo(pProj[0],pProj[1]);
+    ctx.lineTo(pProj[0]-aLen*Math.cos(angle+0.45),pProj[1]-aLen*Math.sin(angle+0.45));
+    ctx.strokeStyle=`hsla(${hue},100%,85%,0.65)`;
+    ctx.lineWidth=1.2;ctx.stroke();
+  }
+
+  // Moving dot + perpendicular vector from X axis
   const di=Math.floor((frame*1.8)%N),dp=proj1[di];
+
+  // The point on the X axis corresponding to the dot's X position
+  const rawPt = pts1[di];
+  const xAxisPt = transform([rawPt[0], 0, 0]); // same x, y=0, z=0
+
+  // Draw glowing perpendicular vector from X axis to dot
+  ctx.save();
+  const glowC2 = getGlowColor(COLOR_SCHEME, MODE);
+  const dx = dp[0] - xAxisPt[0], dy = dp[1] - xAxisPt[1];
+  const len = Math.sqrt(dx*dx + dy*dy);
+
+  if(len > 2){
+    // Outer glow pass (wide, soft)
+    ctx.lineWidth = 12;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = glowC2.replace(/[\d.]+\)$/, '0.12)');
+    ctx.beginPath(); ctx.moveTo(xAxisPt[0], xAxisPt[1]); ctx.lineTo(dp[0], dp[1]); ctx.stroke();
+
+    // Mid glow pass
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = glowC2.replace(/[\d.]+\)$/, '0.25)');
+    ctx.beginPath(); ctx.moveTo(xAxisPt[0], xAxisPt[1]); ctx.lineTo(dp[0], dp[1]); ctx.stroke();
+
+    // Core line (bright, solid)
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = glowC2.replace(/[\d.]+\)$/, '0.95)');
+    ctx.beginPath(); ctx.moveTo(xAxisPt[0], xAxisPt[1]); ctx.lineTo(dp[0], dp[1]); ctx.stroke();
+
+    // Arrowhead
+    const ux = dx/len, uy = dy/len;
+    const arrLen = 13, arrW = 6;
+    const ax = dp[0] - ux*arrLen, ay = dp[1] - uy*arrLen;
+
+    // Arrowhead glow
+    ctx.shadowColor = glowC2;
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = glowC2.replace(/[\d.]+\)$/, '1.0)');
+    ctx.beginPath();
+    ctx.moveTo(dp[0], dp[1]);
+    ctx.lineTo(ax - uy*arrW, ay + ux*arrW);
+    ctx.lineTo(ax + uy*arrW, ay - ux*arrW);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // Glowing foot dot on X axis
+  const footG = ctx.createRadialGradient(xAxisPt[0], xAxisPt[1], 0, xAxisPt[0], xAxisPt[1], 8);
+  footG.addColorStop(0, 'rgba(255,255,255,0.95)');
+  footG.addColorStop(0.4, glowC2.replace(/[\d.]+\)$/, '0.7)'));
+  footG.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath(); ctx.arc(xAxisPt[0], xAxisPt[1], 8, 0, Math.PI*2);
+  ctx.fillStyle = footG; ctx.fill();
+
+  ctx.restore();
+
   glowDot(dp[0],dp[1],13,getGlowColor(COLOR_SCHEME,MODE));
 
   requestAnimationFrame(draw);
