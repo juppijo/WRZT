@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT: Dynamik der Annäherung</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { background-color: #121232; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #plot { width: 100%; height: 600px; margin-top: 20px; }
+        .info { padding: 20px; text-align: center; border-bottom: 1px solid #333; }
+        h1 { color: #ff4500; }
+        .formula-img { display: block; margin: 15px auto; max-width: 100%; }
+        .explanation { max-width: 800px; margin: auto; padding: 10px; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+<div class="info">
+    <h1>WRZT: Die Ur-Kraft-Kurve</h1>
+    <p>Annäherung und Rotation bei R_min.</p>
+</div>
+
+<div class="explanation">
+    <p>Die Gesamtkraft F_Ges (Anziehung) und die Zentrifugalkraft F_Zf (Rotation):</p>
+    <img src="https://latex.codecogs.com/png.latex?\inline&space;\dpi{150}&space;\bg{121242}&space;\color{white}F_{Ges}&space;=&space;F_C&space;&plus;&space;(F_G&space;\cdot&space;F_L)&space;\quad&space;\text{vs}&space;\quad&space;F_{Zf}&space;=&space;\frac{m_{rel}v^2}{r}" class="formula-img" alt="Kraftformeln">
+</div>
+
+<div id="plot"></div>
+
+<script>
+    const R_min = 7.716e-13;
+    const e = 1.602e-19;
+    const epsilon0 = 8.854e-12;
+    const G = 6.674e-11;
+    const m_e = 9.109e-31;
+    const c = 299792458;
+
+    let distances = [];
+    let forces_wrzt = [];
+    let forces_centrifugal = [];
+
+    for (let i = 0; i <= 200; i++) {
+        let r = Math.pow(10, -(i / 200) * 12.5); 
+        if (r < R_min) r = R_min;
+        distances.push(r);
+
+        // 1. WRZT Kraft (Anziehung)
+        let fc = (1 / (4 * Math.PI * epsilon0)) * (Math.pow(e, 2) / Math.pow(r, 2));
+        let v_ratio = Math.sqrt(1 - Math.pow(R_min/r, 2)); 
+        let gamma = 1 / Math.sqrt(1 - Math.pow(v_ratio, 0.999));
+        let fg = G * Math.pow(gamma * m_e, 2) / Math.pow(r, 2);
+        let fl = e * v_ratio * c * 1e-10; 
+        let f_total = fc + (fg * fl);
+        forces_wrzt.push(f_total);
+
+        // 2. Zentrifugalkraft (in Blau)
+        let f_zf = (gamma * m_e * Math.pow(v_ratio * c, 2)) / r;
+        f_zf = f_zf /500; 
+        forces_centrifugal.push(f_zf);
+    }
+
+    const traceWrzt = {
+        x: distances,
+        y: forces_wrzt,
+        name: 'WRZT Anziehung (Rot)',
+        type: 'scatter',
+        line: { color: '#ff4500', width: 2 }
+    };
+
+    const traceCentrifugal = {
+        x: distances,
+        y: forces_centrifugal,
+        name: 'Zentrifugalkraft (Blau)',
+        type: 'scatter',
+        line: { color: '#00ccff', width: 2, dash: 'dot' }
+    };
+
+    const layout = {
+        title: 'Kräftegleichgewicht bei Annäherung',
+        paper_bgcolor: '#121232',
+        plot_bgcolor: '#1e1e1e',
+        font: { color: '#e0e0e0' },
+        xaxis: {
+            title: 'Abstand r (m) - LOGARITHMISCH',
+            type: 'log',
+            autorange: 'reversed',
+            gridcolor: '#333',
+            tickformat: '.1e' 
+        },
+        yaxis: {
+            title: 'Kraft (Newton) - LINEAR',
+            type: 'linear',
+            gridcolor: '#333'
+        },
+        shapes: [{
+            type: 'line',
+            x0: R_min, y0: 0,
+            x1: R_min, y1: 0.0005, 
+            line: { color: '#ffff00', width: 1, dash: 'dot' }
+        }],
+        annotations: [{
+            x: Math.log10(R_min),
+            y: Math.max(...forces_wrzt) ,
+            text: 'R_min',
+            showarrow: true,
+            arrowhead: 2,
+            ax: 0, ay: -50,
+            font: {color: '#ffff00', size: 16}
+        }],
+        showlegend: true
+    };
+
+    Plotly.newPlot('plot', [traceWrzt, traceCentrifugal], layout);
+</script>
+
+</body>
+</html>
