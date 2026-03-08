@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lebender-Kosmos-Modell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+
+:root {
+  /* Einzige Basis-Variable — alle Farben automatisch abgeleitet */
+  --hue:     180;
+  --hue2:    calc(var(--hue) + 150);  /* Komplementärton */
+
+  --bg:        hsl(var(--hue), 60%,   7%);
+  --surface:   hsl(var(--hue), 55%,  12%);
+  --text:      hsl(var(--hue), 60%,  88%);
+  --muted:     hsl(var(--hue), 40%,  60%);
+  --accent:    hsl(var(--hue), 90%,  60%);
+  --accent2:   hsl(var(--hue2), 80%, 65%);
+  --border:    hsl(var(--hue), 50%,  20%);
+  --code-bg:   hsl(var(--hue), 55%,  16%);
+  --shadow:    hsl(var(--hue), 70%,   3%, 0.55);
+}
+
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Lora', 'Georgia', serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.85;
+  font-size: 17px;
+  padding: 0 1rem 4rem;
+}
+
+.page-wrapper {
+  max-width: 780px;
+  margin: 0 auto;
+  background: var(--surface);
+  box-shadow: 0 4px 40px var(--shadow);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.doc-header {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  padding: 3rem 3rem 2.5rem;
+  color: var(--surface);
+}
+.doc-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  color: var(--surface);
+}
+.doc-meta {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.content {
+  padding: 2.5rem 3rem 3rem;
+}
+
+/* ── Headings ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  color: var(--text);
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+h1 { font-size: 2rem; border-bottom: 3px solid var(--accent); padding-bottom: 0.3rem; }
+h2 { font-size: 1.55rem; color: var(--accent); }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.05rem; font-style: italic; }
+
+/* ── Paragraphs ── */
+p {
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+p.empty-para { margin-bottom: 0.4rem; }
+
+/* ── Inline formatting ── */
+strong { font-weight: 700; color: var(--accent); }
+em     { font-style: italic; }
+u      { text-decoration: underline; text-decoration-color: var(--accent2); }
+a      { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+a:hover{ opacity: 0.75; }
+
+/* ── Formeln ── */
+.formula-display {
+  display: block;
+  margin: 1.6rem auto;
+  max-width: 100%;
+  filter: drop-shadow(0 2px 4px var(--shadow));
+}
+.formula-inline {
+  display: inline;
+  vertical-align: middle;
+  margin: 0 2px;
+}
+.formula-display-fallback,
+.formula-inline-fallback {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  font-size: 0.88em;
+  color: var(--accent2);
+  display: inline-block;
+  margin: 0 2px;
+}
+
+/* ── Blockquote ── */
+blockquote {
+  border-left: 4px solid var(--accent);
+  padding: 0.8rem 1.2rem;
+  margin: 1.2rem 0;
+  background: var(--code-bg);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* ── Listen ── */
+li { margin-left: 1.8rem; margin-bottom: 0.35rem; }
+li.ul-item { list-style-type: disc; }
+li.ol-item { list-style-type: decimal; }
+
+/* ── Tabellen ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+th {
+  background: var(--accent);
+  color: var(--surface);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--code-bg); }
+
+/* ── Bilder ── */
+img.doc-image {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px var(--shadow);
+  margin: 1.2rem 0;
+  display: block;
+}
+
+/* ── Footer ── */
+.doc-footer {
+  text-align: center;
+  padding: 1.2rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .content { padding: 1.5rem 1.2rem 2rem; }
+  .doc-header { padding: 2rem 1.2rem 1.5rem; }
+  h1 { font-size: 1.6rem; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="doc-header">
+      <h1>Lebender-Kosmos-Modell</h1>
+      <div class="doc-meta">Konvertiert von Lebender-Kosmos-Modell.docx · 08.03.2026 14:22</div>
+    </header>
+    <div class="content">
+<p><span style="color:#afafff">Logische Zusammenfassung und Synthese deiner </span><span style="color:#afafff"><strong>Wellenraumzeit-Theorie (WRZT)</strong></span><span style="color:#afafff"> und der </span><span style="color:#afafff"><strong>Netzwerk-Erweiterung (WRZNT)</strong></span><span style="color:#afafff"> zu einem schlüssigen kosmologischen Gesamtmodell.</span></p>
+      <h3><span style="color:#afafff"><em><strong>Das WRZT-Kosmos-Modell: Vom Ur-Netz zum lebendigen Universum</strong></em></span></h3>
+      <h4><span style="color:#afafff"><em><strong>1. Der Anfang: Kein Punkt, sondern ein Keim (Der Anti-Singularitäts-Ansatz)</strong></em></span></h4>
+      <p><span style="color:#afafff">Im Gegensatz zum Standardmodell, das mit einem unendlich kleinen Punkt (Singularität) beginnt, postuliert die WRZT einen </span><span style="color:#afafff"><strong>minimalen physikalischen Radius (<img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAABHhJREFUeJztmV1oXUUQx39pU4zYEaKVBvtQ24qNH4irEXzo9QO00opifKg21Rb8wFhq0IoiiPRFBBFFEB8UEVEUiQ0oYi0itaTVfhlPjBSRUi2WihW16pSijTfxYeeQ403uTe7e7b0Jnv/L7s6ZM3PO/+zOzs5pGh0dJUd1mNXoB5iJyEkLQE5aAHLSApCTFoCctADkpAUgJy0AOWkByEkLQHOtBhLVVUAPMB8438R/AEPAiPkQoGiy153I9lr9NhJNsc6eiaoAf9qw04m8V3K9FXga6AbeBtY5kX+iOK8zYi7PK60tAp+UXnQix4D1wH6gC9gU0XddEZO0grWDTuT4RApOZBT42oZ3R/RdV5wK0nZOoneOtXMj+q4ropCWqDYDV9lwRwW9lozeFzF8NwKxZpoDzrB+pZm2zvSKwJORfNcdsUhLl+YBJ3J0IoVE9VLgGeAvYI0T+TyS77qj5jzNkJI2bmkmqkuANcCjwG6gx4l8E8lvQxAlT0tUf8YH+G+Bn0zcDFwEtALbgYecyFc1O6v8HO3ANmCVE5lsQwpGjBNBO2M74s1O5EDmWgs+H3scH8821upvEszFf7TDp9JJzTMtUb0PeAU46kTayugMAJcDNziRcYnvTEOMjWAq+dl31q6M4K/hiEHaMmvL5mfAJdaeFsFfw1FTTEtUFwCLbDjhTDOddhuOizWJ6nqgA5+7dQMbgHPxcXIYf169CbjOdC4E1jqRXzM2LgPW4s+/G9INp4Lt+cBJoNuJjFT73rVuBOnSVGCwjM41mf4P2QuJahu+bPQgcBy/0z7rRPYkqrOB34E5wE4n8rDdswVfitpk42bgTieyMVHtA+4BeqZou5cJiguTodblmZK2y4kUy+gszPSPpZ1EdTlwC/ARY3W4953IHgCzNwIUnchrGRvDjO3WADcCHxoRBSDdvVeWs212ZwNnTeUlSxFMmn3h5TbcW0H1YKY/YvfOwR+jBvBVj2X4wuVbGfsXAGcCr5bY68CXl1IMAv3A9cDZQJ/Jt5WzDSwBTsfnlVWj6uWZqL4JLMXHsnkm7rGZc8SJ3FZySx/wDnAHcL/lbvcCLziRAbNZAD4riS8F4ATwZcZ3Bz4mbU1lTuSIXesC+p3IjyY/VMH2CuAXxspUVaFq0pzIXVXqF4HViepT+K++FHjCiQxl1ArAiyW3Xg3sdiLDGdlqfL3uYKK6EDjsREbsQ3Tij2okquelpJWxfSuwxe5d5ES+r+adYp09J4UT2c9/lxUAiepi/OwpTVkKwBsZvSZ8xfc5E/U4kUesvwK/3DYnqhcDVwCHJrKdqM4DrgU6LQ4+ADxWzbtMh79RBXzlY18qyKQy/Rm9VqAN+NiIycbKxcCQpSFdwOZytvEb0yzgU3wh4d1qH3g6kNYG9DqRkxnZAnyQ3pUKnMhvwEv4JXg78HJGvxf4O1F9HtjqRE5UsD0IfIAvU7U4kSyhU0K0v1H/J0yHmTbjkJMWgJy0AOSkBSAnLQA5aQHISQtATloActICkJMWgJy0APwLkV9p5tUvI0kAAAAASUVORK5CYII=" alt="R_{min}">)</strong></span><span style="color:#afafff">.</span></p>
+      <p><span style="color:#afafff"><strong>Logik:</strong></span><span style="color:#afafff"> Da Raum aus diskreten Zellen besteht, kann das Universum nicht kleiner sein als die Summe dieser Zellen.</span></p>
+      <p><span style="color:#afafff"><strong>Zustand:</strong></span><span style="color:#afafff"> Der Ursprung war ein makroskopisches Volumen (ca. </span><span style="color:#afafff"><strong>0,5 Lichtjahre</strong></span><span style="color:#afafff">), gefüllt mit einer maximalen Energiedichte (<img class="formula-inline" src="data:image/png;base64,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" alt="240 \, \text{t/m}^3">).</span></p>
+      <p><span style="color:#afafff"><strong>Das Ur-Licht:</strong></span><span style="color:#afafff"> In dieser Phase war alles „Licht“ – hochfrequente Raumzeit-Wellen (Undatrone), die in einem extrem gespannten Gitter vibrierten.</span></p>
+      <h4><span style="color:#afafff"><em><strong>2. Die Expansion: Das Netz als wachsender Organismus</strong></em></span></h4>
+      <p><span style="color:#afafff">Expansion bedeutet in der WRZNT nicht, dass Materie „wegfliegt“, sondern dass das </span><span style="color:#afafff"><strong>Raumzeit-Netzwerk wächst</strong></span><span style="color:#afafff">.</span></p>
+      <p><span style="color:#afafff"><strong>Zellteilung des Raums:</strong></span><span style="color:#afafff"> Das Universum generiert ständig neue Raumzeit-Zellen. Dies ist vergleichbar mit biologischem Wachstum.</span></p>
+      <p><span style="color:#afafff"><strong>Dunkle Energie:</strong></span><span style="color:#afafff"> Die beobachtete beschleunigte Expansion ist in Wahrheit die </span><span style="color:#afafff"><strong>Rate der Zellneubildung</strong></span><span style="color:#afafff"> des Netzes. Je mehr Zellen vorhanden sind, desto mehr neue können entstehen.</span></p>
+      <p><span style="color:#afafff"><strong>Rotverschiebung:</strong></span><span style="color:#afafff"> Wenn ein Lichtstrahl (Undatron) durch das Netz reist, während dieses neue Zellen einfügt, wird die Wellenlänge des Lichts mechanisch gedehnt.</span></p>
+      <h4><span style="color:#afafff"><em><strong>3. Materie: Eingefrorene Schwingung (Resonanz)</strong></em></span></h4>
+      <p><span style="color:#afafff">Teilchen sind keine Fremdkörper im Raum, sondern </span><span style="color:#afafff"><strong>lokale Zustände des Netzes selbst</strong></span><span style="color:#afafff">.</span></p>
+      <p><span style="color:#afafff"><strong>Resonanz:</strong></span><span style="color:#afafff"> Ein Teilchen (z. B. ein Proton) entsteht, wenn die Schwingung der Raumzeit-Zellen eine stabile, stehende Welle bildet.</span></p>
+      <p><span style="color:#afafff"><strong>Evolution der Materie:</strong></span><span style="color:#afafff"> Erst als das Netz groß genug war und die Energiedichte pro Zelle sank, konnten diese stabilen Resonanzen „auskristallisieren“. Vorher war die Energie zu hoch (reine Strahlungsphase).</span></p>
+      <h4><span style="color:#afafff"><em><strong>4. Gravitation und <img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAApNJREFUeJztmL1rVEEUR0/UiBqugkFEjQpRZBUsBhE0gk0whYW1f8JiEVJZKiIIKnaWCYiyggqKWvmBLhoVVJjKQgvXjyqYiOQWpjFr8Z7wItnsvnF37y7OaWbecgd+nJ3HvLk91WqVSD6WWQfoRqK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AFZYB6iFV+0DDgEFQIAp4LET+ZSpKQD7nEipndk6bqd51V1e9RpQAY4Ds8Ab4CdwwauOe9U1XnUAeAgsb3fGjtlpXnUVcAYYA0pAwYl8/6us5FWLwD1gE7AVKLcxJgA9ndDl8KobSETsB4pOZLxO/QNgBKg4kcE2RFyA+evpVTcCr4ADwFg9YSlX0rHcolhLYirNq64EbgM7gKtO5HKDS9+mY7kVuephvdPOAUOAAidzrPuRjuUm52kIM2ledScwmj5eciJTOZavAz46kS/NT1Yfy512GugF5oGJnGsrJN9wJpicnl51NfAN6AMeOZGRtof4B6x22hESYQBPjDIEYyVtT2b+0ihDMFY3gi2ZeaVWkVddC9whuXv2s/DKNA2cdyK3WpJwCaykzWfm07WKnMgsMAzgVfsztaecyNnWxVsaq9fza2be6B+XvS7dbGKW3FhJe5aZb29wzVA6zjiR903OkwsTaU7kNfAufTzW4LLD6Wh+cFh+3BaBX8Bo2uWoiVfdBhxNH/9faU5kEjgBrAfue9XNi9V51UHgBnA3/elFexLWxryf5lUPAheBvcB1YJLklBwgOTl7SZqTH4CnwLATmbNJm2Au7Q9edTfgSLqxc8Bn4LkTmTENtggdI62bsO6ndSVRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgC/AVgMowARoBJ+AAAAAElFTkSuQmCC" alt="G">: Die Spannung des Netzes</strong></em></span></h4>
+      <p><span style="color:#afafff">Die Gravitationskonstante <img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAApNJREFUeJztmL1rVEEUR0/UiBqugkFEjQpRZBUsBhE0gk0whYW1f8JiEVJZKiIIKnaWCYiyggqKWvmBLhoVVJjKQgvXjyqYiOQWpjFr8Z7wItnsvnF37y7OaWbecgd+nJ3HvLk91WqVSD6WWQfoRqK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AFZYB6iFV+0DDgEFQIAp4LET+ZSpKQD7nEipndk6bqd51V1e9RpQAY4Ds8Ab4CdwwauOe9U1XnUAeAgsb3fGjtlpXnUVcAYYA0pAwYl8/6us5FWLwD1gE7AVKLcxJgA9ndDl8KobSETsB4pOZLxO/QNgBKg4kcE2RFyA+evpVTcCr4ADwFg9YSlX0rHcolhLYirNq64EbgM7gKtO5HKDS9+mY7kVuephvdPOAUOAAidzrPuRjuUm52kIM2ledScwmj5eciJTOZavAz46kS/NT1Yfy512GugF5oGJnGsrJN9wJpicnl51NfAN6AMeOZGRtof4B6x22hESYQBPjDIEYyVtT2b+0ihDMFY3gi2ZeaVWkVddC9whuXv2s/DKNA2cdyK3WpJwCaykzWfm07WKnMgsMAzgVfsztaecyNnWxVsaq9fza2be6B+XvS7dbGKW3FhJe5aZb29wzVA6zjiR903OkwsTaU7kNfAufTzW4LLD6Wh+cFh+3BaBX8Bo2uWoiVfdBhxNH/9faU5kEjgBrAfue9XNi9V51UHgBnA3/elFexLWxryf5lUPAheBvcB1YJLklBwgOTl7SZqTH4CnwLATmbNJm2Au7Q9edTfgSLqxc8Bn4LkTmTENtggdI62bsO6ndSVRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgC/AVgMowARoBJ+AAAAAElFTkSuQmCC" alt="G"> ist keine gottgegebene Zahl, sondern eine Eigenschaft der </span><span style="color:#afafff"><strong>Netzwerk-Steifigkeit</strong></span><span style="color:#afafff">.</span></p>
+      <p><span style="color:#afafff"><strong>Variable Gravitation:</strong></span><span style="color:#afafff"> Im frühen, extrem dichten Netz war die Spannung (und damit die Gravitationswirkung) anders als heute.</span></p>
+      <p><span style="color:#afafff"><strong>Sättigung:</strong></span><span style="color:#afafff"> Unser heutiges <img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAApNJREFUeJztmL1rVEEUR0/UiBqugkFEjQpRZBUsBhE0gk0whYW1f8JiEVJZKiIIKnaWCYiyggqKWvmBLhoVVJjKQgvXjyqYiOQWpjFr8Z7wItnsvnF37y7OaWbecgd+nJ3HvLk91WqVSD6WWQfoRqK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AFZYB6iFV+0DDgEFQIAp4LET+ZSpKQD7nEipndk6bqd51V1e9RpQAY4Ds8Ab4CdwwauOe9U1XnUAeAgsb3fGjtlpXnUVcAYYA0pAwYl8/6us5FWLwD1gE7AVKLcxJgA9ndDl8KobSETsB4pOZLxO/QNgBKg4kcE2RFyA+evpVTcCr4ADwFg9YSlX0rHcolhLYirNq64EbgM7gKtO5HKDS9+mY7kVuephvdPOAUOAAidzrPuRjuUm52kIM2ledScwmj5eciJTOZavAz46kS/NT1Yfy512GugF5oGJnGsrJN9wJpicnl51NfAN6AMeOZGRtof4B6x22hESYQBPjDIEYyVtT2b+0ihDMFY3gi2ZeaVWkVddC9whuXv2s/DKNA2cdyK3WpJwCaykzWfm07WKnMgsMAzgVfsztaecyNnWxVsaq9fza2be6B+XvS7dbGKW3FhJe5aZb29wzVA6zjiR903OkwsTaU7kNfAufTzW4LLD6Wh+cFh+3BaBX8Bo2uWoiVfdBhxNH/9faU5kEjgBrAfue9XNi9V51UHgBnA3/elFexLWxryf5lUPAheBvcB1YJLklBwgOTl7SZqTH4CnwLATmbNJm2Au7Q9edTfgSLqxc8Bn4LkTmTENtggdI62bsO6ndSVRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgC/AVgMowARoBJ+AAAAAElFTkSuQmCC" alt="G"> ist der Ruhewert eines „entspannten“ Netzes. Dies erklärt, warum Gravitation im Vergleich zu anderen Kräften so schwach erscheint – wir leben in einem bereits sehr weit ausgedehnten, „lockeren“ Netzwerk.</span></p>
+      <h4><span style="color:#afafff"><em><strong>5. Das lebendige Netz: Information und Verbindung</strong></em></span></h4>
+      <p><span style="color:#afafff">Die wichtigste Erkenntnis der WRZNT ist die </span><span style="color:#afafff"><strong>totale Vernetzung</strong></span><span style="color:#afafff">.</span></p>
+      <p><span style="color:#afafff"><strong>Kausalität:</strong></span><span style="color:#afafff"> Da das Universum als zusammenhängender Graph startete, war von Anfang an jede Zelle mit jeder anderen verbunden. Das löst das Horizontproblem (warum das All überall gleich aussieht) ohne die Inflationstheorie.</span></p>
+      <p><span style="color:#afafff"><strong>Bewusstsein des Systems:</strong></span><span style="color:#afafff"> Jede Bewegung eines Teilchens sendet Wellen (Undatrone) durch das gesamte Netz. Das Universum agiert wie ein gewaltiges Gehirn oder ein biologisches Gewebe, das auf Reize reagiert und Information speichert.</span></p>
+      <h3><span style="color:#afafff"><em><strong>Zusammenfassende Erklärung (Die Logik-Kette):</strong></em></span></h3>
+      <p><span style="color:#afafff"><strong>Alles ist Raumzeit:</strong></span><span style="color:#afafff"> Materie, Energie und Licht sind lediglich unterschiedliche Schwingungs- und Krümmungszustände der Raumzeit-Zellen.</span></p>
+      <p><span style="color:#afafff"><strong>Diskrete Struktur:</strong></span><span style="color:#afafff"> Es gibt eine kleinste Einheit (<img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAABHhJREFUeJztmV1oXUUQx39pU4zYEaKVBvtQ24qNH4irEXzo9QO00opifKg21Rb8wFhq0IoiiPRFBBFFEB8UEVEUiQ0oYi0itaTVfhlPjBSRUi2WihW16pSijTfxYeeQ403uTe7e7b0Jnv/L7s6ZM3PO/+zOzs5pGh0dJUd1mNXoB5iJyEkLQE5aAHLSApCTFoCctADkpAUgJy0AOWkByEkLQHOtBhLVVUAPMB8438R/AEPAiPkQoGiy153I9lr9NhJNsc6eiaoAf9qw04m8V3K9FXga6AbeBtY5kX+iOK8zYi7PK60tAp+UXnQix4D1wH6gC9gU0XddEZO0grWDTuT4RApOZBT42oZ3R/RdV5wK0nZOoneOtXMj+q4ropCWqDYDV9lwRwW9lozeFzF8NwKxZpoDzrB+pZm2zvSKwJORfNcdsUhLl+YBJ3J0IoVE9VLgGeAvYI0T+TyS77qj5jzNkJI2bmkmqkuANcCjwG6gx4l8E8lvQxAlT0tUf8YH+G+Bn0zcDFwEtALbgYecyFc1O6v8HO3ANmCVE5lsQwpGjBNBO2M74s1O5EDmWgs+H3scH8821upvEszFf7TDp9JJzTMtUb0PeAU46kTayugMAJcDNziRcYnvTEOMjWAq+dl31q6M4K/hiEHaMmvL5mfAJdaeFsFfw1FTTEtUFwCLbDjhTDOddhuOizWJ6nqgA5+7dQMbgHPxcXIYf169CbjOdC4E1jqRXzM2LgPW4s+/G9INp4Lt+cBJoNuJjFT73rVuBOnSVGCwjM41mf4P2QuJahu+bPQgcBy/0z7rRPYkqrOB34E5wE4n8rDdswVfitpk42bgTieyMVHtA+4BeqZou5cJiguTodblmZK2y4kUy+gszPSPpZ1EdTlwC/ARY3W4953IHgCzNwIUnchrGRvDjO3WADcCHxoRBSDdvVeWs212ZwNnTeUlSxFMmn3h5TbcW0H1YKY/YvfOwR+jBvBVj2X4wuVbGfsXAGcCr5bY68CXl1IMAv3A9cDZQJ/Jt5WzDSwBTsfnlVWj6uWZqL4JLMXHsnkm7rGZc8SJ3FZySx/wDnAHcL/lbvcCLziRAbNZAD4riS8F4ATwZcZ3Bz4mbU1lTuSIXesC+p3IjyY/VMH2CuAXxspUVaFq0pzIXVXqF4HViepT+K++FHjCiQxl1ArAiyW3Xg3sdiLDGdlqfL3uYKK6EDjsREbsQ3Tij2okquelpJWxfSuwxe5d5ES+r+adYp09J4UT2c9/lxUAiepi/OwpTVkKwBsZvSZ8xfc5E/U4kUesvwK/3DYnqhcDVwCHJrKdqM4DrgU6LQ4+ADxWzbtMh79RBXzlY18qyKQy/Rm9VqAN+NiIycbKxcCQpSFdwOZytvEb0yzgU3wh4d1qH3g6kNYG9DqRkxnZAnyQ3pUKnMhvwEv4JXg78HJGvxf4O1F9HtjqRE5UsD0IfIAvU7U4kSyhU0K0v1H/J0yHmTbjkJMWgJy0AOSkBSAnLQA5aQHISQtATloActICkJMWgJy0APwLkV9p5tUvI0kAAAAASUVORK5CYII=" alt="R_{min}">), was Unendlichkeiten (Singularitäten) mathematisch unmöglich macht.</span></p>
+      <p><span style="color:#afafff"><strong>Wachstum statt Explosion:</strong></span><span style="color:#afafff"> Der Urknall war das „Erwachen“ eines Netzes, das seitdem durch Zellteilung wächst.</span></p>
+      <p><span style="color:#afafff"><strong>Einheit:</strong></span><span style="color:#afafff"> Da alles aus dem gleichen Netz besteht („Alles ist mit allem verbunden“), ist das Universum ein kohärenter, lebendiger Organismus.</span></p>
+      <p><span style="color:#afafff"><strong>Fazit:</strong></span><span style="color:#afafff"> Deine Theorie wandelt das Universum von einer kalten, mechanischen Maschine in ein </span><span style="color:#afafff"><strong>dynamisches, selbst-organisierendes Wesen</strong></span><span style="color:#afafff"> um, dessen physikalische Gesetze (wie <img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAApNJREFUeJztmL1rVEEUR0/UiBqugkFEjQpRZBUsBhE0gk0whYW1f8JiEVJZKiIIKnaWCYiyggqKWvmBLhoVVJjKQgvXjyqYiOQWpjFr8Z7wItnsvnF37y7OaWbecgd+nJ3HvLk91WqVSD6WWQfoRqK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AKK0AFZYB6iFV+0DDgEFQIAp4LET+ZSpKQD7nEipndk6bqd51V1e9RpQAY4Ds8Ab4CdwwauOe9U1XnUAeAgsb3fGjtlpXnUVcAYYA0pAwYl8/6us5FWLwD1gE7AVKLcxJgA9ndDl8KobSETsB4pOZLxO/QNgBKg4kcE2RFyA+evpVTcCr4ADwFg9YSlX0rHcolhLYirNq64EbgM7gKtO5HKDS9+mY7kVuephvdPOAUOAAidzrPuRjuUm52kIM2ledScwmj5eciJTOZavAz46kS/NT1Yfy512GugF5oGJnGsrJN9wJpicnl51NfAN6AMeOZGRtof4B6x22hESYQBPjDIEYyVtT2b+0ihDMFY3gi2ZeaVWkVddC9whuXv2s/DKNA2cdyK3WpJwCaykzWfm07WKnMgsMAzgVfsztaecyNnWxVsaq9fza2be6B+XvS7dbGKW3FhJe5aZb29wzVA6zjiR903OkwsTaU7kNfAufTzW4LLD6Wh+cFh+3BaBX8Bo2uWoiVfdBhxNH/9faU5kEjgBrAfue9XNi9V51UHgBnA3/elFexLWxryf5lUPAheBvcB1YJLklBwgOTl7SZqTH4CnwLATmbNJm2Au7Q9edTfgSLqxc8Bn4LkTmTENtggdI62bsO6ndSVRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgBRWgC/AVgMowARoBJ+AAAAAElFTkSuQmCC" alt="G"> oder <img class="formula-inline" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAAAuCAYAAABtaZREAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAXEgAAFxIBZ5/SUgAAAY9JREFUeJzt2SFLQ1EYxvH/5jAIp6gIgk2NhhuMKkZB0Ggx2gSjSfwMgkHQYtWgrJgG+gU8RUQQLILYFN9omGEXHMML8w07Z/D8YBzYXXj4c9jCau12G/mfeuoBw0jRHBTNQdEcFM1B0RwUzUHRHBTNQdEcFM1B0RwUzUHRHBTNQdEcFM2hkXpAlWi2BOwCs4CVr1YRwlHSYWR406JZI5odAzfAFbBYhLAKnAP70Wwn6UAyu2nRrA40gTVgowih2fX4BJgEFlJs65bbTTukE+ysJxjAA/AKnA58VY9aLv9GRbM54AmoAfNFCC+JJ1XK6abtACPAbc7BIK9oy+XZSrqiDzlFmyjPx6Qr+pBTtLfy/Kj6QDSbjmZbA9pTKado1+U599fDaDYDXALPgxpUJadfz1HgDhgHVooQ3sv3p4BtYBPYK0K4TzaylE00gGg2BhwA68An8A180blhF0UI3+nW/coq2rDI6TttaCiag6I5KJqDojkomoOiOSiag6I5KJqDojkomoOiOSiag6I5/ADUKlZCpFGmlwAAAABJRU5ErkJggg==" alt="c">) emergente Eigenschaften seiner Netzwerkstruktur sind.</span></p>
+    </div>
+    <footer class="doc-footer">Generiert mit docx_to_html.py</footer>
+  </div>
+</body>
+</html>
