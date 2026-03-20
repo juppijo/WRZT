@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Physik Taschenrechner</title>
+  <title>Physik Formelrechner</title>
   <link rel="icon" type="image" href="logo.png">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -19,7 +19,7 @@
       <div class="header-title">
         <h1>
           <i class="fas fa-atom logo-icon"></i>
-          Physik<span>Rechner.</span>
+          Physik <span>Formel Rechner.</span>
         </h1>
 
         <p class="subtitle">
@@ -28,7 +28,7 @@
       </div>
 
       <button class="btn-fullscreen" id="btnFullscreen" title="Vollbild">
-        <i class="fas fa-expand" id="fsIcon"></i> Vollbild
+        <i class="fas fa-expand" id="fsIcon"></i>
       </button>
 
     </div>
@@ -36,19 +36,13 @@
 
   <main>
 
-    <!-- KONSTANTEN LEISTE -->
-    <section class="constants-bar">
-      <h2><i class="fas fa-infinity"></i> Physikalische Konstanten</h2>
-      <div class="constants-grid" id="constantsGrid"></div>
-    </section>
-
     <!-- KATEGORIE AUSWAHL -->
     <section class="category-section">
       <h2><i class="fas fa-th-large"></i> Kategorie wählen</h2>
       <div class="category-tabs" id="categoryTabs"></div>
     </section>
 
-    <!-- FORMEL AUSWAHL -->
+        <!-- FORMEL AUSWAHL -->
     <section class="formula-section">
       <h2><i class="fas fa-function"></i> Formel wählen</h2>
       <div class="formula-grid" id="formulaGrid"></div>
@@ -92,6 +86,12 @@
           <div class="result-steps" id="resultSteps"></div>
         </div>
       </div>
+    </section>
+
+    <!-- KONSTANTEN LEISTE -->
+    <section class="constants-bar">
+      <h2><i class="fas fa-infinity"></i> Physikalische Konstanten</h2>
+      <div class="constants-grid" id="constantsGrid"></div>
     </section>
 
     <!-- EIGENE FORMEL HINZUFÜGEN -->
