@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT / WRZNT – Formelsammlung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #05050f;
+      --surface:   #0c0c20;
+      --card:      #10102a;
+      --border:    rgba(120,130,255,0.18);
+      --accent1:   #7b8cff;
+      --accent2:   #4ef0c4;
+      --accent3:   #ff7eb3;
+      --accent4:   #ffd166;
+      --text:      #dde0ff;
+      --muted:     #7880aa;
+      --formula:   #a8f0e0;
+      --glow1:     rgba(123,140,255,0.35);
+      --glow2:     rgba(78,240,196,0.30);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(60,50,180,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(30,180,140,0.12) 0%, transparent 60%);
+      padding-bottom: 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      padding: 60px 30px 40px;
+      position: relative;
+    }
+    .header-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: white;
+    }
+    h1 span.accent { color: var(--accent1); }
+    .subtitle {
+      margin-top: 14px;
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+    .header-line {
+      margin: 36px auto 0;
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent1), var(--accent2), transparent);
+    }
+
+    /* ── TOC ── */
+    .toc {
+      max-width: 900px;
+      margin: 40px auto 0;
+      padding: 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .toc a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent1);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      transition: all 0.25s;
+      letter-spacing: 0.04em;
+    }
+    .toc a:hover {
+      background: var(--glow1);
+      border-color: var(--accent1);
+      color: white;
+    }
+
+    /* ── Layout ── */
+    .wrapper {
+      max-width: 1100px;
+      margin: 50px auto 0;
+      padding: 0 24px;
+    }
+
+    /* ── Section header ── */
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 60px 0 28px;
+    }
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--bg);
+      background: var(--accent1);
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .section-tag.green  { background: var(--accent2); }
+    .section-tag.pink   { background: var(--accent3); }
+    .section-tag.yellow { background: var(--accent4); color: #111; }
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1.75rem;
+      color: white;
+      letter-spacing: 0.01em;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Formula grid ── */
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+      gap: 18px;
+    }
+    .formula-grid.single { grid-template-columns: 1fr; }
+
+    /* ── Formula card ── */
+    .fcard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.2s;
+    }
+    .fcard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .fcard:hover { transform: translateY(-2px); }
+    .fcard:hover::before { opacity: 1; }
+
+    /* accent strip on left */
+    .fcard .strip {
+      position: absolute;
+      left: 0; top: 16px; bottom: 16px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--accent1);
+    }
+    .fcard .strip.green  { background: var(--accent2); }
+    .fcard .strip.pink   { background: var(--accent3); }
+    .fcard .strip.yellow { background: var(--accent4); }
+
+    .fcard-inner { padding-left: 14px; }
+
+    .fcard-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .fcard-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 12px;
+    }
+    .formula-box {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(160,180,255,0.12);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      color: var(--formula);
+      margin-bottom: 12px;
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+    }
+    .formula-box .eq { color: white; font-size: 1.15rem; }
+    .formula-box sub  { font-size: 0.72em; vertical-align: sub; }
+    .formula-box sup  { font-size: 0.72em; vertical-align: super; }
+
+    .desc {
+      font-size: 0.95rem;
+      color: #aab0cc;
+      line-height: 1.6;
+    }
+
+    /* value pills */
+    .values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .vpill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.67rem;
+      background: rgba(123,140,255,0.12);
+      border: 1px solid rgba(123,140,255,0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      color: var(--accent1);
+      letter-spacing: 0.04em;
+    }
+    .vpill.green {
+      background: rgba(78,240,196,0.10);
+      border-color: rgba(78,240,196,0.25);
+      color: var(--accent2);
+    }
+    .vpill.yellow {
+      background: rgba(255,209,102,0.10);
+      border-color: rgba(255,209,102,0.25);
+      color: var(--accent4);
+    }
+
+    /* ── Constants table ── */
+    .const-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+    .const-table th {
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .const-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(120,130,255,0.07);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .const-table td:first-child { color: var(--accent2); }
+    .const-table td:nth-child(2) { color: var(--formula); }
+    .const-table tr:last-child td { border-bottom: none; }
+
+    /* ── footer ── */
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      padding: 30px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer span { color: var(--accent1); }
+
+    @media (max-width: 700px) {
+      .formula-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Theoretische Physik · Undatronik</div>
+  <h1>WRZT &amp; WRZNT<br><span class="accent">Formelsammlung</span></h1>
+  <p class="subtitle">Wellenraumzeit-Theorie &amp; Wellenraumzeit-Netto-Theorie<br>
+  inkl. Ξ-Parameter und Bugwellen-Theorie</p>
+  <div class="header-line"></div>
+</header>
+
+<nav class="toc">
+  <a href="#rmin">R<sub>min</sub>-Berechnungen</a>
+  <a href="#undatron">Undatron-Grundlagen</a>
+  <a href="#wrzt">WRZT-Formeln</a>
+  <a href="#wrznt">WRZNT-Formeln</a>
+  <a href="#xi">Ξ-Parameter</a>
+  <a href="#bugwellen">Bugwellen-Theorie</a>
+  <a href="#konstanten">Konstanten</a>
+</nav>
+
+<div class="wrapper">
+
+  <!-- ═══════════════════════════════════ RMIN ══════════════════════════════════ -->
+  <div class="section-head" id="rmin">
+    <div class="section-tag" style="background: #c084fc; color: #05050f;">00</div>
+    <h2>R<sub>min</sub> – Minimaler Bahnradius</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="formula-grid">
+
+    <div class="fcard">
+      <div class="strip" style="background: #c084fc;"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">R<sub>min</sub> · Coulomb-Gleichgewicht</div>
+        <div class="fcard-name">Klassischer Minimalradius (n = 1)</div>
+        <div class="formula-box">
+          <span class="eq">F<sub>z</sub> = F<sub>C</sub> :</span><br>
+          <span class="eq">μ · r · ω² = e² / (16πε<sub>0</sub> · r²)</span><br><br>
+          <span class="eq">R<sub>min</sub> = 16πε<sub>0</sub>ℏ² / (μ · e²)</span><br>
+          <span class="eq">       = 32πε<sub>0</sub>ℏ² / (m<sub>e</sub> · e²) = 2 · a<sub>0</sub></span>
+        </div>
+        <div class="desc">
+          Gleichgewicht zwischen Zentripetalkraft und Coulomb-Anziehung beim Drehimpuls n=1.
+          Mit μ = m<sub>e</sub>/2 und L = μr²ω = ℏ folgt der minimale Bahnradius als
+          doppelter Bohr-Radius a<sub>0</sub>.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:#c084fc;">R<sub>min</sub> = 2·a<sub>0</sub> ≈ 1,058 × 10⁻¹⁰ m</span>
+          <span class="vpill" style="color:#c084fc;">a<sub>0</sub> = 5,292 × 10⁻¹¹ m (Bohr)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip" style="background: #c084fc;"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">R<sub>min</sub> · Quantisiert</div>
+        <div class="fcard-name">Allgemeiner Bahnradius für Niveau n</div>
+        <div class="formula-box">
+          <span class="eq">R<sub>n</sub> = n² · 16πε<sub>0</sub>ℏ² / (m<sub>e</sub> · e²)</span><br>
+          <span class="eq">   = 2 · n² · a<sub>0</sub></span>
+        </div>
+        <div class="desc">
+          Für Quantenzahl n ≥ 1 ergibt die Drehimpulsquantisierung L = nℏ diskrete
+          Bahnradien. Der kleinste mögliche Wert ist R<sub>1</sub> = 2·a<sub>0</sub> (n=1).
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:#c084fc;">n=1: R = 1,058 × 10⁻¹⁰ m</span>
+          <span class="vpill" style="color:#c084fc;">n=2: R = 4,232 × 10⁻¹⁰ m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip" style="background: #c084fc;"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">R<sub>min</sub> · Relativistisch</div>
+        <div class="fcard-name">Relativistische Untergrenze (Ξ = 1)</div>
+        <div class="formula-box">
+          <span class="eq">v = R · ω = c  →  Ξ = 1</span><br><br>
+          <span class="eq">R<sub>min,rel</sub> = ℏ / (m<sub>e</sub> · c) = λ<sub>C</sub></span>
+        </div>
+        <div class="desc">
+          Wenn die Bahngeschwindigkeit die Lichtgeschwindigkeit erreicht (Ξ = 1),
+          ist der Bahnradius gleich der reduzierten Compton-Wellenlänge λ̄<sub>C</sub>.
+          Darunter wäre v > c — physikalisch verboten.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:#c084fc;">R<sub>min,rel</sub> = λ̄<sub>C</sub> = 3,862 × 10⁻¹³ m</span>
+          <span class="vpill" style="color:#c084fc;">λ̄<sub>C</sub> = ℏ/(m<sub>e</sub>c)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip" style="background: #c084fc;"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">R<sub>min</sub> · Absolute Grenze</div>
+        <div class="fcard-name">Klassischer Elektronenradius (absolute Untergrenze)</div>
+        <div class="formula-box">
+          <span class="eq">r<sub>0</sub> = e² / (4πε<sub>0</sub> · m<sub>e</sub> · c²)</span><br>
+          <span class="eq">   = α · λ̄<sub>C</sub> ≈ α² · a<sub>0</sub></span>
+        </div>
+        <div class="desc">
+          Der klassische Elektronenradius r<sub>0</sub> ist die absolute Untergrenze des Undatron-Radius.
+          Unterhalb dieses Wertes würde die elektrostatische Selbstenergie die Ruhemasse
+          überschreiten. α = Feinstrukturkonstante ≈ 1/137.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:#c084fc;">r<sub>0</sub> ≈ 2,818 × 10⁻¹⁵ m</span>
+          <span class="vpill" style="color:#c084fc;">α = 1/137,036</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip" style="background: #c084fc;"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">R<sub>min</sub> · Maximale Frequenz</div>
+        <div class="fcard-name">Zugehörige Maximalfrequenz bei R<sub>min</sub></div>
+        <div class="formula-box">
+          <span class="eq">ω<sub>max</sub> = c / R<sub>min</sub> = m<sub>e</sub>c² / ℏ</span><br>
+          <span class="eq">f<sub>max</sub> = m<sub>e</sub>c² / h ≈ 1,236 × 10²⁰ Hz</span><br>
+          <span class="eq">E<sub>max</sub> = ℏ · ω<sub>max</sub> = m<sub>e</sub>c² ≈ 0,511 MeV</span>
+        </div>
+        <div class="desc">
+          Bei R = R<sub>min,rel</sub> = λ̄<sub>C</sub> wird die maximale Rotationsfrequenz
+          erreicht. Die emittierte Energie entspricht genau der Ruheenergie des Elektrons —
+          dies markiert die Grenze zur Annihilation.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:#c084fc;">ω<sub>max</sub> ≈ 7,764 × 10²⁰ rad/s</span>
+          <span class="vpill" style="color:#c084fc;">λ<sub>min</sub> = h·c/(m<sub>e</sub>c²) ≈ 2,426 pm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip" style="background: #c084fc;"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">R<sub>min</sub> · Skalenvergleich</div>
+        <div class="fcard-name">Hierarchie der charakteristischen Radien</div>
+        <div class="formula-box">
+          <span class="eq">r<sub>0</sub> ≪ λ̄<sub>C</sub> ≪ R<sub>min</sub> ≤ R<sub>n</sub></span><br><br>
+          <span class="eq">r<sub>0</sub> = α² · a<sub>0</sub> / 2</span><br>
+          <span class="eq">λ̄<sub>C</sub> = α · a<sub>0</sub></span><br>
+          <span class="eq">R<sub>min</sub> = 2 · a<sub>0</sub></span>
+        </div>
+        <div class="desc">
+          Alle charakteristischen Längen des Undatrons sind über die Feinstrukturkonstante
+          α ≈ 1/137 miteinander verknüpft. Faktor zwischen benachbarten Skalen jeweils ~137.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:#c084fc;">r<sub>0</sub> : λ̄<sub>C</sub> : a<sub>0</sub> = α² : α : 1</span>
+          <span class="vpill" style="color:#c084fc;">Verhältnis je ~137</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ UNDATRON ══════════════════════════════════ -->
+  <div class="section-head" id="undatron">
+    <div class="section-tag">01</div>
+    <h2>Undatron-Grundlagen</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="formula-grid">
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Energie</div>
+        <div class="fcard-name">Rotationsenergie des Undatrons</div>
+        <div class="formula-box">
+          <span class="eq">E = ℏω = h·f</span>
+        </div>
+        <div class="desc">
+          Die Energie des emittierten Lichts ist direkt proportional zur Rotationsfrequenz 
+          des Elektron-Positron-Paares. ω = Kreisfrequenz, f = lineare Frequenz des Undatrons.
+        </div>
+        <div class="values">
+          <span class="vpill">ℏ = 1,0546 × 10⁻³⁴ J·s</span>
+          <span class="vpill">h = 6,626 × 10⁻³⁴ J·s</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Kinematik</div>
+        <div class="fcard-name">Bahngeschwindigkeit der Teilchen</div>
+        <div class="formula-box">
+          <span class="eq">v = r · ω = 2π · r · f</span>
+        </div>
+        <div class="desc">
+          Bahngeschwindigkeit von Elektron und Positron auf der Kreisbahn mit 
+          Radius r um den gemeinsamen Schwerpunkt.
+        </div>
+        <div class="values">
+          <span class="vpill green">r = Bahnradius [m]</span>
+          <span class="vpill green">v ≤ c</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Mechanik</div>
+        <div class="fcard-name">Zentripetalkraft im Undatron</div>
+        <div class="formula-box">
+          <span class="eq">F<sub>z</sub> = μ · r · ω²</span><br>
+          <span class="eq">μ = m<sub>e</sub> / 2</span>
+        </div>
+        <div class="desc">
+          Reduzierte Masse μ hält Elektron und Positron auf stabiler Umlaufbahn 
+          ohne direkte Annihilation. m<sub>e</sub> = Elektronenmasse.
+        </div>
+        <div class="values">
+          <span class="vpill">m<sub>e</sub> = 9,109 × 10⁻³¹ kg</span>
+          <span class="vpill">μ = 4,555 × 10⁻³¹ kg</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Drehimpuls</div>
+        <div class="fcard-name">Drehimpuls des Undatrons</div>
+        <div class="formula-box">
+          <span class="eq">L = μ · r² · ω = n · ℏ</span>
+        </div>
+        <div class="desc">
+          Quantisierung des Drehimpulses: nur ganzzahlige Vielfache von ℏ sind erlaubt. 
+          Dies bestimmt die diskreten Emissionsfrequenzen (Spektrallinien).
+        </div>
+        <div class="values">
+          <span class="vpill">n = 1, 2, 3, …</span>
+          <span class="vpill green">ω<sub>n</sub> = nℏ / (μr²)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Raumzeit</div>
+        <div class="fcard-name">Emittierte Wellenlänge</div>
+        <div class="formula-box">
+          <span class="eq">λ = c / f = 2πc / ω</span>
+        </div>
+        <div class="desc">
+          Die Wellenlänge der emittierten Raumzeitwelle ergibt sich aus 
+          Lichtgeschwindigkeit und Rotationsfrequenz des Undatrons.
+        </div>
+        <div class="values">
+          <span class="vpill">c = 2,998 × 10⁸ m/s</span>
+          <span class="vpill green">f = 2 Hz → λ ≈ 1,5 × 10⁸ m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Impuls</div>
+        <div class="fcard-name">Photonenimpuls der Raumzeitwelle</div>
+        <div class="formula-box">
+          <span class="eq">p = E / c = ℏω / c = h / λ</span>
+        </div>
+        <div class="desc">
+          Der Impuls der emittierten Raumzeitwelle entspricht dem klassischen 
+          Photonimpuls. Alle drei Ausdrücke sind äquivalent.
+        </div>
+        <div class="values">
+          <span class="vpill">p = ℏk</span>
+          <span class="vpill green">k = 2π/λ (Wellenzahl)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ WRZT ══════════════════════════════════ -->
+  <div class="section-head" id="wrzt">
+    <div class="section-tag green">02</div>
+    <h2>WRZT – Wellenraumzeit-Theorie</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="formula-grid">
+
+    <div class="fcard">
+      <div class="strip green"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Wellengleichung</div>
+        <div class="fcard-name">Raumzeitwellen-Funktion</div>
+        <div class="formula-box">
+          <span class="eq">ψ(r, t) = A · e<sup>i(kr − ωt)</sup></span>
+        </div>
+        <div class="desc">
+          Ebene Raumzeitwelle: A = Amplitude, k = Wellenzahl, r = Ortsvektor, 
+          ω = Kreisfrequenz. Beschreibt die Propagation der Deformation im Raumzeit-Gefüge.
+        </div>
+        <div class="values">
+          <span class="vpill green">k = ω/c</span>
+          <span class="vpill">Dispersionsrelation: ω = ck</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip green"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Propagation</div>
+        <div class="fcard-name">Dispersionsrelation der WRZT</div>
+        <div class="formula-box">
+          <span class="eq">ω² = c² · k²</span><br>
+          <span class="eq">E² = (pc)² + (m<sub>0</sub>c²)²</span>
+        </div>
+        <div class="desc">
+          Für masselose Raumzeitwellen (m<sub>0</sub>=0) reduziert sich die 
+          relativistische Energie-Impuls-Relation auf ω = ck.
+        </div>
+        <div class="values">
+          <span class="vpill green">Gruppengeschw.: v<sub>g</sub> = dω/dk = c</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip green"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Emission</div>
+        <div class="fcard-name">Strahlungsleistung des Undatrons</div>
+        <div class="formula-box">
+          <span class="eq">P = (q² · a²) / (6πε<sub>0</sub> · c³)</span><br>
+          <span class="eq">a = r · ω² (Zentripetalbeschleunigung)</span>
+        </div>
+        <div class="desc">
+          Larmor-Formel: abgestrahlte Leistung einer beschleunigten Ladung. Im 
+          Undatron-Modell ist dies die Leistung der Raumzeitwellen-Emission.
+        </div>
+        <div class="values">
+          <span class="vpill">q = e = 1,602 × 10⁻¹⁹ C</span>
+          <span class="vpill green">ε<sub>0</sub> = 8,854 × 10⁻¹² F/m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip green"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Raumzeit</div>
+        <div class="fcard-name">Metrische Perturbation (Raumzeit-Deformation)</div>
+        <div class="formula-box">
+          <span class="eq">h<sub>μν</sub> = A<sub>μν</sub> · e<sup>i(k<sub>α</sub>x<sup>α</sup>)</sup></span><br>
+          <span class="eq">□h<sub>μν</sub> = 0 (Vakuum)</span>
+        </div>
+        <div class="desc">
+          Die rotierende Ladungsverteilung erzeugt eine metrische Perturbation h<sub>μν</sub> 
+          im flachen Minkowski-Raum. Diese propagiert als Tensorfeldwelle.
+        </div>
+        <div class="values">
+          <span class="vpill green">□ = d'Alembert-Operator</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip green"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Ruhemasse</div>
+        <div class="fcard-name">Ruhemasse-Energie-Äquivalenz</div>
+        <div class="formula-box">
+          <span class="eq">E<sub>0</sub> = m<sub>0</sub> · c²</span><br>
+          <span class="eq">E<sub>0</sub>(e⁺e⁻) = 2 · m<sub>e</sub> · c² ≈ 1,022 MeV</span>
+        </div>
+        <div class="desc">
+          Mindestenergie des Undatrons. Die Gesamtruhemasse des Elektron-Positron-Systems 
+          entspricht der Schwelle zur Paarerzeugung/-vernichtung.
+        </div>
+        <div class="values">
+          <span class="vpill">m<sub>e</sub>c² = 0,511 MeV</span>
+          <span class="vpill green">Paarschwelle: 1,022 MeV</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip green"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZT · Relativität</div>
+        <div class="fcard-name">Lorentz-Faktor im Undatron</div>
+        <div class="formula-box">
+          <span class="eq">γ = 1 / √(1 − v²/c²)</span><br>
+          <span class="eq">E<sub>kin</sub> = (γ − 1) · m<sub>0</sub>c²</span>
+        </div>
+        <div class="desc">
+          Bei hohen Rotationsgeschwindigkeiten sind relativistische Korrekturen nötig. 
+          Für v → c divergiert γ und es entsteht Cherenkov-artige Bugwellenstrahlung.
+        </div>
+        <div class="values">
+          <span class="vpill">v = 0,1c → γ ≈ 1,005</span>
+          <span class="vpill green">v = 0,9c → γ ≈ 2,294</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ WRZNT ══════════════════════════════════ -->
+  <div class="section-head" id="wrznt">
+    <div class="section-tag pink">03</div>
+    <h2>WRZNT – Wellenraumzeit-Netto-Theorie</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="formula-grid">
+
+    <div class="fcard">
+      <div class="strip pink"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZNT · Netto-Energie</div>
+        <div class="fcard-name">Netto-Energie des Undatron-Systems</div>
+        <div class="formula-box">
+          <span class="eq">E<sub>netto</sub> = E<sub>e⁺</sub> − E<sub>e⁻</sub></span><br>
+          <span class="eq">E<sub>netto</sub> = ℏ(ω<sub>+</sub> − ω<sub>−</sub>)</span>
+        </div>
+        <div class="desc">
+          Differenz zwischen Positron- und Elektronenergie nach Berücksichtigung 
+          relativistischer Asymmetrien. Im Gleichgewicht: E<sub>netto</sub> = 0.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:var(--accent3)">Symmetriebruch → E<sub>netto</sub> ≠ 0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip pink"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZNT · Superposition</div>
+        <div class="fcard-name">Netto-Wellenfeld (Superposition)</div>
+        <div class="formula-box">
+          <span class="eq">Ψ<sub>netto</sub> = ψ<sub>e⁺</sub> + ψ<sub>e⁻</sub></span><br>
+          <span class="eq">|Ψ<sub>netto</sub>|² = Intensität</span>
+        </div>
+        <div class="desc">
+          Superposition der Raumzeitwellen beider Teilchen. Konstruktive Interferenz 
+          erzeugt messbares Lichtsignal; destruktive Interferenz löscht es aus.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:var(--accent3)">Konstruktiv: Δφ = 2nπ</span>
+          <span class="vpill">Destruktiv: Δφ = (2n+1)π</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip pink"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZNT · Netto-Impuls</div>
+        <div class="fcard-name">Netto-Impuls des Strahlungsfeldes</div>
+        <div class="formula-box">
+          <span class="eq">p<sub>netto</sub> = (E<sub>netto</sub>) / c</span><br>
+          <span class="eq">= ℏ(ω<sub>+</sub> − ω<sub>−</sub>) / c</span>
+        </div>
+        <div class="desc">
+          Der Netto-Strahlungsimpuls entsteht durch Frequenzasymmetrie zwischen 
+          den beiden Teilchen. Relevanz: Strahlungsdruck, Photonenkickeffekte.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:var(--accent3)">Bei ω<sub>+</sub>=ω<sub>−</sub>: p<sub>netto</sub>=0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip pink"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZNT · Strahlungsbilanz</div>
+        <div class="fcard-name">Energiebilanz des Undatron-Feldes</div>
+        <div class="formula-box">
+          <span class="eq">E<sub>gesamt</sub> = E<sub>kin</sub> + E<sub>pot</sub> + E<sub>rad</sub></span><br>
+          <span class="eq">dE<sub>rad</sub>/dt = − P<sub>Larmor</sub></span>
+        </div>
+        <div class="desc">
+          Energieerhaltung im WRZNT-System. Die abgestrahlte Energie P<sub>Larmor</sub> 
+          wird aus der kinetischen und potentiellen Energie der Teilchenbahn entnommen.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:var(--accent3)">Spiraleinfall ohne Stabilisierung</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip pink"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZNT · Phasenraum</div>
+        <div class="fcard-name">WRZNT Phasenraumvolumen</div>
+        <div class="formula-box">
+          <span class="eq">ΔxΔp ≥ ℏ/2</span><br>
+          <span class="eq">ΔEΔt ≥ ℏ/2</span>
+        </div>
+        <div class="desc">
+          Heisenberg'sche Unschärfe begrenzt die Lokalisierbarkeit des Undatrons. 
+          Minimaler Ortsraum ~ Compton-Wellenlänge λ<sub>C</sub> = ℏ/(m<sub>e</sub>c).
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:var(--accent3)">λ<sub>C</sub> = 2,426 × 10⁻¹² m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip pink"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">WRZNT · Netto-Frequenz</div>
+        <div class="fcard-name">Differenzfrequenz &amp; Schwebung</div>
+        <div class="formula-box">
+          <span class="eq">f<sub>schwebung</sub> = |f<sub>+</sub> − f<sub>−</sub>|</span><br>
+          <span class="eq">f<sub>träger</sub> = (f<sub>+</sub> + f<sub>−</sub>) / 2</span>
+        </div>
+        <div class="desc">
+          Wenn Elektron und Positron leicht unterschiedliche Kreisfrequenzen aufweisen, 
+          entsteht eine Schwebungsfrequenz — ein moduliertes Wellenpaketsignal.
+        </div>
+        <div class="values">
+          <span class="vpill" style="color:var(--accent3)">Analogie: AM-Modulation</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ XI ══════════════════════════════════ -->
+  <div class="section-head" id="xi">
+    <div class="section-tag yellow">04</div>
+    <h2>Ξ-Parameter (Xi)</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="formula-grid">
+
+    <div class="fcard">
+      <div class="strip yellow"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Ξ · Definition</div>
+        <div class="fcard-name">Xi – dimensionsloser Geschwindigkeitsparameter</div>
+        <div class="formula-box">
+          <span class="eq">Ξ = v / c = r · ω / c</span>
+        </div>
+        <div class="desc">
+          Ξ (Xi) ist das Verhältnis der Bahngeschwindigkeit zur Lichtgeschwindigkeit. 
+          Analogie zum β-Parameter der Relativitätstheorie. Ξ = 0 → Ruhe; Ξ = 1 → Lichtgeschwindigkeit.
+        </div>
+        <div class="values">
+          <span class="vpill yellow">0 ≤ Ξ ≤ 1</span>
+          <span class="vpill yellow">Ξ = β (rel. Beta-Faktor)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip yellow"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Ξ · Energie</div>
+        <div class="fcard-name">Xi-gewichtete Strahlungsenergie</div>
+        <div class="formula-box">
+          <span class="eq">E<sub>Ξ</sub> = ℏω · Ξ = ℏω · (v/c)</span><br>
+          <span class="eq">E<sub>Ξ</sub> = ℏ · r · ω² / c</span>
+        </div>
+        <div class="desc">
+          Die durch Ξ gewichtete Energie beschreibt den relativistischen Anteil 
+          der Raumzeitwellen-Emission. Für Ξ → 1 gilt E<sub>Ξ</sub> → E<sub>WRZT</sub>.
+        </div>
+        <div class="values">
+          <span class="vpill yellow">Ξ → 0: E<sub>Ξ</sub> → 0</span>
+          <span class="vpill yellow">Ξ → 1: E<sub>Ξ</sub> = ℏω</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip yellow"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Ξ · Lorentz</div>
+        <div class="fcard-name">Xi und Lorentz-Faktor</div>
+        <div class="formula-box">
+          <span class="eq">γ = 1 / √(1 − Ξ²)</span><br>
+          <span class="eq">Ξ = √(1 − 1/γ²) = tanh(φ)</span>
+        </div>
+        <div class="desc">
+          Zusammenhang zwischen Ξ-Parameter und Lorentz-Faktor γ. φ = Rapidität. 
+          Im nichtrelativistischen Grenzfall gilt: Ξ ≈ v/c ≪ 1 und γ ≈ 1.
+        </div>
+        <div class="values">
+          <span class="vpill yellow">Ξ = 0,5 → γ ≈ 1,155</span>
+          <span class="vpill yellow">Ξ = 0,99 → γ ≈ 7,089</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip yellow"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Ξ · Wellenlänge</div>
+        <div class="fcard-name">Ξ-abhängige Doppler-Verschiebung</div>
+        <div class="formula-box">
+          <span class="eq">λ<sub>obs</sub> = λ<sub>0</sub> · √((1 + Ξ)/(1 − Ξ))</span>
+        </div>
+        <div class="desc">
+          Relativistischer Doppler-Effekt der emittierten Raumzeitwellen in 
+          Ausbreitungsrichtung. Für Ξ > 0: Rotverschiebung; für Ξ &lt; 0: Blauverschiebung.
+        </div>
+        <div class="values">
+          <span class="vpill yellow">Ξ = 0,5 → λ<sub>obs</sub> ≈ 1,732 λ<sub>0</sub></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip yellow"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Ξ · Schwelle</div>
+        <div class="fcard-name">Kritisches Xi für Bugwellen-Emission</div>
+        <div class="formula-box">
+          <span class="eq">Ξ<sub>krit</sub> = v<sub>krit</sub> / c = 1</span><br>
+          <span class="eq">Ξ > 1: superluminale Bugwelle</span>
+        </div>
+        <div class="desc">
+          Für Ξ ≥ 1 überschreitet die Phasengeschwindigkeit die Lichtgeschwindigkeit, 
+          was zur Bildung eines Mach-Kegels (Bugwelle) führt. In Medien: Ξ<sub>krit</sub> = 1/n.
+        </div>
+        <div class="values">
+          <span class="vpill yellow">In Medien: Ξ<sub>krit</sub> = c/n</span>
+          <span class="vpill yellow">Cherenkov: Ξ > 1/n</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip yellow"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Ξ · WRZNT Netto</div>
+        <div class="fcard-name">Netto-Xi des Undatron-Systems</div>
+        <div class="formula-box">
+          <span class="eq">Ξ<sub>netto</sub> = Ξ<sub>e⁺</sub> − Ξ<sub>e⁻</sub></span><br>
+          <span class="eq">= (v<sub>+</sub> − v<sub>−</sub>) / c</span>
+        </div>
+        <div class="desc">
+          Im symmetrischen Undatron gilt v<sub>+</sub> = v<sub>−</sub>, 
+          also Ξ<sub>netto</sub> = 0. Asymmetrien (z.B. Magnetfeld) erzeugen Ξ<sub>netto</sub> ≠ 0.
+        </div>
+        <div class="values">
+          <span class="vpill yellow">Symmetrie: Ξ<sub>netto</sub> = 0</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ BUGWELLEN ══════════════════════════════════ -->
+  <div class="section-head" id="bugwellen">
+    <div class="section-tag">05</div>
+    <h2>Bugwellen-Theorie</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="formula-grid">
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Bugwelle · Grundlage</div>
+        <div class="fcard-name">Mach-Winkel des Bugwellen-Kegels</div>
+        <div class="formula-box">
+          <span class="eq">sin(θ<sub>Mach</sub>) = c / v = 1 / Ma</span><br>
+          <span class="eq">θ<sub>Mach</sub> = arcsin(1/Ξ)</span>
+        </div>
+        <div class="desc">
+          Der Öffnungswinkel des Mach-Kegels hängt von der Überlichtgeschwindigkeit ab. 
+          Ξ = Ma (Mach-Zahl in der WRZT). Für Ξ = 1: θ = 90° (Grenzfall).
+        </div>
+        <div class="values">
+          <span class="vpill">Ξ = 2 → θ = 30°</span>
+          <span class="vpill green">Ξ = √2 → θ = 45°</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Bugwelle · Cherenkov</div>
+        <div class="fcard-name">Cherenkov-Winkel im Medium</div>
+        <div class="formula-box">
+          <span class="eq">cos(θ<sub>C</sub>) = c / (n · v) = 1 / (n · Ξ)</span><br>
+          <span class="eq">Bedingung: Ξ · n > 1</span>
+        </div>
+        <div class="desc">
+          Cherenkov-Strahlung ist das elektromagnetische Äquivalent der Bugwelle 
+          in einem Medium mit Brechungsindex n. Analoge Struktur zur WRZT-Bugwelle.
+        </div>
+        <div class="values">
+          <span class="vpill">n = 1,33 (Wasser)</span>
+          <span class="vpill green">Ξ<sub>krit</sub> = 1/1,33 ≈ 0,75</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Bugwelle · Raumzeit</div>
+        <div class="fcard-name">Phasenfront der Raumzeit-Bugwelle</div>
+        <div class="formula-box">
+          <span class="eq">r<sub>Bug</sub>(t) = v · t · cos(θ<sub>Mach</sub>)</span><br>
+          <span class="eq">= c · t / Ξ · √(Ξ² − 1)</span>
+        </div>
+        <div class="desc">
+          Geometrie der Bugwellen-Phasenfront in der Raumzeit. Die Bugwelle 
+          entsteht, wenn das Undatron schneller als seine eigene Raumzeitwelle ist.
+        </div>
+        <div class="values">
+          <span class="vpill">t = Zeit seit Emission</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Bugwelle · Energie</div>
+        <div class="fcard-name">Cherenkov-Strahlungsenergie pro Länge</div>
+        <div class="formula-box">
+          <span class="eq">dE/dx = (q²/4π) · ∫ ω(1 − 1/(n²Ξ²)) dω</span>
+        </div>
+        <div class="desc">
+          Frank-Tamm-Formel: Energieverlust pro Weglänge bei Cherenkov-/Bugwellen-Strahlung. 
+          Integration über alle Frequenzen, bei denen Ξ · n > 1 gilt.
+        </div>
+        <div class="values">
+          <span class="vpill">Frank-Tamm (1937)</span>
+          <span class="vpill green">Analogon in WRZT: dE/dx ~ Ξ²</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Bugwelle · Impuls</div>
+        <div class="fcard-name">Impuls-Kegelgeometrie</div>
+        <div class="formula-box">
+          <span class="eq">p<sub>⊥</sub> = p · sin(θ<sub>Mach</sub>) = p · c/v</span><br>
+          <span class="eq">p<sub>∥</sub> = p · cos(θ<sub>Mach</sub>) = p · √(1−1/Ξ²)</span>
+        </div>
+        <div class="desc">
+          Impulskomponenten der Raumzeitwellen-Bugwelle: senkrecht und parallel 
+          zur Bewegungsrichtung des Undatrons.
+        </div>
+        <div class="values">
+          <span class="vpill">p<sub>⊥</sub>/p<sub>∥</sub> = 1/√(Ξ²−1)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="strip"></div>
+      <div class="fcard-inner">
+        <div class="fcard-label">Bugwelle · Grenzfall</div>
+        <div class="fcard-name">Übergang Emission → Bugwelle</div>
+        <div class="formula-box">
+          <span class="eq">Ξ &lt; 1: kugelförmige Raumzeitwellen</span><br>
+          <span class="eq">Ξ = 1: ebene Wellenfront</span><br>
+          <span class="eq">Ξ > 1: Mach-Kegel (Bugwelle)</span>
+        </div>
+        <div class="desc">
+          Qualitative Übergänge des Emissionsmusters in Abhängigkeit vom 
+          Ξ-Parameter. Physikalisch analog zum Übergang Schall → Überschall → Mach-Kegel.
+        </div>
+        <div class="values">
+          <span class="vpill">Ξ=1: „Lichtmauer"</span>
+          <span class="vpill green">Ξ>1: Bugwellenphoton</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════ KONSTANTEN ══════════════════════════════════ -->
+  <div class="section-head" id="konstanten">
+    <div class="section-tag green">06</div>
+    <h2>Physikalische Konstanten</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="fcard" style="border-radius:14px;">
+    <div class="strip green"></div>
+    <div class="fcard-inner">
+      <table class="const-table">
+        <tr>
+          <th>Symbol</th>
+          <th>Wert</th>
+          <th>Einheit</th>
+          <th>Bezeichnung</th>
+        </tr>
+        <tr><td>c</td><td>2,99792458 × 10⁸</td><td>m/s</td><td>Lichtgeschwindigkeit im Vakuum</td></tr>
+        <tr><td>h</td><td>6,62607015 × 10⁻³⁴</td><td>J·s</td><td>Planck'sches Wirkungsquantum</td></tr>
+        <tr><td>ℏ</td><td>1,05457182 × 10⁻³⁴</td><td>J·s</td><td>Reduziertes Plancksches Wirkungsquantum</td></tr>
+        <tr><td>e</td><td>1,60217663 × 10⁻¹⁹</td><td>C</td><td>Elementarladung</td></tr>
+        <tr><td>m<sub>e</sub></td><td>9,10938370 × 10⁻³¹</td><td>kg</td><td>Elektronenmasse</td></tr>
+        <tr><td>ε<sub>0</sub></td><td>8,85418782 × 10⁻¹²</td><td>F/m</td><td>Elektrische Feldkonstante</td></tr>
+        <tr><td>μ<sub>0</sub></td><td>1,25663706 × 10⁻⁶</td><td>H/m</td><td>Magnetische Feldkonstante</td></tr>
+        <tr><td>λ<sub>C</sub></td><td>2,42631023 × 10⁻¹²</td><td>m</td><td>Compton-Wellenlänge (Elektron)</td></tr>
+        <tr><td>r<sub>0</sub></td><td>2,81794033 × 10⁻¹⁵</td><td>m</td><td>Klassischer Elektronenradius</td></tr>
+        <tr><td>α</td><td>7,29735257 × 10⁻³ ≈ 1/137</td><td>—</td><td>Feinstrukturkonstante</td></tr>
+        <tr><td>m<sub>e</sub>c²</td><td>0,51099895</td><td>MeV</td><td>Ruheenergie des Elektrons</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>WRZT / WRZNT Formelsammlung</span> · Undatronik · Wellenraumzeit-Theorie<br>
+  Ξ-Parameter &amp; Bugwellen-Theorie · Stand: 2026
+</footer>
+
+</body>
+</html>
