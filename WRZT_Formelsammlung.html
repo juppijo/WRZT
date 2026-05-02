@@ -323,131 +323,144 @@
 
   <div class="formula-grid">
 
+    <!-- Herleitung -->
     <div class="fcard">
       <div class="strip" style="background: #c084fc;"></div>
       <div class="fcard-inner">
-        <div class="fcard-label">R<sub>min</sub> · Coulomb-Gleichgewicht</div>
-        <div class="fcard-name">Klassischer Minimalradius (n = 1)</div>
+        <div class="fcard-label">R<sub>min</sub> · Herleitung</div>
+        <div class="fcard-name">Kreisbewegung: F<sub>zentrifugal</sub> = F<sub>Coulomb</sub> bei v = c</div>
         <div class="formula-box">
-          <span class="eq">F<sub>z</sub> = F<sub>C</sub> :</span><br>
-          <span class="eq">μ · r · ω² = e² / (16πε<sub>0</sub> · r²)</span><br><br>
-          <span class="eq">R<sub>min</sub> = 16πε<sub>0</sub>ℏ² / (μ · e²)</span><br>
-          <span class="eq">       = 32πε<sub>0</sub>ℏ² / (m<sub>e</sub> · e²) = 2 · a<sub>0</sub></span>
+          <span class="eq">m<sub>e</sub> · c²/r · γ = k · e²/r² · γ</span><br>
+          <span style="color:#7880aa; font-size:0.85em;">γ kürzt sich auf beiden Seiten!</span><br><br>
+          <span class="eq">m<sub>e</sub> · c² · r = k · e²</span><br><br>
+          <span class="eq">→  R<sub>klassisch</sub> = k · e² / (m<sub>e</sub> · c²)</span><br>
+          <span class="eq">              = e² / (4πε<sub>0</sub> · m<sub>e</sub> · c²)</span>
         </div>
         <div class="desc">
-          Gleichgewicht zwischen Zentripetalkraft und Coulomb-Anziehung beim Drehimpuls n=1.
-          Mit μ = m<sub>e</sub>/2 und L = μr²ω = ℏ folgt der minimale Bahnradius als
-          doppelter Bohr-Radius a<sub>0</sub>.
+          Ansatz: Gleichgewicht von Zentrifugalkraft und Coulomb-Kraft bei v = c (Lichtgeschwindigkeit).
+          Der Lorentz-Faktor γ tritt auf beiden Seiten auf und kürzt sich heraus —
+          das Ergebnis ist daher relativistisch exakt.
         </div>
         <div class="values">
-          <span class="vpill" style="color:#c084fc;">R<sub>min</sub> = 2·a<sub>0</sub> ≈ 1,058 × 10⁻¹⁰ m</span>
-          <span class="vpill" style="color:#c084fc;">a<sub>0</sub> = 5,292 × 10⁻¹¹ m (Bohr)</span>
+          <span class="vpill" style="color:#c084fc;">k = 1/(4πε<sub>0</sub>)</span>
+          <span class="vpill" style="color:#c084fc;">v = c → Ξ = 1</span>
         </div>
       </div>
     </div>
 
+    <!-- Klassischer Elektronenradius -->
     <div class="fcard">
       <div class="strip" style="background: #c084fc;"></div>
       <div class="fcard-inner">
-        <div class="fcard-label">R<sub>min</sub> · Quantisiert</div>
-        <div class="fcard-name">Allgemeiner Bahnradius für Niveau n</div>
+        <div class="fcard-label">R<sub>min</sub> · Ergebnis</div>
+        <div class="fcard-name">Klassischer Elektronenradius r<sub>e</sub></div>
         <div class="formula-box">
-          <span class="eq">R<sub>n</sub> = n² · 16πε<sub>0</sub>ℏ² / (m<sub>e</sub> · e²)</span><br>
-          <span class="eq">   = 2 · n² · a<sub>0</sub></span>
+          <span class="eq">r<sub>e</sub> = e² / (4πε<sub>0</sub> · m<sub>e</sub> · c²)</span><br><br>
+          <span class="eq">   = α · R<sub>comp</sub> = α · ℏ / (m<sub>e</sub>c)</span>
         </div>
         <div class="desc">
-          Für Quantenzahl n ≥ 1 ergibt die Drehimpulsquantisierung L = nℏ diskrete
-          Bahnradien. Der kleinste mögliche Wert ist R<sub>1</sub> = 2·a<sub>0</sub> (n=1).
+          Der klassische Elektronenradius ist das Ergebnis der Herleitung.
+          Ansatz: die gesamte Ruheenergie des Elektrons stammt aus seinem elektrostatischen Feld.
+          Dies ist die Skala, bei der Elektrostatik dominant wird.
+          Physikalischer Fokus: Ladung &amp; elektrische Energie = Masse &amp; Quanten-Lokalität.
         </div>
         <div class="values">
-          <span class="vpill" style="color:#c084fc;">n=1: R = 1,058 × 10⁻¹⁰ m</span>
-          <span class="vpill" style="color:#c084fc;">n=2: R = 4,232 × 10⁻¹⁰ m</span>
+          <span class="vpill" style="color:#c084fc;">r<sub>e</sub> ≈ 2,818 × 10⁻¹⁵ m</span>
+          <span class="vpill" style="color:#c084fc;">L = ℏ bei v = c</span>
         </div>
       </div>
     </div>
 
+    <!-- Compton-Radius -->
     <div class="fcard">
       <div class="strip" style="background: #c084fc;"></div>
       <div class="fcard-inner">
-        <div class="fcard-label">R<sub>min</sub> · Relativistisch</div>
-        <div class="fcard-name">Relativistische Untergrenze (Ξ = 1)</div>
+        <div class="fcard-label">R<sub>min</sub> · Compton</div>
+        <div class="fcard-name">Reduzierte Compton-Wellenlänge R<sub>comp</sub></div>
         <div class="formula-box">
-          <span class="eq">v = R · ω = c  →  Ξ = 1</span><br><br>
-          <span class="eq">R<sub>min,rel</sub> = ℏ / (m<sub>e</sub> · c) = λ<sub>C</sub></span>
+          <span class="eq">R<sub>comp</sub> = ℏ / (m<sub>e</sub> · c)</span>
         </div>
         <div class="desc">
-          Wenn die Bahngeschwindigkeit die Lichtgeschwindigkeit erreicht (Ξ = 1),
-          ist der Bahnradius gleich der reduzierten Compton-Wellenlänge λ̄<sub>C</sub>.
-          Darunter wäre v > c — physikalisch verboten.
+          Der zweite minimale Radius in WRZT und Quantenphysik.
+          Ergibt sich aus der Drehimpuls-Quantisierung L = ℏ bei v = c.
+          Unterhalb dieses Radius wäre v &gt; c — physikalisch verboten (Ξ &gt; 1).
+          Dieser Wert entspricht auch der reduzierten Compton-Wellenlänge λ̄<sub>C</sub>.
         </div>
         <div class="values">
-          <span class="vpill" style="color:#c084fc;">R<sub>min,rel</sub> = λ̄<sub>C</sub> = 3,862 × 10⁻¹³ m</span>
-          <span class="vpill" style="color:#c084fc;">λ̄<sub>C</sub> = ℏ/(m<sub>e</sub>c)</span>
+          <span class="vpill" style="color:#c084fc;">R<sub>comp</sub> = λ̄<sub>C</sub> ≈ 3,862 × 10⁻¹³ m</span>
+          <span class="vpill" style="color:#c084fc;">R<sub>comp</sub> = α⁻¹ · r<sub>e</sub></span>
         </div>
       </div>
     </div>
 
+    <!-- Die Brücke: Bug-Winkel α -->
     <div class="fcard">
       <div class="strip" style="background: #c084fc;"></div>
       <div class="fcard-inner">
-        <div class="fcard-label">R<sub>min</sub> · Absolute Grenze</div>
-        <div class="fcard-name">Klassischer Elektronenradius (absolute Untergrenze)</div>
+        <div class="fcard-label">R<sub>min</sub> · Brücke über α</div>
+        <div class="fcard-name">Die Feinstrukturkonstante α verbindet beide Minima</div>
         <div class="formula-box">
-          <span class="eq">r<sub>0</sub> = e² / (4πε<sub>0</sub> · m<sub>e</sub> · c²)</span><br>
-          <span class="eq">   = α · λ̄<sub>C</sub> ≈ α² · a<sub>0</sub></span>
+          <span class="eq">α = 1/(4πε<sub>0</sub>) · e² / (ℏc) ≈ 1/137</span><br><br>
+          <span class="eq">r<sub>e</sub> = α · R<sub>comp</sub></span><br><br>
+          <span class="eq">r<sub>e</sub> = α · ℏ/(m<sub>e</sub>c)</span>
         </div>
         <div class="desc">
-          Der klassische Elektronenradius r<sub>0</sub> ist die absolute Untergrenze des Undatron-Radius.
-          Unterhalb dieses Wertes würde die elektrostatische Selbstenergie die Ruhemasse
-          überschreiten. α = Feinstrukturkonstante ≈ 1/137.
+          Die beiden minimalen Radien sind nicht isoliert — sie sind über die
+          <strong>Feinstrukturkonstante α</strong> perfekt miteinander verknüpft.
+          α ist eine dimensionslose Naturkonstante, die die Stärke der elektromagnetischen
+          Wechselwirkung beschreibt und r<sub>e</sub> mit R<sub>comp</sub> verbindet.
         </div>
         <div class="values">
-          <span class="vpill" style="color:#c084fc;">r<sub>0</sub> ≈ 2,818 × 10⁻¹⁵ m</span>
-          <span class="vpill" style="color:#c084fc;">α = 1/137,036</span>
+          <span class="vpill" style="color:#c084fc;">α ≈ 1/137,036</span>
+          <span class="vpill" style="color:#c084fc;">r<sub>e</sub> / R<sub>comp</sub> = α</span>
         </div>
       </div>
     </div>
 
+    <!-- Vergleich der beiden Minima -->
     <div class="fcard">
       <div class="strip" style="background: #c084fc;"></div>
       <div class="fcard-inner">
-        <div class="fcard-label">R<sub>min</sub> · Maximale Frequenz</div>
-        <div class="fcard-name">Zugehörige Maximalfrequenz bei R<sub>min</sub></div>
+        <div class="fcard-label">R<sub>min</sub> · Vergleich</div>
+        <div class="fcard-name">Vergleich der beiden R<sub>min</sub></div>
         <div class="formula-box">
-          <span class="eq">ω<sub>max</sub> = c / R<sub>min</sub> = m<sub>e</sub>c² / ℏ</span><br>
-          <span class="eq">f<sub>max</sub> = m<sub>e</sub>c² / h ≈ 1,236 × 10²⁰ Hz</span><br>
-          <span class="eq">E<sub>max</sub> = ℏ · ω<sub>max</sub> = m<sub>e</sub>c² ≈ 0,511 MeV</span>
+          <span class="eq">r<sub>e</sub>     = e² / (4πε<sub>0</sub>·m<sub>e</sub>c²)  ≈ 2,818 fm</span><br>
+          <span class="eq">R<sub>comp</sub> = ℏ / (m<sub>e</sub>c)              ≈ 386,2 fm</span><br><br>
+          <span class="eq">Klassisch (r<sub>e</sub>) = α × Compton (R<sub>comp</sub>)</span>
         </div>
         <div class="desc">
-          Bei R = R<sub>min,rel</sub> = λ̄<sub>C</sub> wird die maximale Rotationsfrequenz
-          erreicht. Die emittierte Energie entspricht genau der Ruheenergie des Elektrons —
-          dies markiert die Grenze zur Annihilation.
+          In WRZT und Quantenphysik existieren zwei unterschiedliche minimale Radien.
+          Der klassische Elektronenradius r<sub>e</sub> ist die elektromagnetische Untergrenze,
+          R<sub>comp</sub> die quantenmechanische Grenze (v = c).
+          Beide sind über α = 1/137 miteinander verbunden.
         </div>
         <div class="values">
-          <span class="vpill" style="color:#c084fc;">ω<sub>max</sub> ≈ 7,764 × 10²⁰ rad/s</span>
-          <span class="vpill" style="color:#c084fc;">λ<sub>min</sub> = h·c/(m<sub>e</sub>c²) ≈ 2,426 pm</span>
+          <span class="vpill" style="color:#c084fc;">r<sub>e</sub> ≈ 2,818 × 10⁻¹⁵ m</span>
+          <span class="vpill" style="color:#c084fc;">R<sub>comp</sub> ≈ 3,862 × 10⁻¹³ m</span>
         </div>
       </div>
     </div>
 
+    <!-- Skalenhierarchie -->
     <div class="fcard">
       <div class="strip" style="background: #c084fc;"></div>
       <div class="fcard-inner">
-        <div class="fcard-label">R<sub>min</sub> · Skalenvergleich</div>
+        <div class="fcard-label">R<sub>min</sub> · Skalen</div>
         <div class="fcard-name">Hierarchie der charakteristischen Radien</div>
         <div class="formula-box">
-          <span class="eq">r<sub>0</sub> ≪ λ̄<sub>C</sub> ≪ R<sub>min</sub> ≤ R<sub>n</sub></span><br><br>
-          <span class="eq">r<sub>0</sub> = α² · a<sub>0</sub> / 2</span><br>
-          <span class="eq">λ̄<sub>C</sub> = α · a<sub>0</sub></span><br>
-          <span class="eq">R<sub>min</sub> = 2 · a<sub>0</sub></span>
+          <span class="eq">r<sub>e</sub>  ≪  R<sub>comp</sub>  ≪  a<sub>0</sub></span><br><br>
+          <span class="eq">r<sub>e</sub>     = α² · a<sub>0</sub> / 2</span><br>
+          <span class="eq">R<sub>comp</sub> = α  · a<sub>0</sub></span><br>
+          <span class="eq">a<sub>0</sub>    = ℏ² / (m<sub>e</sub> · e² · k)</span>
         </div>
         <div class="desc">
           Alle charakteristischen Längen des Undatrons sind über die Feinstrukturkonstante
-          α ≈ 1/137 miteinander verknüpft. Faktor zwischen benachbarten Skalen jeweils ~137.
+          α ≈ 1/137 miteinander verknüpft. Der Faktor zwischen benachbarten Skalen
+          beträgt jeweils ~137.
         </div>
         <div class="values">
-          <span class="vpill" style="color:#c084fc;">r<sub>0</sub> : λ̄<sub>C</sub> : a<sub>0</sub> = α² : α : 1</span>
-          <span class="vpill" style="color:#c084fc;">Verhältnis je ~137</span>
+          <span class="vpill" style="color:#c084fc;">r<sub>e</sub> : R<sub>comp</sub> : a<sub>0</sub> = α² : α : 1</span>
+          <span class="vpill" style="color:#c084fc;">a<sub>0</sub> ≈ 5,292 × 10⁻¹¹ m</span>
         </div>
       </div>
     </div>
