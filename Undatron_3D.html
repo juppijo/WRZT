@@ -601,7 +601,7 @@ function buildWaveMesh(N) {
 //
 //  Farbe: Blau/Cyan = Vertiefung (e⁻),  Orange/Rot = Wölbung (e⁺)
 
-function updateWaveMesh_o(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
+function updateWaveMesh_O(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
 
 // Ψ(r, φ, t) = (1/√r) · sin( k·r − ω·t + φ_Quelle )
 // f_spiral = (1/√r) · sin( k·r − ω·t + φ_Quelle )
@@ -1037,6 +1037,7 @@ function animate(ts) {
     const bPt=new THREE.Vector3(xB,yP,zB);
     const rPt=new THREE.Vector3(xR,yP,zR);
     const UP = new THREE.Vector3(0,1,0);
+    const UPM = new THREE.Vector3(0,-1,0);
 
     // Blue: F_z outward, F_C inward, F_L inward, B upward, Result
     setArrow(ArrBFz, bPt, new THREE.Vector3( ux, 0,  uz), lFz);
@@ -1044,7 +1045,7 @@ function animate(ts) {
     setArrow(ArrBFl, bPt, new THREE.Vector3(-ux, 0, -uz).multiplyScalar(1), lFl);
     // Offset F_L slightly up so it doesn't overlap F_C
     ArrBFl.g.position.y = yP + 5;
-    setArrow(ArrBB,  bPt, UP,                              lB);
+    setArrow(ArrBB,  bPt, UPM, lB);
 
     // Resultante for blue: (F_z - F_C - F_L), positive=outward
     const resSign = F_z > F_in ? 1 : -1;
