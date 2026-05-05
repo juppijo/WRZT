@@ -38,7 +38,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 .btn.rmin:hover{background:rgba(192,132,252,.2);}
 
 /* ── Canvas ── */
-#cvs{position:fixed;top:44px;left:0;right:310px;bottom:0;display:block;}
+/* #cvs{position:fixed;top:44px;left:0;right:310px;bottom:0;display:block;} */
+/* Ersetze oder ergänze diese Regeln im <style> Bereich */
+#cvs {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  /* Die Breite wird jetzt dynamisch über die rechte Kante gesteuert */
+  right: 310px; 
+  bottom: 0;
+  display: block;
+  transition: right 0.3s ease-in-out; /* WICHTIG: Gleiche Zeit wie das Panel */
+}
+
+/* Wenn das Panel weg ist, rückt die rechte Kante des Canvas auf 0 */
+#cvs.full-width {
+  right: 0 !important;
+}
 
 /* ── HUD ── */
 #hud-tl{position:fixed;top:56px;left:10px;display:flex;flex-direction:column;
@@ -60,11 +76,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 #pause-banner.show{opacity:1;}
 
 /* ── Panel ── */
-#panel{position:fixed;top:44px;right:0;bottom:0;width:310px;
-  background:rgba(7,7,26,.95);border-left:1px solid var(--bdr);
-  overflow-y:auto;z-index:60;display:flex;flex-direction:column;}
+#panel {
+  position: fixed;
+  top: 44px;
+  right: 0;
+  bottom: 0;
+  width: 310px;
+  background: rgba(7,7,26,.95);
+  border-left: 1px solid var(--bdr);
+  overflow-y: auto;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  /* Sanftes Ausblenden */
+  transition: transform 0.3s ease-in-out;
+}
+
+#panel.hidden {
+  transform: translateX(100%); /* Schiebt das Panel nach rechts raus */
+}
+
+
 #panel::-webkit-scrollbar{width:3px;}
 #panel::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;}
+
 .psec{padding:11px 14px;border-bottom:1px solid var(--bdr);}
 .psec-t{font-size:.54rem;font-family:'JetBrains Mono',monospace;letter-spacing:.2em;
   text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
@@ -124,9 +159,46 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 .leg{display:flex;flex-direction:column;gap:4px;}
 .leg-r{display:flex;align-items:center;gap:6px;font-size:.68rem;}
 .leg-l{width:18px;height:3px;border-radius:1px;flex-shrink:0;}
+
+/* Das Panel bekommt eine Transition für das sanfte Gleiten ------------ */
+#panel {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Diese Klasse versteckt das Panel (schiebt es nach rechts raus) */
+#panel.closed {
+  transform: translateX(310px);
+}
+
+/* Der Canvas muss sich anpassen, wenn das Panel weg ist */
+#cvs {
+  transition: right 0.3s ease-in-out;
+}
+
+#cvs.expanded {
+  right: 0 !important;
+}
+
+/* Ein schwebender Button, um das Panel wieder zu öffnen */
+#togglePanelBtn {
+  position: fixed;
+  top: 55px;
+  right: 10px;
+  z-index: 101; /* Über dem Panel */
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--purple);
+  color: var(--purple);
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
 </style>
 </head>
 <body>
+
+<!-- <button class="btn"  id="togglePanelBtn" onclick="toggleSettings()">✕</button> -->
 
 <!-- Topbar -->
 <div id="topbar">
@@ -141,6 +213,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
     <button class="btn on"  id="btnV"  onclick="toggleVec()">Vektoren</button>
     <button class="btn on"  id="btnW"  onclick="toggleWave()">Wellen-Netz</button>
     <button class="btn on"  id="btnG"  onclick="toggleGrid()">Grid</button>
+    <button class="btn"     id="btnToggle" onclick="togglePanel()">◧ Panel</button>
     <button class="btn fs"  id="btnFs" onclick="toggleFS()">⛶</button>
   </div>
 </div>
@@ -419,11 +492,55 @@ const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 3000);
 camera.position.set(0, 110, 200);
 
 function resizeCvs() {
-  const W = window.innerWidth - 310, H = window.innerHeight - 44;
+  const W = window.innerWidth - 22, H = window.innerHeight - 44;
   renderer.setSize(Math.max(W,100), Math.max(H,100));
   camera.aspect = W / H;
   camera.updateProjectionMatrix();
 }
+// 1. Die resizeCvs Funktion leicht anpassen, damit sie die aktuelle CSS-Breite misst
+function resizeCvs_O() {
+  const rect = cvs.getBoundingClientRect(); 
+  const W = rect.width;
+  const H = rect.height;
+  
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+}
+
+function resizeCvs_O2() {
+  // Wir nehmen die tatsächliche Breite, die das CSS dem Element zuweist
+  const W = cvs.clientWidth;
+  const H = cvs.clientHeight;
+  
+  if (W === 0 || H === 0) return;
+
+  renderer.setSize(W, H, false); // false verhindert, dass Three.js das CSS überschreibt
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+}
+
+/* Dieser Observer überwacht den Canvas auf JEDE Größenänderung
+const resizeObserver = new ResizeObserver(() => {
+  resizeCvs();
+});
+resizeObserver.observe(cvs);
+*/
+
+// Deine Toggle-Funktion
+function togglePanel() {
+  const panel = document.getElementById('panel');
+  const canvas = document.getElementById('cvs');
+  const btn = document.getElementById('btnToggle');
+
+  panel.classList.toggle('hidden');
+  canvas.classList.toggle('expanded');
+
+  btn.textContent = panel.classList.contains('hidden') ? '◨ Panel' : '◧ Panel';
+  
+  // Der ResizeObserver erledigt den Rest automatisch während der Animation!
+}
+
 window.addEventListener('resize', resizeCvs);
 resizeCvs();
 
@@ -1163,6 +1280,51 @@ function fmtF(N){
 buildWaveMesh(30);
 resetSim();   // sets R_min + v=c as default
 requestAnimationFrame(animate);
+
+//---------------------------------------GGGGGGGGGGGGGGGG--------
+function toggleSettings() {
+  const panel = document.getElementById('panel');
+  const canvas = document.getElementById('cvs');
+  const btn = document.getElementById('togglePanelBtn');
+
+  // Klassen umschalten
+  panel.classList.toggle('closed');
+  canvas.classList.toggle('expanded');
+
+  // Button-Text anpassen
+  if (panel.classList.contains('closed')) {
+    btn.textContent = '☰';
+  } else {
+    btn.textContent = '✕';
+  }
+
+  // WICHTIG: Three.js mitteilen, dass sich die Canvas-Größe geändert hat
+  // Wir warten kurz, bis die CSS-Transition (0.3s) fast fertig ist
+  setTimeout(resizeCvs, 300);
+}
+
+// 2. Die neue Funktion zum Ein-/Ausfahren
+function togglePanel() {
+  const panel = document.getElementById('panel');
+  const canvas = document.getElementById('cvs');
+  const btn = document.getElementById('btnToggle');
+
+  panel.classList.toggle('hidden');
+  canvas.classList.toggle('full-width');
+
+  // Text-Indikator ändern
+  btn.textContent = panel.classList.contains('hidden') ? '◨ Panel' : '◧ Panel';
+
+  // Während der 300ms Animation die Grafik flüssig mitvergrößern
+  const startTime = performance.now();
+  function animateResize(now) {
+    resizeCvs();
+    if (now - startTime < 350) { // Etwas länger als die CSS-Transition
+      requestAnimationFrame(animateResize);
+    }
+  }
+  requestAnimationFrame(animateResize);
+}
 </script>
 </body>
 </html>
