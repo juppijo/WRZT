@@ -45,7 +45,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   top: 44px;
   left: 0;
   /* Die Breite wird jetzt dynamisch über die rechte Kante gesteuert */
-  right: 310px; 
+  right: 22px; 
   bottom: 0;
   display: block;
   transition: right 0.3s ease-in-out; /* WICHTIG: Gleiche Zeit wie das Panel */
@@ -338,7 +338,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym zt">ZL</span>Zeitlupe</div>
           <div class="sl-v" id="vZL">1.00×</div>
         </div>
-        <input type="range" id="slZL" min="1" max="200" value="20" oninput="upd()">
+        <input type="range" id="slZL" min="1" max="200" value="40" oninput="upd()">
       </div>
 
       <div>
@@ -379,7 +379,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">λ</span>Wellenlänge (visuell)</div>
           <div class="sl-v" id="vWL">—</div>
         </div>
-        <input type="range" id="slWL" min="1" max="30" value="4" oninput="upd()">
+        <input type="range" id="slWL" min="0.5" max="30" value="4" step="0.5" oninput="upd()">
       </div>
 
       <div>
@@ -387,7 +387,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">A</span>Wellenamplitude</div>
           <div class="sl-v" id="vWA">—</div>
         </div>
-        <input type="range" id="slWA" min="0" max="50" value="20" oninput="upd()">
+        <input type="range" id="slWA" min="0" max="100" value="20" oninput="upd()">
       </div>
 
       <div>
@@ -395,7 +395,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">N</span>Netz-Dichte</div>
           <div class="sl-v" id="vWN">—</div>
         </div>
-        <input type="range" id="slWN" min="10" max="400" value="200" oninput="upd()">
+        <input type="range" id="slWN" min="10" max="500" value="200" oninput="upd()">
       </div>
 
     </div>
@@ -673,7 +673,7 @@ function buildWaveMesh(N) {
   if(waveMesh){ scene.remove(waveMesh); waveGeo.dispose(); }
   if(waveFill){ scene.remove(waveFill); }
   gridN=N;
-  waveGeo=new THREE.PlaneGeometry(460,460,N-1,N-1);
+  waveGeo=new THREE.PlaneGeometry(1500,1500,N-1,N-1);
   waveGeo.rotateX(-Math.PI/2);
   const pos=waveGeo.attributes.position;
   basePts=new Float32Array(pos.array.length);
@@ -823,7 +823,7 @@ function updateWaveMesh_O(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
   }
 }
 
-function updateWaveMesh(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
+function updateWaveMesh_o2(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
   if(!waveMesh||!showWave||amp<.5){ if(waveMesh) waveMesh.visible=false; return; }
   waveMesh.visible=true;
 
@@ -930,6 +930,182 @@ function updateWaveMesh(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
 
   // Sync solid fill mesh
   if(waveFill){
+    const fp = waveFill.geometry.attributes.position;
+    const fc = waveFill.geometry.attributes.color;
+    fp.array.set(pos.array);
+    fc.array.set(col.array);
+    fp.needsUpdate = true;
+    fc.needsUpdate = true;
+    waveFill.visible = waveMesh.visible;
+  }
+}
+
+function updateWaveMesh_G1(xB, zB, xR, zR, t, wavLam, amp, wSpd) {
+  if (!waveMesh || !showWave || amp < .5) { 
+    if (waveMesh) waveMesh.visible = false; 
+    return; 
+  }
+  waveMesh.visible = true;
+
+  const pos = waveGeo.attributes.position;
+  const col = waveGeo.attributes.color;
+  const cnt = pos.count;
+
+  const k = TWO_PI / wavLam;
+  const omV = k * wSpd * 52; 
+  const L_cross = wavLam * 0.8; 
+
+  // Bugwelle-Faktor: Beeinflusst wie stark die Welle nach "vorne" gedrückt wird
+  // Nutzt den Beta-Wert (v/c) für die Stauchung
+  const doppler = beta_vis * 0.5; 
+
+  for (let i = 0; i < cnt; i++) {
+    const bx = basePts[i * 3];
+    const bz = basePts[i * 3 + 2];
+
+    // Berechnung für e- (Blau)
+    const dxB = bx - xB, dzB = bz - zB;
+    const rB = Math.sqrt(dxB * dxB + dzB * dzB) + 0.001;
+    
+    // Bugwellen-Effekt: Die Phase wird durch die Bewegungsrichtung verzerrt
+    // Wir projizieren die Distanz auf den Bewegungsvektor
+    const angleB = Math.atan2(zB, xB);
+    const cosB = Math.cos(angleB), sinB = Math.sin(angleB);
+    const projectionB = (dxB * -sinB + dzB * cosB) * doppler; 
+
+    const nearB = -amp * 1.15 * Math.exp(-(rB * rB) / (2 * 18 * 18));
+    const farB = -amp * 0.6 * (1.0 - Math.exp(-rB / L_cross)) * (1.0 / Math.sqrt(rB))
+                 * Math.sin(k * (rB + projectionB) - omV * t);
+
+    // Berechnung für e+ (Rot)
+    const dxR = bx - xR, dzR = bz - zR;
+    const rR = Math.sqrt(dxR * dxR + dzR * dzR) + 0.001;
+    
+    const angleR = Math.atan2(zR, xR);
+    const projectionR = (dxR * -Math.sin(angleR) + dzR * Math.cos(angleR)) * doppler;
+
+    const nearR = +amp * 1.15 * Math.exp(-(rR * rR) / (2 * 18 * 18));
+    const farR = +amp * 0.6 * (1.0 - Math.exp(-rR / L_cross)) * (1.0 / Math.sqrt(rR))
+                 * Math.sin(k * (rR + projectionR) - omV * t);
+
+    const f = nearB + farB + nearR + farR;
+    pos.array[i * 3 + 1] = Math.max(-amp * 1.8, Math.min(amp * 1.8, f));
+
+    // Farbe (unverändert)
+    const norm = Math.max(-1, Math.min(1, f / (amp + 0.001)));
+    if (norm > 0) {
+      col.array[i*3]=0.16+norm*0.74; col.array[i*3+1]=0.05+norm*0.32; col.array[i*3+2]=0.03;
+    } else {
+      const d=-norm; col.array[i*3]=0.04; col.array[i*3+1]=0.08+d*0.6; col.array[i*3+2]=0.18+d*0.72;
+    }
+  }
+
+  pos.needsUpdate = true;
+  col.needsUpdate = true;
+}
+
+function updateWaveMesh(xB, zB, xR, zR, t, wavLam, amp, wSpd) {
+  if (!waveMesh || !showWave || amp < .5) {
+    if (waveMesh) waveMesh.visible = false;
+    return;
+  }
+  waveMesh.visible = true;
+
+  const pos = waveGeo.attributes.position;
+  const col = waveGeo.attributes.color;
+  const cnt = pos.count;
+
+  // Wellen-Parameter
+  const k = TWO_PI / wavLam; 
+  const omV = k * wSpd * 52; 
+  const L_cross = wavLam * 0.8; 
+
+  // Amplituden-Verteilung
+  const A_near = amp * 1.15;
+  const A_far = amp * 0.60;
+
+  // VERSTÄRKUNG: Erhöhe diesen Wert für eine noch extremere Bugwelle
+  const stauchungsFaktor = 1;
+
+  // Richtungsvektoren für die Bugwelle (Tangenten der Kreisbahn)
+  // Blaues Teilchen (e-)
+  const angleB = Math.atan2(zB, xB);
+  const dirXB = -Math.sin(angleB); 
+  const dirZB =  Math.cos(angleB);
+
+  // Rotes Teilchen (e+)
+  const angleR = Math.atan2(zR, xR);
+  const dirXR = -Math.sin(angleR);
+  const dirZR =  Math.cos(angleR);
+
+  for (let i = 0; i < cnt; i++) {
+    const bx = basePts[i * 3];
+    const bz = basePts[i * 3 + 2];
+
+    // --- Berechnung für e- (Blau / Vertiefung) ---
+    const dxB = bx - xB;
+    const dzB = bz - zB;
+    const rB2 = dxB * dxB + dzB * dzB;
+    const rB = Math.sqrt(rB2) + 0.001;
+
+    // Projektion: Liegt der Punkt vor oder hinter dem Teilchen?
+    const dotB = (dxB * dirXB + dzB * dirZB);
+    
+    // Maximale Stauchung bei v=c (beta_vis = 1)
+    // VORZEICHEN KORRIGIERT: + statt - sorgt dafür, 
+    // dass die Stauchung hinter dem Teilchen liegt (Bugwelle strömt zurück)
+    // Die Stauchung wird durch den Faktor künstlich überhöht
+    const phaseB = k * (rB + dotB * beta_vis * stauchungsFaktor);
+
+    const nearB = -A_near * Math.exp(-rB2 / (2 * 18 * 18));
+    const fadeB = 1.0 - Math.exp(-rB / L_cross);
+    const farB = -A_far * fadeB * (1.0 / Math.sqrt(rB)) * Math.sin(phaseB - omV * t);
+    const fB = nearB + farB;
+
+    // --- Berechnung für e+ (Rot / Wölbung) ---
+    const dxR = bx - xR;
+    const dzR = bz - zR;
+    const rR2 = dxR * dxR + dzR * dzR;
+    const rR = Math.sqrt(rR2) + 0.001;
+
+    const dotR = (dxR * dirXR + dzR * dirZR);
+
+    // VORZEICHEN KORRIGIERT
+    const phaseR = k * (rR + dotR * beta_vis);
+    //const phaseR = k * (rR - dotR * beta_vis);
+
+    const nearR = +A_near * Math.exp(-rR2 / (2 * 18 * 18));
+    const fadeR = 1.0 - Math.exp(-rR / L_cross);
+    const farR = +A_far * fadeR * (1.0 / Math.sqrt(rR)) * Math.sin(phaseR - omV * t);
+    const fR = nearR + farR;
+
+    // --- Superposition und Mesh-Update ---
+    const f = fB + fR;
+    pos.array[i * 3 + 1] = Math.max(-amp * 1.8, Math.min(amp * 1.8, f));
+
+    // --- Dynamische Farbgebung ---
+    const norm = Math.max(-1.0, Math.min(1.0, f / (A_near + 0.001)));
+    if (norm > 0) {
+      // Wölbung (e+) -> Rot-Orange
+      const g = norm;
+      col.array[i * 3]     = 0.16 + g * 0.74;
+      col.array[i * 3 + 1] = 0.05 + g * 0.32;
+      col.array[i * 3 + 2] = 0.03 + g * 0.05;
+    } else {
+      // Vertiefung (e-) -> Blau-Cyan
+      const d = -norm;
+      col.array[i * 3]     = 0.04 + d * 0.03;
+      col.array[i * 3 + 1] = 0.08 + d * 0.60;
+      col.array[i * 3 + 2] = 0.18 + d * 0.72;
+    }
+  }
+
+  pos.needsUpdate = true;
+  col.needsUpdate = true;
+  waveGeo.computeVertexNormals();
+
+  // Synchronisation mit dem gefüllten Mesh (waveFill)
+  if (waveFill) {
     const fp = waveFill.geometry.attributes.position;
     const fc = waveFill.geometry.attributes.color;
     fp.array.set(pos.array);
@@ -1225,7 +1401,7 @@ function setRmin(){
   document.getElementById('slBeta').value= 1000; // β = 1.000
   document.getElementById('slM').value   = 10;   // 1.0 × m_e
   document.getElementById('slQ').value   = 10;   // 1.0 × e
-  document.getElementById('slZL').value  = 20;
+  document.getElementById('slZL').value  = 40;
   upd();
 }
 
