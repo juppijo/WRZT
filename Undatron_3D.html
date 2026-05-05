@@ -338,7 +338,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym zt">ZL</span>Zeitlupe</div>
           <div class="sl-v" id="vZL">1.00×</div>
         </div>
-        <input type="range" id="slZL" min="1" max="200" value="40" oninput="upd()">
+        <input type="range" id="slZL" min="1" max="500" value="50" oninput="upd()">
       </div>
 
       <div>
@@ -387,7 +387,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">A</span>Wellenamplitude</div>
           <div class="sl-v" id="vWA">—</div>
         </div>
-        <input type="range" id="slWA" min="0" max="100" value="20" oninput="upd()">
+        <input type="range" id="slWA" min="0" max="120" value="30" oninput="upd()">
       </div>
 
       <div>
@@ -395,7 +395,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">N</span>Netz-Dichte</div>
           <div class="sl-v" id="vWN">—</div>
         </div>
-        <input type="range" id="slWN" min="10" max="500" value="200" oninput="upd()">
+        <input type="range" id="slWN" min="10" max="500" value="250" oninput="upd()">
       </div>
 
     </div>
@@ -1025,7 +1025,7 @@ function updateWaveMesh(xB, zB, xR, zR, t, wavLam, amp, wSpd) {
   const A_far = amp * 0.60;
 
   // VERSTÄRKUNG: Erhöhe diesen Wert für eine noch extremere Bugwelle
-  const stauchungsFaktor = 1;
+  const stauchungsFaktor = 1.2;
 
   // Richtungsvektoren für die Bugwelle (Tangenten der Kreisbahn)
   // Blaues Teilchen (e-)
@@ -1055,7 +1055,7 @@ function updateWaveMesh(xB, zB, xR, zR, t, wavLam, amp, wSpd) {
     // VORZEICHEN KORRIGIERT: + statt - sorgt dafür, 
     // dass die Stauchung hinter dem Teilchen liegt (Bugwelle strömt zurück)
     // Die Stauchung wird durch den Faktor künstlich überhöht
-    const phaseB = k * (rB + dotB * beta_vis * stauchungsFaktor);
+    const phaseB =  k * (rB + dotB * beta_vis * stauchungsFaktor);
 
     const nearB = -A_near * Math.exp(-rB2 / (2 * 18 * 18));
     const fadeB = 1.0 - Math.exp(-rB / L_cross);
@@ -1071,7 +1071,7 @@ function updateWaveMesh(xB, zB, xR, zR, t, wavLam, amp, wSpd) {
     const dotR = (dxR * dirXR + dzR * dirZR);
 
     // VORZEICHEN KORRIGIERT
-    const phaseR = k * (rR + dotR * beta_vis);
+    const phaseR = k * (rR + dotR * beta_vis * stauchungsFaktor);
     //const phaseR = k * (rR - dotR * beta_vis);
 
     const nearR = +A_near * Math.exp(-rR2 / (2 * 18 * 18));
