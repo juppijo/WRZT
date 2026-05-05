@@ -196,7 +196,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="fval" id="fcV">—</div>
         </div>
         <div class="fbar-bg"><div class="fbar" id="fcB" style="background:#ff4d6d;width:0%"></div></div>
-        <div class="fform">F_C = k·e² / (2r)² &nbsp;→ radial innen</div>
+        <div class="fform">F_C = (k·e² / (2r)²)·α &nbsp;→ radial innen</div>
       </div>
 
       <div class="fcard" style="border-color:rgba(255,159,47,.3);">
@@ -205,7 +205,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="fval" id="flV">—</div>
         </div>
         <div class="fbar-bg"><div class="fbar" id="flB" style="background:#ff9f2f;width:0%"></div></div>
-        <div class="fform">F_L = q·v·B = μ₀q²ω² / (16π) &nbsp;→ innen</div>
+        <div class="fform">F_L = (q·v·B)·α = (μ₀q²ω² / (16π))·α &nbsp;→ innen</div>
       </div>
 
       <div class="fcard" style="border-color:rgba(255,209,102,.25);">
@@ -215,6 +215,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
         </div>
         <div class="fbar-bg"><div class="fbar" id="bfB" style="background:#ffd166;width:0%"></div></div>
         <div class="fform">B = μ₀·q·ω / (16π·r) &nbsp;⊥ Bahnebene (↑Y)</div>
+      </div>
+      <div class="fcard" style="border-color:rgba(120,100,255,0.25);">
+        <div class="fcard-h">
+          <div class="fcard-n"><div class="fdot" style="background:linear-gradient(#4d9fff,#ff4d6d);"></div>Raumzeit-Welle (Spirale)</div>
+        </div>
+        <div class="fform">e⁻ → Vertiefung (negativ) · e⁺ → Wölbung (positiv)</div>
+        <div class="fform">Spiralphase: k·r − ω·t + φ_Quelle · Ausbreitung: 1/√r</div>
       </div>
 
     </div>
@@ -299,7 +306,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">λ</span>Wellenlänge (visuell)</div>
           <div class="sl-v" id="vWL">—</div>
         </div>
-        <input type="range" id="slWL" min="1" max="30" value="3" oninput="upd()">
+        <input type="range" id="slWL" min="1" max="30" value="4" oninput="upd()">
       </div>
 
       <div>
@@ -307,7 +314,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">A</span>Wellenamplitude</div>
           <div class="sl-v" id="vWA">—</div>
         </div>
-        <input type="range" id="slWA" min="0" max="40" value="20" oninput="upd()">
+        <input type="range" id="slWA" min="0" max="50" value="20" oninput="upd()">
       </div>
 
       <div>
@@ -315,7 +322,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <div class="sl-l"><span class="sl-sym wv">N</span>Netz-Dichte</div>
           <div class="sl-v" id="vWN">—</div>
         </div>
-        <input type="range" id="slWN" min="10" max="500" value="200" oninput="upd()">
+        <input type="range" id="slWN" min="10" max="400" value="200" oninput="upd()">
       </div>
 
     </div>
@@ -347,7 +354,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <div class="leg-r"><div class="leg-l" style="background:#ff9f2f;"></div>F_Lorentz (radial innen, magn.)</div>
       <div class="leg-r"><div class="leg-l" style="background:#ffd166;"></div>B-Feld (⊥ Bahnebene, vertikal)</div>
       <div class="leg-r"><div class="leg-l" style="background:#4ef0c4;"></div>Resultierende ΔF gesamt</div>
-      <div class="leg-r"><div class="leg-l" style="background:linear-gradient(90deg,#4ef0c4,#c084fc);"></div>Raumzeit-Wellen-Netz</div>
+      <div class="leg-r"><div class="leg-l" style="background:linear-gradient(90deg,#4d9fff,#00cfff);"></div>Vertiefung e⁻ (Raumzeit eingedellt)</div>
+      <div class="leg-r"><div class="leg-l" style="background:linear-gradient(90deg,#ff9f2f,#ff4d6d);"></div>Wölbung e⁺ (Raumzeit gewölbt)</div>
+      <div class="leg-r"><div class="leg-l" style="background:linear-gradient(90deg,#4ef0c4,#c084fc);"></div>Spiralwelle (rotierendes Dipol-Feld)</div>
     </div>
   </div>
 
@@ -541,10 +550,11 @@ const labBlue = makeSprite('e⁻','#4d9fff');
 const labRed  = makeSprite('e⁺','#ff4d6d');
 
 // ── Wave mesh ─────────────────────────────────────────────────────────────
-let waveMesh=null, waveGeo=null, basePts=null, gridN=30;
+let waveMesh=null, waveFill=null, waveGeo=null, basePts=null, gridN=30;
 
 function buildWaveMesh(N) {
   if(waveMesh){ scene.remove(waveMesh); waveGeo.dispose(); }
+  if(waveFill){ scene.remove(waveFill); }
   gridN=N;
   waveGeo=new THREE.PlaneGeometry(460,460,N-1,N-1);
   waveGeo.rotateX(-Math.PI/2);
@@ -553,39 +563,264 @@ function buildWaveMesh(N) {
   basePts.set(pos.array);
   const cnt=pos.count, cols=new Float32Array(cnt*3).fill(.12);
   waveGeo.setAttribute('color',new THREE.BufferAttribute(cols,3));
-  waveMesh=new THREE.Mesh(waveGeo,new THREE.MeshBasicMaterial({
-    vertexColors:true,wireframe:true,transparent:true,opacity:.5,
-    depthWrite:false,blending:THREE.AdditiveBlending}));
+  // Wireframe for grid lines
+  const wireMat = new THREE.MeshBasicMaterial({
+    vertexColors:true, wireframe:true, transparent:true, opacity:.55,
+    depthWrite:false, blending:THREE.AdditiveBlending});
+  waveMesh = new THREE.Mesh(waveGeo, wireMat);
+  waveMesh.renderOrder = 0;
   scene.add(waveMesh);
+
+  // Solid fill (dim, shows depth of dent/bump as shaded surface)
+  const fillGeo = waveGeo.clone();
+  const fillMat = new THREE.MeshBasicMaterial({
+    vertexColors:true, wireframe:false, transparent:true, opacity:.13,
+    depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide});
+  waveFill = new THREE.Mesh(fillGeo, fillMat);
+  waveFill.renderOrder = 0;
+  scene.add(waveFill);
+}
+
+// ── Wave mesh ─────────────────────────────────────────────────────────────
+// PHYSICS MODEL:
+//
+//  e⁻ (Blau)  → DAUERHAFT negative Raumzeit-Krümmung: Vertiefung (wie Masse im Netz)
+//  e⁺ (Rot)   → DAUERHAFT positive Raumzeit-Krümmung: Wölbung    (wie Anti-Masse)
+//
+//  Jedes Teilchen hat zwei Anteile:
+//
+//  1) NEAR-FIELD  — statische, mitbewegte Verformung  (Gauß-Profil, folgt dem Teilchen)
+//       f_near(r) = ± A_near · exp( −r² / (2·σ²) )
+//     → erzeugt die "Kugel-im-Netz"-Delle direkt am Teilchen
+//
+//  2) FAR-FIELD   — abgestrahlte Spiralwelle           (1/√r Abfall + Spiralphase)
+//       f_far(r,t) = ± A_far · (1/√r) · sin( k·r − ω·t + φ_Quelle )
+//     → erzeugt den spiralförmigen Wellenzug hinter dem rotierenden Dipol
+//
+//  Superposition: Ψ = f_near_e⁺ + f_far_e⁺  +  f_near_e⁻ + f_far_e⁻
+//
+//  Farbe: Blau/Cyan = Vertiefung (e⁻),  Orange/Rot = Wölbung (e⁺)
+
+function updateWaveMesh_o(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
+
+// Ψ(r, φ, t) = (1/√r) · sin( k·r − ω·t + φ_Quelle )
+// f_spiral = (1/√r) · sin( k·r − ω·t + φ_Quelle )
+// f(r, t) = A * (1/sqrt(r)) * sin(k*r - ω*t)  
+
+  if(!waveMesh||!showWave||amp<.5){ if(waveMesh) waveMesh.visible=false; return; }
+  waveMesh.visible=true;
+
+  const pos  = waveGeo.attributes.position;
+  const col  = waveGeo.attributes.color;
+  const cnt  = pos.count;
+
+  // Wave parameters
+  const k    = TWO_PI / wavLam;       // spatial wavenumber
+  const omV  = k * wSpd * 50;         // visual propagation angular frequency
+
+  // Near-field Gaussian width — scales with orbit radius
+  const sigma   = Math.max(wavLam * 0.55, 18);  // width of static dent/bump
+  const sig2    = sigma * sigma;
+
+  // Amplitude split: near-field (static dent) vs far-field (spiral radiation)
+  const A_near  = amp * 1.0;           // strength of permanent deformation
+  const A_far   = amp * 0.55;          // strength of spiral wake
+
+  // Source rotation angles (used as spiral phase seeds)
+  const angB = Math.atan2(zB, xB);   // e⁻ azimuth
+  const angR = Math.atan2(zR, xR);   // e⁺ azimuth (= angB + π)
+
+  for(let i = 0; i < cnt; i++){
+    const bx = basePts[i * 3];
+    const bz = basePts[i * 3 + 2];
+
+    // ── e⁻ (Blau) — VERTIEFUNG  (sign = −1) ────────────────────────────
+    const dBx = bx - xB,  dBz = bz - zB;
+    const rB2  = dBx*dBx + dBz*dBz;
+    const rB   = Math.sqrt(rB2);
+
+    // 1) Permanent Gaussian dent (moves WITH the particle)
+    const nearB = -A_near * Math.exp(-rB2 / (2 * sig2));
+
+    // 2) Outward spiral wave (radiates FROM the particle's current position)
+    const rBc   = Math.max(rB, 10);
+    const farB  = -A_far * (1.0 / Math.sqrt(rBc))
+                         * Math.sin(k * rBc - omV * t + angB);
+
+    const fB = nearB + farB;
+
+    // ── e⁺ (Rot) — WÖLBUNG  (sign = +1) ────────────────────────────────
+    const dRx = bx - xR,  dRz = bz - zR;
+    const rR2  = dRx*dRx + dRz*dRz;
+    const rR   = Math.sqrt(rR2);
+
+    // 1) Permanent Gaussian bump (moves WITH the particle)
+    const nearR = +A_near * Math.exp(-rR2 / (2 * sig2));
+
+    // 2) Outward spiral wave
+    const rRc   = Math.max(rR, 10);
+    const farR  = +A_far * (1.0 / Math.sqrt(rRc))
+                         * Math.sin(k * rRc - omV * t + angR);
+
+    const fR = nearR + farR;
+
+    // ── Total field at this grid point ───────────────────────────────────
+    const f = fB + fR;
+    pos.array[i * 3 + 1] = Math.max(-amp * 1.6, Math.min(amp * 1.6, f));
+
+    // ── Colour mapping ───────────────────────────────────────────────────
+    //  Positive (Wölbung / e⁺ dominates) → warm orange-red
+    //  Negative (Vertiefung / e⁻ dominates) → cool blue-cyan
+    //  Near zero → dim violet grid lines
+    const nRaw = f / (A_near * 1.2 + 0.001);   // normalise roughly to ±1
+    const n    = Math.max(-1, Math.min(1, nRaw));
+
+    if(n > 0){
+      // WÖLBUNG — e⁺ red → orange-yellow
+      const g = n;
+      col.array[i*3]   = 0.18 + g * 0.72;   // R: low → high  (red)
+      col.array[i*3+1] = 0.05 + g * 0.35;   // G: low → mid   (orange hint)
+      col.array[i*3+2] = 0.04 + g * 0.06;   // B: very low
+    } else {
+      // VERTIEFUNG — e⁻ deep blue → bright cyan
+      const d = -n;
+      col.array[i*3]   = 0.04 + d * 0.04;   // R: very low
+      col.array[i*3+1] = 0.10 + d * 0.58;   // G: rises → teal-cyan
+      col.array[i*3+2] = 0.20 + d * 0.70;   // B: high   → blue
+    }
+  }
+
+  pos.needsUpdate = true;
+  col.needsUpdate = true;
+  waveGeo.computeVertexNormals();
+
+  // Sync the solid fill mesh
+  if(waveFill){
+    const fp = waveFill.geometry.attributes.position;
+    const fc = waveFill.geometry.attributes.color;
+    fp.array.set(pos.array);
+    fc.array.set(col.array);
+    fp.needsUpdate = true;
+    fc.needsUpdate = true;
+    waveFill.visible = waveMesh.visible;
+  }
 }
 
 function updateWaveMesh(xB,zB,xR,zR,t,wavLam,amp,wSpd) {
   if(!waveMesh||!showWave||amp<.5){ if(waveMesh) waveMesh.visible=false; return; }
   waveMesh.visible=true;
-  const pos=waveGeo.attributes.position;
-  const col=waveGeo.attributes.color;
-  const k=TWO_PI/wavLam;
-  const omV=k*wSpd*55;
-  const cnt=pos.count;
-  for(let i=0;i<cnt;i++){
-    const bx=basePts[i*3], bz=basePts[i*3+2];
-    const dBx=bx-xB,dBz=bz-zB, dRx=bx-xR,dRz=bz-zR;
-    const rB=Math.sqrt(dBx*dBx+dBz*dBz)+.5;
-    const rR=Math.sqrt(dRx*dRx+dRz*dRz)+.5;
-    const fB=1/Math.sqrt(Math.max(rB,14));
-    const fR=1/Math.sqrt(Math.max(rR,14));
-    const f=fB*Math.sin(k*rB-omV*t) - fR*Math.sin(k*rR-omV*t);
-    pos.array[i*3+1]=amp*Math.tanh(f*1.3);
-    const n=Math.tanh(f);
-    if(n>=0){
-      col.array[i*3]=.07+n*.14; col.array[i*3+1]=.28+n*.55; col.array[i*3+2]=.52+n*.38;
+
+  //f_far = ± A · fadeOut · (1/√r) · sin(k·r − ω·t + φ_Quelle)
+  //f(r, t) = A * (1/sqrt(r)) * sin(k*r - ω*t)
+
+  const pos = waveGeo.attributes.position;
+  const col = waveGeo.attributes.color;
+  const cnt = pos.count;
+
+  // ── Wave parameters ────────────────────────────────────────────────────
+  const k     = TWO_PI / wavLam;        // spatial wavenumber  [1/px]
+  const omV   = k * wSpd * 52;          // angular frequency   [rad/s_visual]
+  //   Phase velocity:  v_ph = omV / k = wSpd*52  → always outward (kr - ωt)
+  //   A crest at radius r moves to r+dr in dt:  dr/dt = omV/k > 0  ✓ only outward
+
+  // Near-field: Gaussian width — determines how tightly the dent/bump clings to particle
+  const sigma  = Math.max(wavLam * 0.52, 16);
+  const sig2   = 2.0 * sigma * sigma;    // 2σ² denominator
+
+  // The far-field spiral fades in with this length scale (smooth crossfade near→far)
+  const L_cross = sigma * 1.8;           // crossfade distance
+
+  // Amplitude split
+  const A_near = amp * 1.15;            // permanent dent/bump amplitude
+  const A_far  = amp * 0.60;            // outward spiral wake amplitude
+
+  // Spiral phase seeds = current azimuth of each source
+  const angB = Math.atan2(zB, xB);      // e⁻ (blue) source angle
+  const angR = Math.atan2(zR, xR);      // e⁺ (red)  source angle  (= angB + π)
+
+  for(let i = 0; i < cnt; i++){
+    const bx = basePts[i*3];
+    const bz = basePts[i*3+2];
+
+    // ════════════════════════════════════════════════════════════════════
+    //  e⁻  (Blau)  →  VERTIEFUNG  (sign = −1)
+    // ════════════════════════════════════════════════════════════════════
+    const dBx = bx - xB,  dBz = bz - zB;
+    const rB2  = dBx*dBx + dBz*dBz;
+    const rB   = Math.sqrt(rB2) + 0.001;  // avoid /0
+
+    // 1) Permanent depression — Gauß-Profil that rides WITH the particle
+    const nearB = -A_near * Math.exp(-rB2 / sig2);
+
+    // 2) Outward spiral wave — sin(k·r − ω·t + φ_source)
+    //    Phase velocity = ω/k > 0  →  crests only move AWAY from source
+    //    Amplitude envelope: tapers away from particle with 1/sqrt(r),
+    //    but SUPPRESSED near the particle (so near-field stays clean)
+    //    via the crossfade factor  (1 − exp(−r/L_cross))
+    const rBs   = Math.max(rB, 8);
+    const fadeB = 1.0 - Math.exp(-rB / L_cross);   // 0 at particle → 1 far away
+    const farB  = -A_far * fadeB * (1.0 / Math.sqrt(rBs))
+                         * Math.sin(k * rBs - omV * t + angB);
+
+    const fB = nearB + farB;
+
+    // ════════════════════════════════════════════════════════════════════
+    //  e⁺  (Rot)   →  WÖLBUNG  (sign = +1)
+    // ════════════════════════════════════════════════════════════════════
+    const dRx = bx - xR,  dRz = bz - zR;
+    const rR2  = dRx*dRx + dRz*dRz;
+    const rR   = Math.sqrt(rR2) + 0.001;
+
+    // 1) Permanent elevation — Gauß-Profil that rides WITH the particle
+    const nearR = +A_near * Math.exp(-rR2 / sig2);
+
+    // 2) Outward spiral wave (same logic, opposite sign)
+    const rRs   = Math.max(rR, 8);
+    const fadeR = 1.0 - Math.exp(-rR / L_cross);
+    const farR  = +A_far * fadeR * (1.0 / Math.sqrt(rRs))
+                         * Math.sin(k * rRs - omV * t + angR);
+
+    const fR = nearR + farR;
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Total field & vertex displacement
+    // ════════════════════════════════════════════════════════════════════
+    const f = fB + fR;
+    pos.array[i*3+1] = Math.max(-amp*1.8, Math.min(amp*1.8, f));
+
+    // ── Colour ───────────────────────────────────────────────────────────
+    //  > 0  →  Wölbung (e⁺):     orange → red
+    //  < 0  →  Vertiefung (e⁻):  deep blue → cyan
+    //  ≈ 0  →  dim violet grid
+    const norm = Math.max(-1.0, Math.min(1.0, f / (A_near + 0.001)));
+
+    if(norm > 0){
+      const g = norm;
+      col.array[i*3]   = 0.16 + g*0.74;   // R high  → warm red-orange
+      col.array[i*3+1] = 0.05 + g*0.32;   // G mid
+      col.array[i*3+2] = 0.03 + g*0.05;   // B low
     } else {
-      const m=-n;
-      col.array[i*3]=.12+m*.75; col.array[i*3+1]=.07+m*.04; col.array[i*3+2]=.20+m*.22;
+      const d = -norm;
+      col.array[i*3]   = 0.04 + d*0.03;   // R very low
+      col.array[i*3+1] = 0.08 + d*0.60;   // G rises → teal
+      col.array[i*3+2] = 0.18 + d*0.72;   // B high  → cyan-blue
     }
   }
-  pos.needsUpdate=true; col.needsUpdate=true;
+
+  pos.needsUpdate = true;
+  col.needsUpdate = true;
   waveGeo.computeVertexNormals();
+
+  // Sync solid fill mesh
+  if(waveFill){
+    const fp = waveFill.geometry.attributes.position;
+    const fc = waveFill.geometry.attributes.color;
+    fp.array.set(pos.array);
+    fc.array.set(col.array);
+    fp.needsUpdate = true;
+    fc.needsUpdate = true;
+    waveFill.visible = waveMesh.visible;
+  }
 }
 
 // ── Floor grid ────────────────────────────────────────────────────────────
@@ -654,8 +889,7 @@ function calcAllForces() {
   const xi = Math.min(v / C_SI, 0.99999);
   const gamma = 1 / Math.sqrt(1 - xi*xi);
 
-
-  //v_vis = v;
+   //v_vis = v;
   v_vis = beta_vis * C_SI;  // v = β·c
 
   // Centrifugal (relativistic correction: γ·m at speed v)
@@ -680,7 +914,7 @@ function calcAllForces() {
   //   B = μ₀·q·ω / (16π·r)  (perpendicular to orbit plane, at partner location)
   const B_field = (MU_0 * charge_SI * omega_SI) / (16 * Math.PI * r_SI);
 
-  // Lorentz force on partner: F_L = q·v·B (v tangential, B vertical → F_L radial inward)
+ // Lorentz force on partner: F_L = q·v·B (v tangential, B vertical → F_L radial inward)
   const F_L = 2 * (charge_SI * v * B_field) / ALPHA;
 
   // Net inward restoring force
@@ -848,6 +1082,7 @@ function toggleVec(){
 }
 function toggleWave(){
   showWave=!showWave;
+  if(waveFill) waveFill.visible=showWave;
   document.getElementById('btnW').className=showWave?'btn on':'btn';
 }
 function toggleGrid(){
