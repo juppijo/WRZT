@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroPhysForm · WRZT · WRZNT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+:root {
+  --bg:#06080f;--bg2:#0d1020;--bg3:#121628;--border:#1a2540;
+  --accent:#c084fc;--accent2:#7c3aed;--astro:#c084fc;
+  --wrzt:#ff8c42;--wrznt:#34d399;--rmin:#f43f5e;--bugw:#60a5fa;
+  --green:#34d399;--red:#f43f5e;--yellow:#fbbf24;
+  --text:#e2e8f8;--text2:#7a8ba8;--text3:#2d4060;
+  --formula:#f0f4ff;--result:#c084fc;
+  --shadow:0 8px 40px rgba(0,0,0,.7);--r:8px;
+  --glow-a:0 0 24px rgba(192,132,252,.2);
+  --glow-w:0 0 24px rgba(255,140,66,.2);
+  --glow-n:0 0 24px rgba(52,211,153,.2);
+  --glow-r:0 0 24px rgba(244,63,94,.2);
+  --glow-b:0 0 24px rgba(96,165,250,.2);
+}
+body.light{
+  --bg:#f0eef8;--bg2:#e8e4f4;--bg3:#ddd8ec;--border:#c0b8dc;
+  --accent:#7c3aed;--astro:#7c3aed;--wrzt:#c05000;--wrznt:#059669;
+  --rmin:#be123c;--bugw:#2563eb;
+  --text:#180f30;--text2:#4a4070;--text3:#9080b0;
+  --formula:#180f30;--result:#7c3aed;
+  --shadow:0 8px 32px rgba(0,0,0,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;transition:background .3s,color .3s;
+  background-image:radial-gradient(ellipse at 20% 50%,rgba(192,132,252,.03) 0%,transparent 60%),
+    radial-gradient(ellipse at 80% 20%,rgba(96,165,250,.03) 0%,transparent 50%)}
+
+/* ─ STARFIELD ─ */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.8}}
+body>*:not(#stars){position:relative;z-index:1}
+
+header{display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;height:54px;background:rgba(13,16,32,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-main{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.15rem;
+  letter-spacing:4px;color:var(--accent);text-shadow:var(--glow-a)}
+.logo-badges{display:flex;gap:4px}
+.lbadge{font-size:.52rem;padding:2px 6px;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;border:1px solid}
+.lb-w{border-color:rgba(255,140,66,.5);color:var(--wrzt);background:rgba(255,140,66,.08)}
+.lb-n{border-color:rgba(52,211,153,.5);color:var(--wrznt);background:rgba(52,211,153,.08)}
+.lb-r{border-color:rgba(244,63,94,.5);color:var(--rmin);background:rgba(244,63,94,.08)}
+.lb-b{border-color:rgba(96,165,250,.5);color:var(--bugw);background:rgba(96,165,250,.08)}
+.header-btns{display:flex;gap:6px}
+.icon-btn{width:34px;height:34px;border-radius:6px;border:1px solid var(--border);
+  background:rgba(13,16,32,.7);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.95rem;
+  transition:all .2s;font-family:'JetBrains Mono',monospace}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:var(--glow-a)}
+
+main{display:grid;grid-template-columns:340px 1fr;flex:1;overflow:hidden}
+
+/* ─ LEFT ─ */
+.left-panel{background:rgba(13,16,32,.85);backdrop-filter:blur(8px);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sec-title{font-size:.58rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);padding:8px 12px 6px;border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;display:flex;align-items:center;justify-content:space-between}
+.sec-action{font-size:.58rem;letter-spacing:1px;padding:2px 8px;border-radius:4px;
+  border:1px solid var(--border);background:transparent;color:var(--text3);
+  cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s}
+.sec-action:hover{border-color:var(--wrznt);color:var(--wrznt)}
+
+.formula-library{padding:8px;overflow-y:auto;flex-shrink:0;max-height:200px}
+.formula-cats{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
+.cat-btn{font-size:.55rem;padding:2px 6px;border-radius:4px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
+.cat-btn:hover,.cat-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(192,132,252,.06)}
+.cat-btn.cc-wrzt:hover,.cat-btn.cc-wrzt.active{border-color:var(--wrzt);color:var(--wrzt);background:rgba(255,140,66,.07)}
+.cat-btn.cc-wrznt:hover,.cat-btn.cc-wrznt.active{border-color:var(--wrznt);color:var(--wrznt);background:rgba(52,211,153,.07)}
+.cat-btn.cc-rmin:hover,.cat-btn.cc-rmin.active{border-color:var(--rmin);color:var(--rmin);background:rgba(244,63,94,.07)}
+.cat-btn.cc-bugw:hover,.cat-btn.cc-bugw.active{border-color:var(--bugw);color:var(--bugw);background:rgba(96,165,250,.07)}
+.cat-btn.cc-user:hover,.cat-btn.cc-user.active{border-color:var(--yellow);color:var(--yellow);background:rgba(251,191,36,.07)}
+
+.formula-list{display:flex;flex-direction:column;gap:2px}
+.formula-item{padding:6px 10px;border-radius:5px;border:1px solid transparent;
+  cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:2px;position:relative}
+.formula-item:hover{border-color:var(--border);background:rgba(255,255,255,.03)}
+.formula-item.sel-a{border-color:var(--accent)!important;background:rgba(192,132,252,.07)!important}
+.formula-item.sel-w{border-color:var(--wrzt)!important;background:rgba(255,140,66,.07)!important}
+.formula-item.sel-n{border-color:var(--wrznt)!important;background:rgba(52,211,153,.07)!important}
+.formula-item.sel-r{border-color:var(--rmin)!important;background:rgba(244,63,94,.07)!important}
+.formula-item.sel-b{border-color:var(--bugw)!important;background:rgba(96,165,250,.07)!important}
+.formula-item.sel-u{border-color:var(--yellow)!important;background:rgba(251,191,36,.07)!important}
+.fi-name{font-size:.76rem;font-weight:600;color:var(--text);padding-right:46px}
+.fi-expr{font-family:'JetBrains Mono',monospace;font-size:.65rem}
+.fi-btns{position:absolute;right:6px;top:6px;display:none;gap:3px}
+.formula-item:hover .fi-btns{display:flex}
+.fi-btn{width:22px;height:22px;border-radius:3px;border:1px solid var(--border);
+  background:var(--bg2);color:var(--text3);cursor:pointer;font-size:.65rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.fi-btn:hover{border-color:var(--accent);color:var(--accent)}
+.fi-btn.del:hover{border-color:var(--red);color:var(--red)}
+
+.var-inputs{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:7px}
+.var-group{display:flex;flex-direction:column;gap:3px}
+.var-label{font-size:.66rem;color:var(--text2);font-family:'JetBrains Mono',monospace;
+  display:flex;align-items:center;gap:5px}
+.vl-sym{font-family:'Crimson Pro',serif;font-size:1rem;min-width:24px;text-align:center}
+.vl-desc{flex:1}.vl-unit{color:var(--text3);font-size:.6rem;font-style:italic}
+.var-input-row{display:flex;gap:5px;align-items:center}
+.var-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;
+  padding:5px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;
+  outline:none;transition:border-color .2s;width:100%}
+.var-input:focus{border-color:var(--accent)}
+.const-tag{font-size:.56rem;padding:2px 5px;background:var(--bg);
+  border:1px solid var(--wrznt);border-radius:4px;color:var(--wrznt);
+  font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.small-x{width:26px;height:26px;background:transparent;border:1px solid var(--border);
+  border-radius:4px;color:var(--text3);cursor:pointer;font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.small-x:hover{border-color:var(--red);color:var(--red)}
+
+.calc-btn{margin:0 8px 8px;padding:9px;border:none;border-radius:6px;color:#fff;
+  font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.calc-btn:hover{opacity:.9;box-shadow:var(--glow-a);transform:translateY(-1px)}
+.calc-btn.cw{background:linear-gradient(135deg,var(--wrzt),#c05000)}
+.calc-btn.cn{background:linear-gradient(135deg,var(--wrznt),#059669)}
+.calc-btn.cr{background:linear-gradient(135deg,var(--rmin),#9f1239)}
+.calc-btn.cb{background:linear-gradient(135deg,var(--bugw),#1d4ed8)}
+.calc-btn.cu{background:linear-gradient(135deg,var(--yellow),#d97706)}
+
+.sym-picker{padding:6px 8px;border-top:1px solid var(--border);flex-shrink:0}
+.sym-grid{display:flex;flex-wrap:wrap;gap:2px;margin-top:4px}
+.sym-key{width:26px;height:24px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:3px;color:var(--text2);cursor:pointer;font-size:.78rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+  font-family:'JetBrains Mono',monospace}
+.sym-key:hover{border-color:var(--accent);color:var(--accent);background:rgba(192,132,252,.08)}
+
+.io-bar{display:flex;gap:4px;padding:5px 8px;border-top:1px solid var(--border);
+  flex-shrink:0;background:rgba(6,8,15,.5)}
+.io-btn{flex:1;padding:5px 2px;border-radius:5px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:1px;
+  text-transform:uppercase;transition:all .15s;text-align:center}
+.io-btn:hover{border-color:var(--accent);color:var(--accent)}
+.io-btn.d:hover{border-color:var(--red);color:var(--red)}
+
+/* ─ RIGHT ─ */
+.right-panel{display:flex;flex-direction:column;overflow:hidden;background:transparent}
+.formula-display{background:rgba(13,16,32,.85);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);padding:14px 24px;min-height:92px;
+  display:flex;flex-direction:column;gap:6px;flex-shrink:0;
+  background-image:linear-gradient(135deg,rgba(192,132,252,.03),rgba(96,165,250,.03))}
+.formula-rendered{font-family:'Crimson Pro','Times New Roman',serif;font-size:1.85rem;
+  color:var(--formula);letter-spacing:2px;line-height:1.4;text-align:center;
+  min-height:48px;display:flex;align-items:center;justify-content:center}
+.formula-name{font-size:.62rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);text-align:center;font-family:'JetBrains Mono',monospace}
+.formula-desc{font-size:.7rem;color:var(--text3);text-align:center;
+  font-family:'Crimson Pro',serif;font-style:italic;margin-top:2px}
+
+.tab-bar{display:flex;border-bottom:1px solid var(--border);background:rgba(13,16,32,.7);flex-shrink:0}
+.tab-btn{flex:1;padding:7px 8px;background:transparent;border:none;
+  border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:2px;
+  text-transform:uppercase;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text2);background:rgba(255,255,255,.02)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.result-area{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.result-block{background:rgba(13,16,32,.8);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;backdrop-filter:blur(4px)}
+.rh{padding:7px 12px;background:rgba(18,22,40,.9);border-bottom:1px solid var(--border);
+  font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);
+  font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.result-value{padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:1.8rem;
+  font-weight:600;color:var(--result);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.result-unit{font-size:.9rem;color:var(--text2);font-weight:300}
+.result-sci{font-size:.7rem;color:var(--text3);padding:0 18px 10px;font-family:'JetBrains Mono',monospace}
+.result-extra{font-size:.72rem;color:var(--text2);padding:0 18px 10px;font-family:'JetBrains Mono',monospace;
+  border-top:1px solid var(--border);padding-top:8px;margin-top:2px}
+.step-row{padding:8px 14px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;
+  font-size:.73rem;color:var(--text2);display:flex;align-items:baseline;gap:8px;line-height:1.6}
+.step-row:last-child{border-bottom:none}
+.step-num{min-width:18px;color:var(--text3);font-size:.6rem}
+.step-text em{color:var(--accent);font-style:normal}
+.step-text .ew{color:var(--wrzt)}.step-text .en{color:var(--wrznt)}
+.step-text .er{color:var(--rmin)}.step-text .eb{color:var(--bugw)}
+.err-msg{padding:14px 18px;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.cg2{display:grid;grid-template-columns:1fr 1fr}
+.crow{padding:7px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:1px;transition:background .15s}
+.crow:nth-child(odd){border-right:1px solid var(--border)}
+.crow:hover{background:rgba(255,255,255,.03)}
+.csym{font-family:'Crimson Pro',serif;font-size:1rem}
+.cname{font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.cval{font-size:.65rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.placeholder-msg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:2px}
+.placeholder-msg .big{font-size:2.5rem;opacity:.2}
+
+/* Badges */
+.ba{font-size:.48rem;padding:1px 4px;border-radius:3px;font-family:'JetBrains Mono',monospace;
+  letter-spacing:1px;vertical-align:middle;margin-left:3px;border:1px solid}
+.ba-a{color:var(--accent);border-color:rgba(192,132,252,.4);background:rgba(192,132,252,.08)}
+.ba-w{color:var(--wrzt);border-color:rgba(255,140,66,.4);background:rgba(255,140,66,.08)}
+.ba-n{color:var(--wrznt);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08)}
+.ba-r{color:var(--rmin);border-color:rgba(244,63,94,.4);background:rgba(244,63,94,.08)}
+.ba-b{color:var(--bugw);border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.08)}
+.ba-u{color:var(--yellow);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+
+/* ─ CONSTANTS TAB ─ */
+.const-section{margin-bottom:16px}
+.const-section-title{font-size:.58rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);font-family:'JetBrains Mono',monospace;padding:6px 4px 5px;
+  border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.const-section-title .line{flex:1;height:1px;background:var(--border)}
+.ct{width:100%;border-collapse:collapse}
+.ct td{padding:6px 8px;border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;vertical-align:middle}
+.ct tr:last-child td{border-bottom:none}
+.ct tr:hover td{background:rgba(255,255,255,.02)}
+.ct .tsym{font-family:'Crimson Pro',serif;font-size:1rem;white-space:nowrap;width:56px}
+.ct .tname{color:var(--text2);min-width:160px}
+.ct .tname small{display:block;font-size:.58rem;color:var(--text3);margin-top:1px}
+.ct .tval{color:var(--text);font-weight:600;text-align:right;white-space:nowrap}
+.ct .tunit{color:var(--text3);text-align:left;padding-left:6px;font-size:.65rem}
+.ct .ttok{font-size:.56rem;padding:1px 4px;border-radius:3px;border:1px solid var(--border);
+  color:var(--text3);background:var(--bg3);white-space:nowrap}
+.cpyb{width:20px;height:20px;border-radius:3px;border:1px solid var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;font-size:.6rem;
+  transition:all .15s;display:inline-flex;align-items:center;justify-content:center}
+.cpyb:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─ MODAL ─ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  width:100%;max-width:700px;max-height:92vh;display:flex;flex-direction:column;
+  box-shadow:var(--shadow);overflow:hidden}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+  border-bottom:1px solid var(--border);background:var(--bg3)}
+.mh-title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:2px;color:var(--text)}
+.mh-close{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);
+  background:var(--bg2);color:var(--text2);cursor:pointer;display:flex;
+  align-items:center;justify-content:center;font-size:.9rem;transition:all .2s}
+.mh-close:hover{border-color:var(--red);color:var(--red)}
+.mb{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.mf{padding:10px 16px;border-top:1px solid var(--border);background:var(--bg3);
+  display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);font-family:'JetBrains Mono',monospace}
+.field input,.field textarea,.field select{background:var(--bg3);border:1px solid var(--border);
+  border-radius:5px;padding:6px 9px;color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:44px}
+.hint{font-size:.58rem;color:var(--text3);font-family:'JetBrains Mono',monospace;line-height:1.7;margin-top:1px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.vt-hdr{display:grid;grid-template-columns:68px 1fr 66px 88px 30px;gap:3px;
+  padding:3px 4px;font-size:.54rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);font-family:'JetBrains Mono',monospace}
+.vt-row{display:grid;grid-template-columns:68px 1fr 66px 88px 30px;gap:3px;align-items:center;margin-bottom:3px}
+.vt-row input{padding:4px 6px;font-size:.72rem}
+.vt-row select{padding:4px;font-size:.68rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);outline:none}
+.vt-del{width:26px;height:26px;border-radius:4px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text3);cursor:pointer;display:flex;
+  align-items:center;justify-content:center;font-size:.72rem;transition:all .15s}
+.vt-del:hover{border-color:var(--red);color:var(--red)}
+.add-var{padding:5px 10px;border-radius:4px;border:1px dashed var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;letter-spacing:1px;text-align:center;transition:all .2s;text-transform:uppercase;
+  margin-top:3px;width:100%}
+.add-var:hover{border-color:var(--wrznt);color:var(--wrznt)}
+.expr-prev{background:var(--bg);border:1px solid var(--border);border-radius:5px;
+  padding:6px 12px;font-family:'Crimson Pro',serif;font-size:1.2rem;color:var(--formula);
+  text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;margin-top:4px}
+.btn{padding:6px 14px;border-radius:5px;border:1px solid;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;transition:all .2s}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#000}
+.btn-p:hover{opacity:.85;box-shadow:var(--glow-a)}
+.btn-g{background:transparent;border-color:var(--border);color:var(--text2)}
+.btn-g:hover{border-color:var(--text2);color:var(--text)}
+.btn-r{background:transparent;border-color:var(--red);color:var(--red)}
+.btn-r:hover{background:var(--red);color:#fff}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+sup{font-size:.55em;vertical-align:super}sub{font-size:.55em;vertical-align:sub}
+</style>
+</head>
+<body>
+
+<!-- STARS -->
+<div id="stars"></div>
+
+<header>
+  <div class="logo">
+    <span class="logo-main">AstroPhysForm</span>
+    <div class="logo-badges">
+      <span class="lbadge lb-w">WRZT</span>
+      <span class="lbadge lb-n">WRZNT</span>
+      <span class="lbadge lb-r">R<sub>min</sub></span>
+      <span class="lbadge lb-b">BUGWELLE</span>
+    </div>
+  </div>
+  <div class="header-btns">
+    <button class="icon-btn" id="themeBtn">☀</button>
+    <button class="icon-btn" id="fsBtn">⛶</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="sec-title">▸ Formelbibliothek
+      <button class="sec-action" onclick="openEditor(null)">＋ Neue Formel</button>
+    </div>
+    <div class="formula-library">
+      <div class="formula-cats" id="catBtns"></div>
+      <div class="formula-list" id="formulaList"></div>
+    </div>
+    <div class="sec-title">▸ Variableneingabe</div>
+    <div class="var-inputs" id="varInputs">
+      <div class="placeholder-msg" style="padding:20px;text-align:center">Formel auswählen →</div>
+    </div>
+    <button class="calc-btn" id="calcBtn" onclick="calculate()">⟹ Berechnen</button>
+    <div class="sym-picker">
+      <div class="sec-title" style="padding:0 0 4px;border:none">▸ Symbole</div>
+      <div class="sym-grid" id="symGrid"></div>
+    </div>
+    <div class="io-bar">
+      <button class="io-btn" onclick="exportJSON()">⬇ Export</button>
+      <button class="io-btn" onclick="document.getElementById('ifil').click()">⬆ Import</button>
+      <button class="io-btn d" onclick="clearUser()">✕ Reset</button>
+      <input type="file" id="ifil" accept=".json" style="display:none" onchange="importJSON(event)">
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="formula-display">
+      <div class="formula-name" id="fName">— Keine Formel ausgewählt —</div>
+      <div class="formula-rendered" id="fRend">⟨ Formel ⟩</div>
+      <div class="formula-desc" id="fDesc"></div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-res" onclick="switchTab('res')">⟹ Ergebnis</button>
+      <button class="tab-btn" id="tab-const" onclick="switchTab('const')">∑ Konstanten</button>
+    </div>
+    <div class="result-area" id="resultArea">
+      <div class="placeholder-msg">
+        <div class="big">✦</div>
+        <div>Formel wählen · Werte eingeben · Berechnen</div>
+      </div>
+    </div>
+    <div class="result-area" id="constArea" style="display:none"></div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mh">
+      <span class="mh-title" id="mTitle">NEUE FORMEL</span>
+      <button class="mh-close" onclick="closeEditor()">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fr2">
+        <div class="field"><label>Name *</label><input id="eName" placeholder="z.B. Schwarzschild-Radius"></div>
+        <div class="field"><label>Kategorie *</label><input id="eCat" placeholder="Astrophysik / WRZT / …"></div>
+      </div>
+      <div class="field">
+        <label>Anzeige-Formel * (HTML: &lt;sub&gt;, &lt;sup&gt;)</label>
+        <input id="eDisp" placeholder="z.B. R_S = 2GM/c²" oninput="updPrev()">
+        <div class="expr-prev" id="ePrev">Vorschau…</div>
+      </div>
+      <div class="field">
+        <label>Berechnungsausdruck * (JavaScript)</label>
+        <input id="eExpr" placeholder="2*G*M/C**2">
+        <div class="hint">
+          Konstanten: C G H KB E_EL EPS0 ME MP NA R_GAS SIGMA<br>
+          Astro: M_SUN R_SUN M_EARTH G_SURF AU LY<br>
+          WRZT: LW TW MW CW FW EW | WRZNT: LN TN MN FN EN<br>
+          Math: PI Math.sqrt() Math.log() Math.abs() Math.atan()
+        </div>
+      </div>
+      <div class="fr3">
+        <div class="field"><label>Ergebnis-Symbol *</label><input id="eRes" placeholder="R_S"></div>
+        <div class="field"><label>Ergebnis-Einheit</label><input id="eUnit" placeholder="m"></div>
+        <div class="field"><label>Typ</label>
+          <select id="eType">
+            <option value="user">Eigene</option>
+            <option value="astro">Astrophysik</option>
+            <option value="wrzt">WRZT</option>
+            <option value="wrznt">WRZNT</option>
+            <option value="rmin">R_min</option>
+            <option value="bugw">Bugwelle</option>
+          </select></div>
+      </div>
+      <div class="field">
+        <label>Beschreibung (optional)</label>
+        <input id="eDescF" placeholder="Kurze physikalische Erklärung">
+      </div>
+      <div class="field">
+        <label>Variablen</label>
+        <div class="vt-hdr"><div>Symbol</div><div>Beschreibung</div><div>Einheit</div><div>Standardwert</div><div></div></div>
+        <div id="eVars"></div>
+        <button class="add-var" onclick="addRow()">＋ Variable hinzufügen</button>
+      </div>
+      <div class="field"><label>Notizen</label>
+        <textarea id="eNote" rows="2" placeholder="Herkunft, Bedingungen, Zusammenhänge …"></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-r" id="mDel" onclick="delEditing()" style="display:none;margin-right:auto">🗑 Löschen</button>
+      <button class="btn btn-g" onclick="closeEditor()">Abbrechen</button>
+      <button class="btn btn-p" onclick="saveFormula()">💾 Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ CONSTANTS ══ */
+const PC = {
+  C:2.99792458e8, G:6.67430e-11, H:6.62607015e-34, HBAR:1.054571817e-34,
+  KB:1.380649e-23, E_EL:1.602176634e-19, EPS0:8.8541878128e-12,
+  ME:9.1093837015e-31, MP:1.67262192369e-27, NA:6.02214076e23,
+  R_GAS:8.314462618, SIGMA:5.670374419e-8,
+  // Astro
+  M_SUN:1.988416e30, R_SUN:6.957e8, M_EARTH:5.972168e24,
+  G_SURF:9.80665, AU:1.495978707e11, LY:9.460730473e15,
+  H0:2.268e-18, // Hubble in s^-1 (67.66 km/s/Mpc)
+  // WRZT (Planck units)
+  LW:1.616255e-35, TW:5.391247e-44, MW:2.176434e-8,
+  CW:2.99792458e8, FW:1.8549e43, EW:1.9561e9,
+  // WRZNT
+  LN:1.616255e-35*2*Math.PI, TN:5.391247e-44*2*Math.PI,
+  MN:2.176434e-8, FN:1.8549e43/(2*Math.PI), EN:1.9561e9*2*Math.PI,
+  PI:Math.PI, E_EULER:Math.E
+};
+
+/* ══ FORMULA DATABASE ══ */
+const BUILTIN = [
+
+/* ─── GRAVITATION ─── */
+{id:'g1',cat:'Gravitation',name:'Gravitationskraft (Newton)',
+ display:'F = G · m₁ · m₂ / r²',
+ desc:'Anziehungskraft zweier Massen',
+ expr:'G*m1*m2/r**2',
+ vars:[{id:'m1',sym:'m₁',name:'Masse 1',unit:'kg'},
+       {id:'m2',sym:'m₂',name:'Masse 2',unit:'kg'},
+       {id:'r', sym:'r', name:'Abstand',unit:'m'},
+       {id:'G', sym:'G', name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'F',resUnit:'N'},
+
+{id:'g2',cat:'Gravitation',name:'Schwarzschild-Radius',
+ display:'R_S = 2GM / c²',
+ desc:'Ereignishorizont eines Schwarzen Lochs',
+ expr:'2*G*M/C**2',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'R_S',resUnit:'m',
+ extra:(v,r)=>`= ${fmt(r/PC.AU)} AU   |   In Sonnenmassen: ${fmt(v.M/PC.M_SUN)} M☉`},
+
+{id:'g3',cat:'Gravitation',name:'Fluchtgeschwindigkeit',
+ display:'v_esc = √(2GM / r)',
+ desc:'Mindestgeschwindigkeit zum Entkommen',
+ expr:'Math.sqrt(2*G*M/r)',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'r',sym:'r',name:'Radius',unit:'m'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'v_esc',resUnit:'m/s',
+ extra:(v,r)=>`= ${fmt(r/PC.C)}·c   |   ${fmt(r/1000)} km/s`},
+
+{id:'g4',cat:'Gravitation',name:'Gravitationspotential',
+ display:'Φ = −GM / r',
+ desc:'Spezifische potentielle Gravitationsenergie',
+ expr:'-G*M/r',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'r',sym:'r',name:'Abstand',unit:'m'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'Φ',resUnit:'J/kg'},
+
+{id:'g5',cat:'Gravitation',name:'Gravitationsrotverschiebung',
+ display:'z_g = GM / (rc²)',
+ desc:'Rotverschebung im Gravitationsfeld',
+ expr:'G*M/(r*C**2)',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'r',sym:'r',name:'Abstand',unit:'m'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'z_g',resUnit:'(dimensionslos)'},
+
+{id:'g6',cat:'Gravitation',name:'Gezeitenkraft',
+ display:'ΔF = 2GMmr / d³',
+ desc:'Differentielle Gravitationskraft',
+ expr:'2*G*M*m*r/d**3',
+ vars:[{id:'M',sym:'M',name:'Masse Zentralkörper',unit:'kg'},
+       {id:'m',sym:'m',name:'Masse Testkörper',unit:'kg'},
+       {id:'r',sym:'r',name:'Größe Testkörper',unit:'m'},
+       {id:'d',sym:'d',name:'Abstand Zentrum',unit:'m'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'ΔF',resUnit:'N'},
+
+/* ─── KEPLER & ORBITS ─── */
+{id:'k1',cat:'Kepler & Orbits',name:'Kepler 3. Gesetz (Umlaufzeit)',
+ display:'T = 2π · √(a³ / GM)',
+ desc:'Umlaufzeit aus großer Halbachse',
+ expr:'2*PI*Math.sqrt(a**3/(G*M))',
+ vars:[{id:'a',sym:'a',name:'Große Halbachse',unit:'m'},
+       {id:'M',sym:'M',name:'Zentralmasse',unit:'kg'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'T',resUnit:'s',
+ extra:(v,r)=>`= ${fmt(r/86400)} Tage   |   ${fmt(r/31557600)} Jahre`},
+
+{id:'k2',cat:'Kepler & Orbits',name:'Orbitgeschwindigkeit (kreisförmig)',
+ display:'v = √(GM / r)',
+ desc:'Kreisbahngeschwindigkeit',
+ expr:'Math.sqrt(G*M/r)',
+ vars:[{id:'M',sym:'M',name:'Zentralmasse',unit:'kg'},
+       {id:'r',sym:'r',name:'Orbitradius',unit:'m'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'v_orb',resUnit:'m/s',
+ extra:(v,r)=>`= ${fmt(r/1000)} km/s   |   ${fmt(r/PC.C)}·c`},
+
+{id:'k3',cat:'Kepler & Orbits',name:'Roche-Grenze',
+ display:'d_R = R_M · (2M_M / m)^(1/3)',
+ desc:'Mindestabstand Satellit ohne Zerstörung',
+ expr:'R_M*(2*M_M/m)**(1/3)',
+ vars:[{id:'R_M',sym:'R_M',name:'Radius Hauptkörper',unit:'m'},
+       {id:'M_M',sym:'M_M',name:'Masse Hauptkörper',unit:'kg'},
+       {id:'m',  sym:'m',  name:'Masse Satellit',unit:'kg'}],
+ resSym:'d_R',resUnit:'m',
+ extra:(v,r)=>`= ${fmt(r/PC.AU)} AU   |   ${fmt(r/1000)} km`},
+
+{id:'k4',cat:'Kepler & Orbits',name:'ISCO-Radius (Schwarzes Loch)',
+ display:'R_ISCO = 6GM / c²',
+ desc:'Innerste stabile Kreisbahn (Kerr r=0)',
+ expr:'6*G*M/C**2',
+ vars:[{id:'M',sym:'M',name:'Masse Schwarzes Loch',unit:'kg'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'R_ISCO',resUnit:'m',
+ extra:(v,r)=>`= 3·R_S = ${fmt(r/1000)} km`},
+
+/* ─── STERNE & STRAHLUNG ─── */
+{id:'s1',cat:'Sterne & Strahlung',name:'Stefan-Boltzmann Leuchtkraft',
+ display:'L = 4π · R² · σ · T⁴',
+ desc:'Strahlungsleistung eines Schwarzkörpers',
+ expr:'4*PI*R**2*SIGMA*T**4',
+ vars:[{id:'R',sym:'R',name:'Sternradius',unit:'m'},
+       {id:'T',sym:'T',name:'Oberflächentemperatur',unit:'K'}],
+ resSym:'L',resUnit:'W',
+ extra:(v,r)=>`= ${fmt(r/3.828e26)} L☉`},
+
+{id:'s2',cat:'Sterne & Strahlung',name:'Wien-Wellenlänge (Maximum)',
+ display:'λ_max = b / T',
+ desc:'Wellenlänge des Strahlungsmaximums',
+ expr:'2.897771955e-3/T',
+ vars:[{id:'T',sym:'T',name:'Temperatur',unit:'K'}],
+ resSym:'λ_max',resUnit:'m',
+ extra:(v,r)=>`= ${fmt(r*1e9)} nm`},
+
+{id:'s3',cat:'Sterne & Strahlung',name:'Eddington-Leuchtkraft',
+ display:'L_Edd = 4πGMc / κ',
+ desc:'Max. Leuchtkraft bei Strahlungsdruck = Gravitation',
+ expr:'4*PI*G*M*C/kappa',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'kappa',sym:'κ',name:'Opazität',unit:'m²/kg',default:0.02}],
+ resSym:'L_Edd',resUnit:'W',
+ extra:(v,r)=>`= ${fmt(r/3.828e26)} L☉`},
+
+{id:'s4',cat:'Sterne & Strahlung',name:'Absolutes Helligkeitsmaß',
+ display:'M = m − 5·log₁₀(d/10pc)',
+ desc:'Absolute Magnitude aus Entfernung',
+ expr:'m_app - 5*Math.log10(d/3.085677581e17)',
+ vars:[{id:'m_app',sym:'m',name:'Scheinbare Magnitude',unit:'mag'},
+       {id:'d',   sym:'d',name:'Entfernung',unit:'m'}],
+ resSym:'M',resUnit:'mag'},
+
+{id:'s5',cat:'Sterne & Strahlung',name:'Chandrasekhar-Massengrenze',
+ display:'M_Ch ≈ 5.87 · (ħc/G)^(3/2) · mₚ⁻²',
+ desc:'Maximale Masse eines weißen Zwergs',
+ expr:'5.87*(HBAR*C/G)**(3/2)/MP**2',
+ vars:[],
+ resSym:'M_Ch',resUnit:'kg',
+ extra:(v,r)=>`= ${fmt(r/PC.M_SUN)} M☉ (Theorie: 1.4 M☉)`},
+
+{id:'s6',cat:'Sterne & Strahlung',name:'Jeans-Masse',
+ display:'M_J = (5kT/Gm)^(3/2) · (3/4πρ)^(1/2)',
+ desc:'Kritische Masse für Gravitationskollaps',
+ expr:'(5*KB*T/(G*mu))**(3/2) * Math.sqrt(3/(4*PI*rho))',
+ vars:[{id:'T',  sym:'T',  name:'Temperatur',unit:'K'},
+       {id:'rho',sym:'ρ',  name:'Dichte',unit:'kg/m³'},
+       {id:'mu', sym:'μ',  name:'Molekülmasse',unit:'kg',default:PC.MP*2.4}],
+ resSym:'M_J',resUnit:'kg',
+ extra:(v,r)=>`= ${fmt(r/PC.M_SUN)} M☉`},
+
+/* ─── KOSMOLOGIE ─── */
+{id:'c1',cat:'Kosmologie',name:'Hubble-Gesetz',
+ display:'v = H₀ · d',
+ desc:'Rückzugsgeschwindigkeit einer Galaxie',
+ expr:'H0*d',
+ vars:[{id:'d', sym:'d', name:'Entfernung',unit:'m'},
+       {id:'H0',sym:'H₀',name:'Hubble-Konstante',unit:'s⁻¹',default:PC.H0}],
+ resSym:'v',resUnit:'m/s',
+ extra:(v,r)=>`= ${fmt(r/PC.C)}·c   |   ${fmt(r/1000)} km/s`},
+
+{id:'c2',cat:'Kosmologie',name:'Rotverschiebung',
+ display:'z = (λ_obs − λ_em) / λ_em',
+ desc:'Kosmologische Rotverschiebung',
+ expr:'(lam_obs-lam_em)/lam_em',
+ vars:[{id:'lam_obs',sym:'λ_obs',name:'Beobachtete Wellenlänge',unit:'m'},
+       {id:'lam_em', sym:'λ_em', name:'Emittierte Wellenlänge',unit:'m'}],
+ resSym:'z',resUnit:'(dimensionslos)'},
+
+{id:'c3',cat:'Kosmologie',name:'Hubble-Radius (Sichtbarer Horizont)',
+ display:'R_H = c / H₀',
+ desc:'Kosmologischer Horizont',
+ expr:'C/H0',
+ vars:[{id:'H0',sym:'H₀',name:'Hubble-Konstante',unit:'s⁻¹',default:PC.H0}],
+ resSym:'R_H',resUnit:'m',
+ extra:(v,r)=>`= ${fmt(r/PC.LY)} Lichtjahre`},
+
+{id:'c4',cat:'Kosmologie',name:'Kritische Dichte (Universum)',
+ display:'ρ_c = 3H₀² / (8πG)',
+ desc:'Dichte für flaches Universum',
+ expr:'3*H0**2/(8*PI*G)',
+ vars:[{id:'H0',sym:'H₀',name:'Hubble-Konstante',unit:'s⁻¹',default:PC.H0},
+       {id:'G', sym:'G', name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'ρ_c',resUnit:'kg/m³'},
+
+{id:'c5',cat:'Kosmologie',name:'Gravitationslinse (Einstein-Ring)',
+ display:'θ_E = √(4GM·D_LS / (c²·D_L·D_S))',
+ desc:'Winkelradius des Einstein-Rings',
+ expr:'Math.sqrt(4*G*M*D_LS/(C**2*D_L*D_S))',
+ vars:[{id:'M',   sym:'M',    name:'Linsenmasse',unit:'kg'},
+       {id:'D_LS',sym:'D_LS', name:'Linse→Quelle',unit:'m'},
+       {id:'D_L', sym:'D_L',  name:'Beobachter→Linse',unit:'m'},
+       {id:'D_S', sym:'D_S',  name:'Beobachter→Quelle',unit:'m'}],
+ resSym:'θ_E',resUnit:'rad',
+ extra:(v,r)=>`= ${fmt(r*(180/Math.PI)*3600)} Bogensekunden`},
+
+{id:'c6',cat:'Kosmologie',name:'Gravitationswellen-Frequenz',
+ display:'f_GW = 2 · f_orb',
+ desc:'GW-Frequenz = 2× Orbitalfrequenz',
+ expr:'2/(2*PI)*Math.sqrt(G*(M1+M2)/a**3)',
+ vars:[{id:'M1',sym:'M₁',name:'Masse 1',unit:'kg'},
+       {id:'M2',sym:'M₂',name:'Masse 2',unit:'kg'},
+       {id:'a', sym:'a', name:'Orbitradius',unit:'m'},
+       {id:'G', sym:'G', name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'f_GW',resUnit:'Hz'},
+
+{id:'c7',cat:'Kosmologie',name:'Chirp-Masse',
+ display:'M_c = (m₁m₂)^(3/5) / (m₁+m₂)^(1/5)',
+ desc:'Effektive Masse für Gravitationswellen',
+ expr:'(m1*m2)**(3/5)/(m1+m2)**(1/5)',
+ vars:[{id:'m1',sym:'m₁',name:'Masse 1',unit:'kg'},
+       {id:'m2',sym:'m₂',name:'Masse 2',unit:'kg'}],
+ resSym:'M_c',resUnit:'kg',
+ extra:(v,r)=>`= ${fmt(r/PC.M_SUN)} M☉`},
+
+/* ─── R_min ─── */
+{id:'r1',cat:'R_min',name:'Planck-Länge (R_min absolut)',
+ display:'ℓ_P = √(ħG / c³)',
+ desc:'Kleinste physikalisch bedeutsame Längenskala',
+ expr:'Math.sqrt(HBAR*G/C**3)',
+ vars:[{id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'ℓ_P',resUnit:'m',rmin:true,
+ extra:(v,r)=>`= ${fmt(r)} m   |   WRZT λ_W = ${fmt(PC.LW)} m`,
+ notes:'Absoluter Mindestradius – unterhalb dieser Skala bricht klassische Raumzeit zusammen'},
+
+{id:'r2',cat:'R_min',name:'R_min Gravitativ (Schwarzschild)',
+ display:'R_S = 2GM / c²',
+ desc:'Gravitativer Mindestradius für gegebene Masse',
+ expr:'2*G*M/C**2',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'R_min',resUnit:'m',rmin:true,
+ extra:(v,r)=>`= ${fmt(r/1000)} km   |   Photon-Sphere: ${fmt(3*PC.G*v.M/PC.C**2/1000)} km`},
+
+{id:'r3',cat:'R_min',name:'WRZT R_min (Quantengravitativ)',
+ display:'R_min,W = λ_W = ℓ_P',
+ desc:'WRZT: Mindestlänge der Raumwellenstruktur',
+ expr:'Math.sqrt(HBAR*G/C**3)',
+ vars:[{id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'R_min,W',resUnit:'m',rmin:true,wrzt:true,
+ extra:(v,r)=>`WRZT λ_W = ${fmt(PC.LW)} m   |   Verhältnis: ${fmt(r/PC.LW)}`,
+ notes:'In der WRZT entspricht R_min der Planck-Länge λ_W – der kleinsten Wellenlänge der Raumwelle'},
+
+{id:'r4',cat:'R_min',name:'R_min Photon-Sphäre',
+ display:'R_ph = (3/2) · R_S = 3GM/c²',
+ desc:'Innerste instabile Photonenbahn',
+ expr:'3*G*M/C**2',
+ vars:[{id:'M',sym:'M',name:'Masse Schwarzes Loch',unit:'kg'},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G},
+       {id:'C',sym:'c',name:'Lichtgeschw.',unit:'m/s',default:PC.C}],
+ resSym:'R_ph',resUnit:'m',rmin:true,
+ extra:(v,r)=>`= ${fmt(r/1000)} km   |   = 1.5 × R_S`},
+
+{id:'r5',cat:'R_min',name:'R_min Quantenkorrektur (GUP)',
+ display:'R_min = ℓ_P · (1 + β·ℓ_P²/r²)',
+ desc:'Verallgem. Unschärfeprinzip – minimal. messbarer Radius',
+ expr:'Math.sqrt(HBAR*G/C**3)*(1+beta*(HBAR*G/C**3)/r**2)',
+ vars:[{id:'r',   sym:'r',  name:'Skala',unit:'m',default:1e-15},
+       {id:'beta',sym:'β',  name:'GUP-Parameter',unit:'',default:1.0}],
+ resSym:'R_min,GUP',resUnit:'m',rmin:true,
+ notes:'GUP = Generalized Uncertainty Principle. β ist ein freier Parameter der Theorie'},
+
+{id:'r6',cat:'R_min',name:'WRZNT Mindestknoten-Abstand',
+ display:'R_min,N = λ_N / (2π)',
+ desc:'WRZNT: Kleinster Knotenabstand im Raumzeitnetzwerk',
+ expr:'LN/(2*PI)',
+ vars:[],
+ resSym:'R_min,N',resUnit:'m',rmin:true,wrznt:true,
+ extra:(v,r)=>`= ${fmt(r)} m   |   N-Knoten λ_N = ${fmt(PC.LN)} m`,
+ notes:'Im WRZNT ist R_min,N der effektive Mindestabstand benachbarter Netzwerkknoten'},
+
+/* ─── BUGWELLE ─── */
+{id:'b1',cat:'Bugwelle',name:'Mach-Winkel (Bugwellen-Halbwinkel)',
+ display:'sin(α) = c_wave / v',
+ desc:'Halbwinkel des Mach-Kegels',
+ expr:'Math.asin(Math.min(c_wave/v,1))',
+ vars:[{id:'c_wave',sym:'c_wave',name:'Wellengeschwindigkeit',unit:'m/s'},
+       {id:'v',     sym:'v',     name:'Objektgeschwindigkeit',unit:'m/s'}],
+ resSym:'α',resUnit:'rad',bugw:true,
+ extra:(v,r)=>`= ${fmt(r*180/Math.PI)}°   |   Mach-Zahl M = ${fmt(v.v/v.c_wave)}`},
+
+{id:'b2',cat:'Bugwelle',name:'Mach-Zahl',
+ display:'M = v / c_wave',
+ desc:'Verhältnis Objekt- zu Wellengeschwindigkeit',
+ expr:'v/c_wave',
+ vars:[{id:'v',     sym:'v',     name:'Objektgeschwindigkeit',unit:'m/s'},
+       {id:'c_wave',sym:'c_wave',name:'Wellengeschwindigkeit',unit:'m/s'}],
+ resSym:'M',resUnit:'(dimensionslos)',bugw:true,
+ extra:(v,r)=>`Bugwelle ${r>1?'✓ AKTIV (v > c_wave)':'✗ keine (v < c_wave)'}`},
+
+{id:'b3',cat:'Bugwelle',name:'WRZT Bugwellen-Mach-Winkel',
+ display:'sin(α_W) = c_W / v',
+ desc:'Bugwellen-Winkel in der WRZT-Raumwelle',
+ expr:'Math.asin(Math.min(CW/v,1))',
+ vars:[{id:'v',sym:'v',name:'Objektgeschwindigkeit',unit:'m/s'}],
+ resSym:'α_W',resUnit:'rad',bugw:true,wrzt:true,
+ extra:(v,r)=>`= ${fmt(r*180/Math.PI)}°   |   M_W = ${fmt(v.v/PC.CW)}   |   c_W = ${fmt(PC.CW)} m/s`,
+ notes:'In der WRZT entsteht eine Raumwellen-Bugwelle wenn v > c_W (= Lichtgeschwindigkeit)'},
+
+{id:'b4',cat:'Bugwelle',name:'Bugwellen-Öffnungswinkel (gesamt)',
+ display:'θ = 2 · arcsin(c_wave / v)',
+ desc:'Gesamtöffnungswinkel des Mach-Kegels',
+ expr:'2*Math.asin(Math.min(c_wave/v,1))',
+ vars:[{id:'c_wave',sym:'c_wave',name:'Wellengeschwindigkeit',unit:'m/s'},
+       {id:'v',     sym:'v',     name:'Objektgeschwindigkeit',unit:'m/s'}],
+ resSym:'θ',resUnit:'rad',bugw:true,
+ extra:(v,r)=>`= ${fmt(r*180/Math.PI)}°`},
+
+{id:'b5',cat:'Bugwelle',name:'Cherenkov-Winkel (Licht im Medium)',
+ display:'cos(θ_C) = c/(n·v)',
+ desc:'Cherenkov-Strahlungs-Abstrahlwinkel',
+ expr:'Math.acos(Math.min(C/(n*v),1))',
+ vars:[{id:'n',sym:'n',name:'Brechungsindex Medium',unit:'',default:1.33},
+       {id:'v',sym:'v',name:'Teilchengeschwindigkeit',unit:'m/s'}],
+ resSym:'θ_C',resUnit:'rad',bugw:true,
+ extra:(v,r)=>`= ${fmt(r*180/Math.PI)}°   |   Schwelle v > c/n = ${fmt(PC.C/v.n)} m/s`},
+
+{id:'b6',cat:'Bugwelle',name:'Bugwellen-Energie (Mach-Kegel)',
+ display:'E_bw = ½ · ρ · A · v² · (M² − 1)',
+ desc:'Druckenergie hinter der Bugwelle',
+ expr:'0.5*rho*A*v**2*(M**2-1)',
+ vars:[{id:'rho',sym:'ρ',name:'Mediumdichte',unit:'kg/m³'},
+       {id:'A',  sym:'A',name:'Querschnittsfläche',unit:'m²'},
+       {id:'v',  sym:'v',name:'Objektgeschwindigkeit',unit:'m/s'},
+       {id:'M',  sym:'M',name:'Mach-Zahl',unit:''}],
+ resSym:'E_bw',resUnit:'J',bugw:true},
+
+{id:'b7',cat:'Bugwelle',name:'WRZT Bugwellen-Druckwelle',
+ display:'p_W = E_W / λ_W³',
+ desc:'Raumwellendruck der WRZT-Bugwelle',
+ expr:'EW/LW**3',
+ vars:[],
+ resSym:'p_W',resUnit:'Pa',bugw:true,wrzt:true,
+ extra:(v,r)=>`= ${fmt(r)} Pa   |   E_W = ${fmt(PC.EW)} J   |   λ_W = ${fmt(PC.LW)} m`,
+ notes:'Der WRZT-Raumwellendruck entsteht wenn ein Objekt die Raumwellenstruktur überschallschnell durchquert'},
+
+{id:'b8',cat:'Bugwelle',name:'Machsche Kegelspitze (Weg)',
+ display:'Δr = v · t · sin(α)',
+ desc:'Querdistanz der Bugwellenfront nach Zeit t',
+ expr:'v*t*Math.sin(Math.asin(Math.min(c_wave/v,1)))',
+ vars:[{id:'v',     sym:'v',     name:'Objektgeschwindigkeit',unit:'m/s'},
+       {id:'t',     sym:'t',     name:'Zeit',unit:'s'},
+       {id:'c_wave',sym:'c_wave',name:'Wellengeschwindigkeit',unit:'m/s'}],
+ resSym:'Δr',resUnit:'m',bugw:true},
+
+/* ─── WRZT ─── */
+{id:'w1',cat:'WRZT',name:'WRZT Raumwellenenergie',
+ display:'E_W = m_W · c_W²',
+ desc:'Grundenergie der Raumwellenstruktur',
+ expr:'mW*cW**2',
+ vars:[{id:'mW',sym:'m_W',name:'WRZT Masse',unit:'kg',default:PC.MW},
+       {id:'cW',sym:'c_W',name:'Wellengeschw.',unit:'m/s',default:PC.CW}],
+ resSym:'E_W',resUnit:'J',wrzt:true,
+ extra:(v,r)=>`= ${fmt(r/PC.E_EL)} eV`},
+
+{id:'w2',cat:'WRZT',name:'WRZT Grundfrequenz-Energie',
+ display:'E = h · f_W',
+ desc:'Quantenenergie bei WRZT-Grundfrequenz',
+ expr:'H*fW',
+ vars:[{id:'fW',sym:'f_W',name:'WRZT Grundfrequenz',unit:'Hz',default:PC.FW}],
+ resSym:'E',resUnit:'J',wrzt:true,
+ extra:(v,r)=>`= ${fmt(r/PC.E_EL)} eV`},
+
+{id:'w3',cat:'WRZT',name:'WRZT Wellenlänge · Frequenz',
+ display:'c_W = λ_W · f_W',
+ desc:'Dispersionsrelation der Raumwelle',
+ expr:'lW*fW',
+ vars:[{id:'lW',sym:'λ_W',name:'WRZT Wellenlänge',unit:'m',default:PC.LW},
+       {id:'fW',sym:'f_W',name:'WRZT Frequenz',unit:'Hz',default:PC.FW}],
+ resSym:'c_W',resUnit:'m/s',wrzt:true,
+ extra:(v,r)=>`= ${fmt(r)} m/s   |   c = ${fmt(PC.CW)} m/s`},
+
+{id:'w4',cat:'WRZT',name:'WRZT Impuls der Raumwelle',
+ display:'p_W = h / λ_W',
+ desc:'Quantenimpuls der Raumwelle',
+ expr:'H/lW',
+ vars:[{id:'lW',sym:'λ_W',name:'WRZT Wellenlänge',unit:'m',default:PC.LW}],
+ resSym:'p_W',resUnit:'kg·m/s',wrzt:true},
+
+{id:'w5',cat:'WRZT',name:'WRZT Energiedichte',
+ display:'ρ_E,W = E_W / λ_W³',
+ desc:'Energiedichte der Raumwellenstruktur',
+ expr:'EW/LW**3',
+ vars:[],
+ resSym:'ρ_E,W',resUnit:'J/m³',wrzt:true,
+ extra:(v,r)=>`= ${fmt(r)} J/m³   |   Planck-Energiedichte`},
+
+{id:'w6',cat:'WRZT',name:'WRZT Gravitationspotential (Raumwelle)',
+ display:'Φ_W = −G · m_W / λ_W',
+ desc:'WRZT-gravitatives Potential auf Planck-Skala',
+ expr:'-G*MW/LW',
+ vars:[{id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'Φ_W',resUnit:'J/kg',wrzt:true},
+
+{id:'w7',cat:'WRZT',name:'WRZT Zeitdilatation (Raumwelle)',
+ display:'τ_W / τ = √(1 − v²/c_W²)',
+ desc:'Zeitdilatation im Raumwellen-Feld',
+ expr:'Math.sqrt(Math.max(0,1-(v/CW)**2))',
+ vars:[{id:'v',sym:'v',name:'Relativgeschwindigkeit',unit:'m/s'}],
+ resSym:'τ_W/τ',resUnit:'(dimensionslos)',wrzt:true,
+ extra:(v,r)=>`Faktor: ${fmt(r)}   |   v/c_W = ${fmt(v.v/PC.CW)}`},
+
+{id:'w8',cat:'WRZT',name:'WRZT Raumwellen-Schwarzschild-Korrektur',
+ display:'R_S,W = R_S + n · λ_W',
+ desc:'WRZT-Korrektur des Schwarzschild-Radius',
+ expr:'2*G*M/CW**2 + n*LW',
+ vars:[{id:'M',sym:'M',name:'Masse',unit:'kg'},
+       {id:'n',sym:'n',name:'Quantenzahl',unit:'',default:1},
+       {id:'G',sym:'G',name:'Gravitationskonst.',unit:'m³kg⁻¹s⁻²',default:PC.G}],
+ resSym:'R_S,W',resUnit:'m',wrzt:true,
+ extra:(v,r)=>`Klass. R_S = ${fmt(2*PC.G*v.M/PC.CW**2)} m   |   Δ = ${fmt(v.n*PC.LW)} m`},
+
+/* ─── WRZNT ─── */
+{id:'n1',cat:'WRZNT',name:'WRZNT Netzwerk-Grundfrequenz',
+ display:'f_N = 1 / (2π · τ_W)',
+ desc:'Grundfrequenz des Raumzeit-Netzwerks (reduziert)',
+ expr:'FN',
+ vars:[],
+ resSym:'f_N',resUnit:'Hz',wrznt:true,
+ extra:(v,r)=>`= ${fmt(r)} Hz   |   τ_W = ${fmt(PC.TW)} s`},
+
+{id:'n2',cat:'WRZNT',name:'WRZNT Netzwerk-Kopplungsenergie',
+ display:'E_N = n · h · f_N',
+ desc:'Energie n-ter Knotenresonanz',
+ expr:'n_nodes*H*FN',
+ vars:[{id:'n_nodes',sym:'n',name:'Anzahl Knoten / Resonanzzahl',unit:'',default:1}],
+ resSym:'E_N',resUnit:'J',wrznt:true,
+ extra:(v,r)=>`= ${fmt(r/PC.E_EL)} eV`},
+
+{id:'n3',cat:'WRZNT',name:'WRZNT Netzwerk-Wellenlänge',
+ display:'λ_N = n · λ_W · 2π',
+ desc:'Effektive Wellenlänge bei n Netzwerkknoten',
+ expr:'n_nodes*LW*2*PI',
+ vars:[{id:'n_nodes',sym:'n',name:'Knotenzahl',unit:'',default:1}],
+ resSym:'λ_N',resUnit:'m',wrznt:true},
+
+{id:'n4',cat:'WRZNT',name:'WRZNT Informationsrate',
+ display:'I_N = f_N · log₂(n)',
+ desc:'Informationsübertragungsrate im Netzwerk',
+ expr:'FN*Math.log2(Math.max(n_nodes,2))',
+ vars:[{id:'n_nodes',sym:'n',name:'Knotenzahl',unit:'',default:2}],
+ resSym:'I_N',resUnit:'bit/s',wrznt:true},
+
+{id:'n5',cat:'WRZNT',name:'WRZNT Netzwerk-Gruppengeschwindigkeit',
+ display:'v_g = dω/dk = c_W · (1 − λ_W²/λ²)',
+ desc:'Gruppengeschwindigkeit im WRZNT-Netzwerk',
+ expr:'CW*(1-(LW/lam)**2)',
+ vars:[{id:'lam',sym:'λ',name:'Wellenlänge (Probe)',unit:'m',default:1e-15}],
+ resSym:'v_g',resUnit:'m/s',wrznt:true,
+ extra:(v,r)=>`= ${fmt(r/PC.CW)}·c_W`},
+
+{id:'n6',cat:'WRZNT',name:'WRZNT Schwarzes Loch Entropie (Bekenstein)',
+ display:'S = k_B · A / (4·ℓ_P²)',
+ desc:'Quantengravitative Entropie via WRZNT-Netzwerk',
+ expr:'KB*A/(4*LW**2)',
+ vars:[{id:'A',sym:'A',name:'Ereignishorizont-Fläche',unit:'m²'}],
+ resSym:'S',resUnit:'J/K',wrznt:true,
+ extra:(v,r)=>`= ${fmt(r/PC.KB)} k_B   |   (Bits: ${fmt(r*Math.log2(Math.E)/PC.KB)})`},
+
+{id:'n7',cat:'WRZNT',name:'WRZNT Raumzeit-Netzwerk-Druck',
+ display:'p_N = E_N / λ_N³',
+ desc:'Effektiver Netzwerkdruck bei n Knoten',
+ expr:'(n_nodes*H*FN)/(n_nodes*LW*2*PI)**3',
+ vars:[{id:'n_nodes',sym:'n',name:'Knotenzahl',unit:'',default:1}],
+ resSym:'p_N',resUnit:'Pa',wrznt:true},
+
+{id:'n8',cat:'WRZNT',name:'WRZNT Kohärenzlänge',
+ display:'l_coh = v_g / f_N',
+ desc:'Räumliche Kohärenz des Netzwerk-Zustands',
+ expr:'CW*(1-(LW/lam)**2)/FN',
+ vars:[{id:'lam',sym:'λ',name:'Wellenlänge',unit:'m',default:1e-15}],
+ resSym:'l_coh',resUnit:'m',wrznt:true},
+
+];
+
+/* ══ STATE ══ */
+let ALL=[]; let CUR=null; let dark=true; let editId=null; let rc=0;
+const SK='aphysform_v1';
+function loadUser(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch{return[];}}
+function saveUser(a){try{localStorage.setItem(SK,JSON.stringify(a));}catch{}}
+function rebuild(){ALL=[...BUILTIN,...loadUser().map(f=>({...f,source:'user'}))];}
+
+/* ══ EVAL ══ */
+function calc(expr,vars){
+  const ctx={...PC,...vars,Math};
+  const ks=Object.keys(ctx),vs=ks.map(k=>ctx[k]);
+  try{const s=expr.replace(/\^/g,'**');return new Function(...ks,`"use strict";return(${s});`)(...vs);}
+  catch{return NaN;}
+}
+
+/* ══ FORMAT ══ */
+function fmt(n){
+  if(n===undefined||n===null||isNaN(n))return'?';
+  if(n===0)return'0';
+  const a=Math.abs(n);
+  if(a>=1e5||a<1e-3)return n.toExponential(5);
+  return parseFloat(n.toPrecision(7)).toString();
+}
+function sci(n){if(!isFinite(n))return'—';const p=n.toExponential(6).split('e');return`${p[0]} × 10^${p[1]}`;}
+function hilite(s){return s.replace(/(-?\d[\d.]*(?:e[+\-]?\d+)?)/g,'<em>$1</em>');}
+
+/* ══ CAT COLOR ══ */
+function catClass(f){
+  if(f.source==='user')return'user';
+  if(f.wrznt)return'wrznt';
+  if(f.rmin)return'rmin';
+  if(f.bugw)return'bugw';
+  if(f.wrzt)return'wrzt';
+  return'astro';
+}
+function dotColor(t){
+  return t==='wrzt'?'var(--wrzt)':t==='wrznt'?'var(--wrznt)':t==='rmin'?'var(--rmin)':
+         t==='bugw'?'var(--bugw)':t==='user'?'var(--yellow)':'var(--accent)';
+}
+function badge(t){
+  const map={astro:['ASTRO','ba-a'],wrzt:['WRZT','ba-w'],wrznt:['WRZNT','ba-n'],
+    rmin:['R_min','ba-r'],bugw:['BUGWELLE','ba-b'],user:['Eigen','ba-u']};
+  const [lbl,cls]=map[t]||map.astro;
+  return`<span class="ba ${cls}">${lbl}</span>`;
+}
+
+/* ══ CATEGORIES ══ */
+let actCat='Alle';
+const CAT_CC={'WRZT':'cc-wrzt','WRZNT':'cc-wrznt','R_min':'cc-rmin','Bugwelle':'cc-bugw','Eigene':'cc-user'};
+
+function cats(){return['Alle',...new Set(ALL.map(f=>f.cat))];}
+function initCats(){
+  document.getElementById('catBtns').innerHTML=cats().map(c=>{
+    const cc=CAT_CC[c]||'';
+    return`<button class="cat-btn ${cc} ${c===actCat?'active':''}" onclick="setCat('${c}')">${c}</button>`;
+  }).join('');
+}
+function setCat(c){actCat=c;initCats();renderList();}
+
+/* ══ LIST ══ */
+function renderList(){
+  const fl=actCat==='Alle'?ALL:ALL.filter(f=>f.cat===actCat);
+  document.getElementById('formulaList').innerHTML=fl.map(f=>{
+    const t=catClass(f);const sel=CUR?.id===f.id;
+    const exprColor=`var(--${t==='astro'?'accent':t==='user'?'yellow':t})`;
+    return`<div class="formula-item ${sel?'sel-'+t[0]+(t==='wrznt'?'n':t==='rmin'?'r':t==='bugw'?'b':t==='wrzt'?'w':t==='user'?'u':'a'):''}"
+      onclick="sel('${f.id}')">
+      <div class="fi-name">${f.name}${badge(t)}</div>
+      <div class="fi-expr" style="color:${exprColor}">${f.display.replace(/<[^>]+>/g,'').slice(0,48)}</div>
+      <div class="fi-btns">
+        <button class="fi-btn" onclick="event.stopPropagation();openEditor('${f.id}')">✎</button>
+        ${f.source==='user'?`<button class="fi-btn del" onclick="event.stopPropagation();delF('${f.id}')">✕</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function sel(id){
+  CUR=ALL.find(f=>f.id===id);
+  renderList();renderVars();renderDisp();
+  document.getElementById('resultArea').innerHTML=`<div class="placeholder-msg"><div>Werte eingeben → Berechnen</div></div>`;
+  const t=catClass(CUR);
+  const cb=document.getElementById('calcBtn');
+  cb.className='calc-btn';
+  if(t!=='astro')cb.classList.add({wrzt:'cw',wrznt:'cn',rmin:'cr',bugw:'cb',user:'cu'}[t]||'');
+}
+
+function renderDisp(){
+  if(!CUR)return;
+  const t=catClass(CUR);
+  document.getElementById('fName').innerHTML=CUR.name+badge(t);
+  document.getElementById('fRend').innerHTML=CUR.display;
+  document.getElementById('fDesc').textContent=CUR.desc||'';
+}
+
+function renderVars(){
+  if(!CUR)return;
+  const t=catClass(CUR);
+  const sc=dotColor(t);
+  if(!CUR.vars.length){
+    document.getElementById('varInputs').innerHTML=
+      `<div class="placeholder-msg" style="font-size:.68rem;padding:10px;text-align:center;color:var(--text3)">Keine Variablen – direkt berechnen</div>`;
+    return;
+  }
+  document.getElementById('varInputs').innerHTML=CUR.vars.map(v=>`
+    <div class="var-group">
+      <div class="var-label">
+        <span class="vl-sym" style="color:${sc}">${v.sym}</span>
+        <span class="vl-desc">${v.name}</span>
+        <span class="vl-unit">[${v.unit}]</span>
+      </div>
+      <div class="var-input-row">
+        <input class="var-input" id="i_${v.id}" type="number" step="any"
+               value="${v.default!==undefined?v.default:''}" placeholder="Wert …">
+        <button class="small-x" onclick="document.getElementById('i_${v.id}').value='';document.getElementById('i_${v.id}').focus()">✕</button>
+      </div>
+      ${v.notes?`<div class="hint" style="padding-left:2px;margin-top:2px">${v.notes}</div>`:''}
+    </div>`).join('');
+}
+
+/* ══ CALCULATE ══ */
+function calculate(){
+  if(!CUR){alert('Formel auswählen!');return;}
+  const vals={};let ok=true;
+  for(const v of CUR.vars){
+    const el=document.getElementById('i_'+v.id);
+    if(!el)continue;
+    const n=parseFloat(el.value);
+    if(isNaN(n)){el.style.borderColor='var(--red)';ok=false;}
+    else{el.style.borderColor='';vals[v.id]=n;}
+  }
+  if(!ok){
+    document.getElementById('resultArea').innerHTML=`<div class="result-block"><div class="rh"><span class="dot" style="background:var(--red)"></span>Eingabefehler</div><div class="err-msg">⚠ Alle Felder mit Zahlen füllen.</div></div>`;
+    return;
+  }
+  const res=calc(CUR.expr,vals);
+  const t=catClass(CUR);const dc=dotColor(t);
+
+  let subst=CUR.expr;
+  [...Object.entries(vals),...Object.entries(PC)].sort((a,b)=>b[0].length-a[0].length)
+    .forEach(([k,val])=>{subst=subst.replaceAll(k,fmt(val));});
+
+  const steps=[`Formel: ${CUR.display.replace(/<[^>]+>/g,'')}`];
+  if(CUR.notes)steps.push(`ℹ ${CUR.notes}`);
+  if(CUR.vars.length)steps.push(`Einsetzen: ${subst.slice(0,120)}`);
+  steps.push(`${CUR.resSym} = ${fmt(res)} ${CUR.resUnit||''}`);
+  if(!isNaN(res)&&CUR.resUnit==='J')steps.push(`In eV: ${fmt(res/PC.E_EL)} eV`);
+  if(!isNaN(res)&&CUR.resUnit==='m')steps.push(`In Lichtjahren: ${fmt(res/PC.LY)} ly   |   ${fmt(res/PC.AU)} AU`);
+  if(isNaN(res))steps.push('⚠ Rechenfehler – Ausdruck und Eingaben prüfen');
+
+  const extra=CUR.extra?CUR.extra(vals,res):'';
+
+  document.getElementById('resultArea').innerHTML=`
+    <div class="result-block">
+      <div class="rh"><span class="dot" style="background:${dc}"></span>Ergebnis · ${CUR.name}</div>
+      <div class="result-value" style="color:${dc}">${CUR.resSym} = ${fmt(res)}<span class="result-unit">${CUR.resUnit||''}</span></div>
+      <div class="result-sci">Wissenschaftlich: ${sci(res)}</div>
+      ${extra?`<div class="result-extra">${extra}</div>`:''}
+    </div>
+    <div class="result-block">
+      <div class="rh"><span class="dot" style="background:var(--wrznt)"></span>Lösungsweg</div>
+      ${steps.map((s,i)=>`<div class="step-row"><span class="step-num">${i+1}.</span><span class="step-text">${hilite(s)}</span></div>`).join('')}
+    </div>
+    ${CUR.vars.length?`<div class="result-block">
+      <div class="rh"><span class="dot"></span>Variablen</div>
+      <div class="cg2">
+        ${CUR.vars.map(v=>{const n=parseFloat(document.getElementById('i_'+v.id)?.value);return`<div class="crow"><div class="csym" style="color:${dc}">${v.sym}</div><div class="cname">${v.name}</div><div class="cval">${fmt(n)} ${v.unit}</div></div>`;}).join('')}
+      </div></div>`:''}`;
+}
+
+/* ══ TABS ══ */
+function switchTab(t){
+  document.getElementById('tab-res').classList.toggle('active',t==='res');
+  document.getElementById('tab-const').classList.toggle('active',t==='const');
+  document.getElementById('resultArea').style.display=t==='res'?'flex':'none';
+  document.getElementById('constArea').style.display=t==='const'?'flex':'none';
+  if(t==='const')renderConsts();
+}
+
+/* ══ CONSTANTS TABLE ══ */
+const CSECTIONS=[
+  {title:'Universelle Konstanten',color:'var(--accent)',rows:[
+    {s:'c',     n:'Lichtgeschwindigkeit',       u:'m s⁻¹',       v:'299 792 458',                 tk:'C',   exact:true},
+    {s:'G',     n:'Gravitationskonstante',       u:'m³ kg⁻¹ s⁻²', v:'6.674 30 × 10⁻¹¹',           tk:'G'},
+    {s:'h',     n:'Planck-Konstante',            u:'J s',          v:'6.626 070 15 × 10⁻³⁴',       tk:'H',   exact:true},
+    {s:'ħ',     n:'Red. Planck-Konstante',       u:'J s',          v:'1.054 571 817 × 10⁻³⁴',      tk:'HBAR'},
+    {s:'ε₀',    n:'El. Feldkonstante',           u:'F m⁻¹',        v:'8.854 187 8128 × 10⁻¹²',     tk:'EPS0'},
+    {s:'μ₀',    n:'Mag. Feldkonstante',          u:'N A⁻²',        v:'1.256 637 062 × 10⁻⁶',       tk:'–'},
+  ]},
+  {title:'Teilchen & Quantenmechanik',color:'var(--accent)',rows:[
+    {s:'e',     n:'Elementarladung',             u:'C',            v:'1.602 176 634 × 10⁻¹⁹',      tk:'E_EL',exact:true},
+    {s:'mₑ',   n:'Elektronenmasse',              u:'kg',           v:'9.109 383 7015 × 10⁻³¹',     tk:'ME'},
+    {s:'mₚ',   n:'Protonenmasse',                u:'kg',           v:'1.672 621 923 69 × 10⁻²⁷',   tk:'MP'},
+    {s:'k_B',  n:'Boltzmann-Konstante',          u:'J K⁻¹',        v:'1.380 649 × 10⁻²³',          tk:'KB',  exact:true},
+    {s:'Nₐ',   n:'Avogadro-Konstante',           u:'mol⁻¹',        v:'6.022 140 76 × 10²³',        tk:'NA',  exact:true},
+    {s:'σ',     n:'Stefan-Boltzmann-Konstante',  u:'W m⁻² K⁻⁴',   v:'5.670 374 419 × 10⁻⁸',      tk:'SIGMA'},
+  ]},
+  {title:'Astrophysikalische Konstanten',color:'var(--astro)',rows:[
+    {s:'M☉',   n:'Sonnenmasse',                  u:'kg',           v:'1.988 416 × 10³⁰',           tk:'M_SUN'},
+    {s:'R☉',   n:'Sonnenradius',                 u:'m',            v:'6.957 × 10⁸',                tk:'R_SUN'},
+    {s:'L☉',   n:'Sonnenleuchtkraft',            u:'W',            v:'3.828 × 10²⁶',               tk:'–'},
+    {s:'M♁',   n:'Erdmasse',                     u:'kg',           v:'5.972 168 × 10²⁴',           tk:'M_EARTH'},
+    {s:'g',     n:'Normschwere Erdoberfläche',   u:'m s⁻²',        v:'9.806 65',                   tk:'G_SURF',exact:true},
+    {s:'AU',    n:'Astronomische Einheit',        u:'m',            v:'1.495 978 707 × 10¹¹',       tk:'AU'},
+    {s:'ly',    n:'Lichtjahr',                   u:'m',            v:'9.460 730 473 × 10¹⁵',       tk:'LY'},
+    {s:'pc',    n:'Parsec',                      u:'m',            v:'3.085 677 581 × 10¹⁶',       tk:'–'},
+    {s:'H₀',   n:'Hubble-Konstante',             u:'s⁻¹',          v:'2.268 × 10⁻¹⁸',             tk:'H0'},
+  ]},
+  {title:'WRZT – Wellenraumzeit-Theorie',color:'var(--wrzt)',wrzt:true,rows:[
+    {s:'λ_W',  n:'WRZT Wellenlänge (Planck-Länge)', u:'m',        v:'1.616 255 × 10⁻³⁵',          tk:'LW',  wrzt:true},
+    {s:'τ_W',  n:'WRZT Zeitquantum (Planck-Zeit)',  u:'s',         v:'5.391 247 × 10⁻⁴⁴',          tk:'TW',  wrzt:true},
+    {s:'m_W',  n:'WRZT Masseeinheit (Planck-Masse)',u:'kg',        v:'2.176 434 × 10⁻⁸',           tk:'MW',  wrzt:true},
+    {s:'c_W',  n:'WRZT Wellengeschwindigkeit',      u:'m s⁻¹',     v:'2.997 924 58 × 10⁸',         tk:'CW',  wrzt:true},
+    {s:'f_W',  n:'WRZT Grundfrequenz (Planck-Freq)',u:'Hz',        v:'1.854 9 × 10⁴³',             tk:'FW',  wrzt:true},
+    {s:'E_W',  n:'WRZT Raumenergie (Planck-Energie)',u:'J',        v:'1.956 1 × 10⁹',              tk:'EW',  wrzt:true},
+    {s:'ℓ_P', n:'Planck-Länge √(ħG/c³)',           u:'m',         v:'1.616 255 × 10⁻³⁵',          tk:'LW',  wrzt:true},
+    {s:'T_P', n:'Planck-Temperatur',               u:'K',          v:'1.416 784 × 10³²',           tk:'–',   wrzt:true},
+    {s:'q_P', n:'Planck-Ladung √(4πε₀ħc)',         u:'C',          v:'1.875 545 × 10⁻¹⁸',         tk:'–',   wrzt:true},
+  ]},
+  {title:'WRZNT – Wellenraumzeit-Netzwerk-Theorie',color:'var(--wrznt)',wrznt:true,rows:[
+    {s:'λ_N',  n:'WRZNT Netzwerk-Wellenlänge λ_W·2π',u:'m',       v:'1.015 4 × 10⁻³⁴',           tk:'LN',  wrznt:true},
+    {s:'τ_N',  n:'WRZNT Netzwerk-Zeitquantum τ_W·2π',u:'s',       v:'3.388 8 × 10⁻⁴³',           tk:'TN',  wrznt:true},
+    {s:'m_N',  n:'WRZNT Netzwerk-Masse',              u:'kg',       v:'2.176 434 × 10⁻⁸',          tk:'MN',  wrznt:true},
+    {s:'f_N',  n:'WRZNT Netzwerk-Grundfrequenz f_W/2π',u:'Hz',     v:'2.951 0 × 10⁴²',            tk:'FN',  wrznt:true},
+    {s:'E_N',  n:'WRZNT Netzwerk-Grundenergie h·f_N', u:'J',       v:'1.956 1 × 10⁹',             tk:'EN',  wrznt:true},
+  ]},
+  {title:'R_min – Mindestradien',color:'var(--rmin)',rmin:true,rows:[
+    {s:'ℓ_P', n:'Planck-Länge = absolutes R_min',    u:'m',        v:'1.616 255 × 10⁻³⁵',         tk:'LW',  rmin:true},
+    {s:'R_S☉',n:'Schwarzschild-Radius der Sonne',    u:'m',        v:'2.953 × 10³',                tk:'–',   rmin:true},
+    {s:'R_S♁',n:'Schwarzschild-Radius der Erde',     u:'m',        v:'8.870 × 10⁻³',              tk:'–',   rmin:true},
+    {s:'r_e', n:'Klass. Elektronenradius',            u:'m',        v:'2.817 940 × 10⁻¹⁵',         tk:'–',   rmin:true},
+    {s:'a₀',  n:'Bohrscher Radius',                  u:'m',        v:'5.291 772 × 10⁻¹¹',         tk:'–',   rmin:true},
+  ]},
+  {title:'Bugwellen & Mach-Konstanten',color:'var(--bugw)',bugw:true,rows:[
+    {s:'c',    n:'Lichtgeschwindigkeit (WRZT: c_W)',  u:'m s⁻¹',   v:'299 792 458',                tk:'C,CW',bugw:true},
+    {s:'v_s☉',n:'Schallgeschwindigkeit (Luft 20°C)', u:'m s⁻¹',   v:'343',                        tk:'–',   bugw:true},
+    {s:'v_s⊕',n:'Schallgeschwindigkeit (Wasser)',    u:'m s⁻¹',   v:'1 480',                      tk:'–',   bugw:true},
+    {s:'n_W', n:'Brechungsindex Wasser (589nm)',      u:'',         v:'1.333',                      tk:'–',   bugw:true},
+    {s:'n_G', n:'Brechungsindex Glas (BK7)',          u:'',         v:'1.517',                      tk:'–',   bugw:true},
+  ]},
+];
+
+function renderConsts(){
+  document.getElementById('constArea').innerHTML=CSECTIONS.map(sec=>`
+    <div class="const-section">
+      <div class="const-section-title" style="color:${sec.color}">
+        <span>${sec.title}</span><span class="line"></span>
+      </div>
+      <table class="ct">
+        ${sec.rows.map(r=>`<tr>
+          <td class="tsym" style="color:${sec.color}">${r.s}</td>
+          <td class="tname">${r.n}</td>
+          <td class="tval">${r.v}${r.exact?'<span style="color:var(--wrznt);margin-left:4px;font-size:.55rem">✓</span>':''}</td>
+          <td class="tunit">${r.u}</td>
+          <td style="padding:4px 6px;white-space:nowrap">
+            ${r.tk!=='–'?`<span class="ttok">${r.tk}</span> `:''}
+            <button class="cpyb" onclick="cpv(this,'${r.v.replace(/\s/g,'')}')">⎘</button>
+          </td>
+        </tr>`).join('')}
+      </table>
+    </div>`).join('');
+}
+function cpv(el,v){navigator.clipboard?.writeText(v).then(()=>{el.textContent='✓';el.style.color='var(--wrznt)';setTimeout(()=>{el.textContent='⎘';el.style.color='';},1200);});}
+
+/* ══ EDITOR MODAL ══ */
+function openEditor(id){
+  editId=id;rc=0;
+  document.getElementById('eVars').innerHTML='';
+  const f=id?ALL.find(x=>x.id===id):null;
+  document.getElementById('mTitle').textContent=f?'FORMEL BEARBEITEN':'NEUE FORMEL';
+  document.getElementById('mDel').style.display=f?.source==='user'?'flex':'none';
+  document.getElementById('eName').value=f?.name||'';
+  document.getElementById('eCat').value=f?.cat||'';
+  document.getElementById('eDisp').value=f?.display||'';
+  document.getElementById('eExpr').value=f?.expr||'';
+  document.getElementById('eRes').value=f?.resSym||'';
+  document.getElementById('eUnit').value=f?.resUnit||'';
+  document.getElementById('eDescF').value=f?.desc||'';
+  document.getElementById('eNote').value=f?.notes||'';
+  document.getElementById('eType').value=f?.wrznt?'wrznt':f?.rmin?'rmin':f?.bugw?'bugw':f?.wrzt?'wrzt':f?.source==='user'?'user':'astro';
+  if(f?.vars?.length)f.vars.forEach(v=>addRow(v));else addRow();
+  updPrev();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeEditor(){document.getElementById('overlay').classList.remove('open');}
+function updPrev(){const v=document.getElementById('eDisp').value;document.getElementById('ePrev').innerHTML=v||`<span style="opacity:.3">Vorschau…</span>`;}
+function addRow(v=null){
+  rc++;const i=rc;const row=document.createElement('div');
+  row.className='vt-row';row.id='vr'+i;
+  row.innerHTML=`<input class="var-input" id="vs${i}" placeholder="v" value="${v?.sym||''}">
+    <input class="var-input" id="vn${i}" placeholder="Beschreibung" value="${v?.name||''}">
+    <input class="var-input" id="vu${i}" placeholder="Einheit" value="${v?.unit||''}">
+    <input class="var-input" id="vd${i}" placeholder="leer=kein" type="number" step="any" value="${v?.default!==undefined?v.default:''}">
+    <button class="vt-del" onclick="document.getElementById('vr${i}').remove()">✕</button>`;
+  document.getElementById('eVars').appendChild(row);
+}
+function getRows(){
+  return[...document.querySelectorAll('[id^="vr"]')].map(r=>{
+    const i=r.id.slice(2);const sym=document.getElementById('vs'+i)?.value.trim();
+    if(!sym)return null;
+    const obj={id:sym.replace(/[^a-zA-Z0-9_]/g,'_'),sym,
+      name:document.getElementById('vn'+i)?.value.trim()||sym,
+      unit:document.getElementById('vu'+i)?.value.trim()||''};
+    const dv=document.getElementById('vd'+i)?.value.trim();
+    if(dv!=='')obj.default=parseFloat(dv);return obj;
+  }).filter(Boolean);
+}
+function saveFormula(){
+  const name=document.getElementById('eName').value.trim();
+  const cat=document.getElementById('eCat').value.trim()||'Eigene';
+  const disp=document.getElementById('eDisp').value.trim();
+  const expr=document.getElementById('eExpr').value.trim();
+  const resSym=document.getElementById('eRes').value.trim();
+  const resUnit=document.getElementById('eUnit').value.trim();
+  const desc=document.getElementById('eDescF').value.trim();
+  const notes=document.getElementById('eNote').value.trim();
+  const type=document.getElementById('eType').value;
+  const vars=getRows();
+  if(!name||!disp||!expr||!resSym){alert('Name, Anzeige, Ausdruck und Ergebnis-Symbol sind Pflichtfelder!');return;}
+  const id=editId||('u'+Date.now());
+  const f={id,cat,name,display:disp,expr,vars,resSym,resUnit,desc,source:'user',
+    wrzt:type==='wrzt',wrznt:type==='wrznt',rmin:type==='rmin',bugw:type==='bugw',
+    notes:notes||undefined};
+  let us=loadUser();const ix=us.findIndex(x=>x.id===id);
+  if(ix>=0)us[ix]=f;else us.push(f);
+  saveUser(us);rebuild();initCats();renderList();closeEditor();sel(id);
+}
+function delF(id){
+  if(!confirm('Formel wirklich löschen?'))return;
+  saveUser(loadUser().filter(f=>f.id!==id));
+  if(CUR?.id===id)CUR=null;
+  rebuild();initCats();renderList();
+  if(!CUR){['fName','fDesc'].forEach(i=>document.getElementById(i).textContent='');
+    document.getElementById('fRend').innerHTML='⟨ Formel ⟩';
+    document.getElementById('varInputs').innerHTML='<div class="placeholder-msg" style="padding:20px;text-align:center">Formel auswählen →</div>';
+    document.getElementById('resultArea').innerHTML='<div class="placeholder-msg"><div class="big">✦</div><div>Formel wählen</div></div>';}
+}
+function delEditing(){if(editId)delF(editId);closeEditor();}
+function clearUser(){if(!confirm('Alle eigenen Formeln löschen?'))return;saveUser([]);rebuild();initCats();renderList();}
+
+/* ══ EXPORT / IMPORT ══ */
+function exportJSON(){const u=loadUser();if(!u.length){alert('Keine eigenen Formeln.');return;}
+  const b=new Blob([JSON.stringify(u,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='aphysform_formeln.json';a.click();}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw 0;
+    let ex=loadUser();let n=0;d.forEach(f=>{if(!f.id||!f.name||!f.expr)return;f.source='user';
+    const i=ex.findIndex(x=>x.id===f.id);if(i>=0)ex[i]=f;else{ex.push(f);n++;}});
+    saveUser(ex);rebuild();initCats();renderList();alert(`Import OK: ${n} neue Formeln.`);}
+  catch{alert('Fehler beim Import.');}};r.readAsText(f);e.target.value='';}
+
+/* ══ SYMBOLS ══ */
+const SYM=['α','β','γ','δ','ε','θ','λ','μ','ν','π','ρ','σ','τ','φ','ψ','ω','Δ','Λ','Σ','Ω','ħ',
+  '∞','∂','∇','∫','√','≈','≠','≤','≥','·','×','÷','⁰','¹','²','³','⁴','⁻','₀','₁','₂','₃','→','⟹','±','☉','♁'];
+document.getElementById('symGrid').innerHTML=SYM.map(s=>`<div class="sym-key" onclick="ins('${s}')">${s}</div>`).join('');
+function ins(s){const a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')){const st=a.selectionStart,en=a.selectionEnd;a.value=a.value.slice(0,st)+s+a.value.slice(en);a.selectionStart=a.selectionEnd=st+s.length;}}
+
+/* ══ STARS ══ */
+(function(){const c=document.getElementById('stars');
+  for(let i=0;i<120;i++){const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2+.5;s.style.cssText=`width:${sz}px;height:${sz}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s;
+      opacity:${.1+Math.random()*.4}`;c.appendChild(s);}})();
+
+/* ══ THEME / FS ══ */
+document.getElementById('themeBtn').addEventListener('click',()=>{dark=!dark;document.body.classList.toggle('light',!dark);document.getElementById('themeBtn').textContent=dark?'☀':'☾';});
+document.getElementById('fsBtn').addEventListener('click',()=>{
+  if(!document.fullscreenElement)(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen||function(){}).call(document.documentElement);
+  else(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);});
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeEditor();});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('overlay').classList.contains('open'))calculate();if(e.key==='Escape')closeEditor();});
+
+/* ══ INIT ══ */
+rebuild();initCats();renderList();
+</script>
+</body>
+</html>

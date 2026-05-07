@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhysForm · Physikalischer Formeleditor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Rajdhani:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+:root {
+  --bg:#0a0c10;--bg2:#111520;--bg3:#161b28;--border:#1e2d48;
+  --accent:#00d4ff;--accent2:#7b5ea7;--wrzt:#ff8c42;--green:#39d98a;
+  --red:#ff4d6d;--yellow:#f5c518;
+  --text:#cdd6f4;--text2:#7a8ba8;--text3:#3d5070;
+  --formula:#e2e8f8;--result:#00d4ff;
+  --shadow:0 8px 32px rgba(0,0,0,.6);--glow:0 0 20px rgba(0,212,255,.15);--r:8px;
+}
+body.light{
+  --bg:#f0f2f8;--bg2:#e4e8f4;--bg3:#d8ddf0;--border:#b8c4dc;
+  --accent:#0070cc;--accent2:#6040a0;--wrzt:#cc5500;--green:#1a8a50;
+  --red:#cc2040;--yellow:#aa8000;
+  --text:#1a2040;--text2:#4a5880;--text3:#8898c0;
+  --formula:#0a1020;--result:#0070cc;
+  --shadow:0 8px 32px rgba(0,0,0,.15);--glow:0 0 20px rgba(0,112,204,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;transition:background .3s,color .3s}
+
+header{display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:50px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+.logo-main{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.3rem;
+  letter-spacing:3px;color:var(--accent);text-transform:uppercase}
+.logo-sub{font-family:'Crimson Pro',serif;font-size:.8rem;color:var(--text2);
+  font-style:italic;margin-left:8px}
+.header-btns{display:flex;gap:6px}
+.icon-btn{width:34px;height:34px;border-radius:6px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.95rem;
+  transition:all .2s;font-family:'JetBrains Mono',monospace}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:var(--glow)}
+
+main{display:grid;grid-template-columns:330px 1fr;flex:1;overflow:hidden}
+
+/* ── LEFT ── */
+.left-panel{background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden}
+.sec-title{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);padding:8px 12px 6px;border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;display:flex;align-items:center;justify-content:space-between}
+.sec-action{font-size:.6rem;letter-spacing:1px;padding:2px 8px;border-radius:4px;
+  border:1px solid var(--border);background:transparent;color:var(--text3);
+  cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s}
+.sec-action:hover{border-color:var(--green);color:var(--green)}
+
+.formula-library{padding:8px;overflow-y:auto;max-height:220px;flex-shrink:0}
+.formula-cats{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px}
+.cat-btn{font-size:.58rem;padding:2px 7px;border-radius:4px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
+.cat-btn.active,.cat-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.06)}
+.cat-btn.wrzt-cat.active,.cat-btn.wrzt-cat:hover{border-color:var(--wrzt);color:var(--wrzt);background:rgba(255,140,66,.08)}
+.cat-btn.user-cat.active,.cat-btn.user-cat:hover{border-color:var(--yellow);color:var(--yellow);background:rgba(245,197,24,.08)}
+
+.formula-list{display:flex;flex-direction:column;gap:2px}
+.formula-item{padding:6px 10px;border-radius:5px;border:1px solid transparent;
+  cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:2px;position:relative}
+.formula-item:hover{border-color:var(--border);background:var(--bg3)}
+.formula-item.selected{border-color:var(--accent);background:rgba(0,212,255,.07)}
+.formula-item.wrzt-item.selected{border-color:var(--wrzt);background:rgba(255,140,66,.07)}
+.formula-item.user-item.selected{border-color:var(--yellow);background:rgba(245,197,24,.07)}
+.fi-name{font-size:.78rem;font-weight:600;color:var(--text);padding-right:46px}
+.fi-expr{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--accent)}
+.fi-expr.wrzt{color:var(--wrzt)}.fi-expr.user{color:var(--yellow)}
+.fi-btns{position:absolute;right:6px;top:6px;display:none;gap:3px}
+.formula-item:hover .fi-btns{display:flex}
+.fi-btn{width:22px;height:22px;border-radius:3px;border:1px solid var(--border);
+  background:var(--bg2);color:var(--text3);cursor:pointer;font-size:.65rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.fi-btn:hover{border-color:var(--accent);color:var(--accent)}
+.fi-btn.del:hover{border-color:var(--red);color:var(--red)}
+
+.var-inputs{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:7px}
+.var-group{display:flex;flex-direction:column;gap:3px}
+.var-label{font-size:.68rem;color:var(--text2);font-family:'JetBrains Mono',monospace;
+  display:flex;align-items:center;gap:5px}
+.var-label .sym{font-size:.95rem;color:var(--accent);min-width:22px;text-align:center}
+.var-label .sym.ws{color:var(--wrzt)}.var-label .sym.us{color:var(--yellow)}
+.var-label .desc{flex:1}.var-label .unit{color:var(--text3);font-size:.62rem;font-style:italic}
+.var-input-row{display:flex;gap:5px;align-items:center}
+.var-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;
+  padding:5px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem;
+  outline:none;transition:border-color .2s;width:100%}
+.var-input:focus{border-color:var(--accent)}
+.const-tag{font-size:.58rem;padding:3px 5px;background:var(--bg);
+  border:1px solid var(--green);border-radius:4px;color:var(--green);
+  font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.small-x{width:26px;height:26px;background:transparent;border:1px solid var(--border);
+  border-radius:4px;color:var(--text3);cursor:pointer;font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.small-x:hover{border-color:var(--red);color:var(--red)}
+
+.calc-btn{margin:0 8px 8px;padding:9px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:6px;color:#fff;
+  font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .2s;flex-shrink:0}
+.calc-btn:hover{opacity:.9;box-shadow:var(--shadow);transform:translateY(-1px)}
+.calc-btn.wb{background:linear-gradient(135deg,var(--wrzt),var(--accent2))}
+.calc-btn.ub{background:linear-gradient(135deg,var(--yellow),#a07030)}
+
+.sym-picker{padding:6px 8px;border-top:1px solid var(--border);flex-shrink:0}
+.sym-grid{display:flex;flex-wrap:wrap;gap:2px;margin-top:5px}
+.sym-key{width:26px;height:24px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:3px;color:var(--text2);cursor:pointer;font-size:.78rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+  font-family:'JetBrains Mono',monospace}
+.sym-key:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+
+.io-bar{display:flex;gap:5px;padding:6px 8px;border-top:1px solid var(--border);
+  flex-shrink:0;background:var(--bg2)}
+.io-btn{flex:1;padding:5px 2px;border-radius:5px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:1px;
+  text-transform:uppercase;transition:all .15s;text-align:center}
+.io-btn:hover{border-color:var(--accent);color:var(--accent)}
+.io-btn.d:hover{border-color:var(--red);color:var(--red)}
+
+/* ── RIGHT ── */
+.right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.formula-display{background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:14px 22px;min-height:90px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.formula-rendered{font-family:'Crimson Pro','Times New Roman',serif;font-size:1.9rem;
+  color:var(--formula);letter-spacing:2px;line-height:1.4;text-align:center;
+  min-height:48px;display:flex;align-items:center;justify-content:center}
+.formula-name{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);text-align:center;font-family:'JetBrains Mono',monospace}
+.result-area{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.result-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.rh{padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
+  font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);
+  font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.dot.g{background:var(--green)}.dot.o{background:var(--wrzt)}.dot.y{background:var(--yellow)}
+.result-value{padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:1.8rem;
+  font-weight:600;color:var(--result);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.result-unit{font-size:.9rem;color:var(--text2);font-weight:300}
+.result-sci{font-size:.72rem;color:var(--text3);padding:0 18px 10px;font-family:'JetBrains Mono',monospace}
+.step-row{padding:8px 14px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;
+  font-size:.75rem;color:var(--text2);display:flex;align-items:baseline;gap:8px;line-height:1.5}
+.step-row:last-child{border-bottom:none}
+.step-num{min-width:18px;color:var(--text3);font-size:.62rem}
+.step-text em{color:var(--accent);font-style:normal}
+.err-msg{padding:14px 18px;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.const-grid{display:grid;grid-template-columns:1fr 1fr}
+.const-row{padding:7px 12px;border-bottom:1px solid var(--border);
+  display:flex;flex-direction:column;gap:1px;transition:background .15s}
+.const-row:nth-child(odd){border-right:1px solid var(--border)}
+.const-row:hover{background:var(--bg3)}
+.csym{font-family:'Crimson Pro',serif;font-size:1rem;color:var(--accent)}
+.csym.w{color:var(--wrzt)}.csym.u{color:var(--yellow)}
+.cname{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.cval{font-size:.66rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.placeholder-msg{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;color:var(--text3);
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:2px}
+.placeholder-msg .big{font-size:2.2rem;opacity:.3}
+.bw{font-size:.5rem;padding:1px 4px;background:rgba(255,140,66,.15);
+  border:1px solid rgba(255,140,66,.4);border-radius:3px;color:var(--wrzt);
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;vertical-align:middle;margin-left:3px}
+.bu{font-size:.5rem;padding:1px 4px;background:rgba(245,197,24,.12);
+  border:1px solid rgba(245,197,24,.4);border-radius:3px;color:var(--yellow);
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;vertical-align:middle;margin-left:3px}
+
+/* ══ MODAL ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  width:100%;max-width:700px;max-height:92vh;display:flex;flex-direction:column;
+  box-shadow:var(--shadow);overflow:hidden}
+.mh{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+.mh-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;
+  letter-spacing:2px;color:var(--text)}
+.mh-close{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);
+  background:var(--bg2);color:var(--text2);cursor:pointer;display:flex;
+  align-items:center;justify-content:center;font-size:.95rem;transition:all .2s}
+.mh-close:hover{border-color:var(--red);color:var(--red)}
+.mb{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.mf{padding:10px 16px;border-top:1px solid var(--border);background:var(--bg3);
+  display:flex;gap:8px;justify-content:flex-end;align-items:center}
+
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);font-family:'JetBrains Mono',monospace}
+.field input,.field textarea,.field select{background:var(--bg3);border:1px solid var(--border);
+  border-radius:5px;padding:6px 9px;color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:.8rem;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:46px}
+.hint{font-size:.6rem;color:var(--text3);font-family:'JetBrains Mono',monospace;
+  line-height:1.6;margin-top:1px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+.vt-hdr{display:grid;grid-template-columns:72px 1fr 72px 90px 30px;gap:4px;
+  padding:3px 4px;font-size:.55rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text3);font-family:'JetBrains Mono',monospace}
+.vt-row{display:grid;grid-template-columns:72px 1fr 72px 90px 30px;gap:4px;align-items:center;margin-bottom:3px}
+.vt-row input{padding:5px 7px;font-size:.73rem}
+.vt-row select{padding:4px;font-size:.7rem;background:var(--bg3);
+  border:1px solid var(--border);border-radius:4px;color:var(--text);outline:none}
+.vt-del{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .15s}
+.vt-del:hover{border-color:var(--red);color:var(--red)}
+.add-var{padding:5px 10px;border-radius:4px;border:1px dashed var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:1px;
+  text-align:center;transition:all .2s;text-transform:uppercase;margin-top:3px;width:100%}
+.add-var:hover{border-color:var(--green);color:var(--green)}
+.expr-prev{background:var(--bg);border:1px solid var(--border);border-radius:5px;
+  padding:7px 12px;font-family:'Crimson Pro',serif;font-size:1.3rem;
+  color:var(--formula);text-align:center;min-height:42px;
+  display:flex;align-items:center;justify-content:center;margin-top:5px}
+
+.btn{padding:6px 14px;border-radius:5px;border:1px solid;cursor:pointer;
+  font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;transition:all .2s}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#000}
+.btn-p:hover{opacity:.85;box-shadow:var(--glow)}
+.btn-g{background:transparent;border-color:var(--border);color:var(--text2)}
+.btn-g:hover{border-color:var(--text2);color:var(--text)}
+.btn-r{background:transparent;border-color:var(--red);color:var(--red)}
+.btn-r:hover{background:var(--red);color:#fff}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+sup{font-size:.55em;vertical-align:super}sub{font-size:.55em;vertical-align:sub}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);
+  background:var(--bg2);flex-shrink:0}
+.tab-btn{flex:1;padding:8px 12px;background:transparent;border:none;
+  border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:2px;
+  text-transform:uppercase;transition:all .2s}
+.tab-btn:hover{color:var(--text2);background:var(--bg3)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── CONSTANTS TABLE ── */
+.const-section{margin-bottom:18px}
+.const-section-title{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--text3);font-family:'JetBrains Mono',monospace;padding:8px 4px 6px;
+  border-bottom:1px solid var(--border);margin-bottom:8px;
+  display:flex;align-items:center;gap:8px}
+.const-section-title .line{flex:1;height:1px;background:var(--border)}
+.ct{width:100%;border-collapse:collapse}
+.ct td{padding:7px 10px;border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;vertical-align:middle}
+.ct tr:last-child td{border-bottom:none}
+.ct tr:hover td{background:var(--bg3)}
+.ct .sym{font-family:'Crimson Pro',serif;font-size:1.05rem;
+  color:var(--accent);white-space:nowrap;width:60px}
+.ct .sym.w{color:var(--wrzt)}
+.ct .sym.g{color:var(--green)}
+.ct .cname{color:var(--text2);min-width:180px}
+.ct .cname small{display:block;font-size:.6rem;color:var(--text3);margin-top:1px}
+.ct .cval{color:var(--text);font-weight:600;text-align:right;white-space:nowrap}
+.ct .cunit{color:var(--text3);text-align:left;padding-left:8px;font-size:.68rem}
+.ct .ctoken{font-size:.6rem;padding:1px 5px;border-radius:3px;
+  border:1px solid var(--border);color:var(--text3);
+  background:var(--bg3);white-space:nowrap}
+.copy-val{width:22px;height:22px;border-radius:3px;border:1px solid var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;font-size:.65rem;
+  transition:all .15s;display:inline-flex;align-items:center;justify-content:center}
+.copy-val:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:baseline;gap:6px">
+    <span class="logo-main">PhysForm</span>
+    <span class="logo-sub">Formeleditor + WRZT</span>
+  </div>
+  <div class="header-btns">
+    <button class="icon-btn" id="themeBtn">☀</button>
+    <button class="icon-btn" id="fsBtn">⛶</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="sec-title">
+      ▸ Formelbibliothek
+      <button class="sec-action" onclick="openEditor(null)">＋ Neue Formel</button>
+    </div>
+    <div class="formula-library">
+      <div class="formula-cats" id="catBtns"></div>
+      <div class="formula-list" id="formulaList"></div>
+    </div>
+
+    <div class="sec-title">▸ Variableneingabe</div>
+    <div class="var-inputs" id="varInputs">
+      <div class="placeholder-msg" style="padding:20px;text-align:center">Formel auswählen →</div>
+    </div>
+
+    <button class="calc-btn" id="calcBtn" onclick="calculate()">⟹ Berechnen</button>
+
+    <div class="sym-picker">
+      <div class="sec-title" style="padding:0 0 5px;border:none">▸ Symbole</div>
+      <div class="sym-grid" id="symGrid"></div>
+    </div>
+
+    <div class="io-bar">
+      <button class="io-btn" onclick="exportJSON()">⬇ Export</button>
+      <button class="io-btn" onclick="document.getElementById('ifil').click()">⬆ Import</button>
+      <button class="io-btn d" onclick="clearUser()">✕ Reset</button>
+      <input type="file" id="ifil" accept=".json" style="display:none" onchange="importJSON(event)">
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="formula-display">
+      <div class="formula-name" id="fName">— Keine Formel ausgewählt —</div>
+      <div class="formula-rendered" id="fRend">⟨ Formel ⟩</div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-result" onclick="switchTab('result')">⟹ Ergebnis</button>
+      <button class="tab-btn" id="tab-const" onclick="switchTab('const')">∑ Konstanten</button>
+    </div>
+
+    <div class="result-area" id="resultArea">
+      <div class="placeholder-msg">
+        <div class="big">∫</div>
+        <div>Formel wählen · Werte eingeben · Berechnen</div>
+      </div>
+    </div>
+
+    <div class="result-area" id="constArea" style="display:none"></div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mh">
+      <span class="mh-title" id="mTitle">NEUE FORMEL</span>
+      <button class="mh-close" onclick="closeEditor()">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fr2">
+        <div class="field"><label>Name der Formel *</label>
+          <input id="eName" placeholder="z.B. Kinetische Energie"></div>
+        <div class="field"><label>Kategorie *</label>
+          <input id="eCat" placeholder="Mechanik / WRZT / …"></div>
+      </div>
+
+      <div class="field">
+        <label>Anzeigeformel * (HTML: &lt;sup&gt;, &lt;sub&gt; erlaubt)</label>
+        <input id="eDisp" placeholder="z.B. E = ½ · m · v²" oninput="updPrev()">
+        <div class="expr-prev" id="ePrev">Vorschau…</div>
+      </div>
+
+      <div class="field">
+        <label>Berechnungsausdruck * (JavaScript)</label>
+        <input id="eExpr" placeholder="0.5 * m * v**2   |   G * m1 * m2 / r**2">
+        <div class="hint">
+          Variablen aus Tabelle unten · Operatoren: + − * / ** Math.sqrt() Math.PI Math.abs()<br>
+          SI-Konstanten: C (Licht) · G · H (Planck) · KB · E_EL · EPS0 · ME · MP · NA · R_GAS<br>
+          WRZT: LW · TW · MW · CW · FW · EW
+        </div>
+      </div>
+
+      <div class="fr3">
+        <div class="field"><label>Ergebnis-Symbol *</label>
+          <input id="eRes" placeholder="E"></div>
+        <div class="field"><label>Ergebnis-Einheit</label>
+          <input id="eUnit" placeholder="J"></div>
+        <div class="field"><label>Typ</label>
+          <select id="eType">
+            <option value="user">Eigene</option>
+            <option value="wrzt">WRZT</option>
+          </select></div>
+      </div>
+
+      <div class="field">
+        <label>Variablen</label>
+        <div class="vt-hdr"><div>Symbol</div><div>Beschreibung</div><div>Einheit</div><div>Standardwert</div><div></div></div>
+        <div id="eVars"></div>
+        <button class="add-var" onclick="addRow()">＋ Variable hinzufügen</button>
+      </div>
+
+      <div class="field"><label>Notizen (optional)</label>
+        <textarea id="eNote" rows="2" placeholder="Herkunft, Bedingungen, Hinweise …"></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-r" id="mDel" onclick="delEditing()" style="display:none;margin-right:auto">🗑 Löschen</button>
+      <button class="btn btn-g" onclick="closeEditor()">Abbrechen</button>
+      <button class="btn btn-p" onclick="saveFormula()">💾 Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── CONSTANTS ── */
+const P={
+  c:{v:2.99792458e8},G:{v:6.67430e-11},h:{v:6.62607015e-34},
+  hb:{v:1.054571817e-34},kB:{v:1.380649e-23},e:{v:1.602176634e-19},
+  eps0:{v:8.8541878128e-12},mu0:{v:1.25663706212e-6},
+  me:{v:9.1093837015e-31},mp:{v:1.67262192369e-27},
+  NA:{v:6.02214076e23},R:{v:8.314462618},sig:{v:5.670374419e-8},
+  lw:{v:1.616255e-35},tw:{v:5.391247e-44},mw:{v:2.176434e-8},
+  cw:{v:2.99792458e8},fw:{v:1.8549e43},Ew:{v:1.9561e9}
+};
+const EC={C:P.c.v,G:P.G.v,H:P.h.v,HBAR:P.hb.v,KB:P.kB.v,E_EL:P.e.v,
+  EPS0:P.eps0.v,MU0:P.mu0.v,ME:P.me.v,MP:P.mp.v,NA:P.NA.v,
+  R_GAS:P.R.v,SIGMA:P.sig.v,
+  LW:P.lw.v,TW:P.tw.v,MW:P.mw.v,CW:P.cw.v,FW:P.fw.v,EW:P.Ew.v,
+  PI:Math.PI,E:Math.E};
+
+/* ── BUILTINS ── */
+const BUILTIN=[
+  {id:'f1',cat:'Mechanik',name:'Newtons 2. Gesetz',display:'F = m · a',
+   expr:'m*a',vars:[{id:'m',sym:'m',name:'Masse',unit:'kg'},{id:'a',sym:'a',name:'Beschleunigung',unit:'m/s²'}],
+   resSym:'F',resUnit:'N'},
+  {id:'f2',cat:'Mechanik',name:'Kinetische Energie',display:'E<sub>kin</sub> = ½ · m · v²',
+   expr:'0.5*m*v**2',vars:[{id:'m',sym:'m',name:'Masse',unit:'kg'},{id:'v',sym:'v',name:'Geschwindigkeit',unit:'m/s'}],
+   resSym:'E',resUnit:'J'},
+  {id:'f3',cat:'Mechanik',name:'Potentielle Energie',display:'E<sub>pot</sub> = m · g · h',
+   expr:'m*g*h',vars:[{id:'m',sym:'m',name:'Masse',unit:'kg'},{id:'g',sym:'g',name:'Erdbeschleunigung',unit:'m/s²',default:9.81},{id:'h',sym:'h',name:'Höhe',unit:'m'}],
+   resSym:'E',resUnit:'J'},
+  {id:'f4',cat:'Mechanik',name:'Freier Fall (Weg)',display:'s = ½ · a · t²',
+   expr:'0.5*a*t**2',vars:[{id:'a',sym:'a',name:'Beschleunigung',unit:'m/s²',default:9.81},{id:'t',sym:'t',name:'Zeit',unit:'s'}],
+   resSym:'s',resUnit:'m'},
+  {id:'f5',cat:'Mechanik',name:'Gravitationskraft',display:'F = G · m₁ · m₂ / r²',
+   expr:'G*m1*m2/r**2',vars:[{id:'m1',sym:'m₁',name:'Masse 1',unit:'kg'},{id:'m2',sym:'m₂',name:'Masse 2',unit:'kg'},{id:'r',sym:'r',name:'Abstand',unit:'m'},{id:'G',sym:'G',name:'Gravitationskonst.',unit:'N·m²/kg²',default:P.G.v}],
+   resSym:'F',resUnit:'N'},
+  {id:'f6',cat:'Mechanik',name:'Impuls',display:'p = m · v',
+   expr:'m*v',vars:[{id:'m',sym:'m',name:'Masse',unit:'kg'},{id:'v',sym:'v',name:'Geschwindigkeit',unit:'m/s'}],
+   resSym:'p',resUnit:'kg·m/s'},
+  {id:'f7',cat:'Elektrik',name:'Ohmsches Gesetz',display:'U = R · I',
+   expr:'R*I',vars:[{id:'R',sym:'R',name:'Widerstand',unit:'Ω'},{id:'I',sym:'I',name:'Stromstärke',unit:'A'}],
+   resSym:'U',resUnit:'V'},
+  {id:'f8',cat:'Elektrik',name:'El. Leistung',display:'P = U · I',
+   expr:'U*I',vars:[{id:'U',sym:'U',name:'Spannung',unit:'V'},{id:'I',sym:'I',name:'Strom',unit:'A'}],
+   resSym:'P',resUnit:'W'},
+  {id:'f9',cat:'Elektrik',name:'Coulomb-Kraft',display:'F = k<sub>e</sub> · q₁ · q₂ / r²',
+   expr:'(1/(4*PI*EPS0))*q1*q2/r**2',vars:[{id:'q1',sym:'q₁',name:'Ladung 1',unit:'C'},{id:'q2',sym:'q₂',name:'Ladung 2',unit:'C'},{id:'r',sym:'r',name:'Abstand',unit:'m'}],
+   resSym:'F',resUnit:'N'},
+  {id:'f10',cat:'Thermo',name:'Ideales Gasgesetz',display:'p = n · R · T / V',
+   expr:'n*R_GAS*T/V',vars:[{id:'n',sym:'n',name:'Stoffmenge',unit:'mol'},{id:'T',sym:'T',name:'Temperatur',unit:'K'},{id:'V',sym:'V',name:'Volumen',unit:'m³'}],
+   resSym:'p',resUnit:'Pa',notes:'R = 8.314 J/(mol·K) automatisch'},
+  {id:'f11',cat:'Quanten',name:'Photonenenergie',display:'E = h · f',
+   expr:'H*f',vars:[{id:'f',sym:'f',name:'Frequenz',unit:'Hz'}],
+   resSym:'E',resUnit:'J',notes:'h = 6.626×10⁻³⁴ J·s (automatisch)'},
+  {id:'f12',cat:'Quanten',name:'De-Broglie-Wellenlänge',display:'λ = h / (m · v)',
+   expr:'H/(m*v)',vars:[{id:'m',sym:'m',name:'Masse',unit:'kg'},{id:'v',sym:'v',name:'Geschwindigkeit',unit:'m/s'}],
+   resSym:'λ',resUnit:'m'},
+  {id:'f13',cat:'Relativ',name:'Masse-Energie-Äquiv.',display:'E = m · c²',
+   expr:'m*C**2',vars:[{id:'m',sym:'m',name:'Masse',unit:'kg'}],
+   resSym:'E',resUnit:'J',notes:'c = 2.998×10⁸ m/s (automatisch)'},
+  {id:'w1',cat:'WRZT',name:'WRZT Raumwellenenergie',display:'E<sub>W</sub> = m<sub>W</sub> · c<sub>W</sub>²',
+   expr:'mW*cW**2',vars:[{id:'mW',sym:'m_W',name:'WRZT Masse',unit:'kg',default:P.mw.v,wrzt:true},{id:'cW',sym:'c_W',name:'Wellengeschw.',unit:'m/s',default:P.cw.v,wrzt:true}],
+   resSym:'E_W',resUnit:'J',wrzt:true},
+  {id:'w2',cat:'WRZT',name:'WRZT Grundfrequenz-Energie',display:'E = h · f<sub>W</sub>',
+   expr:'H*fW',vars:[{id:'fW',sym:'f_W',name:'WRZT Grundfrequenz',unit:'Hz',default:P.fw.v,wrzt:true}],
+   resSym:'E',resUnit:'J',wrzt:true,notes:'h automatisch; f_W = WRZT Grundfrequenz'},
+  {id:'w3',cat:'WRZT',name:'WRZT Wellenlänge · Frequenz',display:'c = λ<sub>W</sub> · f<sub>W</sub>',
+   expr:'lW*fW',vars:[{id:'lW',sym:'λ_W',name:'WRZT Wellenlänge',unit:'m',default:P.lw.v,wrzt:true},{id:'fW',sym:'f_W',name:'WRZT Frequenz',unit:'Hz',default:P.fw.v,wrzt:true}],
+   resSym:'c_eff',resUnit:'m/s',wrzt:true},
+];
+
+/* ── STATE ── */
+let ALL=[];
+let CUR=null;
+let dark=true;
+let editId=null;
+let rc=0;
+const SK='physform_v2';
+
+function loadUser(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch{return[];}}
+function saveUser(a){try{localStorage.setItem(SK,JSON.stringify(a));}catch{}}
+
+function rebuild(){ALL=[...BUILTIN,...loadUser()];}
+
+/* ── EVAL ── */
+function calc(expr,vars){
+  const ctx={...EC,...vars,Math};
+  const ks=Object.keys(ctx),vs=ks.map(k=>ctx[k]);
+  try{
+    const safe=expr.replace(/\^/g,'**');
+    return new Function(...ks,`"use strict";return(${safe});`)(...vs);
+  }catch{return NaN;}
+}
+
+/* ── FORMAT ── */
+function fmt(n){
+  if(n===undefined||n===null||isNaN(n))return'?';
+  if(n===0)return'0';
+  const a=Math.abs(n);
+  if(a>=1e5||a<1e-3)return n.toExponential(5);
+  return parseFloat(n.toPrecision(7)).toString();
+}
+function sci(n){if(!isFinite(n))return'—';const p=n.toExponential(6).split('e');return`${p[0]} × 10^${p[1]}`;}
+function hilite(s){return s.replace(/(-?\d[\d.]*(?:e[+\-]?\d+)?)/g,'<em>$1</em>');}
+
+/* ── CATS ── */
+let actCat='Alle';
+function cats(){return['Alle',...new Set(ALL.map(f=>f.cat))];}
+function initCats(){
+  document.getElementById('catBtns').innerHTML=cats().map(c=>{
+    const wz=c==='WRZT',uc=loadUser().some(f=>f.cat===c)&&c!=='WRZT';
+    return`<button class="cat-btn ${wz?'wrzt-cat':uc?'user-cat':''} ${c===actCat?'active':''}"
+      onclick="setCat('${c}')">${c}</button>`;
+  }).join('');
+}
+function setCat(c){actCat=c;initCats();renderList();}
+
+/* ── LIST ── */
+function renderList(){
+  const fl=actCat==='Alle'?ALL:ALL.filter(f=>f.cat===actCat);
+  document.getElementById('formulaList').innerHTML=fl.map(f=>{
+    const w=f.wrzt,u=f.source==='user',s=CUR?.id===f.id;
+    const badge=w?`<span class="bw">WRZT</span>`:u?`<span class="bu">Eigen</span>`:'';
+    return`<div class="formula-item ${w?'wrzt-item':u?'user-item':''} ${s?'selected':''}" onclick="sel('${f.id}')">
+      <div class="fi-name">${f.name}${badge}</div>
+      <div class="fi-expr ${w?'wrzt':u?'user':''}">${f.display.replace(/<[^>]+>/g,'')}</div>
+      <div class="fi-btns">
+        <button class="fi-btn" onclick="event.stopPropagation();openEditor('${f.id}')">✎</button>
+        ${u?`<button class="fi-btn del" onclick="event.stopPropagation();delF('${f.id}')">✕</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function sel(id){
+  CUR=ALL.find(f=>f.id===id);
+  renderList();renderVars();renderDisp();
+  document.getElementById('resultArea').innerHTML=`<div class="placeholder-msg"><div>Werte eingeben → Berechnen</div></div>`;
+  const cb=document.getElementById('calcBtn');
+  cb.className='calc-btn'+(CUR?.wrzt?' wb':CUR?.source==='user'?' ub':'');
+}
+
+function renderDisp(){
+  if(!CUR)return;
+  const w=CUR.wrzt,u=CUR.source==='user';
+  document.getElementById('fName').innerHTML=CUR.name+(w?`<span class="bw">WRZT</span>`:u?`<span class="bu">Eigen</span>`:'');
+  document.getElementById('fRend').innerHTML=CUR.display;
+}
+
+function renderVars(){
+  if(!CUR)return;
+  document.getElementById('varInputs').innerHTML=CUR.vars.map(v=>{
+    const wsc=v.wrzt?'ws':CUR.source==='user'?'us':'';
+    const dv=v.default!==undefined?v.default:'';
+    return`<div class="var-group">
+      <div class="var-label">
+        <span class="sym ${wsc}">${v.sym}</span>
+        <span class="desc">${v.name}</span>
+        <span class="unit">[${v.unit}]</span>
+      </div>
+      <div class="var-input-row">
+        <input class="var-input" id="i_${v.id}" type="number" step="any" value="${dv}" placeholder="Wert …">
+        <button class="small-x" onclick="document.getElementById('i_${v.id}').value='';document.getElementById('i_${v.id}').focus()">✕</button>
+      </div>
+      ${v.notes?`<div class="hint" style="padding-left:2px">${v.notes}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ── CALCULATE ── */
+function calculate(){
+  if(!CUR){alert('Formel auswählen!');return;}
+  const vals={};let ok=true;
+  for(const v of CUR.vars){
+    const el=document.getElementById('i_'+v.id);
+    if(!el){ok=false;break;}
+    const n=parseFloat(el.value);
+    if(isNaN(n)){el.style.borderColor='var(--red)';ok=false;}
+    else{el.style.borderColor='';vals[v.id]=n;}
+  }
+  if(!ok){
+    document.getElementById('resultArea').innerHTML=`<div class="result-block"><div class="rh"><span class="dot" style="background:var(--red)"></span>Eingabefehler</div><div class="err-msg">⚠ Alle Felder mit Zahlen füllen.</div></div>`;
+    return;
+  }
+  const res=calc(CUR.expr,vals);
+  const w=CUR.wrzt,u=CUR.source==='user';
+  const ac=w?'var(--wrzt)':u?'var(--yellow)':'var(--accent)';
+  const dc=w?'o':u?'y':'';
+
+  // Steps
+  const steps=[`Formel: ${CUR.display.replace(/<[^>]+>/g,'')}` ];
+  if(CUR.notes) steps.push(`Hinweis: ${CUR.notes}`);
+  // Substituted expression
+  let subst=CUR.expr;
+  Object.keys(vals).sort((a,b)=>b.length-a.length).forEach(k=>{subst=subst.replaceAll(k,fmt(vals[k]));});
+  steps.push(`Einsetzen: ${subst}`);
+  steps.push(`${CUR.resSym} = ${fmt(res)} ${CUR.resUnit}`);
+  if(isNaN(res)) steps.push('⚠ Rechenfehler – Ausdruck prüfen');
+
+  document.getElementById('resultArea').innerHTML=`
+    <div class="result-block">
+      <div class="rh"><span class="dot ${dc}"></span>Ergebnis · ${CUR.name}</div>
+      <div class="result-value" style="color:${ac}">${CUR.resSym} = ${fmt(res)} <span class="result-unit">${CUR.resUnit}</span></div>
+      <div class="result-sci">Wissenschaftlich: ${sci(res)}</div>
+      ${!isNaN(res)&&CUR.resUnit==='J'?`<div class="result-sci">In eV: ${fmt(res/P.e.v)} eV</div>`:''}
+    </div>
+    <div class="result-block">
+      <div class="rh"><span class="dot g"></span>Lösungsweg</div>
+      ${steps.map((s,i)=>`<div class="step-row"><span class="step-num">${i+1}.</span><span class="step-text">${hilite(s)}</span></div>`).join('')}
+    </div>
+    <div class="result-block">
+      <div class="rh"><span class="dot"></span>Variablen</div>
+      <div class="const-grid">
+        ${CUR.vars.map(v=>{
+          const n=parseFloat(document.getElementById('i_'+v.id)?.value);
+          const wc=v.wrzt?'w':CUR.source==='user'?'u':'';
+          return`<div class="const-row"><div class="csym ${wc}">${v.sym}</div><div class="cname">${v.name}</div><div class="cval">${fmt(n)} ${v.unit}</div></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+/* ── EDITOR ── */
+function openEditor(id){
+  editId=id; rc=0;
+  document.getElementById('eVars').innerHTML='';
+  const f=id?ALL.find(x=>x.id===id):null;
+  document.getElementById('mTitle').textContent=f?'FORMEL BEARBEITEN':'NEUE FORMEL';
+  document.getElementById('mDel').style.display=f?.source==='user'?'flex':'none';
+  document.getElementById('eName').value=f?.name||'';
+  document.getElementById('eCat').value=f?.cat||'';
+  document.getElementById('eDisp').value=f?.display||'';
+  document.getElementById('eExpr').value=f?.expr||'';
+  document.getElementById('eRes').value=f?.resSym||'';
+  document.getElementById('eUnit').value=f?.resUnit||'';
+  document.getElementById('eNote').value=f?.notes||'';
+  document.getElementById('eType').value=f?.wrzt?'wrzt':'user';
+  if(f?.vars?.length)f.vars.forEach(v=>addRow(v)); else addRow();
+  updPrev();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeEditor(){document.getElementById('overlay').classList.remove('open');}
+function updPrev(){
+  const v=document.getElementById('eDisp').value;
+  document.getElementById('ePrev').innerHTML=v||`<span style="opacity:.3">Vorschau…</span>`;
+}
+function addRow(v=null){
+  rc++;const i=rc;
+  const row=document.createElement('div');
+  row.className='vt-row';row.id='vr'+i;
+  row.innerHTML=`
+    <input class="var-input" id="vs${i}" placeholder="v" value="${v?.sym||''}">
+    <input class="var-input" id="vn${i}" placeholder="Beschreibung" value="${v?.name||''}">
+    <input class="var-input" id="vu${i}" placeholder="Einheit" value="${v?.unit||''}">
+    <input class="var-input" id="vd${i}" placeholder="leer=kein" type="number" step="any" value="${v?.default!==undefined?v.default:''}">
+    <button class="vt-del" onclick="document.getElementById('vr${i}').remove()">✕</button>`;
+  document.getElementById('eVars').appendChild(row);
+}
+function getRows(){
+  return[...document.querySelectorAll('[id^="vr"]')].map(r=>{
+    const i=r.id.slice(2);
+    const sym=document.getElementById('vs'+i)?.value.trim();
+    if(!sym)return null;
+    const obj={id:sym.replace(/[^a-zA-Z0-9_]/g,'_'),sym,
+      name:document.getElementById('vn'+i)?.value.trim()||sym,
+      unit:document.getElementById('vu'+i)?.value.trim()||''};
+    const dv=document.getElementById('vd'+i)?.value.trim();
+    if(dv!=='')obj.default=parseFloat(dv);
+    return obj;
+  }).filter(Boolean);
+}
+function saveFormula(){
+  const name=document.getElementById('eName').value.trim();
+  const cat=document.getElementById('eCat').value.trim()||'Eigene';
+  const disp=document.getElementById('eDisp').value.trim();
+  const expr=document.getElementById('eExpr').value.trim();
+  const resSym=document.getElementById('eRes').value.trim();
+  const resUnit=document.getElementById('eUnit').value.trim();
+  const notes=document.getElementById('eNote').value.trim();
+  const type=document.getElementById('eType').value;
+  const vars=getRows();
+  if(!name||!disp||!expr||!resSym){alert('Name, Anzeige, Ausdruck und Ergebnis-Symbol sind Pflichtfelder!');return;}
+  if(!vars.length){alert('Mindestens eine Variable eingeben!');return;}
+  const id=editId||('u'+Date.now());
+  const f={id,cat,name,display:disp,expr,vars,resSym,resUnit,source:'user',wrzt:type==='wrzt',notes:notes||undefined};
+  let us=loadUser();const ix=us.findIndex(x=>x.id===id);
+  if(ix>=0)us[ix]=f; else us.push(f);
+  saveUser(us);rebuild();initCats();renderList();closeEditor();sel(id);
+}
+function delF(id){
+  if(!confirm('Formel wirklich löschen?'))return;
+  saveUser(loadUser().filter(f=>f.id!==id));
+  if(CUR?.id===id){CUR=null;document.getElementById('fName').textContent='— Keine Formel —';document.getElementById('fRend').innerHTML='⟨ Formel ⟩';document.getElementById('varInputs').innerHTML='<div class="placeholder-msg" style="padding:20px;text-align:center">Formel auswählen →</div>';document.getElementById('resultArea').innerHTML='<div class="placeholder-msg"><div class="big">∫</div><div>Formel wählen</div></div>';}
+  rebuild();initCats();renderList();
+}
+function delEditing(){if(editId)delF(editId);closeEditor();}
+function clearUser(){if(!confirm('Alle eigenen Formeln löschen?'))return;saveUser([]);rebuild();initCats();renderList();}
+
+/* ── EXPORT / IMPORT ── */
+function exportJSON(){
+  const u=loadUser();if(!u.length){alert('Keine eigenen Formeln.');return;}
+  const b=new Blob([JSON.stringify(u,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='physform_formeln.json';a.click();
+}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(!Array.isArray(d))throw new Error('Kein Array');
+      let ex=loadUser();let n=0;
+      d.forEach(f=>{if(!f.id||!f.name||!f.expr)return;f.source='user';const i=ex.findIndex(x=>x.id===f.id);if(i>=0)ex[i]=f;else{ex.push(f);n++;}});
+      saveUser(ex);rebuild();initCats();renderList();alert(`Import OK: ${n} neue Formeln.`);
+    }catch(err){alert('Fehler: '+err.message);}
+  };
+  r.readAsText(f);e.target.value='';
+}
+
+/* ── SYMBOLS ── */
+const SYM=['α','β','γ','δ','ε','ζ','η','θ','λ','μ','ν','π','ρ','σ','τ','φ','ψ','ω',
+  'Δ','Σ','Ω','ħ','∞','∂','∇','∫','√','≈','≠','≤','≥','·','×','÷',
+  '⁰','¹','²','³','⁴','⁻','₀','₁','₂','₃','→','⟹','±'];
+document.getElementById('symGrid').innerHTML=SYM.map(s=>`<div class="sym-key" onclick="ins('${s}')">${s}</div>`).join('');
+function ins(s){const a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')){const st=a.selectionStart,en=a.selectionEnd;a.value=a.value.slice(0,st)+s+a.value.slice(en);a.selectionStart=a.selectionEnd=st+s.length;}}
+
+/* ── TABS ── */
+function switchTab(t){
+  document.getElementById('tab-result').classList.toggle('active',t==='result');
+  document.getElementById('tab-const').classList.toggle('active',t==='const');
+  document.getElementById('resultArea').style.display=t==='result'?'flex':'none';
+  document.getElementById('constArea').style.display=t==='const'?'flex':'none';
+  if(t==='const') renderConsts();
+}
+
+/* ── FULL CONSTANTS DATABASE ── */
+const CONST_SECTIONS=[
+  {
+    title:'Universelle Konstanten',
+    rows:[
+      {sym:'c',       name:'Lichtgeschwindigkeit',   sub:'im Vakuum',               val:'299 792 458',         exp:'',      unit:'m s⁻¹',        token:'C',     exact:true},
+      {sym:'G',       name:'Gravitationskonstante',  sub:'Newton\'sche',             val:'6.674 30 × 10⁻¹¹',   exp:'-11',   unit:'m³ kg⁻¹ s⁻²', token:'G'},
+      {sym:'h',       name:'Planck-Konstante',       sub:'',                         val:'6.626 070 15 × 10⁻³⁴',exp:'-34',  unit:'J s',          token:'H',     exact:true},
+      {sym:'ħ',       name:'Red. Planck-Konstante',  sub:'h / 2π',                  val:'1.054 571 817 × 10⁻³⁴',exp:'-34', unit:'J s',          token:'HBAR'},
+      {sym:'ε₀',      name:'El. Feldkonstante',      sub:'Permittivität Vakuum',     val:'8.854 187 8128 × 10⁻¹²',exp:'-12',unit:'F m⁻¹',       token:'EPS0'},
+      {sym:'μ₀',      name:'Mag. Feldkonstante',     sub:'Permeabilität Vakuum',     val:'1.256 637 062 12 × 10⁻⁶',exp:'-6',unit:'N A⁻²',       token:'MU0'},
+      {sym:'Z₀',      name:'Wellenwiderstand Vakuum',sub:'√(μ₀/ε₀)',                val:'376.730 313 668',      exp:'',      unit:'Ω',            token:'–'},
+    ]
+  },
+  {
+    title:'Elektromagnetismus & Quantenphysik',
+    rows:[
+      {sym:'e',       name:'Elementarladung',        sub:'Ladung des Protons',       val:'1.602 176 634 × 10⁻¹⁹',exp:'-19', unit:'C',            token:'E_EL',  exact:true},
+      {sym:'mₑ',      name:'Elektronenmasse',        sub:'',                         val:'9.109 383 7015 × 10⁻³¹',exp:'-31',unit:'kg',           token:'ME'},
+      {sym:'mₚ',      name:'Protonenmasse',          sub:'',                         val:'1.672 621 923 69 × 10⁻²⁷',exp:'-27',unit:'kg',         token:'MP'},
+      {sym:'mₙ',      name:'Neutronenmasse',         sub:'',                         val:'1.674 927 498 04 × 10⁻²⁷',exp:'-27',unit:'kg',         token:'–'},
+      {sym:'mᵤ',      name:'Atomare Masseeinheit',   sub:'u = 1/12 m(¹²C)',         val:'1.660 539 066 60 × 10⁻²⁷',exp:'-27',unit:'kg',         token:'–'},
+      {sym:'αₑ',      name:'Feinstrukturkonstante',  sub:'e²/(4πε₀ħc)',             val:'7.297 352 5693 × 10⁻³',  exp:'-3',  unit:'(dimensionslos)',token:'–'},
+      {sym:'rₑ',      name:'Klass. Elektronenradius',sub:'',                        val:'2.817 940 3227 × 10⁻¹⁵', exp:'-15', unit:'m',           token:'–'},
+      {sym:'λ꜀',      name:'Compton-Wellenlänge',    sub:'h/(mₑ c)',                 val:'2.426 310 238 67 × 10⁻¹²',exp:'-12',unit:'m',          token:'–'},
+      {sym:'μ_B',     name:'Bohrsches Magneton',     sub:'eħ/(2mₑ)',                 val:'9.274 010 0783 × 10⁻²⁴', exp:'-24', unit:'J T⁻¹',       token:'–'},
+      {sym:'a₀',      name:'Bohrscher Radius',       sub:'',                         val:'5.291 772 109 03 × 10⁻¹¹',exp:'-11',unit:'m',          token:'–'},
+    ]
+  },
+  {
+    title:'Thermodynamik & Chemie',
+    rows:[
+      {sym:'k_B',     name:'Boltzmann-Konstante',    sub:'',                         val:'1.380 649 × 10⁻²³',    exp:'-23',  unit:'J K⁻¹',       token:'KB',    exact:true},
+      {sym:'Nₐ',      name:'Avogadro-Konstante',     sub:'',                         val:'6.022 140 76 × 10²³',  exp:'+23',  unit:'mol⁻¹',       token:'NA',    exact:true},
+      {sym:'R',       name:'Gaskonstante',            sub:'k_B · Nₐ',               val:'8.314 462 618',         exp:'',      unit:'J mol⁻¹ K⁻¹', token:'R_GAS', exact:true},
+      {sym:'F',       name:'Faraday-Konstante',      sub:'e · Nₐ',                  val:'96 485.332 12',         exp:'',      unit:'C mol⁻¹',     token:'–'},
+      {sym:'σ',       name:'Stefan-Boltzmann-Konst.',sub:'',                         val:'5.670 374 419 × 10⁻⁸', exp:'-8',   unit:'W m⁻² K⁻⁴',   token:'SIGMA'},
+      {sym:'b',       name:'Wiensches Verschiebungsg.',sub:'',                       val:'2.897 771 955 × 10⁻³', exp:'-3',   unit:'m K',         token:'–'},
+      {sym:'eV',      name:'Elektronenvolt',          sub:'Umrechnungsfaktor',       val:'1.602 176 634 × 10⁻¹⁹',exp:'-19', unit:'J',            token:'–',     exact:true},
+    ]
+  },
+  {
+    title:'Astronomie & Gravitation',
+    rows:[
+      {sym:'M☉',      name:'Sonnenmasse',             sub:'',                        val:'1.988 416 × 10³⁰',     exp:'+30',  unit:'kg',          token:'–'},
+      {sym:'R☉',      name:'Sonnenradius',            sub:'',                        val:'6.957 × 10⁸',          exp:'+8',   unit:'m',           token:'–'},
+      {sym:'M♁',      name:'Erdmasse',                sub:'',                        val:'5.972 168 × 10²⁴',     exp:'+24',  unit:'kg',          token:'–'},
+      {sym:'R♁',      name:'Erdradius (äquatorial)',  sub:'',                        val:'6.378 137 × 10⁶',      exp:'+6',   unit:'m',           token:'–'},
+      {sym:'g',       name:'Normschwere',             sub:'Erdoberfläche',           val:'9.806 65',              exp:'',      unit:'m s⁻²',       token:'–'},
+      {sym:'AU',      name:'Astronomische Einheit',   sub:'Erde–Sonne',              val:'1.495 978 707 × 10¹¹', exp:'+11',  unit:'m',           token:'–'},
+      {sym:'ly',      name:'Lichtjahr',               sub:'',                        val:'9.460 730 473 × 10¹⁵', exp:'+15',  unit:'m',           token:'–'},
+      {sym:'pc',      name:'Parsec',                  sub:'',                        val:'3.085 677 581 × 10¹⁶', exp:'+16',  unit:'m',           token:'–'},
+      {sym:'H₀',      name:'Hubble-Konstante',        sub:'(Planck 2018)',           val:'67.66',                 exp:'',      unit:'km s⁻¹ Mpc⁻¹',token:'–'},
+    ]
+  },
+  {
+    title:'WRZT – Wellenraumzeit-Theorie',
+    wrzt:true,
+    rows:[
+      {sym:'λ_W',     name:'WRZT Wellenlänge',        sub:'Planck-Länge',            val:'1.616 255 × 10⁻³⁵',   exp:'-35',  unit:'m',           token:'LW',    wrzt:true},
+      {sym:'τ_W',     name:'WRZT Zeitquantum',         sub:'Planck-Zeit',            val:'5.391 247 × 10⁻⁴⁴',   exp:'-44',  unit:'s',           token:'TW',    wrzt:true},
+      {sym:'m_W',     name:'WRZT Masseeinheit',        sub:'Planck-Masse',           val:'2.176 434 × 10⁻⁸',    exp:'-8',   unit:'kg',          token:'MW',    wrzt:true},
+      {sym:'c_W',     name:'WRZT Wellengeschwindigkeit',sub:'= c (Lichtgeschw.)',    val:'2.997 924 58 × 10⁸',   exp:'+8',   unit:'m s⁻¹',       token:'CW',    wrzt:true},
+      {sym:'f_W',     name:'WRZT Grundfrequenz',       sub:'Planck-Frequenz',        val:'1.854 9 × 10⁴³',       exp:'+43',  unit:'Hz',          token:'FW',    wrzt:true},
+      {sym:'E_W',     name:'WRZT Raumenergie',         sub:'Planck-Energie',         val:'1.956 1 × 10⁹',        exp:'+9',   unit:'J',           token:'EW',    wrzt:true},
+      {sym:'ℓ_P',     name:'Planck-Länge',             sub:'√(ħG/c³)',              val:'1.616 255 × 10⁻³⁵',    exp:'-35',  unit:'m',           token:'–',     wrzt:true},
+      {sym:'t_P',     name:'Planck-Zeit',              sub:'ℓ_P / c',               val:'5.391 247 × 10⁻⁴⁴',    exp:'-44',  unit:'s',           token:'–',     wrzt:true},
+      {sym:'T_P',     name:'Planck-Temperatur',        sub:'m_P c² / k_B',          val:'1.416 784 × 10³²',      exp:'+32',  unit:'K',           token:'–',     wrzt:true},
+      {sym:'q_P',     name:'Planck-Ladung',            sub:'√(4πε₀ħc)',             val:'1.875 545 × 10⁻¹⁸',    exp:'-18',  unit:'C',           token:'–',     wrzt:true},
+    ]
+  },
+  {
+    title:'Mathematische Konstanten',
+    green:true,
+    rows:[
+      {sym:'π',       name:'Pi',                      sub:'Kreiszahl',               val:'3.141 592 653 589 793',exp:'',     unit:'(dimensionslos)',token:'PI',  exact:true},
+      {sym:'e',       name:'Eulersche Zahl',           sub:'Basis des Nat. Log.',    val:'2.718 281 828 459 045',exp:'',     unit:'(dimensionslos)',token:'E',   exact:true},
+      {sym:'φ',       name:'Goldener Schnitt',         sub:'(1+√5)/2',               val:'1.618 033 988 749 895',exp:'',     unit:'(dimensionslos)',token:'–'},
+      {sym:'√2',      name:'Wurzel aus 2',             sub:'',                       val:'1.414 213 562 373 095',exp:'',     unit:'(dimensionslos)',token:'–'},
+      {sym:'ln 2',    name:'Natürlicher Log. von 2',  sub:'',                        val:'0.693 147 180 559 945',exp:'',     unit:'(dimensionslos)',token:'–'},
+    ]
+  }
+];
+
+function renderConsts(){
+  const area=document.getElementById('constArea');
+  area.innerHTML=CONST_SECTIONS.map(sec=>`
+    <div class="const-section">
+      <div class="const-section-title">
+        <span>${sec.wrzt?'<span class="bw">WRZT</span> ':sec.green?'':''}${sec.title}</span>
+        <span class="line"></span>
+      </div>
+      <table class="ct">
+        ${sec.rows.map(r=>`
+          <tr>
+            <td class="sym ${r.wrzt?'w':sec.green?'g':''}">${r.sym}</td>
+            <td class="cname">${r.name}${r.sub?`<small>${r.sub}</small>`:''}</td>
+            <td class="cval">${r.val}${r.exact?'<span title="exakter Wert" style="color:var(--green);margin-left:4px;font-size:.6rem">✓</span>':''}</td>
+            <td class="cunit">${r.unit}</td>
+            <td style="padding:4px 6px;white-space:nowrap">
+              ${r.token!=='–'?`<span class="ctoken" title="Bezeichner im Berechnungsausdruck">${r.token}</span>`:''}
+              <button class="copy-val" onclick="cpv('${r.val.replace(/\s/g,'')}')" title="Wert kopieren">⎘</button>
+            </td>
+          </tr>`).join('')}
+      </table>
+    </div>`).join('');
+}
+
+function cpv(v){
+  navigator.clipboard?.writeText(v).then(()=>{
+    const el=event.target;
+    el.textContent='✓'; el.style.color='var(--green)';
+    setTimeout(()=>{el.textContent='⎘';el.style.color='';},1200);
+  });
+}
+
+document.getElementById('themeBtn').addEventListener('click',()=>{dark=!dark;document.body.classList.toggle('light',!dark);document.getElementById('themeBtn').textContent=dark?'☀':'☾';});
+document.getElementById('fsBtn').addEventListener('click',()=>{
+  if(!document.fullscreenElement)(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen||function(){}).call(document.documentElement);
+  else(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);
+});
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeEditor();});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('overlay').classList.contains('open'))calculate();if(e.key==='Escape')closeEditor();});
+
+/* ── INIT ── */
+rebuild();initCats();renderList();
+</script>
+</body>
+</html>
