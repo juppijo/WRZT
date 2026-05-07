@@ -436,9 +436,9 @@ sup{font-size:.55em;vertical-align:super}sub{font-size:.55em;vertical-align:sub}
 /* ══ CONSTANTS ══ */
 const PC = {
   C:2.99792458e8, G:6.67430e-11, H:6.62607015e-34, HBAR:1.054571817e-34,
-  KB:1.380649e-23, E_EL:1.602176634e-19, EPS0:8.8541878128e-12,
+  KB:1.380649e-23, E_EL:1.602176634e-19, EPS0:8.8541878128e-12, E:1.602176634e-19,
   ME:9.1093837015e-31, MP:1.67262192369e-27, NA:6.02214076e23,
-  R_GAS:8.314462618, SIGMA:5.670374419e-8,
+  R_GAS:8.314462618, SIGMA:5.670374419e-8, ALPHA:7.2973525693e-3,
   // Astro
   M_SUN:1.988416e30, R_SUN:6.957e8, M_EARTH:5.972168e24,
   G_SURF:9.80665, AU:1.495978707e11, LY:9.460730473e15,
@@ -935,6 +935,111 @@ const BUILTIN = [
  vars:[{id:'lam',sym:'λ',name:'Wellenlänge',unit:'m',default:1e-15}],
  resSym:'l_coh',resUnit:'m',wrznt:true},
 
+ /*- WRZNT -*/
+ // --- WRZT / WRZNT Formelsammlung ---
+{
+  id: 'w9',
+  cat: 'WRZT',
+  name: 'Minimaler Radius (Energetisch)',
+  display: 'r_min = ħ / (m_e · c)',
+  desc: 'Kritischer Radius (reduzierte Compton-Wellenlänge), an dem die Rotation c erreicht und in ein Undatron umklappt.',
+  expr: 'HBAR / (ME * C)',
+  vars: [],
+  resSym: 'r_min',
+  resUnit: 'm',
+  wrznt: false,
+  extra: (v, r) => `= ${fmt(r)} m | Entspricht der physikalischen Grenze der Teilchenstruktur.`
+},
+
+{
+  id: 'w10',
+  cat: 'WRZT',
+  name: 'Minimaler Radius (Dynamisch)',
+  display: 'r_min = e² / (4π · ε₀ · m_e · c² · α)',
+  desc: 'Herleitung über das Kräftegleichgewicht zwischen Zentrifugalkraft (bei v=c) und Coulomb-Kraft.',
+  expr: 'Math.pow(E, 2) / (4 * Math.PI * EPS0 * ME * Math.pow(C, 2) * ALPHA)',
+  vars: [],
+  resSym: 'r_min',
+  resUnit: 'm',
+  wrznt: false,
+  extra: (v, r) => `= ${fmt(r)} m | Beweist die mathematische Konsistenz über die Feinstrukturkonstante.`
+},
+
+{
+  id: 'w11',
+  cat: 'WRZT',
+  name: 'Undatron-Energie',
+  display: 'E = h · f',
+  desc: 'Energie der hochfrequenten Raumzeitwelle (Undatron), die bei Annihilation entsteht.',
+  expr: 'H * f',
+  
+  vars: [{id:'f',sym: 'f', name: 'f', label: 'Frequenz', unit: 'Hz'}],
+  resSym: 'E',
+  resUnit: 'J',
+  wrznt: false,
+  extra: (v, r) => `= ${fmt(r)} J | Das Undatron trägt die gesamte Ruheenergie des Teilchenpaares.`
+},
+
+{
+  id: 'w12',
+  cat: 'WRZT',
+  name: 'Lorentz-Faktor (WRZT-Ableitung)',
+  display: 'γ = c² / (c² - v · c)',
+  desc: 'Spezielle Form des Lorentz-Faktors aus der Energie-Masse-Beziehung der WRZT.',
+  expr: 'Math.pow(C, 2) / (Math.pow(C, 2) - v * C)',
+  vars: [{id:'v',sym: 'v', name: 'v', label: 'Geschwindigkeit', unit: 'm/s'}],
+  resSym: 'γ',
+  resUnit: '',
+  wrznt: false,
+  extra: (v, r) => `Lorentz-Faktor bei v=${fmt(v.v)} m/s`
+},
+
+{
+  id: 'n9',
+  cat: 'WRZNT',
+  name: 'WRZNT Netzwerk-Grundfrequenz',
+  display: 'f_N = 1 / (2π · τ_W)',
+  desc: 'Grundfrequenz des Raumzeit-Netzwerks (reduziert).',
+  expr: '1 / (2 * Math.PI * TW)',
+  vars: [],
+  resSym: 'f_N',
+  resUnit: 'Hz',
+  wrznt: true,
+  extra: (v, r) => `= ${fmt(r)} Hz | τ_W = ${fmt(PC.TW)} s`
+},
+
+{
+  id: 'n10',
+  cat: 'WRZNT',
+  name: 'Netzwerk-Bugwelle (Impuls)',
+  display: 'p_N = ħ · k_N',
+  desc: 'Impulsübertrag im Raumzeit-Netzwerk durch Wellenzahl-Kopplung.',
+  expr: 'HBAR * kN',
+  vars: [{id:'kN',sym: 'kN', name: 'kN', label: 'Wellenzahl', unit: '1/m'}],
+  resSym: 'p_N',
+  resUnit: 'kg·m/s',
+  wrznt: true,
+  extra: (v, r) => `Beschreibt die Ausbreitung der Deformation im Gitter.`
+},
+
+{
+  id: 'n11',
+  cat: 'WRZNT',
+  name: 'Relativistischer Impuls (Bugwelle)',
+  display: 'p = γ · m₀ · v',
+  desc: 'Der Impuls eines Teilchens als Ausdruck der netzwerkgebundenen Bugwelle.',
+  expr: 'gamma * m0 * v',
+  vars: [
+    {id:'gamma',sym: 'gamma', name: 'gamma', label: 'Lorentz-Faktor', unit: ''},
+    {id:'m0',sym: 'm0', name: 'm0', label: 'Ruhemasse', unit: 'kg'},
+    {id:'v',sym: 'v', name: 'v', label: 'Geschwindigkeit', unit: 'm/s'}
+  ],
+  resSym: 'p',
+  resUnit: 'kg·m/s',
+  wrznt: true,
+  extra: (v, r) => `Resultierende kinetische Energie: E_kin = p · c`
+}
+
 ];
 
 /* ══ STATE ══ */
@@ -1119,12 +1224,21 @@ function switchTab(t){
 /* ══ CONSTANTS TABLE ══ */
 const CSECTIONS=[
   {title:'Universelle Konstanten',color:'var(--accent)',rows:[
-    {s:'c',     n:'Lichtgeschwindigkeit',       u:'m s⁻¹',       v:'299 792 458',                 tk:'C',   exact:true},
-    {s:'G',     n:'Gravitationskonstante',       u:'m³ kg⁻¹ s⁻²', v:'6.674 30 × 10⁻¹¹',           tk:'G'},
+    {s:'c',     n:'Lichtgeschwindigkeit',        u:'m s⁻¹',        v:'299 792 458',                tk:'C',   exact:true},
+    {s:'G',     n:'Gravitationskonstante',       u:'m³ kg⁻¹ s⁻²',  v:'6.674 30 × 10⁻¹¹',           tk:'G'},
     {s:'h',     n:'Planck-Konstante',            u:'J s',          v:'6.626 070 15 × 10⁻³⁴',       tk:'H',   exact:true},
     {s:'ħ',     n:'Red. Planck-Konstante',       u:'J s',          v:'1.054 571 817 × 10⁻³⁴',      tk:'HBAR'},
     {s:'ε₀',    n:'El. Feldkonstante',           u:'F m⁻¹',        v:'8.854 187 8128 × 10⁻¹²',     tk:'EPS0'},
     {s:'μ₀',    n:'Mag. Feldkonstante',          u:'N A⁻²',        v:'1.256 637 062 × 10⁻⁶',       tk:'–'},
+    
+    {s:'mₙ',    n:'Neutronenmasse',                     u:'kg',              v:'1.674 927 498 04 × 10⁻²⁷',           tk:'–'},
+    {s:'mᵤ',    n:'Atomare Masseeinheit',               u:'kg',             v:'1.660 539 066 60 × 10⁻²⁷',            tk:'–'},
+    {s:'αₑ',    n:'Feinstrukturkonstante e²/(4πε₀ħc)',  u:'(dimensionslos)',         v:'7.297 352 5693 × 10⁻³',      tk:'–'},
+    {s:'rₑ',    n:'Klass. Elektronenradius',            u:'m',             v:'2.817 940 3227 × 10⁻¹⁵',               tk:'–'},
+    {s:'λ꜀',    n:'Compton-Wellenlänge',                u:'m',              v:'2.426 310 238 67 × 10⁻¹²',            tk:'–'},
+    {s:'μ_B',   n:'Bohrsches Magneton',                 u:'J T⁻¹',          v:'9.274 010 0783 × 10⁻²⁴',              tk:'–'},
+    {s:'a₀',    n:'Bohrscher Radius',                   u:'m',              v:'5.291 772 109 03 × 10⁻¹¹',            tk:'–'},
+  
   ]},
   {title:'Teilchen & Quantenmechanik',color:'var(--accent)',rows:[
     {s:'e',     n:'Elementarladung',             u:'C',            v:'1.602 176 634 × 10⁻¹⁹',      tk:'E_EL',exact:true},
@@ -1132,7 +1246,7 @@ const CSECTIONS=[
     {s:'mₚ',   n:'Protonenmasse',                u:'kg',           v:'1.672 621 923 69 × 10⁻²⁷',   tk:'MP'},
     {s:'k_B',  n:'Boltzmann-Konstante',          u:'J K⁻¹',        v:'1.380 649 × 10⁻²³',          tk:'KB',  exact:true},
     {s:'Nₐ',   n:'Avogadro-Konstante',           u:'mol⁻¹',        v:'6.022 140 76 × 10²³',        tk:'NA',  exact:true},
-    {s:'σ',     n:'Stefan-Boltzmann-Konstante',  u:'W m⁻² K⁻⁴',   v:'5.670 374 419 × 10⁻⁸',      tk:'SIGMA'},
+    {s:'σ',     n:'Stefan-Boltzmann-Konstante',  u:'W m⁻² K⁻⁴',   v:'5.670 374 419 × 10⁻⁸',       tk:'SIGMA'},
   ]},
   {title:'Astrophysikalische Konstanten',color:'var(--astro)',rows:[
     {s:'M☉',   n:'Sonnenmasse',                  u:'kg',           v:'1.988 416 × 10³⁰',           tk:'M_SUN'},
