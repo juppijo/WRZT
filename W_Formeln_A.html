@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W_Formeln_styled</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.7;color:#1a1a2e;background:#ffffff;max-width:820px;margin:0 auto;padding:48px}h1{color:#0d0d1a;font-size:32px}h2{color:#1a2d6e;font-size:24px;border-bottom:2px solid #1565c0;padding-bottom:.3em}h3{color:#2d3d8e;font-size:20px}p{margin:0 0 1.1em}a{color:#1565c0}code{background:#f0f4f8;padding:2px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:.88em}pre{background:#f0f4f8;padding:16px 20px;border-left:4px solid #1565c0;font-family:'Courier New',monospace;font-size:.88em}blockquote{border-left:4px solid #1565c0;margin:1.2em 0;padding:.5em 1.2em;font-style:italic}table{border-collapse:collapse;width:100%}th{background:#e4ecf7;padding:9px 13px;border:1px solid #ccc;font-weight:700;text-align:left}td{padding:8px 12px;border:1px solid #ddd}ul,ol{margin:.8em 0;padding-left:2em}li{margin:.25em 0}hr{border:none;border-top:1px solid #ccc;margin:2em 0}.katex-display{margin:1.2em 0;overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="manifest-container">
+    <h1>WRZT - Das Einheits-Manifest</h1>
+    <h2>Kapitel: Die geometrische Kopplung des Elektrons</h2>
+    
+    <p>In der Wellenraumzeit-Theorie (WRZT) betrachten wir fundamentale Wechselwirkungen als Resonanzerscheinungen. Wenn wir die mechanische Trägheit bei Grenzgeschwindigkeit mit der elektrischen Ur-Spannung gleichsetzen, offenbart sich die wahre Struktur der Materie.</p>
+
+    <h3>1. Die fundamentale Herleitung</h3>
+    <p>Wir setzen die Zentrifugalkraft gleich der Coulomb-Kraft, wobei die Rotation mit Lichtgeschwindigkeit ($v=c$) erfolgt:</p>
+    
+    <div class="formula-box">
+        $$m_e \cdot \frac{c^2}{r} = k \cdot \frac{e^2}{r^2}$$
+    </div>
+
+    <p>Durch algebraische Umformung isolieren wir den Radius <span class="highlight">r</span>:</p>
+    <div class="step-list">
+        <ol>
+            <li>Multiplikation mit $r^2$: $$m_e \cdot c^2 \cdot r = k \cdot e^2$$</li>
+            <li>Division durch $m_e \cdot c^2$: $$\mathbf{r = \frac{k \cdot e^2}{m_e \cdot c^2}}$$</li>
+        </ol>
+    </div>
+
+    <p>Unter Einbeziehung der Feldkonstante $k = \frac{1}{4\pi\varepsilon_0}$ ergibt sich:</p>
+    <div class="formula-box" style="border-color: #ff2e63; background-color: #fff5f7;">
+        $$r_e = \frac{1}{4\pi\varepsilon_0} \cdot \frac{e^2}{m_e c^2}$$
+    </div>
+
+    <h3>2. Struktur-Tabelle der WRZT-Formeln</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Kategorie</th>
+                <th>Formel</th>
+                <th>Bedeutung in der WRZT</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Elektronen-Radius</strong></td>
+                <td>$$r_e = \frac{k e^2}{m_e c^2}$$</td>
+                <td>Minimaler Elektronenradius der stehenden Welle.</td>
+            </tr>
+            <tr>
+                <td><strong>Quanten-Kopplung</strong></td>
+                <td>$$\alpha = \frac{r_e \cdot m_e \cdot c}{\hbar}$$</td>
+                <td>Verhältnis von klassischem Drehimpuls zum Wirkungsquantum.</td>
+            </tr>
+            <tr>
+                <td><strong>Raumzeit-Radius</strong></td>
+                <td>$$R_{min} = \frac{\hbar}{m_e c}$$</td>
+                <td>Reduzierte Compton-Wellenlänge (Undatron-Entstehung).</td>
+            </tr>
+            <tr>
+                <td><strong>Ladungs-Energie</strong></td>
+                <td>$$e = \sqrt{4\pi\varepsilon_0 \cdot r_e \cdot m_e c^2}$$</td>
+                <td>Ladung als Wurzel aus Geometrie und Ruheenergie.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3. Fazit</h3>
+    <p>Das Elektron ist kein punktförmiges Teilchen, sondern ein stabiler Wellenwirbel. Der Radius <span class="highlight">$r_e$</span> markiert den Bereich, in dem die Ur-Spannung $\Xi$ und die Raumzeit-Trägheit $\eta$ ein energetisches Gleichgewicht bilden. Diese Harmonie wird durch die Feinstrukturkonstante $\alpha$ exakt definiert.</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+window.addEventListener('load', function() {
+  if (typeof renderMathInElement !== 'undefined') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left:'$$', right:'$$', display:true},
+        {left:'$', right:'$', display:false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>
