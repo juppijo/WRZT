@@ -1,0 +1,321 @@
+
+<h2 class="sr-only">Interaktive 2D Welleninterferenz-Simulation mit mehreren Quellen, Echtzeit-WebGL-Rendering</h2>
+
+<div id="sim" style="position:relative;width:100%;height:680px;overflow:hidden;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);">
+
+<canvas id="glc" style="position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;"></canvas>
+
+<div id="tb" style="position:absolute;top:0;left:0;right:0;height:44px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:10;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:14px;font-weight:500;">2D Welleninterferenz</span>
+    <span id="srcCount" style="font-size:12px;color:var(--color-text-secondary);">2 Quellen</span>
+    <span style="font-size:11px;color:var(--color-text-secondary);">· Klick = Quelle · Ziehen = verschieben · Rechtsklick = löschen</span>
+  </div>
+  <div style="display:flex;gap:5px;">
+    <button id="btnP" onclick="togglePause()" style="font-size:12px;padding:4px 10px;"><i class="ti ti-player-pause" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i> Pause</button>
+    <button onclick="clearAll()" style="font-size:12px;padding:4px 10px;"><i class="ti ti-trash" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i></button>
+    <button id="btnFs" onclick="toggleFS()" style="font-size:12px;padding:4px 10px;"><i class="ti ti-maximize" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i></button>
+  </div>
+</div>
+
+<div id="sp" style="position:absolute;top:52px;right:8px;width:228px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:10px;z-index:10;max-height:calc(100% - 145px);overflow-y:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span style="font-size:12px;color:var(--color-text-secondary);">Quellen</span>
+    <div style="display:flex;gap:3px;">
+      <button onclick="preset('d')" style="font-size:10px;padding:2px 6px;">2-Spalt</button>
+      <button onclick="preset('t')" style="font-size:10px;padding:2px 6px;">3er</button>
+      <button onclick="preset('g')" style="font-size:10px;padding:2px 6px;">5er</button>
+    </div>
+  </div>
+  <canvas id="pvc" width="208" height="118" style="width:100%;height:auto;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);display:block;margin-bottom:8px;"></canvas>
+  <div id="sl"></div>
+  <button onclick="addSrc()" style="width:100%;margin-top:6px;font-size:12px;"><i class="ti ti-plus" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i> Neue Quelle</button>
+</div>
+
+<div id="cb" style="position:absolute;bottom:0;left:0;right:0;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);padding:8px 12px 10px;z-index:10;display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+  <div style="display:flex;flex-direction:column;gap:3px;min-width:100px;flex:1;">
+    <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--color-text-secondary);">λ Wellenlänge</span><span style="font-size:11px;font-weight:500;" id="vL">80 px</span></div>
+    <input type="range" id="sL" min="15" max="250" value="80" step="1" oninput="upd()">
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;min-width:100px;flex:1;">
+    <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--color-text-secondary);">f Frequenz</span><span style="font-size:11px;font-weight:500;" id="vF">1.0</span></div>
+    <input type="range" id="sF" min="1" max="40" value="10" step="1" oninput="upd()">
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;min-width:100px;flex:1;">
+    <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--color-text-secondary);">A Amplitude</span><span style="font-size:11px;font-weight:500;" id="vA">1.0</span></div>
+    <input type="range" id="sA" min="1" max="20" value="10" step="1" oninput="upd()">
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;min-width:100px;flex:1;">
+    <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--color-text-secondary);">Dämpfung</span><span style="font-size:11px;font-weight:500;" id="vD">0.2</span></div>
+    <input type="range" id="sD" min="0" max="30" value="6" step="1" oninput="upd()">
+  </div>
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <span style="font-size:11px;color:var(--color-text-secondary);">Farbe</span>
+    <div id="csw" style="display:flex;gap:4px;align-items:center;"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const COLS=['#185FA5','#993C1D','#0F6E56','#854F0B','#534AB7','#993556','#3B6D11','#A32D2D'];
+const CMAPS=[
+  {b:'linear-gradient(135deg,#0518e8,#000,#e50f03)',t:'Rot/Blau'},
+  {b:'linear-gradient(135deg,#000,#777,#ddd)',t:'Grau'},
+  {b:'linear-gradient(135deg,#060,#0af,#ff0)',t:'Spektral'},
+  {b:'linear-gradient(135deg,#001,#038,#0af)',t:'Ozean'},
+  {b:'linear-gradient(135deg,#200,#a20,#f60)',t:'Feuer'}
+];
+
+let srcs=[{x:.35,y:.5,a:1},{x:.65,y:.5,a:1}];
+let paused=false,cm=0,T=0,lT=null,lam=80,omega=1,gamp=1,dec=0.2,drag=null;
+
+const cont=document.getElementById('sim');
+const cvs=document.getElementById('glc');
+const gl=cvs.getContext('webgl')||cvs.getContext('experimental-webgl');
+
+const VS=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
+const FS=`precision highp float;
+uniform vec2 R;uniform float T;
+uniform vec2 S[8];uniform float AA[8];
+uniform float L,OM,DC,GA;uniform int CM;
+vec3 cm0(float v){
+  vec3 B=vec3(.04,.15,.95),M=vec3(.015,.015,.04),r=vec3(.95,.08,.04);
+  float t=(v+1.)*.5;
+  return t<.5?mix(B,M,t*2.):mix(M,r,(t-.5)*2.);
+}
+vec3 cm1(float v){float t=((v+1.)*.5);t=t*t*(3.-2.*t);return vec3(t*.88);}
+vec3 cm2(float v){
+  float t=(v+1.)*.5;
+  float r=abs(t*6.-3.)-1.,g=2.-abs(t*6.-2.),b=2.-abs(t*6.-4.);
+  return clamp(vec3(r,g,b)*.82,0.,1.);
+}
+vec3 cm3(float v){
+  float t=(v+1.)*.5;
+  vec3 a=mix(vec3(.0,.0,.04),vec3(.0,.25,.72),t);
+  return mix(a,vec3(.55,.9,1.),t*t*.75);
+}
+vec3 cm4(float v){
+  float t=(v+1.)*.5;
+  if(t<.33)return mix(vec3(.03,0.,0.),vec3(.72,.07,0.),t*3.);
+  if(t<.67)return mix(vec3(.72,.07,0.),vec3(1.,.52,0.),(t-.33)*3.);
+  return mix(vec3(1.,.52,0.),vec3(1.,1.,.5),(t-.67)*3.);
+}
+void main(){
+  vec2 px=gl_FragCoord.xy;
+  float tot=0.;
+  for(int i=0;i<8;i++){
+    float a=AA[i]*GA;
+    vec2 sp=S[i]*R;
+    float d=max(distance(px,sp),5.);
+    float w=a*sin(6.28318*d/L-OM*T);
+    tot+=w*exp(-DC*d/R.x)/sqrt(d*.032+1.);
+  }
+  tot=clamp(tot*1.4,-1.,1.);
+  vec3 c;
+  if(CM==0)c=cm0(tot);
+  else if(CM==1)c=cm1(tot);
+  else if(CM==2)c=cm2(tot);
+  else if(CM==3)c=cm3(tot);
+  else c=cm4(tot);
+  gl_FragColor=vec4(c,1.);
+}`;
+
+function mkSh(t,s){const h=gl.createShader(t);gl.shaderSource(h,s);gl.compileShader(h);return h;}
+const pr=gl.createProgram();
+gl.attachShader(pr,mkSh(gl.VERTEX_SHADER,VS));
+gl.attachShader(pr,mkSh(gl.FRAGMENT_SHADER,FS));
+gl.linkProgram(pr);gl.useProgram(pr);
+const bf=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,bf);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+const ap=gl.getAttribLocation(pr,'p');
+gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,2,gl.FLOAT,false,0,0);
+const UL={R:gl.getUniformLocation(pr,'R'),T:gl.getUniformLocation(pr,'T'),
+  S:gl.getUniformLocation(pr,'S'),AA:gl.getUniformLocation(pr,'AA'),
+  L:gl.getUniformLocation(pr,'L'),OM:gl.getUniformLocation(pr,'OM'),
+  DC:gl.getUniformLocation(pr,'DC'),GA:gl.getUniformLocation(pr,'GA'),
+  CM:gl.getUniformLocation(pr,'CM')};
+
+function resize(){
+  const r=cont.getBoundingClientRect();
+  cvs.width=Math.floor(r.width);cvs.height=Math.floor(r.height);
+  gl.viewport(0,0,cvs.width,cvs.height);
+}
+new ResizeObserver(resize).observe(cont);resize();
+
+const pvc=document.getElementById('pvc');
+const p2=pvc.getContext('2d');
+
+function drawPrev(){
+  const W=pvc.width,H=pvc.height;
+  p2.fillStyle='#03030c';p2.fillRect(0,0,W,H);
+  const ph=(T*omega)%(Math.PI*2),step=lam*W/cvs.width*.55;
+  srcs.forEach((s,i)=>{
+    const sx=s.x*W,sy=(1-s.y)*H,col=COLS[i%8];
+    for(let r=step-ph/Math.PI/2*step;r<95;r+=step){
+      if(r<2)continue;
+      const al=Math.max(0,(1-r/90)*.6);
+      p2.strokeStyle=col+Math.round(al*255).toString(16).padStart(2,'0');
+      p2.lineWidth=.7;p2.beginPath();p2.arc(sx,sy,r,0,Math.PI*2);p2.stroke();
+    }
+    const g=p2.createRadialGradient(sx,sy,0,sx,sy,9);
+    g.addColorStop(0,col+'cc');g.addColorStop(1,col+'00');
+    p2.fillStyle=g;p2.beginPath();p2.arc(sx,sy,9,0,Math.PI*2);p2.fill();
+    p2.fillStyle=col;p2.beginPath();p2.arc(sx,sy,3.5,0,Math.PI*2);p2.fill();
+    p2.font='bold 10px sans-serif';p2.fillStyle=col;p2.fillText(i+1,sx+6,sy-5);
+  });
+  p2.strokeStyle='rgba(100,110,255,.2)';p2.lineWidth=1;
+  p2.strokeRect(.5,.5,W-1,H-1);
+}
+
+function frame(ts){
+  requestAnimationFrame(frame);
+  if(!lT)lT=ts;
+  const dt=Math.min((ts-lT)/1000,.05);lT=ts;
+  if(!paused)T+=dt;
+  const W=cvs.width,H=cvs.height;
+  const sa=new Float32Array(16).fill(0),aa=new Float32Array(8).fill(0);
+  const n=Math.min(srcs.length,8);
+  for(let i=0;i<n;i++){sa[i*2]=srcs[i].x;sa[i*2+1]=srcs[i].y;aa[i]=srcs[i].a;}
+  gl.uniform2f(UL.R,W,H);gl.uniform1f(UL.T,T);
+  gl.uniform2fv(UL.S,sa);gl.uniform1fv(UL.AA,aa);
+  gl.uniform1f(UL.L,lam);gl.uniform1f(UL.OM,omega);
+  gl.uniform1f(UL.DC,dec);gl.uniform1f(UL.GA,gamp);
+  gl.uniform1i(UL.CM,cm);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  drawPrev();
+}
+requestAnimationFrame(frame);
+
+function reSrcList(){
+  const el=document.getElementById('sl');el.innerHTML='';
+  document.getElementById('srcCount').textContent=srcs.length+' Quelle'+(srcs.length!==1?'n':'');
+  srcs.forEach((s,i)=>{
+    const col=COLS[i%8];
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;flex-direction:column;gap:4px;padding:6px 8px;margin-bottom:4px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);';
+    d.innerHTML=`<div style="display:flex;align-items:center;gap:6px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;box-shadow:0 0 4px ${col};"></div>
+      <span style="font-size:12px;font-weight:500;flex:1;">Quelle ${i+1}</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);">${Math.round(s.x*100)}% / ${Math.round(s.y*100)}%</span>
+      <button onclick="rmSrc(${i})" style="padding:1px 5px;font-size:11px;"><i class="ti ti-x" style="font-size:12px;" aria-hidden="true"></i></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:10px;color:var(--color-text-secondary);width:14px;">A</span>
+      <input type="range" min="0" max="20" step="1" value="${Math.round(s.a*10)}" style="flex:1;"
+        oninput="srcs[${i}].a=this.value/10;document.getElementById('av${i}').textContent=(this.value/10).toFixed(1);">
+      <span style="font-size:11px;font-weight:500;width:22px;text-align:right;" id="av${i}">${s.a.toFixed(1)}</span>
+    </div>`;
+    el.appendChild(d);
+  });
+}
+
+window.addSrc=function(){
+  if(srcs.length>=8)return;
+  srcs.push({x:.2+Math.random()*.6,y:.2+Math.random()*.6,a:1});reSrcList();
+};
+window.rmSrc=function(i){srcs.splice(i,1);reSrcList();};
+window.clearAll=function(){srcs=[];reSrcList();};
+window.preset=function(t){
+  srcs=[];
+  if(t==='d')srcs=[{x:.35,y:.5,a:1},{x:.65,y:.5,a:1}];
+  else if(t==='t')srcs=[{x:.5,y:.72,a:1},{x:.34,y:.4,a:1},{x:.66,y:.4,a:1}];
+  else if(t==='g')for(let i=0;i<5;i++)srcs.push({x:.16+i*.17,y:.5,a:1});
+  reSrcList();
+};
+
+function gp(e){
+  const r=cvs.getBoundingClientRect();
+  return{x:(e.clientX-r.left)/r.width,y:1-(e.clientY-r.top)/r.height};
+}
+function near(x,y,th=.04){
+  for(let i=0;i<srcs.length;i++){
+    const dx=srcs[i].x-x,dy=srcs[i].y-y;
+    if(Math.sqrt(dx*dx+dy*dy)<th)return i;
+  }return -1;
+}
+
+cvs.addEventListener('mousedown',e=>{
+  if(e.button===2)return;
+  const sr=document.getElementById('sp').getBoundingClientRect();
+  if(e.clientX>=sr.left&&e.clientX<=sr.right&&e.clientY>=sr.top&&e.clientY<=sr.bottom)return;
+  const cr=document.getElementById('cb').getBoundingClientRect();
+  if(e.clientY>=cr.top)return;
+  const tr=document.getElementById('tb').getBoundingClientRect();
+  if(e.clientY<=tr.bottom)return;
+  const{x,y}=gp(e);const idx=near(x,y);
+  if(idx>=0){drag=idx;}
+  else if(srcs.length<8){srcs.push({x,y,a:1});reSrcList();drag=srcs.length-1;}
+});
+window.addEventListener('mousemove',e=>{
+  if(drag===null)return;
+  const{x,y}=gp(e);
+  srcs[drag].x=Math.max(0,Math.min(1,x));
+  srcs[drag].y=Math.max(0,Math.min(1,y));
+  reSrcList();
+});
+window.addEventListener('mouseup',()=>drag=null);
+cvs.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const{x,y}=gp(e);const idx=near(x,y,.05);
+  if(idx>=0){srcs.splice(idx,1);reSrcList();}
+});
+
+cvs.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const t=e.touches[0];const{x,y}=gp(t);
+  const idx=near(x,y);
+  if(idx>=0){drag=idx;}
+  else if(srcs.length<8){srcs.push({x,y,a:1});reSrcList();drag=srcs.length-1;}
+},{passive:false});
+cvs.addEventListener('touchmove',e=>{
+  e.preventDefault();if(drag===null)return;
+  const t=e.touches[0];const{x,y}=gp(t);
+  srcs[drag].x=Math.max(0,Math.min(1,x));srcs[drag].y=Math.max(0,Math.min(1,y));
+  reSrcList();
+},{passive:false});
+cvs.addEventListener('touchend',()=>drag=null);
+
+window.upd=function(){
+  lam=+document.getElementById('sL').value;
+  omega=document.getElementById('sF').value/10;
+  gamp=document.getElementById('sA').value/10;
+  dec=document.getElementById('sD').value/10;
+  document.getElementById('vL').textContent=lam+' px';
+  document.getElementById('vF').textContent=omega.toFixed(1);
+  document.getElementById('vA').textContent=gamp.toFixed(1);
+  document.getElementById('vD').textContent=dec.toFixed(1);
+};
+
+window.togglePause=function(){
+  paused=!paused;
+  const b=document.getElementById('btnP');
+  b.innerHTML=paused
+    ?'<i class="ti ti-player-play" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i> Start'
+    :'<i class="ti ti-player-pause" style="font-size:13px;vertical-align:-1px;" aria-hidden="true"></i> Pause';
+};
+
+window.toggleFS=function(){
+  if(!document.fullscreenElement){cont.requestFullscreen&&cont.requestFullscreen();}
+  else{document.exitFullscreen&&document.exitFullscreen();}
+};
+
+const cswEl=document.getElementById('csw');
+CMAPS.forEach((c,i)=>{
+  const d=document.createElement('div');
+  d.style.cssText=`width:22px;height:22px;border-radius:4px;cursor:pointer;background:${c.b};border:2px solid ${i===0?'var(--color-text-primary)':'transparent'};transition:transform .12s,border .12s;`;
+  d.title=c.t;
+  d.addEventListener('click',()=>{
+    cm=i;
+    cswEl.querySelectorAll('div').forEach(e=>e.style.border='2px solid transparent');
+    d.style.border='2px solid var(--color-text-primary)';
+    d.style.transform='scale(1.15)';
+  });
+  cswEl.appendChild(d);
+});
+
+upd();reSrcList();
+})();
+</script>
+</div>
