@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZNT - Wellen-Interferenz Simulator</title>
+    <style>
+        body { background: #050505; color: #00ffcc; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow: hidden; }
+        canvas { background: #000; box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); cursor: crosshair; }
+        .controls { position: absolute; top: 20px; left: 20px; background: rgba(0, 0, 0, 0.8); padding: 15px; border-radius: 8px; border: 1px solid #00ffcc; z-index: 10; }
+        label { display: block; margin-bottom: 5px; font-size: 0.8em; }
+        input { width: 150px; margin-bottom: 15px; accent-color: #00ffcc; }
+        h2 { margin: 0 0 10px 0; font-size: 1.2em; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <h2>WRZNT Simulation</h2>
+    <label>Wellenlänge (λ):</label>
+    <input type="range" id="waveLength" min="5" max="100" value="30">
+    <label>Quell-Abstand:</label>
+    <input type="range" id="sourceDist" min="10" max="200" value="60">
+    <label>Phasengeschwindigkeit (c):</label>
+    <input type="range" id="speed" min="0" max="5" step="0.1" value="1">
+    <div id="info" style="font-size: 0.7em; color: #888;">Berechnung der Raumzeit-Struktur...</div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const waveLengthInput = document.getElementById('waveLength');
+    const sourceDistInput = document.getElementById('sourceDist');
+    const speedInput = document.getElementById('speed');
+
+    let width, height, time = 0;
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        time += parseFloat(speedInput.value);
+
+        const λ = parseFloat(waveLengthInput.value);
+        const dist = parseFloat(sourceDistInput.value);
+        
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        const s1 = { x: centerX - dist / 2, y: centerY };
+        const s2 = { x: centerX + dist / 2, y: centerY };
+
+        // Wir nutzen ein Pixel-Grid für die Wellen-Interferenz
+        const step = 4; // Höherer Wert = bessere Performance
+        for (let x = 0; x < width; x += step) {
+            for (let y = 0; y < height; y += step) {
+                const d1 = Math.sqrt((x - s1.x) ** 2 + (y - s1.y) ** 2);
+                const d2 = Math.sqrt((x - s2.x) ** 2 + (y - s2.y) ** 2);
+
+                // Sinuswellen-Interferenz
+                const w1 = Math.sin((d1 / λ) - (time * 0.1));
+                const w2 = Math.sin((d2 / λ) - (time * 0.1));
+                
+                const intensity = (w1 + w2) / 2;
+                const alpha = Math.abs(intensity);
+                
+                // Farbspektrum basierend auf Intensität (Impressionistischer Glow)
+                const r = 0;
+                const g = Math.floor(128 + intensity * 127);
+                const b = Math.floor(200 + intensity * 55);
+
+                if (alpha > 0.1) {
+                    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                    ctx.fillRect(x, y, step, step);
+                }
+            }
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+</script>
+</body>
+</html>
