@@ -1,665 +1,85 @@
-Wellenfeld-Gleichung der WRZT
-„WRZT – Einheits-Manifest Formel“, die alle deine Parameter – von der Ur-Spannung 
-Ξ
-Ξ bis hin zum Bug-Winkel 
-θ
-θ – in einem konsistenten Wellenfeld vereint.
+# Wellenfeld-Gleichung der WRZT
 
-Die vollständige Wellenfeld-Gleichung der WRZT
-Für zwei Punktquellen, die in der 
-x
-y
-xy-Ebene mit dem Radius 
-a
-a und der Winkelfrequenz 
-ω
-ω rotieren, beschreibt die Funktion 
-Ψ
-(
-r
-⃗
-,
-t
-)
-Ψ( 
-r
- ,t) die Amplitude der Wellenraumzeit an einem Punkt 
-r
-⃗
-r
-  zur Zeit 
-t
-t:
-
-Ψ
-(
-r
-⃗
-,
-t
-)
-=
-∑
-i
-=
-1
-2
-Ξ
-∣
-r
-⃗
-−
-r
-⃗
-i
-(
-t
-r
-e
-t
-)
-∣
-⋅
-cos
-⁡
-(
-Φ
-i
-(
-r
-⃗
-,
-t
-)
-)
-Ψ( 
-r
- ,t)= 
-i=1
-∑
-2
-​
-  
-∣ 
-r
- − 
-r
-  
-i
-​
- (t 
-ret
-​
- )∣
-Ξ
-​
- ⋅cos(Φ 
-i
-​
- ( 
-r
- ,t))
-Eine Quelle :
-
-Ψ
-(
-r
-⃗
-,
-t
-)
-=
-Ξ
-∣
-r
-⃗
-−
-r
-⃗
-1
-(
-t
-r
-e
-t
-)
-∣
-⋅
-cos
-⁡
-(
-ω
-(
-−
-t
-+
-∣
-r
-⃗
-−
-r
-⃗
-1
-∣
-c
-⋅
-(
-1
-−
-M
-cos
-⁡
-(
-α
-1
-)
-)
-)
-)
-Ψ( 
-r
- ,t)= 
-∣ 
-r
- − 
-r
-  
-1
-​
- (t 
-ret
-​
- )∣
-Ξ
-​
- ⋅cos(ω(−t+ 
-c
-∣ 
-r
- − 
-r
-  
-1
-​
- ∣
-​
- ⋅(1−Mcos(α 
-1
-​
- ))))
-Radiale Expansion
-
-Ψ
-(
-r
-⃗
-,
-t
-)
-=
-Ξ
-∣
-r
-⃗
-−
-r
-⃗
-s
-(
-t
-)
-∣
-⋅
-cos
-⁡
-(
-ω
-⋅
-t
-−
-ω
-⋅
-r
-c
-⋅
-(
-1
-−
-M
-cos
-⁡
-(
-α
-r
-e
-l
-)
-)
-)
-Ψ( 
-r
- ,t)= 
-∣ 
-r
- − 
-r
-  
-s
-​
- (t)∣
-Ξ
-​
- ⋅cos(ω⋅t− 
-c
-ω⋅r
-​
- ⋅(1−Mcos(α 
-rel
-​
- )))
-Die entscheidenden Änderungen:
-ω
-⋅
-t
-−
-k
-⋅
-r
-ω⋅t−k⋅r : Das Minuszeichen vor dem Distanzterm (
-r
-r) sorgt dafür, dass mit fortschreitender Zeit 
-t
-t ein größerer Abstand 
-r
-r nötig ist, um dieselbe Phase zu halten – die Welle wandert also nach außen.
-
-Uhrzeigersinn: In der Simulation wird dies durch 
-r
-⃗
-s
-(
-t
-)
-=
-(
-a
-⋅
-cos
-⁡
-(
-ω
-t
-)
-,
-−
-a
-⋅
-sin
-⁡
-(
-ω
-t
-)
-)
-r
-  
-s
-​
- (t)=(a⋅cos(ωt),−a⋅sin(ωt)) umgesetzt.
-
-Bugwellen-Korrektur: Der Term 
-(
-1
-−
-M
-cos
-⁡
-(
-α
-r
-e
-l
-)
-)
-(1−Mcos(α 
-rel
-​
- )) staucht die Wellenlänge in Bewegungsrichtung der Singularität, was die Bugwelle bei hohen Geschwindigkeiten (nahe 
-c
-c) erzeugt.
-
-1. Die Komponenten der Formel
-*Ur-Spannung (
-Ξ
-Ξ):** Bestimmt die maximale Amplitude der Welle. Du hast diesen Wert als 
-Ξ
-≈
-5
-,
-897427
-×
-1
-0
-−
-19
-Ξ≈5,897427×10 
-−19
-  kg/m definiert. *Retardierte Position (
-r
-⃗
-i
-(
-t
-r
-e
-t
-)
-r
-  
-i
-​
- (t 
-ret
-​
- )):** Die Position der 
-i
-i-ten Quelle zum Zeitpunkt der Emission 
-t
-r
-e
-t
-=
-t
-−
-∣
-r
-⃗
-−
-r
-⃗
-i
-∣
-c
-t 
-ret
-​
- =t− 
-c
-∣ 
-r
- − 
-r
-  
-i
-​
- ∣
-​
- . *Wellengeschwindigkeit (
-c
-c):** Berechnet aus deiner Strukturformel 
-c
-=
-Ξ
-η
-⋅
-R
-m
-i
-n
-c= 
-η
-Ξ
-​
- ⋅R 
-min
-​
- . *Phasenterm (
-Φ
-i
-Φ 
-i
-​
- ):** Beinhaltet die Rotation und die Kompression der Wellenfront (Bugwelle):
-
-Φ
-i
-(
-r
-⃗
-,
-t
-)
-=
-ω
-(
-t
-−
-∣
-r
-⃗
-−
-r
-⃗
-i
-∣
-c
-⋅
-(
-1
-−
-M
-cos
-⁡
-(
-α
-i
-)
-)
-)
-+
-Δ
-ϕ
-i
-Φ 
-i
-​
- ( 
-r
- ,t)=ω(t− 
-c
-∣ 
-r
- − 
-r
-  
-i
-​
- ∣
-​
- ⋅(1−Mcos(α 
-i
-​
- )))+Δϕ 
-i
-​
- 
-* Dabei ist 
-M
-=
-a
-⋅
-ω
-c
-M= 
-c
-a⋅ω
-​
-  die Mach-Zahl der Raumzeit. * 
-Δ
-ϕ
-i
-Δϕ 
-i
-​
-  ist der Phasenversatz (für zwei gegenüberliegende Quellen ist 
-Δ
-ϕ
-1
-=
-0
-Δϕ 
-1
-​
- =0 und 
-Δ
-ϕ
-2
-=
-π
-Δϕ 
-2
-​
- =π).
-
-2. Der Bug-Winkel 
-θ
-θ
-In deinem System entsteht eine signifikante Bugwelle, wenn die Bahngeschwindigkeit 
-v
-r
-o
-t
-=
-a
-⋅
-ω
-v 
-rot
-​
- =a⋅ω die Ausbreitungsgeschwindigkeit 
-c
-c erreicht. Der Winkel 
-θ
-θ dieser Wellenfront zur Bewegungsrichtung der Quelle ist definiert als:
-
-sin
-⁡
-(
-θ
-)
-=
-c
-a
-⋅
-ω
-=
-1
-M
-sin(θ)= 
-a⋅ω
-c
-​
- = 
-M
-1
-​
- 
-3. Zusammenfassung der Konstanten für das Manifest
-Um die Formel im HTML-Code deines Manifests zu vervollständigen, kannst du folgende Werte als Referenz nutzen:
-
-| Ur-Spannung : 
-Ξ
-Ξ = 
-5
-,
-8993
-×
-1
-0
-−
-19
-5,8993×10 
-−19
-  kg/m |
-
-| Raumzeit-Trägheit : 
-η
-η = 
-4
-,
-5543
-×
-1
-0
-−
-31
-4,5543×10 
-−31
-  kg |
-
-| Minimal-Radius : 
-R
-m
-i
-n
-R 
-min
-​
-  = 
-7
-,
-716
-×
-1
-0
-−
-13
-7,716×10 
-−13
-  m |
-
-| Bug-Winkel : 
-θ
-θ = 
-arcsin
-⁡
-(
-c
-/
-v
-r
-o
-t
-)
-arcsin(c/v 
-rot
-​
- ) |
-
-| Lichtgeschwindigkeit : 
-c
-c = 
-299.792.458
-299.792.458 m/s |
-
-Diese Formel beschreibt präzise das „Wellenraumzeit-Netz“ und wie sich Energie-Singularitäten durch die Interferenz ihrer Rotationsfelder im Raum ausbreiten.
+Das **„WRZT – Einheits-Manifest“** vereint alle elementaren Parameter – von der Ur-Spannung $\Xi$ bis hin zum Bug-Winkel $\theta$ – in einem konsistenten Wellenfeld.
 
 ---
 
-###script.js — 5 Stellen geändert:
+## 1. Die vollständige Wellenfeld-Gleichung
 
-state.rotTilt = 0.0 hinzugefügt.
+Für zwei Punktquellen, die in der $xy$-Ebene mit dem Radius $a$ und der Winkelfrequenz $\omega$ rotieren, beschreibt die Funktion $\Psi(\vec{r},t)$ die Amplitude der Wellenraumzeit an einem Punkt $\vec{r}$ zur Zeit $t$:
 
-computeRotSources() — Umlaufbahn wird nun um die Y-Achse um α gekippt:
+$$\Psi(\vec{r},t) = \sum_{i=1}^{2} \frac{\Xi}{|\vec{r} - \vec{r}_i(t_{\text{ret}})|} \cdot \cos(\Phi_i(\vec{r},t))$$
 
-x = cx + R·cos(θ)·cos(α)   ← X-Ausdehnung schrumpft
-y = cy + R·sin(θ)           ← Y unverändert
-z = z₀ + R·cos(θ)·sin(α)   ← Z variiert jetzt mit der Phase
+### Spezialfall: Eine einzelne Quelle
+$$\Psi(\vec{r},t) = \frac{\Xi}{|\vec{r} - \vec{r}_1(t_{\text{ret}})|} \cdot \cos\left(\omega\left(-t + \frac{|\vec{r} - \vec{r}_1|}{c} \cdot (1 - M\cos(\alpha_1))\right)\right)$$
 
-draw3DView() — die Ellipse folgt der Kippung, und bei α > 0 erscheint eine gestrichelte Neigungsachse mit Winkelbeschriftung (z. B. α=45°).
+### Radiale Expansion
+$$\Psi(\vec{r},t) = \frac{\Xi}{|\vec{r} - \vec{r}_s(t)|} \cdot \cos\left(\omega \cdot t - \frac{\omega \cdot r}{c} \cdot (1 - M\cos(\alpha_{\text{rel}}))\right)$$
 
-updateRot() — liest sRT, schreibt vRT.
+---
 
-Event-Listener-Array — 'sRT' ergänzt.
+## 2. Die entscheidenden physikalischen Effekte
 
-Physikalisches Verhalten: Bei α = 0° rotieren die Quellen flach parallel zum Schirm (wie bisher). Bei α = 90° bewegen sie sich senkrecht — die Z-Tiefe pulsiert, was ein völlig anderes, asymmetrisches Interferenzmuster erzeugt. Dazwischen entsteht eine elliptische Bahn im 3D-Raum.
+* **Wellen-Ausbreitung ($\omega\cdot t - k\cdot r$):** Das Minuszeichen vor dem Distanzterm ($r$) sorgt dafür, dass mit fortschreitender Zeit $t$ ein größerer Abstand $r$ nötig ist, um dieselbe Phase zu halten. Die Welle wandert somit physikalisch korrekt nach außen.
+* **Uhrzeigersinn:** In der Simulation wird die Rotation der Quellen über folgende Trajektorie umgesetzt:
+    $$\vec{r}_s(t) = (a \cdot \cos(\omega t), -a \cdot \sin(\omega t))$$
+* **Bugwellen-Korrektur:** Der Term $(1 - M\cos(\alpha_{\text{rel}}))$ staucht die Wellenlänge in Bewegungsrichtung der Singularität. Dies erzeugt die charakteristische Bugwelle bei hohen Geschwindigkeiten nahe der Lichtgeschwindigkeit $c$.
+
+---
+
+## 3. Die Komponenten der Formel im Detail
+
+* **Ur-Spannung ($\Xi$):** Bestimmt die maximale Amplitude der Welle. Dieser Wert ist definiert als:
+    $$\Xi \approx 5,897427 \times 10^{-19} \text{ kg/m}$$
+* **Retardierte Position ($\vec{r}_i(t_{\text{ret}})$):** Die Position der $i$-ten Quelle zum Zeitpunkt der Emission:
+    $$t_{\text{ret}} = t - \frac{|\vec{r} - \vec{r}_i|}{c}$$
+* **Wellengeschwindigkeit ($c$):** Wird direkt aus deiner Raumzeit-Strukturformel berechnet:
+    $$c = \frac{\Xi}{\eta} \cdot R_{\text{min}}$$
+* **Phasenterm ($\Phi_i$):** Beinhaltet die Rotation und die Kompression der Wellenfront (Bugwelle):
+    $$\Phi_i(\vec{r},t) = \omega \left( t - \frac{|\vec{r} - \vec{r}_i|}{c} \cdot (1 - M\cos(\alpha_i)) \right) + \Delta\phi_i$$
+    * $M = \frac{a \cdot \omega}{c}$ repräsentiert die **Mach-Zahl der Raumzeit**.
+    * $\Delta\phi_i$ ist der Phasenversatz. Für zwei exakt gegenüberliegende Quellen gilt $\Delta\phi_1 = 0$ und $\Delta\phi_2 = \pi$.
+
+---
+
+## 4. Der Bug-Winkel $\theta$
+
+In deinem System entsteht eine signifikante Bugwelle, wenn die Bahngeschwindigkeit $v_{\text{rot}} = a \cdot \omega$ die Ausbreitungsgeschwindigkeit $c$ erreicht. Der Winkel $\theta$ dieser Wellenfront zur Bewegungsrichtung der Quelle ist wie folgt definiert:
+
+$$\sin(\theta) = \frac{c}{a \cdot \omega} = \frac{1}{M}$$
+
+---
+
+## 5. Zusammenfassung der Konstanten für das Manifest
+
+Diese Werte dienen als feste Referenz für den HTML-Code deines Manifests:
+
+| Konstante | Symbol | Wert / Formel |
+| :--- | :---: | :--- |
+| **Ur-Spannung** | $\Xi$ | $5,8993 \times 10^{-19} \text{ kg/m}$ |
+| **Raumzeit-Trägheit** | $\eta$ | $4,5543 \times 10^{-31} \text{ kg}$ |
+| **Minimal-Radius** | $R_{\text{min}}$ | $7,716 \times 10^{-13} \text{ m}$ |
+| **Lichtgeschwindigkeit** | $c$ | $299.792.458 \text{ m/s}$ |
+| **Bug-Winkel** | $\theta$ | $\arcsin(c / v_{\text{rot}})$ |
+
+> **Fazit:** Diese mathematische Formulierung beschreibt präzise das dynamische „Wellenraumzeit-Netz“ und zeigt, wie sich Energie-Singularitäten durch die Interferenz ihrer Rotationsfelder im Raum ausbreiten.
+
+---
+
+## 6. Simulations-Changelog (`script.js`)
+
+Es wurden **5 zentrale Stellen** im Code modifiziert, um eine dreidimensionale Verkippung der Umlaufbahn zu ermöglichen:
+
+1.  **State-Erweiterung:** `state.rotTilt = 0.0` wurde als neue Variable hinzugefügt.
+2.  **Umlaufbahn-Kippung (`computeRotSources`):** Die fundamentale Rotation wird nun um die Y-Achse um den Winkel $\alpha$ gekippt:
+    * $x = cx + R \cdot \cos(\theta) \cdot \cos(\alpha)$ *(X-Ausdehnung schrumpft)*
+    * $y = cy + R \cdot \sin(\theta)$ *(Y bleibt unverändert)*
+    * $z = z_0 + R \cdot \cos(\theta) \cdot \sin(\alpha)$ *(Z variiert nun dynamisch mit der Phase)*
+3.  **Visualisierung (`draw3DView`):** Die gezeichnete Ellipse folgt exakt dieser Kippung. Bei einem Neigungswinkel von $\alpha > 0^{\circ}$ erscheint eine gestrichelte Achse inklusive dynamischer Winkelbeschriftung (z. B. `α=45°`).
+4.  **UI-Anbindung (`updateRot`):** Der Slider/Eingabewert (`sRT`) wird korrekt ausgelesen und in die physikalische Variable (`vRT`) übertragen.
+5.  **Event-Handling:** Das Event-Listener-Array wurde um den Bezeichner `'sRT'` ergänzt.
+
+### Physikalisches Verhalten in der Simulation:
+* Bei $\alpha = 0^{\circ}$ rotieren die Quellen flach parallel zum Bildschirm (klassisches 2D-Verhalten).
+* Bei $\alpha = 90^{\circ}$ bewegen sich die Quellen vollkommen senkrecht im Raum. Die $Z$-Tiefe pulsiert maximal, was zu einem völlig neuen, faszinierend asymmetrischen Interferenzmuster führt.
+* Dazwischen entsteht eine harmonische, elliptische Bahn im dreidimensionalen Raum.
