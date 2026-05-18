@@ -1,0 +1,448 @@
+/* ════════════════════════════════════════════════════════
+   Welleninterferenz · style.css
+   Dunkles Sci-Fi Erscheinungsbild — WRZT / Undatron Stil
+   ════════════════════════════════════════════════════════ */
+
+:root {
+  --bg:       #03030c;
+  --surface:  #07071a;
+  --card:     #0d0d24;
+  --border:   rgba(100, 110, 255, 0.15);
+  --border2:  rgba(100, 110, 255, 0.30);
+  --accent1:  #7b8cff;
+  --accent2:  #4ef0c4;
+  --accent3:  #ff4d6d;
+  --accent4:  #ffd166;
+  --purple:   #c084fc;
+  --text:     #ccd0f0;
+  --muted:    #5a6090;
+  --mono:     'JetBrains Mono', monospace;
+  --serif:    'Cormorant Garamond', Georgia, serif;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+/* ── App shell ─────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Topbar ─────────────────────────────────────────────── */
+#topbar {
+  height: 44px;
+  flex-shrink: 0;
+  background: rgba(7, 7, 26, 0.96);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+}
+
+.tb-left  { display: flex; align-items: center; gap: 12px; }
+.tb-right { display: flex; gap: 5px; }
+
+.tb-title {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.tb-title em { color: var(--purple); font-style: normal; }
+
+.tb-hint {
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+/* ── Main area ──────────────────────────────────────────── */
+#main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* ── Canvas wrapper ─────────────────────────────────────── */
+#canvas-wrap {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+#glc {
+  flex: 1;
+  display: block;
+  cursor: crosshair;
+}
+
+#gl-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  color: var(--accent3);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+}
+
+/* ── Right panel ────────────────────────────────────────── */
+#panel {
+  width: 264px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+#tabs {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  padding: 10px 4px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab:last-child { border-right: none; }
+.tab:hover { color: var(--text); background: rgba(123, 140, 255, 0.06); }
+.tab.active {
+  color: var(--accent1);
+  background: rgba(123, 140, 255, 0.1);
+  font-weight: 500;
+}
+
+/* ── Pages ──────────────────────────────────────────────── */
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.page::-webkit-scrollbar { width: 3px; }
+.page::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.hidden { display: none !important; }
+
+/* ── Preset buttons ─────────────────────────────────────── */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ── Preview / 3D canvas ────────────────────────────────── */
+#previewCvs, #view3d {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ── Source list ────────────────────────────────────────── */
+#sourceList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.src-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: border-color 0.2s;
+}
+.src-card:hover { border-color: var(--border2); }
+
+.src-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.src-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.src-name {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #fff;
+  flex: 1;
+}
+
+.src-pos {
+  font-size: 0.56rem;
+  color: var(--muted);
+}
+
+.src-del {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0 3px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.src-del:hover { color: var(--accent3); }
+
+.src-amp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.src-amp-label {
+  font-size: 0.56rem;
+  color: var(--muted);
+  width: 12px;
+}
+
+.src-amp-val {
+  font-size: 0.58rem;
+  color: var(--text);
+  width: 20px;
+  text-align: right;
+}
+
+/* ── Panel buttons ──────────────────────────────────────── */
+.panel-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+/* ── Z-Rotation tab ─────────────────────────────────────── */
+.rot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(192, 132, 252, 0.06);
+  border: 1px solid rgba(192, 132, 252, 0.22);
+  border-radius: 8px;
+}
+
+.rot-title {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.rot-sub {
+  font-size: 0.56rem;
+  color: var(--muted);
+}
+
+#rotBtn { font-size: 0.62rem; padding: 4px 12px; }
+#rotBtn.active {
+  background: rgba(192, 132, 252, 0.14);
+  border-color: var(--purple);
+  color: var(--purple);
+}
+
+.sliders-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sl-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sl-top span:first-child {
+  font-size: 0.58rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.sl-top span:last-child {
+  font-size: 0.6rem;
+  color: #fff;
+  font-weight: 500;
+}
+
+.rot-info {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.6rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* ── Controls bar ───────────────────────────────────────── */
+#controls {
+  height: 88px;
+  flex-shrink: 0;
+  background: rgba(7, 7, 26, 0.96);
+  border-top: 1px solid var(--border);
+  padding: 8px 14px 10px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.ctrl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 88px;
+  flex: 1;
+}
+
+.ctrl-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ctrl-head span:first-child {
+  font-size: 0.58rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.ctrl-head span:last-child {
+  font-size: 0.6rem;
+  color: #fff;
+  font-weight: 500;
+}
+
+.color-group {
+  flex: 0 0 auto;
+  min-width: unset;
+}
+
+#colorSwatches {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.swatch:hover { transform: scale(1.1); }
+.swatch.active {
+  border-color: var(--accent2);
+  transform: scale(1.16);
+}
+
+/* ── Buttons (global) ───────────────────────────────────── */
+button {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+button:hover {
+  background: rgba(123, 140, 255, 0.1);
+  border-color: var(--accent1);
+  color: #fff;
+}
+button:active { transform: scale(0.97); }
+
+/* ── Range sliders ──────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  background: rgba(100, 110, 255, 0.16);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--purple);
+  box-shadow: 0 0 6px rgba(192, 132, 252, 0.5);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--purple);
+  border: none;
+  cursor: pointer;
+}
+
+/* ── Fullscreen ─────────────────────────────────────────── */
+:fullscreen #app, :-webkit-full-screen #app {
+  height: 100vh;
+}
