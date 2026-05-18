@@ -157,12 +157,13 @@ const state = {
   gamp:  1.0,
   dec:   0.2,
   /* Rotierende Quellen */
-  rotOn:  false,
-  rotSpd: 1.0,
-  rotRad: 0.20,
-  rotZ:   0.30,
-  rotPhi: Math.PI,
-  rotAmp: 1.0,
+  rotOn:   false,
+  rotSpd:  1.0,
+  rotRad:  0.20,
+  rotZ:    0.30,
+  rotPhi:  Math.PI,
+  rotAmp:  1.0,
+  rotTilt: 0.0,    // Neigungswinkel der Umlaufbahn zur Z-Achse (Radiant)
   /* Aktuelle Positionen der rotierenden Quellen */
   rs1: { x: 0.70, y: 0.50, z: 0.30 },
   rs2: { x: 0.30, y: 0.50, z: 0.30 }
@@ -240,15 +241,22 @@ new ResizeObserver(resizeCanvas).observe(cvs);
 
 function computeRotSources() {
   const angle = state.rotSpd * state.time;
+  const cosT  = Math.cos(state.rotTilt);
+  const sinT  = Math.sin(state.rotTilt);
+
+  // Umlaufbahn im um Y gekippten Kreis:
+  //   x = cx + R·cos(θ)·cos(α)   (Kippung reduziert x-Ausdehnung)
+  //   y = cy + R·sin(θ)           (y unverändert)
+  //   z = z0 + R·cos(θ)·sin(α)   (Kippung erzeugt Z-Variation)
   state.rs1 = {
-    x: 0.5 + state.rotRad * Math.cos(angle),
+    x: 0.5 + state.rotRad * Math.cos(angle)              * cosT,
     y: 0.5 + state.rotRad * Math.sin(angle),
-    z: state.rotZ
+    z: state.rotZ + state.rotRad * Math.cos(angle)              * sinT
   };
   state.rs2 = {
-    x: 0.5 + state.rotRad * Math.cos(angle + state.rotPhi),
+    x: 0.5 + state.rotRad * Math.cos(angle + state.rotPhi) * cosT,
     y: 0.5 + state.rotRad * Math.sin(angle + state.rotPhi),
-    z: state.rotZ
+    z: state.rotZ + state.rotRad * Math.cos(angle + state.rotPhi) * sinT
   };
 }
 
@@ -452,19 +460,36 @@ function draw3DView() {
   ctx3.fillStyle = 'rgba(160,200,255,.65)';
   ctx3.fillText('Z', zb.u + 3, zb.v + 3);
 
-  /* Umlaufbahn-Ellipse bei Tiefe rotZ */
-  ctx3.strokeStyle = 'rgba(255,255,255,.12)';
+  /* Umlaufbahn-Ellipse (gekippt um Neigungswinkel α) */
+  const cosT = Math.cos(state.rotTilt);
+  const sinT = Math.sin(state.rotTilt);
+  ctx3.strokeStyle = 'rgba(255,255,255,.18)';
   ctx3.lineWidth   = 0.8;
   ctx3.beginPath();
   let firstPt = true;
   for (let th = 0; th <= Math.PI * 2 + 0.05; th += 0.08) {
-    const ox = 0.5 + state.rotRad * Math.cos(th);
+    const ox = 0.5 + state.rotRad * Math.cos(th) * cosT;
     const oy = 0.5 + state.rotRad * Math.sin(th);
-    const p  = proj(ox, oy, state.rotZ);
+    const oz = state.rotZ + state.rotRad * Math.cos(th) * sinT;
+    const p  = proj(ox, oy, oz);
     if (firstPt) { ctx3.moveTo(p.u, p.v); firstPt = false; }
     else ctx3.lineTo(p.u, p.v);
   }
   ctx3.closePath(); ctx3.stroke();
+
+  /* Neigungsachse andeuten (wenn α > 0) */
+  if (state.rotTilt > 0.02) {
+    const pA = proj(0.5, 0.5 - state.rotRad * 1.15, state.rotZ);
+    const pB = proj(0.5, 0.5 + state.rotRad * 1.15, state.rotZ);
+    ctx3.strokeStyle = 'rgba(255,209,102,.25)';
+    ctx3.lineWidth   = 0.7;
+    ctx3.setLineDash([4, 3]);
+    ctx3.beginPath(); ctx3.moveTo(pA.u, pA.v); ctx3.lineTo(pB.u, pB.v); ctx3.stroke();
+    ctx3.setLineDash([]);
+    ctx3.font      = '9px JetBrains Mono, monospace';
+    ctx3.fillStyle = 'rgba(255,209,102,.5)';
+    ctx3.fillText('α=' + Math.round(state.rotTilt * 180 / Math.PI) + '°', pB.u + 3, pB.v + 3);
+  }
 
   /* Mittelpunktkreuz */
   const pc = proj(0.5, 0.5, state.rotZ);
@@ -736,17 +761,19 @@ function updateGlobal() {
 // ── Steuerelemente – Rotation ─────────────────────────────────────────────────
 
 function updateRot() {
-  state.rotSpd = document.getElementById('sRS').value / 10;
-  state.rotRad = document.getElementById('sRR').value / 50;
-  state.rotZ   = document.getElementById('sRD').value / 60;
-  state.rotPhi = document.getElementById('sRP').value * Math.PI / 180;
-  state.rotAmp = document.getElementById('sRA').value / 10;
+  state.rotSpd  = document.getElementById('sRS').value / 10;
+  state.rotRad  = document.getElementById('sRR').value / 50;
+  state.rotZ    = document.getElementById('sRD').value / 60;
+  state.rotPhi  = document.getElementById('sRP').value * Math.PI / 180;
+  state.rotAmp  = document.getElementById('sRA').value / 10;
+  state.rotTilt = document.getElementById('sRT').value * Math.PI / 180;
 
   document.getElementById('vRS').textContent = state.rotSpd.toFixed(1);
   document.getElementById('vRR').textContent = state.rotRad.toFixed(2);
   document.getElementById('vRD').textContent = state.rotZ.toFixed(2);
   document.getElementById('vRP').textContent = document.getElementById('sRP').value + '°';
   document.getElementById('vRA').textContent = state.rotAmp.toFixed(1);
+  document.getElementById('vRT').textContent = document.getElementById('sRT').value + '°';
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
@@ -864,7 +891,7 @@ document.querySelectorAll('[data-preset]').forEach(btn =>
 );
 
 /* Rotations-Slider */
-['sRS', 'sRR', 'sRD', 'sRP', 'sRA'].forEach(id =>
+['sRS', 'sRR', 'sRD', 'sRP', 'sRA', 'sRT'].forEach(id =>
   document.getElementById(id).addEventListener('input', updateRot)
 );
 
