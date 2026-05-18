@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Advanced Readme.md Live Editor</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-main: #0f111a;
+            --bg-panel: #1e2235;
+            --border-color: #2f354f;
+            --text-main: #e3e6ed;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #1f6feb;
+            --btn-sec: #21262d;
+            --btn-sec-hover: #30363d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header h1 span {
+            color: var(--accent);
+            font-size: 0.8rem;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background-color: var(--accent); }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-secondary { background-color: var(--btn-sec); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background-color: var(--btn-sec-hover); }
+
+        #file-input { display: none; }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .editor-panel {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .main-container.fullscreen-preview .editor-panel {
+            display: none;
+        }
+
+        .panel-header {
+            background-color: rgba(30, 34, 53, 0.5);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        textarea {
+            width: 100%;
+            flex: 1;
+            background-color: var(--bg-main);
+            color: #f0f3f6;
+            border: none;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            overflow-y: auto;
+        }
+
+        /* Spickzettel / Hilfe-Leiste unten im Editor */
+        .cheat-sheet-toggle {
+            background-color: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .cheat-sheet-content {
+            background-color: #141724;
+            max-height: 0;
+            overflow-y: auto;
+            transition: max-height 0.3s ease;
+            border-top: 0 solid var(--border-color);
+        }
+
+        .cheat-sheet-content.open {
+            max-height: 200px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            padding: 15px;
+            font-size: 0.8rem;
+        }
+
+        .help-item {
+            background: rgba(255,255,255,0.03);
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .help-item code {
+            color: #ff7b72;
+            font-family: 'Fira Code', monospace;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Live Vorschau */
+        .preview-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background-color: #0d1117;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* Markdown Styling */
+        .preview-content h1, .preview-content h2, .preview-content h3 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+            color: #f0f6fc;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 0.3em;
+        }
+        .preview-content h1 { font-size: 2em; }
+        .preview-content h2 { font-size: 1.5em; }
+        .preview-content h3 { font-size: 1.25em; }
+        .preview-content p { margin-bottom: 16px; color: #c9d1d9; }
+        .preview-content hr { height: 0.25em; margin: 24px 0; background-color: #21262d; border: 0; }
+        .preview-content ul { padding-left: 2em; margin-bottom: 16px; color: #c9d1d9; }
+        .preview-content li { margin-top: 0.25em; }
+        .preview-content blockquote { padding: 0 1em; color: #8b949e; border-left: 0.25em solid #30363d; margin-bottom: 16px; font-style: italic; }
+        
+        .preview-content table { border-spacing: 0; border-collapse: collapse; width: 100%; margin-bottom: 16px; color: #c9d1d9; }
+        .preview-content table th { font-weight: 600; background-color: #161b22; }
+        .preview-content table th, .preview-content table td { padding: 6px 13px; border: 1px solid #30363d; }
+        .preview-content table tr:nth-child(even) { background-color: #0d1117; }
+        .katex-display { padding: 12px 0; margin: 1em 0; overflow-x: auto; overflow-y: hidden; }
+        textarea.dragover { background-color: #161b22; border: 2px dashed var(--accent); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>WRZT Readme Editor <span>Advanced + Help</span></h1>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="triggerFileInput()">📂 Datei öffnen</button>
+            <input type="file" id="file-input" accept=".md,.txt" onchange="loadMarkdownFile(event)">
+            <button class="btn btn-primary" onclick="downloadMarkdown()">💾 .md speichern</button>
+        </div>
+    </header>
+
+    <div class="main-container" id="container">
+        <div class="panel editor-panel">
+            <div class="panel-header">Markdown Input</div>
+            <textarea id="editor" placeholder="# Loslegen..." oninput="updatePreview()"># Wellenfeld-Gleichung der WRZT
+
+Das **„WRZT – Einheits-Manifest“** vereint alle Parameter in einem konsistenten Wellenfeld.
+
+$$\Psi(\vec{r},t) = \sum_{i=1}^{2} \frac{\Xi}{|\vec{r} - \vec{r}_i(t_{\text{ret}})|} \cdot \cos(\Phi_i(\vec{r},t))$$</textarea>
+            
+            <div class="cheat-sheet-toggle" onclick="toggleCheatSheet()">💡 Formatierungshilfe (Klicken zum Ausklappen)</div>
+            <div class="cheat-sheet-content" id="cheat-sheet">
+                <div class="help-grid">
+                    <div class="help-item">Überschrift 1: <code># Text</code></div>
+                    <div class="help-item">Überschrift 2: <code>## Text</code></div>
+                    <div class="help-item">Überschrift 3: <code>### Text</code></div>
+                    <div class="help-item">Fett drucken: <code>**Text**</code></div>
+                    <div class="help-item">Kursiv: <code>*Text*</code></div>
+                    <div class="help-item">Trennlinie: <code>---</code></div>
+                    <div class="help-item">Liste: <code>* Punkt 1</code></div>
+                    <div class="help-item">Nummeriert: <code>1. Punkt 1</code></div>
+                    <div class="help-item">Zitat-Block: <code>&gt; Text</code></div>
+                    <div class="help-item">Inline Code: <code>`code`</code></div>
+                    <div class="help-item">Inline Mathe: <code>$\Xi$</code></div>
+                    <div class="help-item">Formel-Block: <code>$$\Psi$$</code></div>
+                    <div class="help-item" style="grid-column: span 2;">Tabelle: <code>| Spalte 1 | Spalte 2 |</code><br><code>| :--- | :--- |</code></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="preview-panel">
+            <div class="panel-header">
+                <span>Live Vorschau</span>
+                <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="toggleFullscreen()" id="fs-btn">🖥️ Vollbild</button>
+            </div>
+            <div id="preview" class="preview-content"></div>
+        </div>
+    </div>
+
+    <script>
+        marked.setOptions({ breaks: true, gfm: true });
+
+        function renderMath(text) {
+            text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(match, expression) {
+                try { return '<div class="katex-display">' + katex.renderToString(expression, { displayMode: true }) + '</div>'; } 
+                catch (e) { return match; }
+            });
+            text = text.replace(/\$([\s\S]+?)\$/g, function(match, expression) {
+                try { return katex.renderToString(expression, { displayMode: false }); } 
+                catch (e) { return match; }
+            });
+            return text;
+        }
+
+        function updatePreview() {
+            const editorText = document.getElementById('editor').value;
+            const mathRenderedText = renderMath(editorText);
+            const htmlContent = marked.parse(mathRenderedText);
+            document.getElementById('preview').innerHTML = htmlContent;
+        }
+
+        function triggerFileInput() { document.getElementById('file-input').click(); }
+
+        function loadMarkdownFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('editor').value = e.target.result;
+                updatePreview();
+            };
+            reader.readAsText(file);
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('container');
+            const btn = document.getElementById('fs-btn');
+            container.classList.toggle('fullscreen-preview');
+            btn.innerHTML = container.classList.contains('fullscreen-preview') ? "🪟 Splitscreen" : "🖥️ Vollbild";
+        }
+
+        function toggleCheatSheet() {
+            document.getElementById('cheat-sheet').classList.toggle('open');
+        }
+
+        function downloadMarkdown() {
+            const text = document.getElementById('editor').value;
+            const blob = new Blob([text], { type: 'text/markdown;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Readme_WRZT.md";
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Drag and Drop
+        const textarea = document.getElementById('editor');
+        textarea.addEventListener('dragover', (e) => { e.preventDefault(); textarea.classList.add('dragover'); });
+        textarea.addEventListener('dragleave', () => { textarea.classList.remove('dragover'); });
+        textarea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            textarea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && (file.name.endsWith('.md') || file.name.endsWith('.txt'))) {
+                const reader = new FileReader();
+                reader.onload = function(evt) { textarea.value = evt.target.result; updatePreview(); };
+                reader.readAsText(file);
+            }
+        });
+
+        window.onload = updatePreview;
+    </script>
+</body>
+</html>
