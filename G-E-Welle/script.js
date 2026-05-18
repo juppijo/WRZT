@@ -239,15 +239,16 @@ new ResizeObserver(resizeCanvas).observe(cvs);
 
 // ── Animations-Loop ───────────────────────────────────────────────────────────
 
-function computeRotSources() {
+function computeRotSources_WR() {
   const angle = state.rotSpd * state.time;
   const cosT  = Math.cos(state.rotTilt);
   const sinT  = Math.sin(state.rotTilt);
 
-  // Umlaufbahn im um Y gekippten Kreis:
-  //   x = cx + R·cos(θ)·cos(α)   (Kippung reduziert x-Ausdehnung)
-  //   y = cy + R·sin(θ)           (y unverändert)
-  //   z = z0 + R·cos(θ)·sin(α)   (Kippung erzeugt Z-Variation)
+  /* Umlaufbahn im um Y gekippten Kreis:
+     x = cx + R·cos(θ)·cos(α)   (Kippung reduziert x-Ausdehnung)
+     y = cy + R·sin(θ)           (y unverändert)
+     z = z0 + R·cos(θ)·sin(α)   (Kippung erzeugt Z-Variation) */
+
   state.rs1 = {
     x: 0.5 + state.rotRad * Math.cos(angle)              * cosT,
     y: 0.5 + state.rotRad * Math.sin(angle),
@@ -257,6 +258,47 @@ function computeRotSources() {
     x: 0.5 + state.rotRad * Math.cos(angle + state.rotPhi) * cosT,
     y: 0.5 + state.rotRad * Math.sin(angle + state.rotPhi),
     z: state.rotZ + state.rotRad * Math.cos(angle + state.rotPhi) * sinT
+  };
+}
+
+function computeRotSources() {
+  const angle = state.rotSpd * state.time;
+  const cosT  = Math.cos(state.rotTilt);
+  const sinT  = Math.sin(state.rotTilt);
+
+  // Feste Neigung um die dritte Achse (z.B. 45 Grad um X)
+  //const fAngle = 45 * Math.PI / 180; // 45° in Rad
+  const cosF = Math.cos(state.rotF);
+  const sinF = Math.sin(state.rotF);
+
+  // --- Quelle 1 ---
+  const cosA1 = Math.cos(angle);
+  const sinA1 = Math.sin(angle);
+
+  // 1. Ursprüngliche flache Position vor der festen Neigung:
+  const x1_raw = state.rotRad * cosA1 * cosT;
+  const y1_raw = state.rotRad * cosA1 * sinT;
+  const z1_raw = state.rotRad * sinA1;
+
+  // 2. Feste Neigung um die X-Achse anwenden:
+  state.rs1 = {
+    x: 0.5 + x1_raw,
+    y: 0.5 + (y1_raw * cosF - z1_raw * sinF),
+    z: state.rotZ + (y1_raw * sinF + z1_raw * cosF)
+  };
+
+  // --- Quelle 2 ---
+  const cosA2 = Math.cos(angle + state.rotPhi);
+  const sinA2 = Math.sin(angle + state.rotPhi);
+
+  const x2_raw = state.rotRad * cosA2 * cosT;
+  const y2_raw = state.rotRad * cosA2 * sinT;
+  const z2_raw = state.rotRad * sinA2;
+
+  state.rs2 = {
+    x: 0.5 + x2_raw,
+    y: 0.5 + (y2_raw * cosF - z2_raw * sinF),
+    z: state.rotZ + (y2_raw * sinF + z2_raw * cosF)
   };
 }
 
@@ -767,6 +809,7 @@ function updateRot() {
   state.rotPhi  = document.getElementById('sRP').value * Math.PI / 180;
   state.rotAmp  = document.getElementById('sRA').value / 10;
   state.rotTilt = document.getElementById('sRT').value * Math.PI / 180;
+  state.rotF = document.getElementById('sRF').value * Math.PI / 180;
 
   document.getElementById('vRS').textContent = state.rotSpd.toFixed(1);
   document.getElementById('vRR').textContent = state.rotRad.toFixed(2);
@@ -774,6 +817,7 @@ function updateRot() {
   document.getElementById('vRP').textContent = document.getElementById('sRP').value + '°';
   document.getElementById('vRA').textContent = state.rotAmp.toFixed(1);
   document.getElementById('vRT').textContent = document.getElementById('sRT').value + '°';
+  document.getElementById('vRF').textContent = document.getElementById('sRF').value + '°';
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
@@ -891,7 +935,7 @@ document.querySelectorAll('[data-preset]').forEach(btn =>
 );
 
 /* Rotations-Slider */
-['sRS', 'sRR', 'sRD', 'sRP', 'sRA', 'sRT'].forEach(id =>
+['sRS', 'sRR', 'sRD', 'sRP', 'sRA', 'sRT', 'sRF'].forEach(id =>
   document.getElementById(id).addEventListener('input', updateRot)
 );
 
