@@ -346,7 +346,7 @@
             latexBaseFormula.innerHTML = `$$v(r) = c \\cdot \\frac{R_{\\text{min}}}{r}$$`;
             let factor = 1 / scaleFactor;
             //if (sVal <= R_min) factor = 1.0;
-            latexSpeed.innerHTML = `$$v(r) = ${factor.toFixed(2)} \\cdot c \\quad \\color{green}{\\mathbf{(\\le c)}}$$`;
+            latexSpeed.innerHTML = `$$v(r) = ${factor.toFixed(2)} \\cdot c \\quad {\\mathbf{(\\le c)}}$$`;
         }
         
         latexRadius.innerHTML = `$$r = ${realRadius.toFixed(2)} \\times 10^{-13} \\text{ m}$$`;
