@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WRZT - Advanced Readme.md Live Editor</title>
+    <title>WRZT - Ultimate Readme.md Live Editor</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -23,6 +23,8 @@
             --accent-hover: #1f6feb;
             --btn-sec: #21262d;
             --btn-sec-hover: #30363d;
+            --btn-success: #238636;
+            --btn-success-hover: #2ea043;
         }
 
         * {
@@ -72,16 +74,16 @@
 
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
         .btn {
             color: #ffffff;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s ease, border-color 0.2s ease;
@@ -94,6 +96,8 @@
         .btn-primary:hover { background-color: var(--accent-hover); }
         .btn-secondary { background-color: var(--btn-sec); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: var(--btn-sec-hover); }
+        .btn-success { background-color: var(--btn-success); }
+        .btn-success:hover { background-color: var(--btn-success-hover); }
 
         #file-input { display: none; }
 
@@ -151,7 +155,6 @@
             overflow-y: auto;
         }
 
-        /* Spickzettel / Hilfe-Leiste unten im Editor */
         .cheat-sheet-toggle {
             background-color: var(--bg-panel);
             border-top: 1px solid var(--border-color);
@@ -172,7 +175,7 @@
         }
 
         .cheat-sheet-content.open {
-            max-height: 200px;
+            max-height: 180px;
             border-top: 1px solid var(--border-color);
         }
 
@@ -234,16 +237,56 @@
         .preview-content table tr:nth-child(even) { background-color: #0d1117; }
         .katex-display { padding: 12px 0; margin: 1em 0; overflow-x: auto; overflow-y: hidden; }
         textarea.dragover { background-color: #161b22; border: 2px dashed var(--accent); }
+
+        /* PRINT STYLESHEET (Für den perfekten PDF-Druck) */
+        @media print {
+            body, .main-container, .preview-content {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+            header, .editor-panel, .panel-header, .cheat-sheet-toggle, .cheat-sheet-content {
+                display: none !important;
+            }
+            .panel {
+                overflow: visible !important;
+                height: auto !important;
+            }
+            .preview-content {
+                padding: 0 !important;
+            }
+            .preview-content h1, .preview-content h2, .preview-content h3 {
+                color: #000000 !important;
+                border-bottom: 1px solid #ddd !important;
+            }
+            .preview-content p, .preview-content li, .preview-content td {
+                color: #222222 !important;
+            }
+            .preview-content table th {
+                background-color: #f5f5f5 !important;
+                color: #000000 !important;
+            }
+            .preview-content table td, .preview-content table th {
+                border: 1px solid #aaa !important;
+            }
+            .katex {
+                color: #000000 !important;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>WRZT Readme Editor <span>Advanced + Help</span></h1>
+        <h1>WRZT Readme Editor <span>Ultimate</span></h1>
         <div class="button-group">
-            <button class="btn btn-secondary" onclick="triggerFileInput()">📂 Datei öffnen</button>
+            <button class="btn btn-secondary" onclick="triggerFileInput()">📂 Öffnen</button>
             <input type="file" id="file-input" accept=".md,.txt" onchange="loadMarkdownFile(event)">
-            <button class="btn btn-primary" onclick="downloadMarkdown()">💾 .md speichern</button>
+            
+            <button class="btn btn-secondary" onclick="downloadMarkdown()">💾 .md Export</button>
+            <button class="btn btn-secondary" onclick="downloadHTML()">🌐 .html Export</button>
+            <button class="btn btn-success" onclick="printPDF()">🖨️ PDF Drucken</button>
         </div>
     </header>
 
@@ -254,6 +297,8 @@
 
 Das **„WRZT – Einheits-Manifest“** vereint alle Parameter in einem konsistenten Wellenfeld.
 
+## 1. Die vollständige Wellenfeld-Gleichung
+
 $$\Psi(\vec{r},t) = \sum_{i=1}^{2} \frac{\Xi}{|\vec{r} - \vec{r}_i(t_{\text{ret}})|} \cdot \cos(\Phi_i(\vec{r},t))$$</textarea>
             
             <div class="cheat-sheet-toggle" onclick="toggleCheatSheet()">💡 Formatierungshilfe (Klicken zum Ausklappen)</div>
@@ -261,17 +306,13 @@ $$\Psi(\vec{r},t) = \sum_{i=1}^{2} \frac{\Xi}{|\vec{r} - \vec{r}_i(t_{\text{ret}
                 <div class="help-grid">
                     <div class="help-item">Überschrift 1: <code># Text</code></div>
                     <div class="help-item">Überschrift 2: <code>## Text</code></div>
-                    <div class="help-item">Überschrift 3: <code>### Text</code></div>
-                    <div class="help-item">Fett drucken: <code>**Text**</code></div>
+                    <div class="help-item">Fett: <code>**Text**</code></div>
                     <div class="help-item">Kursiv: <code>*Text*</code></div>
                     <div class="help-item">Trennlinie: <code>---</code></div>
-                    <div class="help-item">Liste: <code>* Punkt 1</code></div>
-                    <div class="help-item">Nummeriert: <code>1. Punkt 1</code></div>
-                    <div class="help-item">Zitat-Block: <code>&gt; Text</code></div>
-                    <div class="help-item">Inline Code: <code>`code`</code></div>
+                    <div class="help-item">Liste: <code>* Punkt</code></div>
                     <div class="help-item">Inline Mathe: <code>$\Xi$</code></div>
                     <div class="help-item">Formel-Block: <code>$$\Psi$$</code></div>
-                    <div class="help-item" style="grid-column: span 2;">Tabelle: <code>| Spalte 1 | Spalte 2 |</code><br><code>| :--- | :--- |</code></div>
+                    <div class="help-item" style="grid-column: span 2;">Tabelle: <code>| Spalte 1 | Spalte 2 |</code></div>
                 </div>
             </div>
         </div>
@@ -331,16 +372,54 @@ $$\Psi(\vec{r},t) = \sum_{i=1}^{2} \frac{\Xi}{|\vec{r} - \vec{r}_i(t_{\text{ret}
             document.getElementById('cheat-sheet').classList.toggle('open');
         }
 
+        // NEU: Exporte der Live-Vorschau als HTML-Datei inklusive KaTeX Stylesheets
+        function downloadHTML() {
+            const previewHTML = document.getElementById('preview').innerHTML;
+            
+            // Zusammenbauen einer vollständigen HTML-Datei, damit sie überall autark geöffnet werden kann
+            const fullHTML = `<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Exportiertes Dokument</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; padding: 40px; max-width: 900px; margin: 0 auto; background-color: #0d1117; color: #c9d1d9; }
+        h1, h2, h3 { color: #f0f6fc; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; margin-top: 24px; margin-bottom: 16px; }
+        p { margin-bottom: 16px; }
+        hr { height: 0.25em; margin: 24px 0; background-color: #21262d; border: 0; }
+        table { border-spacing: 0; border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+        table th { font-weight: 600; background-color: #161b22; padding: 6px 13px; border: 1px solid #30363d; }
+        table td { padding: 6px 13px; border: 1px solid #30363d; }
+        table tr:nth-child(even) { background-color: #161b22; }
+        blockquote { padding: 0 1em; color: #8b949e; border-left: 0.25em solid #30363d; font-style: italic; }
+        .katex-display { padding: 12px 0; margin: 1em 0; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    ${previewHTML}
+</body>
+</html>`;
+
+            const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Vorschau_WRZT.html";
+            link.click();
+        }
+
+        // NEU: PDF-Druckfunktion (Nutzt das CSS-Drucklayout)
+        function printPDF() {
+            window.print();
+        }
+
         function downloadMarkdown() {
             const text = document.getElementById('editor').value;
             const blob = new Blob([text], { type: 'text/markdown;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = "Readme_WRZT.md";
-            link.style.display = 'none';
-            document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
         }
 
         // Drag and Drop
