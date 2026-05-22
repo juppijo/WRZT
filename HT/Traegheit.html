@@ -1,105 +1,236 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<style type="text/css">
-td, th { border: 1px solid #c3c3c3; padding: 0 3px 0 3px; }
-table { border-collapse: collapse; }
-img { max-width: 100%; }
-</style>
-<meta name="generator" content="ReText 8.1.0">
-<title>Neues Dokument</title>
-<style type="text/css">
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WRZT – Trägheit</title>
 
 <script>
 MathJax = {
-  options: {
-    renderActions: {
-      find: [10, function (doc) {
-        for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
-          const display = !!node.type.match(/; *mode=display/);
-          const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-          const text = document.createTextNode('');
-          node.parentNode.replaceChild(text, node);
-          math.start = {node: text, delim: '', n: 0};
-          math.end = {node: text, delim: '', n: 0};
-          doc.math.push(math);
-        }
-      }, '']
-    }
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']]
   }
 };
 </script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script></head>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at center, #16213e, #0a0f1f);
+    color: #f1f1f1;
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.8;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 40px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    text-align: center;
+    color: #7dd3fc;
+    font-size: 42px;
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: #93c5fd;
+    margin-top: 40px;
+    border-left: 4px solid #60a5fa;
+    padding-left: 15px;
+}
+
+p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.formula {
+    background: rgba(255,255,255,0.06);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 25px 0;
+    overflow-x: auto;
+}
+
+.highlight {
+    background: rgba(125,211,252,0.08);
+    border-left: 4px solid #7dd3fc;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+ul {
+    padding-left: 25px;
+}
+
+li {
+    margin-bottom: 12px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 60px;
+    opacity: 0.7;
+    font-size: 14px;
+}
+</style>
+</head>
+
 <body>
-<p>\section*{Trägheit in der Wellenraumzeit-Theorie (WRZT)}</p>
-<p>In der klassischen Mechanik gilt:
-<script type="math/tex; mode=display">
-F = m \cdot a,
-</script>
-wobei die Kraft der zeitlichen Änderung des Impulses entspricht:
-<script type="math/tex; mode=display">
-\vec{F} = \frac{d}{dt}(m \vec{v}).
-</script>
+
+<div class="container">
+
+<h1>Trägheit in der Wellenraumzeit-Theorie (WRZT)</h1>
+
+<p>
+In der klassischen Mechanik gilt:
 </p>
-<p>\subsection*{Relativistische Erweiterung}
-In der speziellen Relativitätstheorie wird der Impuls durch den Lorentzfaktor 
-<script type="math/tex">\gamma</script> modifiziert:
-<script type="math/tex; mode=display">
+
+<div class="formula">
+\[
+F = m \cdot a
+\]
+</div>
+
+<p>
+wobei die Kraft der zeitlichen Änderung des Impulses entspricht:
+</p>
+
+<div class="formula">
+\[
+\vec{F} = \frac{d}{dt}(m \vec{v})
+\]
+</div>
+
+<h2>Relativistische Erweiterung</h2>
+
+<p>
+In der speziellen Relativitätstheorie wird der Impuls durch den Lorentzfaktor
+$\gamma$ modifiziert:
+</p>
+
+<div class="formula">
+\[
 \vec{p} = \gamma m \vec{v},
 \quad
-\gamma = \frac{1}{\sqrt{1 - v^{2}/c^{2}}}.
-</script>
-</p>
-<p>Damit ergibt sich für die Kraft:
-<script type="math/tex; mode=display">
-\vec{F} = \frac{d}{dt}(\gamma m \vec{v}).
-</script>
-</p>
-<p>\subsection*{WRZT-Erweiterung}
-Die Wellenraumzeit-Theorie berücksichtigt zusätzlich, 
-dass ein Teilchen bei Beschleunigung Energie in Form von Undatronen abstrahlt.
-Diese abgestrahlte Energie sei <script type="math/tex">E_{U}(t)</script>.
-Ihre zeitliche Änderung trägt ebenfalls zur erfahrbaren Trägheitskraft bei:</p>
+\gamma = \frac{1}{\sqrt{1 - v^{2}/c^{2}}}
+\]
+</div>
+
 <p>
-<script type="math/tex; mode=display">
-\boxed{ \;
+Damit ergibt sich für die Kraft:
+</p>
+
+<div class="formula">
+\[
+\vec{F} = \frac{d}{dt}(\gamma m \vec{v})
+\]
+</div>
+
+<h2>WRZT-Erweiterung</h2>
+
+<p>
+Die Wellenraumzeit-Theorie berücksichtigt zusätzlich,
+dass ein Teilchen bei Beschleunigung Energie in Form von Undatronen abstrahlt.
+Diese abgestrahlte Energie sei $E_U(t)$.
+Ihre zeitliche Änderung trägt ebenfalls zur erfahrbaren Trägheitskraft bei:
+</p>
+
+<div class="formula">
+\[
+\boxed{
 \vec{F}_{\text{Trägheit}}
-= \frac{d}{dt}(\gamma m \vec{v})
-+ \frac{1}{c}\frac{dE_{U}}{dt}
-\; }
-</script>
+=
+\frac{d}{dt}(\gamma m \vec{v})
++
+\frac{1}{c}\frac{dE_U}{dt}
+}
+\]
+</div>
+
+<h2>Interpretation der Terme</h2>
+
+<div class="highlight">
+<ul>
+<li>
+$\frac{d}{dt}(\gamma m \vec{v})$ :
+relativistischer Anteil der Trägheit,
+bekannt aus der klassischen Relativitätstheorie.
+</li>
+
+<li>
+$\frac{1}{c}\frac{dE_U}{dt}$ :
+WRZT-Zusatzterm,
+beschreibt die Rückwirkung der abgestrahlten Wellenenergie
+(Undatrone) auf die Bewegung des Teilchens.
+</li>
+</ul>
+</div>
+
+<h2>Grenzfälle</h2>
+
+<div class="highlight">
+<ul>
+<li>
+Falls keine Energie abgestrahlt wird
+$(dE_U/dt = 0)$,
+reduziert sich die Formel auf die relativistische Standardform.
+</li>
+
+<li>
+Bei kontinuierlicher Abstrahlung verstärkt der zweite Term die
+erlebte Trägheit, was als Wechselwirkung zwischen Teilchen und
+Wellenraum verstanden werden kann.
+</li>
+</ul>
+</div>
+
+<h2>Beispiel</h2>
+
+<p>
+Ein Elektron wird beschleunigt.
+Neben der Änderung seines relativistischen Impulses emittiert es
+Photonen (in der WRZT: Undatrone) mit einer Leistungsrate
+$P = dE_U/dt$.
 </p>
-<p>\subsection*{Interpretation der Terme}
-<script type="math/tex; mode=display">\begin{itemize}
-  \item \(\tfrac{d}{dt}(\gamma m \vec{v})\): relativistischer Anteil der Trägheit,
-        bekannt aus der klassischen Relativitätstheorie.
-  \item \(\tfrac{1}{c}\tfrac{dE_{U}}{dt}\): WRZT-Zusatzterm,
-        beschreibt die Rückwirkung der abgestrahlten Wellenenergie 
-        (Undatrone) auf die Bewegung des Teilchens.
-\end{itemize}</script>
-</p>
-<p>\subsection*{Grenzfälle}
-<script type="math/tex; mode=display">\begin{itemize}
-  \item Falls keine Energie abgestrahlt wird \((dE_{U}/dt = 0)\), 
-        reduziert sich die Formel auf die relativistische Standardform.
-  \item Bei kontinuierlicher Abstrahlung verstärkt der zweite Term die
-        erlebte Trägheit, was als Wechselwirkung zwischen Teilchen und 
-        Wellenraum verstanden werden kann.
-\end{itemize}</script>
-</p>
-<p>\subsection*{Beispiel}
-Ein Elektron wird beschleunigt. Neben der Änderung seines relativistischen 
-Impulses emittiert es Photonen (in der WRZT: Undatrone) mit einer 
-Leistungsrate <script type="math/tex">P = dE_{U}/dt</script>.<br>
+
+<p>
 Die gesamte wirksame Trägheitskraft ist dann:
-<script type="math/tex; mode=display">
-F_{\text{Trägheit}} = \frac{d}{dt}(\gamma m v) + \frac{P}{c}.
-</script>
 </p>
-<p>Dies zeigt: die Abstrahlungsleistung wirkt wie eine zusätzliche
-Kraft, die mit der Lichtgeschwindigkeit normiert wird.</p>
+
+<div class="formula">
+\[
+F_{\text{Trägheit}}
+=
+\frac{d}{dt}(\gamma m v)
++
+\frac{P}{c}
+\]
+</div>
+
+<p>
+Dies zeigt:
+die Abstrahlungsleistung wirkt wie eine zusätzliche Kraft,
+die mit der Lichtgeschwindigkeit normiert wird.
+</p>
+
+<div class="footer">
+WRZT – Wellenraumzeit-Theorie
+</div>
+
+</div>
 
 </body>
 </html>
