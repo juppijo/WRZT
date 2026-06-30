@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Mathematischer Vergleich der Spin-Herleitungen</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        .spin-vergleich-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 1000px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #c9d1d9;
+            margin: 20px auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .vergleich-title {
+            color: #00ced1;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+            letter-spacing: 0.5px;
+        }
+
+        .vergleich-subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .vergleich-grid {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .vergleich-column {
+            flex: 1;
+            min-width: 450px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            padding: 25px;
+            box-sizing: border-box;
+            border: 1px solid #30363d;
+        }
+
+        .vergleich-column.falsch {
+            border-top: 4px solid #ff7b72;
+        }
+
+        .vergleich-column.richtig {
+            border-top: 4px solid #00ced1;
+        }
+
+        .column-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .falsch .column-header { color: #ff7b72; }
+        .richtig .column-header { color: #00ced1; }
+
+        .section-step {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #f0f6fc;
+            font-size: 0.95em;
+        }
+
+        .math-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .text-block {
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #8b949e;
+            margin-bottom: 15px;
+        }
+
+        .text-block strong {
+            color: #c9d1d9;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .falsch .result-box {
+            background: rgba(248, 81, 73, 0.1);
+            color: #ff7b72;
+            border: 1px solid rgba(248, 81, 73, 0.2);
+        }
+
+        .richtig .result-box {
+            background: rgba(56, 139, 253, 0.1);
+            color: #58a6ff;
+            border: 1px solid rgba(56, 139, 253, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="spin-vergleich-container">
+    <div class="vergleich-title">Mathematische Gegenüberstellung des Elektronen-Spins</div>
+    <div class="vergleich-subtitle">Klassischer Starrkörper-Ansatz vs. Topologischer Feldwirbel (WRZT)</div>
+    
+    <div class="vergleich-grid">
+        
+        <div class="vergleich-column falsch">
+            <div class="column-header">❌ Mechanische Kugel-Rotation</div>
+            
+            <div class="text-block">
+                Wird das Elektron als feste, gleichmäßig geladene Kugel mit dem klassischen Trägheitsmoment \(I = \frac{2}{5}m \cdot r^2\) betrachtet, lautet der mechanische Drehimpuls:
+            </div>
+            
+            <div class="section-step">1. Ansatz des klassischen Spins:</div>
+            <div class="math-box">
+                \[S = I \cdot \omega = \frac{2}{5}m \cdot r^2 \cdot \frac{v}{r} = \frac{2}{5}m \cdot v \cdot r\]
+            </div>
+            
+            <div class="text-block">
+                Gleichgesetzt mit dem Quanten-Spin (\(S = n\hbar\)) führt dies zur Auflösung nach der Umfangsgeschwindigkeit \(v\):
+            </div>
+            <div class="math-box">
+                \[\frac{2}{5}m \cdot v \cdot r = n\hbar \implies v = \frac{5n\hbar}{2mr}\]
+            </div>
+
+            <div class="section-step">2. Das Verhalten im Raumzeit-Feld:</div>
+            <div class="text-block">
+                Definiert man einen festen Grenzradius \(R_{\text{min}}\), verhält sich jede starre Rotation nach außen hin **proportional** zum Abstand (\(v \sim r\)):
+            </div>
+            <div class="math-box">
+                \[v(r) = \omega \cdot r = c \cdot \frac{r}{R_{\text{min}}}\]
+            </div>
+
+            <div class="result-box">
+                💥 Relativistischer Zusammenbruch:<br>
+                Da \(v\) mit größerem Radius wächst, gilt im Außenraum sofort \(\color{salmon}{v > c}\). Das Modell ist physikalisch unmöglich.
+            </div>
+        </div>
+
+        <div class="vergleich-column richtig">
+            <div class="column-header">🌀 Topologischer WRZT-Raumwirbel</div>
+            
+            <div class="text-block">
+                Die Wellenraumzeit-Theorie beschreibt den Spin als eine kontinuierliche Scherung und Verdrehung des Raumes selbst. Die Geschwindigkeit folgt dem hyperbolischen Feldgesetz:
+            </div>
+            
+            <div class="section-step">1. Das hyperbolische Geschwindigkeitsfeld:</div>
+            <div class="math-box">
+                \[v(r) = c \cdot \frac{R_{\text{min}}}{r}\]
+            </div>
+            
+            <div class="text-block">
+                Direkt an der inneren Singularität (\(R_{\text{min}}\)) rotiert das Feld mit Lichtgeschwindigkeit (\(v = c\)). Der Spin ergibt sich aus dem Impulsfluss an dieser Grenzfläche:
+            </div>
+            <div class="math-box">
+                \[S = m_e \cdot c \cdot R_{\text{min}} = \frac{1}{2}\hbar\]
+            </div>
+
+            <div class="section-step">2. Exakte Bestimmung des Kernradius:</div>
+            <div class="text-block">
+                Durch Auflösung nach dem strukturellen Minimal-Radius (\(R_{\text{min}}\)) für den Elementarspin (\(S = \frac{1}{2}\hbar\)) erhalten wir:
+            </div>
+            <div class="math-box">
+                \[R_{\text{min}} = \frac{\hbar}{2 \cdot m_e \cdot c}\]
+            </div>
+
+            <div class="result-box">
+                ✓ Kausalität perfekt gewahrt:<br>
+                Da \(v \sim \frac{1}{r}\) abfällt, ist die Lichtgeschwindigkeit \(c\) die Obergrenze. Im gesamten Außenraum gilt absolut stabil: \(\color{lightgreen}{v \le c}\).
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

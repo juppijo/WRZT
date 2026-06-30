@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Mathematischer Vergleich mit Zahlenwerten</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        .spin-vergleich-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 1050px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #c9d1d9;
+            margin: 20px auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .vergleich-title {
+            color: #00ced1;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+            letter-spacing: 0.5px;
+        }
+
+        .vergleich-subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .vergleich-grid {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .vergleich-column {
+            flex: 1;
+            min-width: 450px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            padding: 25px;
+            box-sizing: border-box;
+            border: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .vergleich-column.falsch { border-top: 4px solid #ff7b72; }
+        .vergleich-column.richtig { border-top: 4px solid #00ced1; }
+
+        .column-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .falsch .column-header { color: #ff7b72; }
+        .richtig .column-header { color: #00ced1; }
+
+        .section-step {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #f0f6fc;
+            font-size: 0.95em;
+        }
+
+        .math-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .text-block {
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+
+        .text-block strong { color: #c9d1d9; }
+
+        .value-badge {
+            background: rgba(255,255,255,0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #58a6ff;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .falsch .result-box {
+            background: rgba(248, 81, 73, 0.1);
+            color: #ff7b72;
+            border: 1px solid rgba(248, 81, 73, 0.2);
+        }
+
+        .richtig .result-box {
+            background: rgba(56, 139, 253, 0.1);
+            color: #58a6ff;
+            border: 1px solid rgba(56, 139, 253, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="spin-vergleich-container">
+    <div class="vergleich-title">Mathematische Gegenüberstellung mit Zahlenwerten</div>
+    <div class="vergleich-subtitle">Konstanten: \(m_e \approx 9,109 \times 10^{-31}\text{ kg}\) | \(c \approx 2,998 \times 10^8\text{ m/s}\) | \(\hbar \approx 1,055 \times 10^{-34}\text{ J s}\)</div>
+    
+    <div class="vergleich-grid">
+        
+        <div class="vergleich-column falsch">
+            <div>
+                <div class="column-header">❌ Mechanische Kugel-Rotation</div>
+                
+                <div class="text-block">
+                    Nimmt man für das Elektron den klassischen Radius aus der Elektrostatik an (\(r_e \approx 2,82 \times 10^{-15}\text{ m}\)), lautet die Umstellung für die Umfangsgeschwindigkeit:
+                </div>
+                
+                <div class="section-step">1. Berechnung der Geschwindigkeit \(v\):</div>
+                <div class="math-box">
+                    \[v = \frac{5 \cdot \hbar}{4 \cdot m_e \cdot r_e}\]
+                </div>
+                
+                <div class="text-block">
+                    Setzt man die realen Werte des Elektrons (für Elementarspin \(n = 1/2\)) in diese mechanische Gleichung ein, erhält man:
+                </div>
+                <div class="math-box">
+                    \[v = \frac{5 \cdot (1,055 \times 10^{-34})}{4 \cdot (9,109 \times 10^{-31}) \cdot (2,82 \times 10^{-15})}\]
+                </div>
+                <div class="math-box" style="color: #ff7b72; font-weight: bold;">
+                    \[v \approx 5,13 \times 10^{10} \text{ m/s} \approx 171 \cdot c\]
+                </div>
+
+                <div class="section-step">2. Lineare Feldexplosion im Außenraum:</div>
+                <div class="text-block">
+                    Selbst wenn man einen fiktiven Kernradius bei \(R_{\text{min}} = 7,72 \times 10^{-13}\text{ m}\) ansetzt, wächst \(v\) nach außen hin proportional (\(v \sim r\)):
+                </div>
+                <div class="math-box">
+                    \[v(10^{-12}\text{ m}) = c \cdot \frac{10^{-12}\text{ m}}{7,72 \times 10^{-13}\text{ m}} \approx 1,30 \cdot c\]
+                </div>
+            </div>
+
+            <div class="result-box">
+                💥 Absurdes Ergebnis:<br>
+                Die Oberfläche müsste sich mit über 170-facher Lichtgeschwindigkeit bewegen! Das Kugelmodell bricht physikalisch vollkommen zusammen.
+            </div>
+        </div>
+
+        <div class="vergleich-column richtig">
+            <div>
+                <div class="column-header">🌀 Topologischer WRZT-Raumwirbel</div>
+                
+                <div class="text-block">
+                    Der Raumwirbel verhält sich hyperbolisch (\(v \sim 1/r\)). Die Lichtgeschwindigkeit \(c\) bildet das fundamentale Maximum exakt an der inneren Begrenzung des Kerns.
+                </div>
+                
+                <div class="section-step">1. Exakte Herleitung von \(R_{\text{min}}\):</div>
+                <div class="math-box">
+                    \[R_{\text{min}} = \frac{\hbar}{2 \cdot m_e \cdot c}\]
+                </div>
+                
+                <div class="text-block">
+                    Eingesetzt mit den Quantenkonstanten ergibt sich die strukturelle Dimension des raumzeitlichen Wirbelzentrums:
+                </div>
+                <div class="math-box">
+                    \[R_{\text{min}} = \frac{1,055 \times 10^{-34}\text{ J s}}{2 \cdot (9,109 \times 10^{-31}\text{ kg}) \cdot (2,998 \times 10^8\text{ m/s})}\]
+                </div>
+                <div class="math-box" style="color: #00ced1; font-weight: bold;">
+                    \[R_{\text{min}} \approx 1,93 \times 10^{-13} \text{ m}\]
+                </div>
+
+                <div class="section-step">2. Harmonische Feldabflachung nach außen:</div>
+                <div class="text-block">
+                    Durch den Kehrwert in der Gleichung sinkt die Trägheitsgeschwindigkeit im Außenraum bei größer werdendem Abstand \(r\) ab:
+                </div>
+                <div class="math-box">
+                    \[v(10^{-12}\text{ m}) = c \cdot \frac{1,93 \times 10^{-13}\text{ m}}{10^{-12}\text{ m}} \approx 0,19 \cdot c\]
+                </div>
+            </div>
+
+            <div class="result-box">
+                ✓ Kausalität perfekt gewahrt:<br>
+                Am Kernrand gilt exakt \(v = c\). Nach außen hin fällt die Geschwindigkeit vollkommen harmonisch und absolut unterhalb der Lichtgeschwindigkeit ab.
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
