@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        .wrzt-summary-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 900px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #c9d1d9;
+            margin: 20px auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .wrzt-summary-title {
+            color: #00ced1;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            letter-spacing: 0.5px;
+        }
+
+        .wrzt-grid {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .wrzt-card {
+            flex: 1;
+            min-width: 380px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .wrzt-card.classical {
+            border-top: 4px solid #ff7b72;
+        }
+
+        .wrzt-card.theory {
+            border-top: 4px solid #00ced1;
+        }
+
+        .card-header {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .classical .card-header { color: #ff7b72; }
+        .theory .card-header { color: #00ced1; }
+
+        .formula-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .explanation-text {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #8b949e;
+        }
+
+        .explanation-text strong {
+            color: #c9d1d9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .classical .status-badge {
+            background: rgba(248, 81, 73, 0.1);
+            color: #ff7b72;
+            border: 1px solid rgba(248, 81, 73, 0.2);
+        }
+
+        .theory .status-badge {
+            background: rgba(56, 139, 253, 0.1);
+            color: #58a6ff;
+            border: 1px solid rgba(56, 139, 253, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrzt-summary-container">
+    <div class="wrzt-summary-title">Gegenüberstellung: Rotation vs. Raumzeit-Feldwirbel</div>
+    
+    <div class="wrzt-grid">
+        <div class="wrzt-card classical">
+            <div>
+                <div class="card-header">❌ Klassisches Kugelmodell (Fehlversuch)</div>
+                <div class="explanation-text">
+                    Versucht man den Teilchen-Spin über eine rotierende, starre Kugel mit dem klassischen Drehimpuls 
+                    \(S = \frac{2}{5}m \cdot v \cdot r = n\hbar\) zu erklären, führt dies bei Elementarteilchen wie dem Elektron zu einem fundamentalen Widerspruch. 
+                </div>
+                <div class="formula-box">
+                    $$v(r) = \omega \cdot r = c \cdot \frac{r}{R_{\text{min}}}$$
+                </div>
+                <div class="explanation-text">
+                    Da die Tangentialgeschwindigkeit \(v\) **proportional** zum Radius \(r\) wächst, überschreitet die Struktur bereits in extrem kurzen Distanzen (\(r \ge 10^{-12}\text{ m}\)) die Lichtgeschwindigkeit \(c\). Das Modell bricht relativistisch zusammen.
+                </div>
+            </div>
+            <div class="status-badge">Widerspruch: \(v > c\) im Außenraum</div>
+        </div>
+
+        <div class="wrzt-card theory">
+            <div>
+                <div class="card-header">🌀 WRZT Raumwirbel (Die Lösung)</div>
+                <div class="explanation-text">
+                    Die Wellenraumzeit-Theorie löst den Widerspruch auf, indem sie den Spin nicht als starre Festkörper-Rotation, sondern als eine **topologische Verdrehung (Raumwirbel)** des elastischen Raumzeit-Netzes beschreibt.
+                </div>
+                <div class="formula-box">
+                    $$v(r) = c \cdot \frac{R_{\text{min}}}{r}$$
+                </div>
+                <div class="explanation-text">
+                    Hier verhält sich die Geschwindigkeit **hyperbolisch** (\(1/r\)). Direkt an der Grenze des Minimal-Radius (\(R_{\text{min}}\)) beträgt die Trägheitsgeschwindigkeit exakt \(v = c\). Nach außen hin flacht der Wirbel harmonisch ab, sodass **überall** gilt: \(v \le c\).
+                </div>
+            </div>
+            <div class="status-badge">Kausal: \(v \le c\) im gesamten Feldraum</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
