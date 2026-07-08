@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WRZT - Das Einheits-Manifest: Elektrodynamische Kopplung</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            background: #110A1C;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #c9d1d9;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .manifest-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 950px;
+            margin: 40px auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+        h2 {
+            color: #00ced1;
+            border-bottom: 2px solid #00ced1;
+            padding-bottom: 10px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #58a6ff;
+            margin-top: 35px;
+            border-left: 3px solid #58a6ff;
+            padding-left: 10px;
+        }
+        .math-box {
+            background: rgba(0, 206, 209, 0.05);
+            border-left: 4px solid #00ced1;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .comparison-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight {
+            color: #00ced1;
+            font-weight: bold;
+        }
+        .highlight-orange {
+            color: #ffa500;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        th {
+            border-bottom: 2px solid #30363d;
+            color: #00ced1;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="manifest-container">
+    <section id="milestone-coupling">
+        <h2>🌀 Meilenstein: Elektrodynamische Kopplung und die Entschlüsselung der Polarisierbarkeit</h2>
+        
+        <p>
+            Ein zentrales Qualitätsmerkmal einer übergeordneten physikalischen Theorie ist ihre Anschlussfähigkeit an etablierte, funktionierende Formalismen der klassischen Physik. Dieses Kapitel dokumentiert die mathematische Äquivalenz der 
+            <strong>Wellenraumzeit-Theorie (WRZT)</strong> zur klassischen Elektrodynamik und liefert eine mechanische Ursachenerklärung für makroskopische Feldkonstanten.
+        </p>
+
+        <h3>1. Die klassische Entsprechung: Elektrische Suszeptibilität</h3>
+        <p>
+            In der Standard-Maxwell-Elektrodynamik wird die makroskopische Kopplungsstärke eines Mediums an eine elektromagnetische Welle durch die 
+            <span class="highlight">Elektrische Suszeptibilität $\chi_e$</span> beschrieben. Im lokalen Feld dichter Medien (Nahfeld-Kopplung) kollabiert dieser Zustand in die Struktur der klassischen <em>Lorentz-Lorenz-Gleichung</em>:
+        </p>
+
+        <div class="math-box">
+            $$\chi_{\text{lokal}} = \frac{n^2 - 1}{n^2 + 2} = \frac{N \cdot \alpha_e}{3 \cdot \varepsilon_0}$$
+        </div>
+        
+        <p>
+            Hierbei ist $\alpha_e$ die feldtheoretische „Polarisierbarkeit“ des Atoms und $\varepsilon_0$ die elektrische Feldkonstante des Vakuums. Die klassische Physik behandelt $\alpha_e$ primär als phänomenologische, empirisch ermittelte Hilfsgröße.
+        </p>
+
+        <h3>2. Der Brückenschlag: Die mechanische Entschlüsselung durch die WRZT</h3>
+        <p>
+            Die WRZT benötigt keine abstrakten Hilfsgrößen. Durch Gegenüberstellung des klassischen Lorentz-Lorenz-Ansatzes und der wellenraumzeitlichen Dichte-Resonanz-Formel offenbart sich eine fundamentale, direkte Symmetrie:
+        </p>
+
+        <div class="comparison-box">
+            <p><strong>Klassischer Ansatz (Lorentz-Lorenz):</strong></p>
+            $$\frac{n^2 - 1}{n^2 + 2} = \frac{N}{3 \cdot \varepsilon_0} \cdot \mathbf{\alpha_e}$$
+            
+            <p><strong>Wellenraumzeit-Theorie (WRZT):</strong></p>
+            $$\frac{n^2 - 1}{n^2 + 2} = \frac{N}{3 \cdot \eta} \cdot \mathbf{\left(Z_{\text{eff}} \cdot m_e \cdot R_{\min} \cdot d \cdot \lambda \cdot \sqrt{\frac{2}{3}}\right)}$$
+        </div>
+
+        <p>
+            Durch mathematischen Vergleich beider Gleichungen wird die rein mathematische Eigenschaft der Polarisierbarkeit $\alpha_e$ in der WRZT als konkrete, elastische Auslenkung der Trägheitsknoten im Raumzeit-Netz entschlüsselt:
+        </p>
+
+        <div class="math-box">
+            $$\alpha_e = \frac{Z_{\text{eff}} \cdot m_e \cdot R_{\min} \cdot d \cdot \lambda \cdot \sqrt{\frac{2}{3}}}{\eta} \cdot \varepsilon_0$$
+        </div>
+
+        <h3>3. Konzeptueller Strukturvergleich</h3>
+        <p>
+            Die nachfolgende Matrix veranschaulicht, wie die mathematischen Abstraktionen der etablierten Physik durch die WRZT eine greifbare, wellenmechanische Realität erhalten:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Physikalische Eigenschaft</th>
+                    <th>Interpretation Standardphysik (Klassisch)</th>
+                    <th>Fundamentale Ursache in der WRZT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="highlight">Kopplungsstärke $\chi$</span></td>
+                    <td>Verhältnis der Polarisation zur Feldstärke.</td>
+                    <td>Maß der lokalen Trägheitszunahme des Netzes im Kollektivtakt.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Polarisierbarkeit $\alpha_e$</span></td>
+                    <td>Abstrakter Koeffizient für die induzierte Dipolbildung.</td>
+                    <td>Elastische Auslenkung der mitschwingenden Hüllenelektronen ($m_e$) im Medium.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Raumkonstante</span></td>
+                    <td>Empirischer Skalierungsfaktor ($1/3$).</td>
+                    <td>Geometrische Projektion entlang des raumdiagonalen Bug-Winkels ($\sqrt{2/3}$).</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Medien-Einfluss</span></td>
+                    <td>Dielektrische Verschiebung.</td>
+                    <td>Geometrische Verdichtung der Ur-Spannung ($\Xi$) durch den realen Bindungsabstand $d$.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top: 25px;">
+            <strong>Resultat:</strong> Die WRZT ersetzt unvollständige phänomenologische Modelle der Elektrodynamik durch ein geschlossenes, mechanisches Schwingungsmodell. Jedes optische und elektrische Verhalten von Materie erweist sich damit als direkte Konsequenz der dynamischen Geometrie des elastischen Wellenraums.
+        </p>
+    </section>
+</div>
+
+</body>
+</html>
