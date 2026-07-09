@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physik Rechner — Formel-Editor</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">Σ</span>
+      <div class="brand-text">
+        <h1>PHYSIK RECHNER</h1>
+        <p>LaTeX-Formel-Editor &amp; Auswertung</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="themeToggle" title="Design wechseln">
+        <svg id="themeIconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <button class="icon-btn" id="fullscreenToggle" title="Vollbild">
+        <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- LINKE SPALTE: EDITOR -->
+    <section class="panel editor-panel">
+      <div class="panel-head">
+        <h2>Formel-Editor</h2>
+        <span class="hint">LaTeX-Syntax, z. B. <code>E = m c^2</code></span>
+      </div>
+
+      <textarea id="latexInput" class="latex-input" spellcheck="false" placeholder="Formel eingeben, z. B. E = m c^2  oder  F = \frac{G m_1 m_2}{r^2}"></textarea>
+
+      <div class="palette">
+        <div class="palette-group">
+          <span class="palette-label">Struktur</span>
+          <button class="sym-btn" data-insert="\frac{}{}" data-cursor="-3">a/b</button>
+          <button class="sym-btn" data-insert="\sqrt{}" data-cursor="-1">√</button>
+          <button class="sym-btn" data-insert="^{}" data-cursor="-1">xⁿ</button>
+          <button class="sym-btn" data-insert="_{}" data-cursor="-1">xₙ</button>
+          <button class="sym-btn" data-insert="\cdot ">·</button>
+          <button class="sym-btn" data-insert="\pi ">π</button>
+          <button class="sym-btn" data-insert="()">()</button>
+        </div>
+        <div class="palette-group">
+          <span class="palette-label">Griechisch</span>
+          <button class="sym-btn" data-insert="\alpha ">α</button>
+          <button class="sym-btn" data-insert="\beta ">β</button>
+          <button class="sym-btn" data-insert="\gamma ">γ</button>
+          <button class="sym-btn" data-insert="\delta ">δ</button>
+          <button class="sym-btn" data-insert="\theta ">θ</button>
+          <button class="sym-btn" data-insert="\lambda ">λ</button>
+          <button class="sym-btn" data-insert="\mu ">μ</button>
+          <button class="sym-btn" data-insert="\rho ">ρ</button>
+          <button class="sym-btn" data-insert="\sigma ">σ</button>
+          <button class="sym-btn" data-insert="\omega ">ω</button>
+          <button class="sym-btn" data-insert="\varepsilon ">ε</button>
+        </div>
+        <div class="palette-group">
+          <span class="palette-label">Funktionen</span>
+          <button class="sym-btn" data-insert="\sin()" data-cursor="-1">sin</button>
+          <button class="sym-btn" data-insert="\cos()" data-cursor="-1">cos</button>
+          <button class="sym-btn" data-insert="\tan()" data-cursor="-1">tan</button>
+          <button class="sym-btn" data-insert="\ln()" data-cursor="-1">ln</button>
+          <button class="sym-btn" data-insert="\log()" data-cursor="-1">log</button>
+          <button class="sym-btn" data-insert="\exp()" data-cursor="-1">exp</button>
+        </div>
+      </div>
+
+      <div class="preview-box">
+        <span class="preview-label">Vorschau</span>
+        <div id="latexPreview" class="latex-preview">—</div>
+      </div>
+
+      <div class="presets">
+        <span class="palette-label">Beispiele</span>
+        <div class="preset-list" id="presetList"></div>
+      </div>
+
+      <div class="saved-formulas">
+        <div class="saved-head">
+          <span class="palette-label">Gespeicherte Formeln</span>
+        </div>
+        <div class="save-row">
+          <input type="text" id="formulaNameInput" placeholder="Name der Formel eingeben…">
+          <button id="saveFormulaBtn" class="save-btn">Speichern</button>
+        </div>
+        <div id="savedFormulaList" class="saved-list">
+          <p class="empty-hint">Noch keine Formeln gespeichert.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECHTE SPALTE: VARIABLEN & ERGEBNIS -->
+    <section class="panel result-panel">
+      <div class="panel-head">
+        <h2>Variablen &amp; Werte</h2>
+        <span class="hint">Konstanten werden automatisch erkannt</span>
+      </div>
+
+      <div id="varList" class="var-list">
+        <p class="empty-hint">Gib links eine Formel ein — erkannte Variablen erscheinen hier.</p>
+      </div>
+
+      <div class="saved-formulas">
+        <div class="saved-head">
+          <span class="palette-label">Gespeicherte Variablensätze</span>
+        </div>
+        <div class="save-row">
+          <input type="text" id="varsetNameInput" placeholder="Name des Variablensatzes…">
+          <button id="saveVarsetBtn" class="save-btn">Speichern</button>
+        </div>
+        <div id="savedVarsetList" class="saved-list">
+          <p class="empty-hint">Noch keine Variablensätze gespeichert.</p>
+        </div>
+      </div>
+
+      <div class="angle-mode">
+        <span class="palette-label">Winkel-Einheit</span>
+        <div class="segmented" id="angleMode">
+          <button class="seg-btn active" data-mode="rad">Radiant</button>
+          <button class="seg-btn" data-mode="deg">Grad</button>
+        </div>
+      </div>
+
+      <button id="calcBtn" class="calc-btn">Berechnen</button>
+
+      <div id="resultBox" class="result-box empty">
+        <span class="result-label">Ergebnis</span>
+        <div id="resultValue" class="result-value">—</div>
+        <div class="result-unit-row">
+          <label for="resultUnit">Einheit (optional)</label>
+          <input type="text" id="resultUnit" placeholder="z. B. J, m/s, N">
+        </div>
+      </div>
+
+      <div class="history">
+        <div class="history-head">
+          <span class="palette-label">Verlauf</span>
+          <button id="clearHistory" class="text-btn">Leeren</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="constants-footer">
+    <div class="panel-head">
+      <h2>Physikalische Konstanten</h2>
+      <span class="hint">Klicken zum Einfügen</span>
+    </div>
+    <div class="const-grid" id="constGrid"></div>
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
