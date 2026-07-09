@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZNT 2 - Formelsammlung</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="dark-theme">
+
+    <header>
+        <h1>WRZNT 2 – Physikalische Formelkartei</h1>
+        <div class="controls">
+            <button id="btn-fullscreen" onclick="toggleFullscreen()">📺 Vollbild</button>
+            <button id="btn-theme" onclick="toggleTheme()">👗 Dressing (Theme)</button>
+            <button onclick="saveCards()">💾 Speichern</button>
+            <button onclick="document.getElementById('file-input').click()">📂 Laden</button>
+            <input type="file" id="file-input" style="display:none;" onchange="loadCards(event)">
+        </div>
+    </header>
+
+    <main>
+        <div class="grid-container" id="card-grid"></div>
+    </main>
+
+    <div id="modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title"></h2>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

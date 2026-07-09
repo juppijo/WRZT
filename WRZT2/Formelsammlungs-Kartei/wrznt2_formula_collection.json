@@ -1,0 +1,439 @@
+[
+  {
+    "id": 1,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "\\eta",
+    "name": "Raumzeit-Trägheit η",
+    "desc": "Grundgröße der WRZT. η beschreibt die fundamentale Raumzeit-Trägheit und dient als Basis mehrerer Herleitungen.",
+    "formula": "$$\\eta = \\frac{m_e}{2}$$",
+    "value": "4.55469185 × 10⁻³¹ kg",
+    "unit": "kg",
+    "details": "\n<h3>Definition</h3>\nη ist die halbe Elektronenmasse und bildet eine der Fundamentalkonstanten der WRZT.\n\n<h3>Herleitung</h3>\n$$\\eta = \\frac{m_e}{2}$$\n\n<h3>Numerischer Wert</h3>\nη ≈ 4.55469185 × 10⁻³¹ kg\n\n<h3>Bedeutung</h3>\nη repräsentiert die effektive Raumzeit-Trägheit einer elementaren Raumzeitstruktur.\n\n<h3>Verknüpfte Formeln</h3>\nΞ, Rmin, c, ħ\n",
+    "related": [
+      "Ξ",
+      "Rmin",
+      "c",
+      "ħ"
+    ],
+    "keywords": [
+      "eta",
+      "Raumzeit",
+      "Trägheit",
+      "WRZT"
+    ]
+  },
+  {
+    "id": 2,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "\\Xi",
+    "name": "Xi-Konstante",
+    "desc": "Grundspannung bzw. lineare Raumzeitdichte des Raumzeitgewebes.",
+    "formula": "$$\\Xi=\\frac{m_e^2 c}{4\\hbar}$$",
+    "value": "≈ 5.899 × 10⁻¹⁹ kg/m",
+    "unit": "kg/m",
+    "details": "\n<h3>Definition</h3>\nΞ beschreibt die lineare Raumzeitdichte bzw. Grundspannung des Raumzeitgewebes.\n\n<h3>Herleitung</h3>\n$$\n\\Xi=\\frac{m_e^2 c}{4\\hbar}\n$$\n\n<h3>Einheit</h3>\nkg/m\n\n<h3>Bedeutung</h3>\nΞ verbindet Masse, Lichtgeschwindigkeit und Plancksches Wirkungsquantum.\n\n<h3>Verknüpfte Formeln</h3>\nη, Rmin, c, ħ\n",
+    "related": [
+      "η",
+      "Rmin",
+      "c",
+      "ħ"
+    ],
+    "keywords": [
+      "Xi",
+      "WRZT",
+      "Raumzeit",
+      "Grundspannung"
+    ]
+  },
+  {
+    "id": 3,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "R_{min}",
+    "name": "Minimaler Raumzeitradius",
+    "desc": "Kleinster charakteristischer Radius einer elementaren Raumzeitstruktur.",
+    "formula": "$$R_{min}=\\frac{2\\hbar}{m_e c}$$",
+    "value": "≈ 7.72 × 10⁻¹³ m",
+    "unit": "m",
+    "details": "\n<h3>Definition</h3>\nMinimaler Radius einer Raumzeitzelle.\n\n<h3>Herleitung</h3>\n$$\nR_{min}=\\frac{2\\hbar}{m_e c}\n$$\n\n<h3>Numerischer Wert</h3>\nRmin ≈ 7.72 × 10⁻¹³ m\n\n<h3>Bedeutung</h3>\nDieser Radius erscheint in zahlreichen WRZT-Gleichungen als fundamentale Längenskala.\n",
+    "related": [
+      "η",
+      "Ξ",
+      "ħ",
+      "c"
+    ],
+    "keywords": [
+      "Rmin",
+      "Radius",
+      "WRZT"
+    ]
+  },
+  {
+    "id": 4,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "c",
+    "name": "Lichtgeschwindigkeit aus WRZT",
+    "desc": "Herleitung der Lichtgeschwindigkeit aus den WRZT-Grundkonstanten.",
+    "formula": "$$c=\\frac{\\Xi\\,R_{min}}{\\eta}$$",
+    "value": "299792458 m/s",
+    "unit": "m/s",
+    "details": "\n<h3>WRZT-Herleitung</h3>\n$$\nc=\\frac{\\Xi R_{min}}{\\eta}\n$$\n\n<h3>Bedeutung</h3>\nIn der WRZT ist c keine unabhängige Naturkonstante, sondern ergibt sich aus η, Ξ und Rmin.\n",
+    "related": [
+      "η",
+      "Ξ",
+      "Rmin",
+      "ħ"
+    ],
+    "keywords": [
+      "c",
+      "Lichtgeschwindigkeit",
+      "WRZT"
+    ]
+  },
+  {
+    "id": 5,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "\\hbar",
+    "name": "Reduziertes Plancksches Wirkungsquantum",
+    "desc": "WRZT-Darstellung des reduzierten Planckschen Wirkungsquantums.",
+    "formula": "$$\\hbar=\\Xi c R_{min}^{2}$$",
+    "value": "1.054571817 × 10⁻³⁴ J·s",
+    "unit": "J·s",
+    "details": "\n<h3>WRZT-Form</h3>\n$$\n\\hbar=\\Xi c R_{min}^{2}\n$$\n\n<h3>Bedeutung</h3>\nDas Wirkungsquantum ergibt sich unmittelbar aus den Raumzeitparametern.\n",
+    "related": [
+      "Ξ",
+      "Rmin",
+      "c"
+    ],
+    "keywords": [
+      "hbar",
+      "Planck",
+      "WRZT"
+    ]
+  },
+  {
+    "id": 6,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "h",
+    "name": "Plancksches Wirkungsquantum",
+    "desc": "Herleitung über das reduzierte Plancksche Wirkungsquantum.",
+    "formula": "$$h=2\\pi\\hbar$$",
+    "value": "6.62607015 × 10⁻³⁴ J·s",
+    "unit": "J·s",
+    "details": "\n<h3>Definition</h3>\n$$\nh=2\\pi\\hbar\n$$\nDie klassische Beziehung bleibt innerhalb der WRZT erhalten.\n",
+    "related": [
+      "ħ"
+    ],
+    "keywords": [
+      "Planck",
+      "h"
+    ]
+  },
+  {
+    "id": 7,
+    "category": "WRZT-Grundkonstanten",
+    "symbol": "\\rho_{vac}",
+    "name": "Vakuumenergiedichte",
+    "desc": "Energiedichte einer elementaren Raumzeitzelle.",
+    "formula": "$$\\rho_{vac}=\\frac{\\eta c^2}{\\frac43\\pi R_{min}^{3}}$$",
+    "value": "Berechnet aus Struktur",
+    "unit": "J/m³",
+    "details": "\n<h3>Definition</h3>\n$$\n\\rho_{vac}=\\frac{\\eta c^2}{\\frac43\\pi R_{min}^{3}}\n$$\n\n<h3>Bedeutung</h3>\nBeschreibt die Energiedichte des Raumzeitvakuums innerhalb der WRZT.\n",
+    "related": [
+      "η",
+      "Rmin",
+      "c"
+    ],
+    "keywords": [
+      "Vakuum",
+      "Energiedichte"
+    ]
+  },
+  {
+    "id": 8,
+    "category": "Fundamentale Skalen",
+    "symbol": "r_e",
+    "name": "Klassischer Elektronenradius (WRZNT)",
+    "desc": "Gleichgewicht aus Coulomb-Kraft und Zentrifugalkraft bei v=c.",
+    "formula": "$$r_e = \\frac{1}{4\\pi \\varepsilon_0} \\cdot \\frac{e^2}{m_e c^2}$$",
+    "value": "≈ 2.81794 × 10⁻¹Vis m",
+    "unit": "m",
+    "details": "<h3>Herleitung:</h3>Zentrifugalkraft bei Lichtgeschwindigkeit gleich der Coulomb-Wechselwirkung gesetzt:<br>$$m_e \\frac{c^2}{r} = k \\frac{e^2}{r^2}$$<br>Auflösen nach $r$ liefert exakt den klassischen Elektronenradius.<br><br><b>Exakte Werte:</b><br>• $m_e \\approx 9{,}109383 \\cdot 10^{-31}$ kg<br>• $e \\approx 1{,}602176 \\cdot 10^{-19}$ C<br>• $c \\approx 299792458$ m/s<br>• $r_e \\approx 2{,}81794 \\cdot 10^{-15}$ m",
+    "related": [
+      "c",
+      "\\eta"
+    ],
+    "keywords": [
+      "Elektronenradius",
+      "Coulomb",
+      "Zentrifugalkraft"
+    ]
+  },
+  {
+    "id": 9,
+    "category": "Fundamentale Skalen",
+    "symbol": "\\ell_P",
+    "name": "Planck-Länge",
+    "desc": "Fundamentale Skala, bei der Gravitation und Quanteneffekte verschmelzen.",
+    "formula": "$$\\ell_P = \\sqrt{\\frac{\\hbar G}{c^3}}$$",
+    "value": "≈ 1.616255 × 10⁻³⁵ m",
+    "unit": "m",
+    "details": "<h3>Bedeutung:</h3>Die absolute untere Grenze der sinnvollen physikalischen Raumzeit-Geometrie. Ergibt sich aus der Kombination von Gravitationskonstante $G$, reduzierter Planck-Konstante $\\hbar$ und Lichtgeschwindigkeit $c$.<br><br><b>Exakte Werte:</b><br>• $\\hbar \\approx 1{,}054571 \\cdot 10^{-34}$ J·s<br>• $G \\approx 6{,}67430 \\cdot 10^{-11}$ m³/(kg·s²)<br>• $\\ell_P \\approx 1{,}616255 \\cdot 10^{-35}$ m",
+    "related": [
+      "\\hbar",
+      "c"
+    ],
+    "keywords": [
+      "Planck",
+      "Laenge",
+      "Gravitation"
+    ]
+  },
+  {
+    "id": 10,
+    "category": "Fundamentale Skalen",
+    "symbol": "r_s",
+    "name": "Schwarzschild-Radius",
+    "desc": "Grenzradius, bei dem die Fluchtgeschwindigkeit einer Masse gleich c wird.",
+    "formula": "$$r_s = \\frac{2Gm}{c^2}$$",
+    "value": "Abhängig von m",
+    "unit": "m",
+    "details": "<h3>Herleitung & Bedeutung:</h3>Setzt man die kinetische Energie gleich der gravitativen Bindungsenergie für ein Objekt, das sich mit Lichtgeschwindigkeit ($v=c$) vom Radius $r$ wegbewegen will, erhält man diesen Grenzradius für Schwarze Löcher.<br><br><b>Komponenten:</b><br>• $G$: Gravitationskonstante<br>• $m$: Masse des Körpers<br>• $c$: Lichtgeschwindigkeit",
+    "related": [
+      "c"
+    ],
+    "keywords": [
+      "Schwarzschild",
+      "Radius",
+      "Masse"
+    ]
+  },
+  {
+    "id": 11,
+    "category": "Fundamentale Skalen",
+    "symbol": "\\frac{F_e}{F_g}",
+    "name": "Verhältnis elektrischer Kraft zu Gravitation",
+    "desc": "Das extreme Missverhältnis der Kräfte im Mikrokosmos.",
+    "formula": "$$\\frac{F_e}{F_g} = \\frac{e^2}{4\\pi\\varepsilon_0 G m_p m_e}$$",
+    "value": "≈ 10³⁹",
+    "unit": "dimensionslos",
+    "details": "<h3>Bedeutung:</h3>Zeigt, dass auf atomarer Ebene die elektromagnetische Wechselwirkung zwischen einem Proton und einem Elektron um rund 39 Größenordnungen ($10^{39}$) stärker ist als deren gravitative Anziehung. Ein zentrales Rätsel für jede vereinheitlichte Feldtheorie.<br><br><b>Werte:</b><br>• $m_p \\approx 1{,}672621 \\cdot 10^{-27}$ kg<br>• $\\varepsilon_0 \\approx 8{,}854187 \\cdot 10^{-12}$ A·s/(V·m)",
+    "related": [
+      "r_e"
+    ],
+    "keywords": [
+      "Kräfteverhältnis",
+      "Coulomb",
+      "Gravitation"
+    ]
+  },
+  {
+    "id": 12,
+    "category": "Erweiterbar",
+    "symbol": "F_{12}",
+    "name": "Freier Slot 12",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{12} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 13,
+    "category": "Erweiterbar",
+    "symbol": "F_{13}",
+    "name": "Freier Slot 13",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{13} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 14,
+    "category": "Erweiterbar",
+    "symbol": "F_{14}",
+    "name": "Freier Slot 14",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{14} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 15,
+    "category": "Erweiterbar",
+    "symbol": "F_{15}",
+    "name": "Freier Slot 15",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{15} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 16,
+    "category": "Erweiterbar",
+    "symbol": "F_{16}",
+    "name": "Freier Slot 16",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{16} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 17,
+    "category": "Erweiterbar",
+    "symbol": "F_{17}",
+    "name": "Freier Slot 17",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{17} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 18,
+    "category": "Erweiterbar",
+    "symbol": "F_{18}",
+    "name": "Freier Slot 18",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{18} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 19,
+    "category": "Erweiterbar",
+    "symbol": "F_{19}",
+    "name": "Freier Slot 19",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{19} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 20,
+    "category": "Erweiterbar",
+    "symbol": "F_{20}",
+    "name": "Freier Slot 20",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{20} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 21,
+    "category": "Erweiterbar",
+    "symbol": "F_{21}",
+    "name": "Freier Slot 21",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{21} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 22,
+    "category": "Erweiterbar",
+    "symbol": "F_{22}",
+    "name": "Freier Slot 22",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{22} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 23,
+    "category": "Erweiterbar",
+    "symbol": "F_{23}",
+    "name": "Freier Slot 23",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{23} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 24,
+    "category": "Erweiterbar",
+    "symbol": "F_{24}",
+    "name": "Freier Slot 24",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{24} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  },
+  {
+    "id": 25,
+    "category": "Erweiterbar",
+    "symbol": "F_{25}",
+    "name": "Freier Slot 25",
+    "desc": "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+    "formula": "$$E = m_{25} c^2$$",
+    "value": "—",
+    "unit": "—",
+    "details": "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+    "related": [],
+    "keywords": [
+      "Slot"
+    ]
+  }
+]
