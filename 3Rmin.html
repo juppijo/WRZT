@@ -4,8 +4,20 @@
 <meta charset="UTF-8">
 <title>Vergleich der drei Minimalradien</title>
 
-<!-- MathJax für LaTeX -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!-- MathJax Konfiguration und Skript für LaTeX-Darstellung -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 <style>
 body {
@@ -82,7 +94,7 @@ Numerischer Wert:
 <p>
 Physikalische Bedeutung:  
 Quantenrelativistische Lokalisierungsgrenze.  
-Unterhalb dieser Skala wird die Energie groß genug für Paarbildung.
+Unterhalb dieser Skala wird die Energie groß enough für Paarbildung.
 </p>
 
 <hr>

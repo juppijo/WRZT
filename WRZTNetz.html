@@ -1,12 +1,25 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <title>WRZT – Zusammenfassung</title>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  
+  <!-- MathJax Einbindung für die korrekte Darstellung von LaTeX-Formeln -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
+  
   <style>
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -53,7 +66,7 @@
 <main>
   <section>
     <h2>1. Raum als elastisches Netz</h2>
-    <p>In der WRZT wird der Raum als elastisches Netz betrachtet. Jede lokale Auslenkung wird durch ein Feld \\(\psi(\vec x,t)\\) beschrieben. Die Energie des Raums lautet:</p>
+    <p>In der WRZT wird der Raum als elastisches Netz betrachtet. Jede lokale Auslenkung wird durch ein Feld \(\psi(\vec x,t)\) beschrieben. Die Energie des Raums lautet:</p>
     <div class="equation"> 
       $$\mathcal{E}(\psi) = \frac{1}{2}\rho_\text{Raum}(\psi)\left(\frac{\partial \psi}{\partial t}\right)^2 + \frac{1}{2}K_\text{Raum}(\psi)\left(\nabla \psi\right)^2$$
     </div>
@@ -69,7 +82,7 @@
     <div class="equation">
       $$Z_\text{Raum} = \rho_\text{Raum} c = \sqrt{K_\text{Raum}\rho_\text{Raum}}$$
     </div>
-    <p>Proportional zur Raumwölbung \\(\mathcal{U}\\):</p>
+    <p>Proportional zur Raumwölbung \(\mathcal{U}\):</p>
     <div class="equation">
       $$Z(\mathcal{U}) = Z_0 e^{\alpha \mathcal{U}}$$
     </div>
