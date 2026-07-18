@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Automatische Formelsammlung</title>
+    <!-- MathJax für die wunderschöne Darstellung der LaTeX-Formeln -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #121824;
+            --card-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-color: #0ea5e9;
+            --accent-hover: #0284c7;
+            --border-color: #334155;
+            --inline-bg: #293548;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #status {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .file-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-path {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .formula-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .formula-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .formula-item:last-child {
+            border-bottom: none;
+        }
+
+        .formula-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .formula-render {
+            font-size: 18px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .raw-tex {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            background-color: rgba(0,0,0,0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Formelsammlung Generator</h1>
+        <p>Durchsucht HTML-Dateien in Ordnern & Unterordnern nach LaTeX-Formaten ($...$ und $$...$$)</p>
+        
+        <div class="btn-container">
+            <button id="scan-btn">Ordner auswählen & scannen</button>
+        </div>
+        <div id="status">Bereit zum Scannen. Bitte wähle einen Ordner aus.</div>
+    </header>
+
+    <main id="output">
+        <!-- Hier werden die Ergebnisse dynamisch eingefügt -->
+    </main>
+</div>
+
+<script>
+    document.getElementById('scan-btn').addEventListener('click', async () => {
+        const outputDiv = document.getElementById('output');
+        const statusDiv = document.getElementById('status');
+        
+        // Überprüfen, ob die API vom Browser unterstützt wird
+        if (!window.showDirectoryPicker) {
+            alert('Dein Browser unterstützt die File System Access API leider nicht. Bitte nutze einen modernen Browser wie Chrome, Edge oder Opera.');
+            return;
+        }
+
+        try {
+            // Ordner-Picker öffnen
+            const dirHandle = await window.showDirectoryPicker();
+            outputDiv.innerHTML = '';
+            statusDiv.textContent = 'Durchsuchen der Ordnerstruktur läuft...';
+            
+            let fileCount = 0;
+            let formulaCount = 0;
+
+            // Rekursive Funktion zum Durchsuchen der Verzeichnisse
+            async function scanDirectory(directoryHandle, currentPath = '') {
+                for await (const entry of directoryHandle.values()) {
+                    const relativePath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
+                    
+                    if (entry.kind === 'directory') {
+                        // Unterordner rekursiv durchsuchen
+                        await scanDirectory(entry, relativePath);
+                    } else if (entry.kind === 'file' && entry.name.endsWith('.html')) {
+                        fileCount++;
+                        statusDiv.textContent = `Scanne Datei: ${relativePath}...`;
+                        
+                        const file = await entry.getFile();
+                        const content = await file.text();
+                        
+                        // Formeln extrahieren
+                        const formulas = extractFormulas(content);
+                        
+                        if (formulas.length > 0) {
+                            formulaCount += formulas.length;
+                            renderFileSection(relativePath, entry.name, formulas);
+                        }
+                    }
+                }
+            }
+
+            // Scan starten
+            await scanDirectory(dirHandle);
+            
+            // MathJax triggern, um die neuen Elemente zu rendern
+            statusDiv.textContent = `Scan abgeschlossen! ${fileCount} HTML-Dateien geprüft. ${formulaCount} Formeln gefunden. Rendere mathematische Darstellung...`;
+            
+            if (formulaCount === 0) {
+                outputDiv.innerHTML = '<div class="no-results">Keine LaTeX-Formeln ($ oder $$) in den HTML-Dateien gefunden.</div>';
+            } else {
+                // MathJax anweisen, die Seite neu zu verarbeiten
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise().then(() => {
+                        statusDiv.textContent = `Fertig! ${formulaCount} Formeln erfolgreich gelistet.`;
+                    });
+                }
+            }
+
+        } catch (err) {
+            console.error(err);
+            if (err.name !== 'AbortError') {
+                statusDiv.textContent = 'Fehler beim Lesen des Ordners: ' + err.message;
+            } else {
+                statusDiv.textContent = 'Scan abgebrochen.';
+            }
+        }
+    });
+
+    // Reguläre Ausdrücke zum Finden von $$...$$ und $...$
+    function extractFormulas(text) {
+        const formulas = [];
+        
+        // Temporär Code-Blöcke oder Scripts maskieren/ignorieren, falls nötig.
+        // Hier nutzen wir direkt Regex für die Matches.
+        
+        // 1. Suche nach Display-Math ($$...$$)
+        // Nutzt [^$] um sicherzustellen, dass wir nicht falsch matchen, steuert Zeilenumbrüche an via [\s\S]
+        const displayRegex = /\$\$([\s\S]*?)\$\$/g;
+        let match;
+        
+        while ((match = displayRegex.exec(text)) !== null) {
+            if (match[1].trim()) {
+                formulas.push({
+                    raw: match[0],
+                    content: match[1].trim(),
+                    type: 'Display Math ($$)'
+                });
+            }
+        }
+        
+        // 2. Suche nach Inline-Math ($...$)
+        // Verhindert das Matchen von $$ durch Lookarounds oder präzise Abgrenzung
+        const inlineRegex = /(?<!\$)\$([^\$\n]+?)\$(?!\$)/g;
+        while ((match = inlineRegex.exec(text)) !== null) {
+            if (match[1].trim()) {
+                formulas.push({
+                    raw: match[0],
+                    content: match[1].trim(),
+                    type: 'Inline Math ($)'
+                });
+            }
+        }
+        
+        return formulas;
+    }
+
+    // Funktion zur Darstellung der Ergebnisse einer Datei
+    function renderFileSection(relativePath, fileName, formulas) {
+        const outputDiv = document.getElementById('output');
+        
+        const section = document.createElement('section');
+        section.className = 'file-section';
+        
+        const title = document.createElement('h2');
+        title.className = 'file-title';
+        title.innerHTML = `${fileName} <span class="file-path">${relativePath}</span>`;
+        section.appendChild(title);
+        
+        const list = document.createElement('ul');
+        list.className = 'formula-list';
+        
+        formulas.forEach(formula => {
+            const item = document.createElement('li');
+            item.className = 'formula-item';
+            
+            const type = document.createElement('span');
+            type.className = 'formula-type';
+            type.textContent = formula.type;
+            
+            const renderContainer = document.createElement('div');
+            renderContainer.className = 'formula-render';
+            // Wir geben MathJax den exakten rohen String mit den $-Zeichen zum Parsen
+            renderContainer.textContent = formula.raw;
+            
+            const rawCode = document.createElement('div');
+            rawCode.className = 'raw-tex';
+            rawCode.textContent = `Code: ${formula.content}`;
+            
+            item.appendChild(type);
+            item.appendChild(renderContainer);
+            item.appendChild(rawCode);
+            list.appendChild(item);
+        });
+        
+        section.appendChild(list);
+        outputDiv.appendChild(section);
+    }
+</script>
+</body>
+</html>
