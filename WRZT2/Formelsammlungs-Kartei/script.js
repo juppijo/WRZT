@@ -7,7 +7,7 @@ let formulaData = [
         name: "Raumzeit-Trägheit η",
         desc: "Grundgröße der WRZT. η beschreibt die fundamentale Raumzeit-Trägheit und dient als Basis mehrerer Herleitungen.",
         formula: "$$\\eta = \\frac{m_e}{2}$$",
-        value: "4.55469185 × 10⁻³¹ kg",
+        value: "4.55469185 × 10⁻³¹",
         unit: "kg",
         details: `
 <h3>Definition</h3>
@@ -35,7 +35,7 @@ $$\\eta = \\frac{m_e}{2}$$
         name: "Xi-Konstante",
         desc: "Grundspannung bzw. lineare Raumzeitdichte des Raumzeitgewebes.",
         formula: "$$\\Xi=\\frac{m_e^2 c}{4\\hbar}$$",
-        value: "≈ 5.899 × 10⁻¹⁹ kg/m",
+        value: "≈ 5.899 × 10⁻¹⁹",
         unit: "kg/m",
         details: `
 <h3>Definition</h3>
@@ -65,7 +65,7 @@ kg/m
         name: "Minimaler Raumzeitradius",
         desc: "Kleinster charakteristischer Radius einer elementaren Raumzeitstruktur.",
         formula: "$$R_{min}=\\frac{2\\hbar}{m_e c}$$",
-        value: "≈ 7.72 × 10⁻¹³ m",
+        value: "≈ 7.72 × 10⁻¹³",
         unit: "m",
         details: `
 <h3>Definition</h3>
@@ -92,7 +92,7 @@ Dieser Radius erscheint in zahlreichen WRZT-Gleichungen als fundamentale Längen
         name: "Lichtgeschwindigkeit aus WRZT",
         desc: "Herleitung der Lichtgeschwindigkeit aus den WRZT-Grundkonstanten.",
         formula: "$$c=\\frac{\\Xi\\,R_{min}}{\\eta}$$",
-        value: "299792458 m/s",
+        value: "299792458",
         unit: "m/s",
         details: `
 <h3>WRZT-Herleitung</h3>
@@ -113,7 +113,7 @@ In der WRZT ist c keine unabhängige Naturkonstante, sondern ergibt sich aus η,
         name: "Reduziertes Plancksches Wirkungsquantum",
         desc: "WRZT-Darstellung des reduzierten Planckschen Wirkungsquantums.",
         formula: "$$\\hbar=\\Xi c R_{min}^{2}$$",
-        value: "1.054571817 × 10⁻³⁴ J·s",
+        value: "1.054571817 × 10⁻³⁴",
         unit: "J·s",
         details: `
 <h3>WRZT-Form</h3>
@@ -134,7 +134,7 @@ Das Wirkungsquantum ergibt sich unmittelbar aus den Raumzeitparametern.
         name: "Plancksches Wirkungsquantum",
         desc: "Herleitung über das reduzierte Plancksches Wirkungsquantum.",
         formula: "$$h=2\\pi\\hbar$$",
-        value: "6.62607015 × 10⁻³⁴ J·s",
+        value: "6.62607015 × 10⁻³⁴",
         unit: "J·s",
         details: `
 <h3>Definition</h3>
@@ -174,7 +174,7 @@ Beschreibt die Energiedichte des Raumzeitvakuums innerhalb der WRZT.
         name: "Klassischer Elektronenradius (WRZNT)",
         desc: "Gleichgewicht aus Coulomb-Kraft und Zentrifugalkraft bei v=c.",
         formula: "$$r_e = \\frac{1}{4\\pi \\varepsilon_0} \\cdot \\frac{e^2}{m_e c^2}$$",
-        value: "≈ 2.81794 × 10⁻¹⁵ m",
+        value: "≈ 2.81794 × 10⁻¹⁵",
         unit: "m",
         details: `
 <h3>Kreisbewegung mit fundamentalen Wechselwirkungen</h3>
@@ -204,9 +204,9 @@ Dieser Ausdruck entspricht exakt dem klassischen Elektronenradius.
         name: "Planck-Länge",
         desc: "Fundamentale Skala, bei der Gravitation und Quanteneffekte verschmelzen.",
         formula: "$$\\ell_P = \\sqrt{\\frac{\\hbar G}{c^3}}$$",
-        value: "≈ 1.616255 × 10⁻³⁵ m",
+        value: "≈ 1.616255 × 10⁻³⁵",
         unit: "m",
-        details: "<h3>Bedeutung:</h3>Die absolute untere Grenze der sinnvollen physikalischen Raumzeit-Geometrie. Ergibt sich aus der Kombination von Gravitationskonstante $G$, reduzierter Planck-Konstante $\\hbar$ und Lichtgeschwindigkeit $c$.<br><br><b>Exakte Werte:</b><br>• $\\hbar \\approx 1{,}054571 \\cdot 10^{-34}$ J·s<br>• $G \\approx 6{,}67430 \\cdot 10^{-11}$ m³/(kg·s²)<br>• $\\ell_P \\approx 1{,}616255 \\cdot 10^{-35}$ m",
+        details: "<h3>Bedeutung:</h3>Die absolute untere Grenze der sinnvollen physikalischen Raumzeit-Geometrie. Ergibt sich aus der Kombination von Gravitationskonstante $G$, reduzierter Planck-Konstante $\\hbar$ und Lichtgeschwindigkeit $c$.",
         related: ["\\hbar", "c"],
         keywords: ["Planck", "Laenge", "Gravitation"]
     },
@@ -219,7 +219,7 @@ Dieser Ausdruck entspricht exakt dem klassischen Elektronenradius.
         formula: "$$r_s = \\frac{2Gm}{c^2}$$",
         value: "Abhängig von m",
         unit: "m",
-        details: "<h3>Herleitung & Bedeutung:</h3>Setzt man die kinetische Energie gleich der gravitativen Bindungsenergie für ein Objekt, das sich mit Lichtgeschwindigkeit ($v=c$) vom Radius $r$ wegbewegen will, erhält man diesen Grenzradius für Schwarze Löcher.<br><br><b>Komponenten:</b><br>• $G$: Gravitationskonstante<br>• $m$: Masse des Körpers<br>• $c$: Lichtgeschwindigkeit",
+        details: "<h3>Herleitung & Bedeutung:</h3>Setzt man die kinetische Energie gleich der gravitativen Bindungsenergie für ein Objekt, das sich mit Lichtgeschwindigkeit ($v=c$) vom Radius $r$ wegbewegen will, erhält man diesen Grenzradius für Schwarze Löcher.",
         related: ["c"],
         keywords: ["Schwarzschild", "Radius", "Masse"]
     },
@@ -232,128 +232,148 @@ Dieser Ausdruck entspricht exakt dem klassischen Elektronenradius.
         formula: "$$\\frac{F_e}{F_g} = \\frac{e^2}{4\\pi\\varepsilon_0 G m_p m_e}$$",
         value: "≈ 10³⁹",
         unit: "dimensionslos",
-        details: "<h3>Bedeutung:</h3>Zeigt, dass auf atomarer Ebene die elektromagnetische Wechselwirkung zwischen einem Proton und einem Elektron um rund 39 Größenordnungen ($10^{39}$) stärker ist als deren gravitative Anziehung. Ein zentrales Rätsel für jede vereinheitlichte Feldtheorie.<br><br><b>Werte:</b><br>• $m_p \\approx 1{,}672621 \\cdot 10^{-27}$ kg<br>• $\\varepsilon_0 \\approx 8{,}854187 \\cdot 10^{-12}$ A·s/(V·m)",
+        details: "<h3>Bedeutung:</h3>Zeigt, dass auf atomarer Ebene die elektromagnetische Wechselwirkung zwischen einem Proton und einem Elektron um rund 39 Größenordnungen ($10^{39}$) stärker ist als deren gravitative Anziehung.",
         related: ["r_e"],
         keywords: ["Kräfteverhältnis", "Coulomb", "Gravitation"]
     }
 ];
 
-// Füllt das Grid automatisch auf exakt 25 Slots auf (5x5 System)
+// Füllt das Grid auf 25 Karten auf (5x5 Grid)
 for (let i = formulaData.length; i < 25; i++) {
     formulaData.push({
         id: i + 1,
         category: "Erweiterbar",
         symbol: `F_{${i+1}}`,
         name: `Freier Slot ${i + 1}`,
-        desc: "Doppelklick auf die Formel, um eigenen LaTeX-Code einzugeben.",
+        desc: "Klicke unten auf Öffnen, um diese Karte vollständig zu gestalten.",
         formula: `$$E = m_{${i+1}} c^2$$`,
         value: "—",
         unit: "—",
-        details: "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung direkt hier im Modal bearbeiten.</p>",
+        details: "<h3>Beschreibung</h3><p>Hier kannst du eigene Details und Herleitungen eintragen.</p>",
         related: [],
         keywords: ["Slot"]
     });
 }
 
 const grid = document.getElementById('card-grid');
+let activeCardIndex = null;
 
-// Grid rendern
+// Grid rendern (Nur-Lese-Ansicht für absolute Stabilität)
 function renderGrid() {
     grid.innerHTML = '';
     formulaData.forEach((card, index) => {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
-        cardEl.onclick = () => showDetails(index);
         
-        const badgeDisplay = card.value && card.value !== "—" ? `<span class="value-badge">${card.value}</span>` : "";
+        const badgeDisplay = card.value && card.value !== "—" ? `<span class="value-badge">${card.value} ${card.unit !== "—" ? card.unit : ""}</span>` : "";
         
         cardEl.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <h3 contenteditable="true" onclick="event.stopPropagation()" onblur="updateCard(${index}, 'name', this.innerText)">${card.name}</h3>
-                <button title="LaTeX kopieren" class="copy-btn" onclick="event.stopPropagation(); copyLaTeX(${index})">📋</button>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>${card.name}</h3>
+                <button title="LaTeX kopieren" class="copy-btn" onclick="copyLaTeX(${index})">📋</button>
             </div>
-            <div class="formula" id="formula-${index}" onclick="event.stopPropagation()">${card.formula}</div>
-            <p contenteditable="true" onclick="event.stopPropagation()" onblur="updateCard(${index}, 'desc', this.innerText)">${card.desc}</p>
-            <div class="card-footer">${badgeDisplay}</div>
+            <div class="formula">${card.formula}</div>
+            <p>${card.desc}</p>
+            <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                ${badgeDisplay}
+                <button class="open-card-btn" onclick="openModal(${index})">🔍 Öffnen & Bearbeiten</button>
+            </div>
         `;
-        
-        const formulaDiv = cardEl.querySelector(`#formula-${index}`);
-        formulaDiv.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-            startFormulaEdit(index, formulaDiv);
-        });
 
         grid.appendChild(cardEl);
     });
     triggerMathJax();
 }
 
-function updateCard(index, field, value) {
-    formulaData[index][field] = value;
-}
-
-function startFormulaEdit(index, element) {
-    element.removeAttribute('onclick');
-    element.innerText = formulaData[index].formula;
-    element.contentEditable = true;
-    element.focus();
-    
-    element.onblur = function() {
-        element.contentEditable = false;
-        formulaData[index].formula = element.innerText;
-        renderGrid();
-    };
-}
-
-function showDetails(index) {
+// Modal zum vollständigen Bearbeiten öffnen
+function openModal(index) {
+    activeCardIndex = index;
     const card = formulaData[index];
     
-    // Editierbarer Titel im Modal
-    const modalTitle = document.getElementById('modal-title');
-    modalTitle.innerText = card.name;
-    modalTitle.contentEditable = true;
-    modalTitle.onblur = () => updateCard(index, 'name', modalTitle.innerText);
+    document.getElementById('modal-title').innerText = card.name;
     
-    let metaInfo = `
-        <div style="margin-bottom: 15px; opacity: 0.8; font-size: 0.9rem;">
-            <b>Kategorie:</b> ${card.category} | <b>Wert:</b> ${card.value} ${card.unit !== "—" ? card.unit : ""}
-        </div>
-    `;
-    
-    let formulaBlock = `
-        <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin:15px 0;">
-            <div style="font-size:1.6rem;">${card.formula}</div>
-            <button class="copy-btn" onclick="copyLaTeX(${index})">📋 LaTeX kopieren</button>
-        </div>
-    `;
-    
-    let detailsBlock = `
-        <div id="modal-details-content" contenteditable="true" style="border: 1px dashed var(--border-color); padding: 10px; border-radius: 6px;" onblur="updateCard(${index}, 'details', this.innerHTML)">
-            ${card.details}
+    let modalContent = `
+        <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; gap:10px;">
+                <div style="flex:2;">
+                    <label style="font-size:0.8rem; opacity:0.8;">Titel / Name:</label>
+                    <input type="text" id="edit-name" value="${escapeHtml(card.name)}" style="width:100%; padding:6px; box-sizing:border-box;">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; opacity:0.8;">Kategorie:</label>
+                    <input type="text" id="edit-category" value="${escapeHtml(card.category)}" style="width:100%; padding:6px; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <div>
+                <label style="font-size:0.8rem; opacity:0.8;">Kurzbeschreibung:</label>
+                <input type="text" id="edit-desc" value="${escapeHtml(card.desc)}" style="width:100%; padding:6px; box-sizing:border-box;">
+            </div>
+
+            <div>
+                <label style="font-size:0.8rem; opacity:0.8;">LaTeX Formel (z.B. $$E=mc^2$$):</label>
+                <input type="text" id="edit-formula" value="${escapeHtml(card.formula)}" style="width:100%; padding:6px; font-family:monospace; box-sizing:border-box;">
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; opacity:0.8;">Wert:</label>
+                    <input type="text" id="edit-value" value="${escapeHtml(card.value)}" style="width:100%; padding:6px; box-sizing:border-box;">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem; opacity:0.8;">Einheit:</label>
+                    <input type="text" id="edit-unit" value="${escapeHtml(card.unit)}" style="width:100%; padding:6px; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <div>
+                <label style="font-size:0.8rem; opacity:0.8;">Vollständiger Details-Text / Herleitung (HTML erlaubt):</label>
+                <textarea id="edit-details" rows="8" style="width:100%; padding:8px; box-sizing:border-box; font-family:inherit;">${card.details}</textarea>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <button class="copy-btn" onclick="copyLaTeX(${index})">📋 LaTeX Kopieren</button>
+                <button onclick="saveModalChanges()" style="background:var(--accent-color); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">💾 Speichern & Schließen</button>
+            </div>
         </div>
     `;
 
-    document.getElementById('modal-body').innerHTML = metaInfo + formulaBlock + detailsBlock;
+    document.getElementById('modal-body').innerHTML = modalContent;
     document.getElementById('modal').style.display = 'flex';
-    triggerMathJax();
 }
 
-// Funktion zum Kopieren des LaTeX-Codes
-function copyLaTeX(index) {
-    const rawFormula = formulaData[index].formula;
-    // Entfernt $$ oder $ Tags für reinen LaTeX-Code
-    const cleanFormula = rawFormula.replace(/^\$\$|\$\$$|^\$|\$$/g, '').trim();
+// Änderungen aus dem Editor im Modal speichern
+function saveModalChanges() {
+    if (activeCardIndex === null) return;
     
-    navigator.clipboard.writeText(cleanFormula).then(() => {
-        alert("LaTeX-Code in die Zwischenablage kopiert:\n" + cleanFormula);
-    }).catch(err => {
-        console.error('Fehler beim Kopieren: ', err);
-    });
+    formulaData[activeCardIndex].name = document.getElementById('edit-name').value;
+    formulaData[activeCardIndex].category = document.getElementById('edit-category').value;
+    formulaData[activeCardIndex].desc = document.getElementById('edit-desc').value;
+    formulaData[activeCardIndex].formula = document.getElementById('edit-formula').value;
+    formulaData[activeCardIndex].value = document.getElementById('edit-value').value;
+    formulaData[activeCardIndex].unit = document.getElementById('edit-unit').value;
+    formulaData[activeCardIndex].details = document.getElementById('edit-details').value;
+
+    closeModal();
 }
 
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
-    renderGrid(); // Aktualisiert das Grid, falls Titel im Modal geändert wurden
+    activeCardIndex = null;
+    renderGrid();
+}
+
+function copyLaTeX(index) {
+    const rawFormula = formulaData[index].formula;
+    const cleanFormula = rawFormula.replace(/^\$\$|\$\$$|^\$|\$$/g, '').trim();
+    
+    navigator.clipboard.writeText(cleanFormula).then(() => {
+        alert("LaTeX-Code kopiert:\n" + cleanFormula);
+    });
+}
+
+function escapeHtml(str) {
+    return (str || '').replace(/"/g, '&quot;');
 }
 
 function triggerMathJax() {

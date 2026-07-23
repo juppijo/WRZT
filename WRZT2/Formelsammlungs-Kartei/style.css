@@ -4,6 +4,7 @@
     --text-color: #f8fafc;
     --accent-color: #38bdf8;
     --border-color: #334155;
+    --input-bg: #0f172a;
 }
 
 .light-theme {
@@ -12,6 +13,7 @@
     --text-color: #0f172a;
     --accent-color: #0284c7;
     --border-color: #cbd5e1;
+    --input-bg: #f1f5f9;
 }
 
 body {
@@ -30,22 +32,27 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 8px 16px;
     background: rgba(0,0,0,0.1);
     border-bottom: 1px solid var(--border-color);
-    height: 50px;
+    height: 48px;
     box-sizing: border-box;
 }
 
-h1 { font-size: 1.3rem; margin: 0; color: var(--accent-color); }
+h1 { 
+    font-size: 1.2rem; 
+    margin: 0; 
+    color: var(--accent-color); 
+}
 
 .controls button {
     background: var(--card-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    padding: 6px 12px;
+    padding: 5px 10px;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 0.85rem;
     font-weight: bold;
     margin-left: 5px;
     transition: 0.2s;
@@ -56,75 +63,138 @@ h1 { font-size: 1.3rem; margin: 0; color: var(--accent-color); }
     color: #fff;
 }
 
+/* 5x5 Grid Layout - Optimiert für maximale Lesbarkeit */
 .grid-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    gap: 8px;
-    padding: 12px;
-    height: calc(100vh - 50px);
+    gap: 6px;
+    padding: 8px;
+    height: calc(100vh - 48px);
     box-sizing: border-box;
 }
 
 .card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px;
+    border-radius: 6px;
+    padding: 6px 8px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .card h3 { 
-    margin: 0 0 4px 0; 
-    font-size: 0.95rem; 
+    margin: 0; 
+    font-size: 0.85rem; 
     color: var(--accent-color); 
-    outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .card p { 
-    margin: 0; 
-    font-size: 0.8rem; 
+    margin: 2px 0; 
+    font-size: 0.72rem; 
     opacity: 0.8; 
-    outline: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.25;
 }
 
-/* DEINE WÜNSCHE: Noch größere Formelschrift & Editier-Modus Styling */
+/* Formelbereich mit automatischer Skalierung */
 .card .formula { 
-    font-size: 1.35rem; 
+    font-size: clamp(0.75rem, 1.1vw, 1.05rem); 
     text-align: center; 
-    margin: 6px 0; 
-    padding: 4px;
-    min-height: 2rem;
+    margin: 2px 0; 
+    padding: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
-    outline: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+}
+
+/* Schmalere Scrollbars für überlange Formeln */
+.card .formula::-webkit-scrollbar {
+    height: 3px;
+}
+.card .formula::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/* Buttons & Badges auf den Kärtchen */
+.copy-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--accent-color);
     border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.card .formula[contenteditable="true"] {
-    background: rgba(0, 0, 0, 0.2);
-    font-family: monospace;
-    font-size: 1rem;
-    color: #f43f5e; /* Hebt den rohen LaTeX-Code beim Editieren farblich ab */
+.copy-btn:hover {
+    background: rgba(56, 189, 248, 0.2);
 }
 
+.open-card-btn {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.open-card-btn:hover {
+    background: var(--accent-color);
+    color: #ffffff;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.value-badge {
+    font-size: 0.68rem;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-color);
+    padding: 1px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 55%;
+}
+
+/* Modal / Bearbeitungsfenster */
 .modal {
     display: none;
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -132,35 +202,60 @@ h1 { font-size: 1.3rem; margin: 0; color: var(--accent-color); }
 
 .modal-content {
     background: var(--card-bg);
-    padding: 25px;
-    border-radius: 12px;
-    width: 80%;
-    max-width: 650px;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 720px;
+    max-height: 88vh;
+    overflow-y: auto;
     border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     position: relative;
     color: var(--text-color);
 }
 
 .close-btn {
     position: absolute;
-    top: 10px; right: 15px;
-    font-size: 1.5rem; cursor: pointer;
+    top: 10px; right: 16px;
+    font-size: 1.5rem; 
+    cursor: pointer;
+    opacity: 0.7;
 }
 
-.card-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 4px;
+.close-btn:hover {
+    opacity: 1;
 }
-.value-badge {
-    font-size: 0.7rem;
-    background: rgba(56, 189, 248, 0.15);
+
+/* Style für Formularelemente im Modal */
+#modal-body label {
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--accent-color);
-    padding: 2px 6px;
-    border-radius: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+}
+
+#modal-body input, 
+#modal-body textarea {
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 6px;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#modal-body input:focus, 
+#modal-body textarea:focus {
+    border-color: var(--accent-color);
+}
+
+#modal-body textarea {
+    line-height: 1.4;
+    resize: vertical;
+}
+
+/* Skalierung der MathJax-Anzeige innerhalb der Karten */
+.mjx-chtml {
+    font-size: 90% !important;
 }
