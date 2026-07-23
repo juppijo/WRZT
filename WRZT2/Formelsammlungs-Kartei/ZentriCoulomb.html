@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZNT 2 - Formelsammlung</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="dark-theme">
+
+    <header>
+        <h1>WRZNT 2 – Physikalische Formelkartei</h1>
+        <div class="controls">
+            <button id="btn-fullscreen" onclick="toggleFullscreen()">📺 Vollbild</button>
+            <button id="btn-theme" onclick="toggleTheme()">👗 Dressing (Theme)</button>
+
+            <input type="file" id="file-input" style="display:none;" onchange="loadCards(event)">
+        </div>
+    </header>
+
+    <h3>Kreisbewegung mit fundamentalen Wechselwirkungen</h3>
+    <p>Wir setzen die Zentrifugalkraft gleich der Coulomb-Kraft mit $m = m_e$ und $v = c$:</p>
+
+    $$m_e \cdot \frac{c^2}{r} = k \cdot \frac{e^2}{r^2}$$
+
+    <h3>Herleitung Schritt für Schritt</h3>
+    <p>1. Beide Seiten mit $r^2$ multiplizieren:</p>
+    $$m_e \, c^2 \, r = k \, e^2$$
+
+    <p>2. Nach $r$ auflösen:</p>
+    $$r = \frac{k \, e^2}{m_e \, c^2}$$
+
+    <p>3. Mit der Coulomb-Konstanten $k = \frac{1}{4\pi \varepsilon_0}$ einsetzen:</p>
+    $$r = \frac{1}{4\pi \varepsilon_0} \cdot \frac{e^2}{m_e c^2}$$
+
+    <h3>✨ Bedeutung</h3>
+    <p>Dieser Ausdruck entspricht exakt dem <b>klassischen Elektronenradius $r_e$</b>. Er zeigt das fundamentale Wechselspiel zwischen Massenträgheit, Ladung und Raumzeit-Grenzgeschwindigkeit $c$.</p>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
