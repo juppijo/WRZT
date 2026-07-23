@@ -132,7 +132,7 @@ Das Wirkungsquantum ergibt sich unmittelbar aus den Raumzeitparametern.
         category: "WRZT-Grundkonstanten",
         symbol: "h",
         name: "Plancksches Wirkungsquantum",
-        desc: "Herleitung über das reduzierte Plancksche Wirkungsquantum.",
+        desc: "Herleitung über das reduzierte Plancksches Wirkungsquantum.",
         formula: "$$h=2\\pi\\hbar$$",
         value: "6.62607015 × 10⁻³⁴ J·s",
         unit: "J·s",
@@ -174,9 +174,26 @@ Beschreibt die Energiedichte des Raumzeitvakuums innerhalb der WRZT.
         name: "Klassischer Elektronenradius (WRZNT)",
         desc: "Gleichgewicht aus Coulomb-Kraft und Zentrifugalkraft bei v=c.",
         formula: "$$r_e = \\frac{1}{4\\pi \\varepsilon_0} \\cdot \\frac{e^2}{m_e c^2}$$",
-        value: "≈ 2.81794 × 10⁻¹Vis m",
+        value: "≈ 2.81794 × 10⁻¹⁵ m",
         unit: "m",
-        details: "<h3>Herleitung:</h3>Zentrifugalkraft bei Lichtgeschwindigkeit gleich der Coulomb-Wechselwirkung gesetzt:<br>$$m_e \\frac{c^2}{r} = k \\frac{e^2}{r^2}$$<br>Auflösen nach $r$ liefert exakt den klassischen Elektronenradius.<br><br><b>Exakte Werte:</b><br>• $m_e \\approx 9{,}109383 \\cdot 10^{-31}$ kg<br>• $e \\approx 1{,}602176 \\cdot 10^{-19}$ C<br>• $c \\approx 299792458$ m/s<br>• $r_e \\approx 2{,}81794 \\cdot 10^{-15}$ m",
+        details: `
+<h3>Kreisbewegung mit fundamentalen Wechselwirkungen</h3>
+Wir setzen die Zentrifugalkraft gleich der Coulomb-Kraft mit $m=m_e$ und $v=c$:
+$$m_e \\cdot \\frac{c^2}{r} = k \\cdot \\frac{e^2}{r^2}$$
+
+<h3>Herleitung nach r:</h3>
+Beide Seiten mit $r^2$ multiplizieren:
+$$m_e c^2 r = k e^2$$
+
+Nach $r$ auflösen:
+$$r = \\frac{k e^2}{m_e c^2}$$
+
+Mit $k = \\frac{1}{4\\pi \\varepsilon_0}$:
+$$r = \\frac{1}{4\\pi \\varepsilon_0} \\cdot \\frac{e^2}{m_e c^2}$$
+
+<h3>Bedeutung:</h3>
+Dieser Ausdruck entspricht exakt dem klassischen Elektronenradius.
+`,
         related: ["c", "\\eta"],
         keywords: ["Elektronenradius", "Coulomb", "Zentrifugalkraft"]
     },
@@ -232,7 +249,7 @@ for (let i = formulaData.length; i < 25; i++) {
         formula: `$$E = m_{${i+1}} c^2$$`,
         value: "—",
         unit: "—",
-        details: "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung im Script oder über die Speicherfunktion als JSON-Datei verwalten.</p>",
+        details: "<h3>Details bearbeiten</h3><p>Du kannst diese Beschreibung direkt hier im Modal bearbeiten.</p>",
         related: [],
         keywords: ["Slot"]
     });
@@ -251,7 +268,10 @@ function renderGrid() {
         const badgeDisplay = card.value && card.value !== "—" ? `<span class="value-badge">${card.value}</span>` : "";
         
         cardEl.innerHTML = `
-            <h3 contenteditable="true" onclick="event.stopPropagation()" onblur="updateCard(${index}, 'name', this.innerText)">${card.name}</h3>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <h3 contenteditable="true" onclick="event.stopPropagation()" onblur="updateCard(${index}, 'name', this.innerText)">${card.name}</h3>
+                <button title="LaTeX kopieren" class="copy-btn" onclick="event.stopPropagation(); copyLaTeX(${index})">📋</button>
+            </div>
             <div class="formula" id="formula-${index}" onclick="event.stopPropagation()">${card.formula}</div>
             <p contenteditable="true" onclick="event.stopPropagation()" onblur="updateCard(${index}, 'desc', this.innerText)">${card.desc}</p>
             <div class="card-footer">${badgeDisplay}</div>
@@ -287,21 +307,53 @@ function startFormulaEdit(index, element) {
 
 function showDetails(index) {
     const card = formulaData[index];
-    document.getElementById('modal-title').innerText = card.name;
+    
+    // Editierbarer Titel im Modal
+    const modalTitle = document.getElementById('modal-title');
+    modalTitle.innerText = card.name;
+    modalTitle.contentEditable = true;
+    modalTitle.onblur = () => updateCard(index, 'name', modalTitle.innerText);
     
     let metaInfo = `
-        <div style="margin-bottom: 15px; opacity: 0.7; font-size: 0.9rem;">
+        <div style="margin-bottom: 15px; opacity: 0.8; font-size: 0.9rem;">
             <b>Kategorie:</b> ${card.category} | <b>Wert:</b> ${card.value} ${card.unit !== "—" ? card.unit : ""}
         </div>
     `;
     
-    document.getElementById('modal-body').innerHTML = `${metaInfo}<div style="text-align:center; font-size:1.6rem; margin:15px 0;">${card.formula}</div><br>${card.details}`;
+    let formulaBlock = `
+        <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin:15px 0;">
+            <div style="font-size:1.6rem;">${card.formula}</div>
+            <button class="copy-btn" onclick="copyLaTeX(${index})">📋 LaTeX kopieren</button>
+        </div>
+    `;
+    
+    let detailsBlock = `
+        <div id="modal-details-content" contenteditable="true" style="border: 1px dashed var(--border-color); padding: 10px; border-radius: 6px;" onblur="updateCard(${index}, 'details', this.innerHTML)">
+            ${card.details}
+        </div>
+    `;
+
+    document.getElementById('modal-body').innerHTML = metaInfo + formulaBlock + detailsBlock;
     document.getElementById('modal').style.display = 'flex';
     triggerMathJax();
 }
 
+// Funktion zum Kopieren des LaTeX-Codes
+function copyLaTeX(index) {
+    const rawFormula = formulaData[index].formula;
+    // Entfernt $$ oder $ Tags für reinen LaTeX-Code
+    const cleanFormula = rawFormula.replace(/^\$\$|\$\$$|^\$|\$$/g, '').trim();
+    
+    navigator.clipboard.writeText(cleanFormula).then(() => {
+        alert("LaTeX-Code in die Zwischenablage kopiert:\n" + cleanFormula);
+    }).catch(err => {
+        console.error('Fehler beim Kopieren: ', err);
+    });
+}
+
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
+    renderGrid(); // Aktualisiert das Grid, falls Titel im Modal geändert wurden
 }
 
 function triggerMathJax() {
