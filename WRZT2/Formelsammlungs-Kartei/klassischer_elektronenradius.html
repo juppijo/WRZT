@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Herleitung des klassischen Elektronenradius</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            background-color: #fdfbf7;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: auto;
+            background-color: #fdfbf7;
+            padding: 20px;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        .box {
+            background-color: #ffffff;
+            border-left: 5px solid #2980b9;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .math-container {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+
+    <h1>Herleitung: Klassischer Elektronenradius</h1>
+    
+    <p>Die Grundlage dieser Herleitung ist die Kreisbewegung im Rahmen fundamentaler Wechselwirkungen. Wir setzen die Zentrifugalkraft gleich der Coulomb-Kraft, interpretiert als dynamische Wirbelbewegung.</p>
+
+    <h2>1. Die Kraftgleichung & Umformung</h2>
+    <div class="box">
+        <p>Mit $m = m_e$ (Elektronenmasse) und $v = c$ (Lichtgeschwindigkeit):</p>
+        <div class="math-container">
+            $$m_e \cdot \frac{c^2}{r} = k \cdot \frac{e^2}{r^2}$$
+        </div>
+        <p>Beide Seiten mit $r^2$ multiplizieren:</p>
+        <div class="math-container">
+            $$m_e \, c^2 \, r = k \, e^2$$
+        </div>
+        <p>Nach $r$ auflösen:</p>
+        <div class="math-container">
+            $$r = \frac{k \, e^2}{m_e \, c^2}$$
+        </div>
+        <p>Das Ergebnis mit $k = \frac{1}{4\pi \varepsilon_0}$:</p>
+        <div class="math-container">
+            $$r_e = \frac{1}{4\pi \varepsilon_0} \cdot \frac{e^2}{m_e c^2}$$
+        </div>
+        <p>✨ <strong>Bedeutung:</strong> Dieser Ausdruck ist sehr tiefgehend – er entspricht genau dem klassischen Elektronenradius[cite: 2].</p>
+    </div>
+
+    <h2>2. Die physikalischen Konstanten</h2>
+    <table>
+        <tr><th>Konstante</th><th>Symbol</th><th>Wert</th></tr>
+        <tr><td>Coulomb-Konstante</td><td>\( k = \frac{1}{4\pi \varepsilon_0} \)</td><td>\( \approx 8,987 \times 10^9 \, \text{N m}^2/\text{C}^2 \)</td></tr>
+        <tr><td>Elementarladung</td><td>\( e \)</td><td>\( \approx 1,602177 \times 10^{-19} \, \text{C} \)</td></tr>
+        <tr><td>Elektronenmasse</td><td>\( m_e \)</td><td>\( \approx 9,109384 \times 10^{-31} \, \text{kg} \)</td></tr>
+        <tr><td>Lichtgeschwindigkeit</td><td>\( c \)</td><td>\( \approx 2,997925 \times 10^8 \, \text{m/s} \)</td></tr>
+    </table>
+
+    <h2>3. Numerische Berechnung</h2>
+    <p><strong>Schritt 1: Zähler ($k \cdot e^2$)</strong></p>
+    <div class="math-container">
+        $$(8,987 \times 10^9) \cdot (1,602 \times 10^{-19})^2 \approx 2,307 \times 10^{-28} \, \text{J}\cdot\text{m}$$
+    </div>
+
+    <p><strong>Schritt 2: Nenner ($m_e \cdot c^2$)</strong></p>
+    <div class="math-container">
+        $$(9,109 \times 10^{-31}) \cdot (2,998 \times 10^8)^2 \approx 8,187 \times 10^{-14} \, \text{J}$$
+    </div>
+
+    <p><strong>Schritt 3: Endergebnis</strong></p>
+    <div class="box" style="border-left-color: #27ae60;">
+        <div class="math-container">
+            $$r_e = \frac{2,307 \times 10^{-28} \, \text{J}\cdot\text{m}}{8,187 \times 10^{-14} \, \text{J}} \approx 2,818 \times 10^{-15} \, \text{m} = 2,82 \, \text{fm}$$
+        </div>
+    </div>
+
+</body>
+</html>
