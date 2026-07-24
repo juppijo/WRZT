@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            background-color: #ffffff;
+        }
+        body {
+            font-family: 'Latin Modern Roman', 'Times New Roman', serif;
+            color: #1a1a1a;
+            line-height: 1.7;
+            padding: 0;
+            margin: 0;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1.5pt solid #000;
+            margin-bottom: 30pt;
+            padding-bottom: 15pt;
+        }
+        h1 { font-size: 18pt; margin: 0; }
+        h2 { font-size: 14pt; margin-top: 25pt; border-bottom: 0.5pt solid #aaa; padding-bottom: 5pt; }
+        .math-block {
+            text-align: center;
+            font-size: 1.3em;
+            margin: 20pt 0;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 0.2em;
+            text-align: center;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.fdn { border-top: 0.7pt solid black; }
+        
+        .box {
+            border: 1.5pt solid #2c3e50;
+            padding: 15pt;
+            background-color: #f9f9f9;
+            margin: 20pt 0;
+        }
+        .step { font-weight: bold; color: #2c3e50; }
+        p { text-align: justify; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+        <p>Herleitung des minimalen Radius \( r_{	ext{min}} \) via Kräftegleichgewicht</p>
+    </div>
+
+    <div class="section">
+        <h2>1. Der mechanische Ansatz</h2>
+        <p>In der WRZT wird das Teilchen-Antiteilchen-System am Punkt der Annihilation als rotierendes System betrachtet. Die Stabilität der Bahn wird durch das Gleichgewicht zwischen der Zentrifugalkraft \( F_Z \) und der elektrostatischen Coulomb-Kraft \( F_C \) bestimmt:</p>
+        
+        <div class="math-block">
+            F_Z = F_C
+        </div>
+
+        <p>Eingesetzt ergibt sich:</p>
+        <div class="math-block">
+            <div class="fraction">
+                <span>m<sub>e</sub> &sdot; v<sup>2</sup></span>
+                <span class="fdn">r</span>
+            </div>
+            =
+            <div class="fraction">
+                <span>e<sup>2</sup></span>
+                <span class="fdn">4 &pi; &epsilon;<sub>0</sub> &sdot; r<sup>2</sup></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Einbezug der Feinstrukturkonstante \( lpha \)</h2>
+        <p>Die Kopplungskonstante \( lpha \) beschreibt die Stärke der elektromagnetischen Wechselwirkung und ist definiert als:</p>
+        
+        <div class="math-block">
+            &alpha; = 
+            <div class="fraction">
+                <span>e<sup>2</sup></span>
+                <span class="fdn">4 &pi; &epsilon;<sub>0</sub> &sdot; &hslash; &sdot; c</span>
+            </div>
+        </div>
+
+        <p>Durch Umstellen nach der Ladungskomponente erhalten wir:</p>
+        <div class="math-block">
+            <div class="fraction">
+                <span>e<sup>2</sup></span>
+                <span class="fdn">4 &pi; &epsilon;<sub>0</sub></span>
+            </div>
+            = &alpha; &sdot; &hslash; &sdot; c
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3. Der Grenzfall der Lichtgeschwindigkeit</h2>
+        <p>Am Punkt \( r_{	ext{min}} \) erreicht die Bahngeschwindigkeit des Systems die Lichtgeschwindigkeit \( v 	o c \). Dies markiert den Übergang von Materie zu einer Wellenform (Undatron). Wir setzen dies in die Gleichung aus Schritt 1 ein:</p>
+
+        <div class="math-block">
+            <div class="fraction">
+                <span>m<sub>e</sub> &sdot; c<sup>2</sup></span>
+                <span class="fdn">r</span>
+            </div>
+            =
+            <div class="fraction">
+                <span>&alpha; &sdot; &hslash; &sdot; c</span>
+                <span class="fdn">r<sup>2</sup></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>4. Isolierung von \( r_{	ext{min}} \)</h2>
+        <p>Wir kürzen ein \( c \) und multiplizieren mit \( r^2 \):</p>
+        <div class="math-block">
+            m<sub>e</sub> &sdot; c &sdot; r = &alpha; &sdot; &hslash;
+        </div>
+
+        <div class="box">
+            <div class="math-block" style="margin:0;">
+                r<sub>min</sub> = 
+                <div class="fraction">
+                    <span>&alpha; &sdot; &hslash;</span>
+                    <span class="fdn">m<sub>e</sub> &sdot; c</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 40pt; font-size: 9pt; color: #666; text-align: center;">
+        Physikalische Interpretation: Der Radius entspricht dem klassischen Elektronenradius \( r_e \). <br>
+        In der WRZT markiert dieser Wert die fundamentale Grenze der Raumzeit-Kompression.
+    </div>
+</body>
+</html>

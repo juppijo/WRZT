@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #fcfdfd;
+        }
+        body {
+            font-family: 'Times New Roman', serif;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2pt solid #2c3e50;
+            padding-bottom: 10pt;
+            margin-bottom: 20pt;
+        }
+        h1 { font-size: 20pt; margin: 0; color: #2c3e50; }
+        h2 { font-size: 14pt; color: #2980b9; border-left: 4pt solid #2980b9; padding-left: 10pt; margin-top: 20pt; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15pt 0;
+        }
+        th, td {
+            border: 1pt solid #bdc3c7;
+            padding: 8pt;
+            text-align: left;
+        }
+        th { background-color: #ecf0f1; }
+        .math-block {
+            text-align: center;
+            font-size: 1.25em;
+            margin: 15pt 0;
+            padding: 10pt;
+            background: #f9f9f9;
+            border: 0.5pt solid #ddd;
+        }
+        .result-box {
+            background-color: #e8f4f8;
+            border: 1.5pt solid #2980b9;
+            padding: 12pt;
+            margin: 15pt 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>WRZT Präzisionsdatenblatt</h1>
+        <p>Numerische Auswertung der Wellenraumzeit-Theorie</p>
+    </div>
+
+    <h2>1. Fundamentale Basiswerte (SI-Einheiten)</h2>
+    <table>
+        <tr><th>Größe</th><th>Symbol</th><th>Präzisionswert</th></tr>
+        <tr><td>Lichtgeschwindigkeit</td><td>c</td><td>299792458 m/s</td></tr>
+        <tr><td>Elektronenruhemasse</td><td>m<sub>e</sub></td><td>9,1093837015 &times; 10<sup>-31</sup> kg</td></tr>
+        <tr><td>Reduziertes Planck-Quantum</td><td>&hslash;</td><td>1,054571817 &times; 10<sup>-34</sup> Js</td></tr>
+        <tr><td>Feinstrukturkonstante</td><td>&alpha;</td><td>0,0072973525693 (1/137,0359)</td></tr>
+        <tr><td>Elementarladung</td><td>e</td><td>1,602176634 &times; 10<sup>-19</sup> C</td></tr>
+    </table>
+
+    <h2>2. Herleitung von r<sub>min</sub> (Zentrifugal- & Coulomb-Gleichgewicht)</h2>
+    <p>Gleichung unter Berücksichtigung von &alpha;:</p>
+    <div class="math-block">
+        r<sub>min</sub> = &alpha; &hslash; / (m<sub>e</sub> c)
+    </div>
+    <div class="result-box">
+        Numerischer Wert r<sub>min</sub>: 2.817940326677e-15 m<br>
+        (&approx; 2,81794 &times; 10<sup>-15</sup> m - Klassischer Elektronenradius)
+    </div>
+
+    <h2>3. Herleitung von r<sub>min</sub> (Wellen-Umklapppunkt)</h2>
+    <p>Gleichung nach der Energie-Frequenz-Kopplung (reduzierte Compton-Wellenlänge):</p>
+    <div class="math-block">
+        r<sub>Compton</sub> = &hslash; / (m<sub>e</sub> c)
+    </div>
+    <div class="result-box">
+        Numerischer Wert r<sub>Compton</sub>: 3.861592680245e-13 m<br>
+        (&approx; 3,86159 &times; 10<sup>-13</sup> m)
+    </div>
+
+    <h2>4. Energie-Äquivalente im System</h2>
+    <p>Die Energie eines einzelnen Undatrons bei Annihilation:</p>
+    <div class="math-block">
+        E = m<sub>e</sub> c<sup>2</sup>
+    </div>
+    <div class="result-box">
+        E &approx; 8.187105775476e-14 J (&approx; 0,510998 MeV)
+    </div>
+
+    <h2>5. Dynamik (Bugwellen-Theorie)</h2>
+    <p>Staudruck-Faktor B<sub>v</sub> bei 90% Lichtgeschwindigkeit (v = 0,9c):</p>
+    <div class="math-block">
+        B<sub>0,9c</sub> = 1 / &radic;(1 - 0,9<sup>2</sup>) &approx; 2,294
+    </div>
+    <p>Dies bedeutet eine 2,29-fache Verdichtung der Xi-Energiedichte gegenüber dem Ruhezustand.</p>
+
+    <footer style="margin-top:30pt; font-size:9pt; text-align:center; color:#7f8c8d;">
+        Berechnet auf Basis der CODATA-Empfehlungen für die WRZT-Forschung.
+    </footer>
+</body>
+</html>
