@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 12mm;
+            background-color: #f0f4f8;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #1a2a3a;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+        }
+        .header-banner {
+            background-color: #1a2a3a;
+            color: #e0e0e0;
+            padding: 25pt;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+        }
+        h1 { margin: 0; font-size: 22pt; letter-spacing: 1px; }
+        .container { padding: 20pt; }
+        h2 { 
+            color: #2980b9; 
+            border-left: 5px solid #2980b9; 
+            padding-left: 10pt;
+            margin-top: 25pt;
+            font-size: 16pt;
+            background: rgba(41, 128, 185, 0.05);
+        }
+        .formula-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 12px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .math-display {
+            text-align: center;
+            font-size: 1.4em;
+            margin: 12pt 0;
+            color: #2c3e50;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+        }
+        .math-inline {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .explanation {
+            font-size: 10pt;
+            color: #4a5568;
+            margin-top: 5pt;
+            border-top: 1px solid #eee;
+            padding-top: 5pt;
+        }
+        .tag {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 2pt 6pt;
+            border-radius: 4pt;
+            font-size: 9pt;
+            margin-bottom: 5pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-banner">
+        <h1>Erweiterte Formelsammlung: WRZT / WRZNT</h1>
+        <p>Inklusive Xi-Teilchen & Bugwellen-Theorie</p>
+    </div>
+
+    <div class="container">
+        <h2>1. Dynamik der Bewegung: Bugwellen-Theorie</h2>
+        <p>Die Bugwellen-Theorie beschreibt Materiebewegung als Interaktion mit dem Raumzeit-Medium.</p>
+        
+        <div class="formula-card">
+            <div class="tag">Bugwellen-Faktor (Lorentz-äquivalent)</div>
+            <div class="math-display">
+                B_v = 1 / &radic;(1 - v&sup2;/c&sup2;)
+            </div>
+            <p class="explanation">Der Faktor bestimmt die Kompression der Raumzeit-Knoten vor einem bewegten Objekt. Bei v=c wird die Bugwelle unendlich groß (Singularität der Energie).</p>
+        </div>
+
+        <div class="formula-card">
+            <div class="tag">Staudruck-Energie</div>
+            <div class="math-display">
+                E_{kin} = (B_v - 1) &middot; m_0 c&sup2;
+            </div>
+            <p class="explanation">Kinetische Energie ist in der WRZT die Energie, die in der Deformation der Bugwelle gespeichert ist.</p>
+        </div>
+
+        <h2>2. Xi-Teilchen (&xi;) & Netzstruktur</h2>
+        <div class="formula-card">
+            <div class="tag">Xi-Energiedichte</div>
+            <div class="math-display">
+                &rho;<sub>&xi;</sub> = &Sigma; &xi; / V<sub>r_min</sub>
+            </div>
+            <p class="explanation">Beschreibt die Konzentration von Xi-Informationseinheiten innerhalb des minimalen Radius. Höhere Dichte entspricht stärkerer Gravitation / Raumkrümmung.</p>
+        </div>
+
+        <h2>3. Fundamentale WRZT-Grenzen</h2>
+        <div class="formula-card">
+            <div class="tag">Minimaler Radius (Umklapp-Punkt)</div>
+            <div class="math-display">
+                r_{min} = &hslash; / (m_e &middot; c)
+            </div>
+            <p class="explanation">Grenze zwischen Teilchen-Rotation und Wellen-Abstrahlung (Undatron). Wert: &approx; 3,861 &times; 10&sup1;&sup3; m.</p>
+        </div>
+
+        <div class="formula-card">
+            <div class="tag">Undatron-Welle (Licht)</div>
+            <div class="math-display">
+                &Psi;_{U}(t, x) = A &middot; e^{i(kx - &omega;t)}
+            </div>
+            <p class="explanation">Licht als transversale Störung im Xi-Feld des Raumzeit-Netzes.</p>
+        </div>
+    </div>
+</body>
+</html>
