@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            background-color: #ffffff;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #1a1a1a;
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1pt solid #000;
+            margin-bottom: 30pt;
+            padding-bottom: 10pt;
+        }
+        h1 { font-size: 18pt; margin: 0; text-transform: uppercase; }
+        h2 { font-size: 14pt; margin-top: 20pt; border-bottom: 0.5pt solid #666; }
+        .section { margin-bottom: 20pt; }
+        .formula-box {
+            text-align: center;
+            margin: 15pt 0;
+            font-size: 12pt;
+        }
+        /* LaTeX Style Simulation */
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 0.2em;
+            text-align: center;
+        }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.fdn { border-top: 0.5pt solid black; }
+        
+        .description {
+            font-size: 10pt;
+            color: #333;
+            margin-left: 20pt;
+            font-style: normal;
+        }
+        .value {
+            font-weight: bold;
+            margin-top: 5pt;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+        <p>Wissenschaftliche Formelsammlung & Herleitungen</p>
+    </div>
+
+    <div class="section">
+        <h2>I. Fundamentale Konstanten</h2>
+        <ul>
+            <li>Lichtgeschwindigkeit: <span class="math">c = 299.792.458 m/s</span></li>
+            <li>Elektronenmasse: <span class="math">m<sub>e</sub> &approx; 9,109 &times; 10<sup>-31</sup> kg</span></li>
+            <li>Reduziertes Planck-Quantum: <span class="math">&hslash; &approx; 1,054 &times; 10<sup>-34</sup> Js</span></li>
+            <li>Feinstrukturkonstante: <span class="math">&alpha; &approx; 1/137,036</span></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>II. Herleitung des Minimalen Radius r<sub>min</sub></h2>
+        <p>Das Gleichgewicht zwischen Zentrifugalkraft und elektrostatischer Bindung am Punkt <span class="math">v = c</span>:</p>
+        
+        <div class="formula-box">
+            <span class="math">F<sub>Z</sub> = F<sub>C</sub></span>
+        </div>
+
+        <div class="formula-box">
+            <div class="fraction">
+                <span>m<sub>e</sub> v<sup>2</sup></span>
+                <span class="fdn">r</span>
+            </div>
+            =
+            <div class="fraction">
+                <span>e<sup>2</sup></span>
+                <span class="fdn">4 &pi; &epsilon;<sub>0</sub> r<sup>2</sup></span>
+            </div>
+        </div>
+
+        <p>Unter Verwendung der Substitution für <span class="math">&alpha;</span>:</p>
+        <div class="formula-box">
+            <span class="math">e<sup>2</sup> = 4 &pi; &epsilon;<sub>0</sub> &alpha; &hslash; c</span>
+        </div>
+
+        <p>Einsetzen für <span class="math">v = c</span>:</p>
+        <div class="formula-box">
+            <div class="fraction">
+                <span>m<sub>e</sub> c<sup>2</sup></span>
+                <span class="fdn">r</span>
+            </div>
+            =
+            <div class="fraction">
+                <span>&alpha; &hslash; c</span>
+                <span class="fdn">r<sup>2</sup></span>
+            </div>
+        </div>
+
+        <div class="formula-box" style="border: 1pt solid black; padding: 10pt;">
+            <span class="math">r<sub>min</sub> = </span>
+            <div class="fraction">
+                <span>&alpha; &hslash;</span>
+                <span class="fdn">m<sub>e</sub> c</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>III. Dynamik des Wellenraumzeit-Netzes (WRZNT)</h2>
+        <p><b>1. Bugwellen-Faktor (Trägheitseffekt):</b></p>
+        <div class="formula-box">
+            <span class="math">B<sub>v</sub> = </span>
+            <div class="fraction">
+                <span>1</span>
+                <span class="fdn">&radic;(1 - v<sup>2</sup>/c<sup>2</sup>)</span>
+            </div>
+        </div>
+        
+        <p><b>2. Xi-Energiedichte (&rho;<sub>&xi;</sub>):</b></p>
+        <div class="formula-box">
+            <span class="math">&rho;<sub>&xi;</sub> = </span>
+            <div class="fraction">
+                <span>&sum; E<sub>&xi;</sub></span>
+                <span class="fdn">V<sub>r_min</sub></span>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50pt; font-size: 8pt; text-align: center; color: #888;">
+        Dokument generiert für die Erforschung der Wellenraumzeit-Theorie.
+    </div>
+</body>
+</html>
