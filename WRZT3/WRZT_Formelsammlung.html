@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 12mm;
+            background-color: #f4f7f9;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #2c3e50;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f9;
+        }
+        .header-banner {
+            background-color: #2c3e50;
+            color: white;
+            padding: 25pt;
+            text-align: center;
+        }
+        h1 { margin: 0; font-size: 20pt; text-transform: uppercase; letter-spacing: 2px; }
+        .subtitle { font-size: 11pt; opacity: 0.8; margin-top: 5pt; }
+        
+        .container { padding: 20pt; }
+        
+        h2 { 
+            color: #2980b9; 
+            border-bottom: 2px solid #2980b9; 
+            padding-bottom: 5px;
+            margin-top: 20pt;
+            font-size: 15pt;
+        }
+        
+        .formula-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 5px solid #3498db;
+            page-break-inside: avoid;
+        }
+        
+        .math-display {
+            text-align: center;
+            font-size: 1.3em;
+            margin: 10pt 0;
+            color: #c0392b;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+        }
+        
+        .math-inline {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15pt 0;
+            background: white;
+            font-size: 10pt;
+        }
+        th, td {
+            padding: 10pt;
+            border: 1px solid #dfe6e9;
+            text-align: left;
+        }
+        th { background-color: #34495e; color: white; }
+        
+        .explanation {
+            font-size: 10pt;
+            color: #535c68;
+            margin-top: 5pt;
+        }
+        
+        .value-box {
+            display: inline-block;
+            background: #ecf0f1;
+            padding: 3pt 8pt;
+            border-radius: 4pt;
+            font-weight: bold;
+            font-size: 10pt;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-banner">
+        <h1>Formelsammlung: WRZT & WRZNT</h1>
+        <div class="subtitle">Wellenraumzeit-Theorie & Netz-Erweiterung</div>
+    </div>
+
+    <div class="container">
+        <h2>1. Physikalische Konstanten</h2>
+        <table>
+            <tr>
+                <th>Konstante</th>
+                <th>Symbol</th>
+                <th>Wert in der Theorie</th>
+            </tr>
+            <tr>
+                <td>Lichtgeschwindigkeit</td>
+                <td><span class="math-inline">c</span></td>
+                <td>2,99792458 × 10⁸ m/s</td>
+            </tr>
+            <tr>
+                <td>Elektronenmasse</td>
+                <td><span class="math-inline">m<sub>e</sub></span></td>
+                <td>9,10938 × 10⁻³¹ kg</td>
+            </tr>
+            <tr>
+                <td>Red. Planck-Konstante</td>
+                <td><span class="math-inline">ℏ</span></td>
+                <td>1,05457 × 10⁻³⁴ Js</td>
+            </tr>
+            <tr>
+                <td>Elementarladung</td>
+                <td><span class="math-inline">e</span></td>
+                <td>1,60218 × 10⁻¹⁹ C</td>
+            </tr>
+            <tr>
+                <td>Feinstrukturkonstante</td>
+                <td><span class="math-inline">α</span></td>
+                <td>≈ 1 / 137,036</td>
+            </tr>
+        </table>
+
+        <h2>2. Kernformeln der WRZT</h2>
+        
+        <div class="formula-card">
+            <h3>Minimaler Radius (<span class="math-inline">r<sub>min</sub></span>)</h3>
+            <div class="math-display">
+                r<sub>min</sub> = ℏ / (m<sub>e</sub> · c)
+            </div>
+            <div class="explanation">
+                Beschreibt die Grenze, an der die Rotation eines Teilchen-Antiteilchen-Paares die Lichtgeschwindigkeit erreicht und in eine Wellenform (Undatron) übergeht.
+            </div>
+            <div class="value-box">Wert: ≈ 3,86159 × 10⁻¹³ m</div>
+        </div>
+
+        <div class="formula-card">
+            <h3>Undatron-Energie</h3>
+            <div class="math-display">
+                E = h · f = m<sub>e</sub> · c²
+            </div>
+            <div class="explanation">
+                Die Energie einer Raumzeitwelle (Photon/Undatron), die aus der Ruhemasse eines Elektrons bei der Annihilation hervorgeht.
+            </div>
+        </div>
+
+        <div class="formula-card">
+            <h3>Kräftegleichgewicht (Vorgang)</h3>
+            <div class="math-display">
+                (e² / 4πε₀r²) = (m · v² / r)
+            </div>
+            <div class="explanation">
+                Gleichsetzung von Coulomb-Kraft und Zentrifugalkraft für rotierende Paare vor dem Umklapp-Punkt.
+            </div>
+        </div>
+
+        <h2>3. WRZNT (Netz-Theorie)</h2>
+        
+        <div class="formula-card">
+            <h3>Graphen-Definition</h3>
+            <div class="math-display">
+                G = (V, E)
+            </div>
+            <div class="explanation">
+                Das Universum als Netz: <span class="math-inline">V</span> (Knoten) repräsentieren Teilchen, <span class="math-inline">E</span> (Kanten) die raumzeitlichen Beziehungen/Netzspannungen.
+            </div>
+        </div>
+
+        <div class="formula-card">
+            <h3>Lorentz-Faktor (<span class="math-inline">Γ</span>)</h3>
+            <div class="explanation">
+                In der WRZNT emergent abgeleitet: Er beschreibt die Verzerrung der Netz-Taktfrequenz bei Bewegung eines stabilen Knoten-Clusters durch das Gitter.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

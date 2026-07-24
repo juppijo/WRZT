@@ -1,5 +1,116 @@
 [
   {
+    "id": "custom_1784885176921",
+    "cat": "Benutzerdefiniert",
+    "name": "e",
+    "expr": "e =  2.71828",
+    "displayExpr": "e =  2.71828",
+    "desc": "e =  2,71828 Euler",
+    "vars": [
+      {
+        "sym": "e",
+        "name": "Euler Zahl",
+        "unit": ""
+      }
+    ],
+    "formula": "2.71828",
+    "resultUnit": "",
+    "resultName": "e",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1784884662906",
+    "cat": "WRZT",
+    "name": "Rmin 1 Electron",
+    "expr": "Rmin = ℏ / ( mₑ * c )",
+    "displayExpr": "Rmin = ℏ / ( mₑ * c )",
+    "desc": "Rmin für ein Electron",
+    "vars": [
+      {
+        "sym": "ℏ",
+        "name": "Hbar H-Quer",
+        "unit": "J·s"
+      },
+      {
+        "sym": "mₑ",
+        "name": "Elektronen masse",
+        "unit": "Kg"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s"
+      }
+    ],
+    "formula": "ℏ / ( mₑ * c )",
+    "resultUnit": "m",
+    "resultName": "Rmin 1 Electron",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771406457577",
+    "cat": "WRZT",
+    "name": "Strukturelle Ur-Spannung",
+    "expr": "Ξ = ( mₑ ^ 2 * c ) / ( 4 * ℏ )",
+    "displayExpr": "Ξ = ( mₑ ^ 2 * c ) / ( 4 * ℏ )",
+    "desc": "Ur-Spannung   Ξ",
+    "vars": [
+      {
+        "sym": "mₑ",
+        "name": "Elektronenmasse",
+        "unit": "kg"
+      },
+      {
+        "sym": "ℏ",
+        "name": "Reduz. Plank Konstante",
+        "unit": "J·s"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschindigkeit",
+        "unit": "m/s"
+      }
+    ],
+    "formula": "( mₑ ^ 2 * c ) / ( 4 * ℏ )",
+    "resultUnit": "kg / m",
+    "resultName": "Strukturelle Ur-Spannung",
+    "isCustom": true
+  },
+  {
+    "id": "custom_1771407570649",
+    "cat": "WRZT",
+    "name": "minimale Radius Rmin",
+    "expr": "Rmin = ( e ^ 2  ) / ( 4 * ε * m * c ^ 2 )",
+    "displayExpr": "Rmin = ( e ^ 2  ) / ( 4 * ε * m * c ^ 2 )",
+    "desc": "",
+    "vars": [
+      {
+        "sym": "e",
+        "name": "Elementarladund",
+        "unit": "C"
+      },
+      {
+        "sym": "ε",
+        "name": "ε₀",
+        "unit": "F/m"
+      },
+      {
+        "sym": "m",
+        "name": "masse",
+        "unit": "kg"
+      },
+      {
+        "sym": "c",
+        "name": "Lichtgeschwindigkeit",
+        "unit": "m/s"
+      }
+    ],
+    "formula": "( e ^ 2  ) / ( 4 * ε * m * c ^ 2 )",
+    "resultUnit": "m",
+    "resultName": "minimale Radius Rmin",
+    "isCustom": true
+  },
+  {
     "id": "custom_1771336154681_evzo",
     "cat": "Wellen",
     "name": "Raumzeit Trägheit",
