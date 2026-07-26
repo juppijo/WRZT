@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellenraumzeit-Netz-Theorie (WRZNT) - Das Einheits-Manifest</title>
+
+    <!-- MathJax Config & Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-accent: #0b1120;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-cyan: #38bdf8;
+            --accent-teal: #2dd4bf;
+            --accent-amber: #fbbf24;
+            --border-color: #334155;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.65;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .meta-info {
+            color: var(--accent-amber);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            color: var(--accent-teal);
+            font-size: 1.45rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-teal);
+            padding-left: 10px;
+        }
+
+        h3 {
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        .formula-box {
+            background-color: var(--bg-card-accent);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            text-align: center;
+            font-size: 1.15rem;
+            overflow-x: auto;
+        }
+
+        .step-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2rem 0;
+        }
+
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-card-accent);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .quote-box {
+            font-style: italic;
+            border-left: 3px solid var(--accent-amber);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="subtitle">Wellenraumzeit-Netz-Theorie (WRZNT)</div>
+        <h1>Fiat Lux – Das Einheits-Manifest</h1>
+        <div class="meta-info">Vers. 2.0 • Autoren-Symbiose & Mathematische Synthese • @juppijo</div>
+    </header>
+
+    <!-- 1. Einleitung & Philosophie -->
+    <div class="section">
+        <h2>1. Einleitung & Grundkonzept</h2>
+        <p>
+            Licht ist seit Jeher das fundamentale Phänomen unseres Universums. In der klassischen Elektrodynamik als elektromagnetische Welle und in der Quantenmechanik als Photonenstrom beschrieben, offenbart die <strong>Wellenraumzeit-Netz-Theorie (WRZNT)</strong> eine tiefere, vereinheitlichte Perspektive:
+        </p>
+        <p>
+            Licht ist eine hochfrequente Gravitations- bzw. Raumzeitwelle, hervorgerufen durch die relativistische Rotation von Teilchen-Antiteilchen-Paaren oder hochfrequente Ladungsschwingungen im Raumzeit-Gewebe.
+        </p>
+        <p>
+            Jedes Teilchen entspricht einer lokalen <strong>Raumzeitkrümmung</strong> (Vertiefung), während jedes Antiteilchen eine komplementäre <strong>Raumzeit-Wölbung</strong> darstellt. Beide bilden dynamische Pole im fraktalen Netz der Raumzeit.
+        </p>
+        <div class="quote-box">
+            „Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“ — Thich Nhat Hanh
+        </div>
+    </div>
+
+    <!-- 2. Anschauliche Erklärung -->
+    <div class="section">
+        <h2>2. Anschauliche Erklärung: Der Tanz an der Lichtgeschwindigkeit</h2>
+        <h3>Die Grundidee</h3>
+        <p>
+            Stell dir das Universum als ein elastisches, dynamisches Netz vor. Wenn ein Elektron ($e^-$) und ein Positron ($e^+$) aufeinandertreffen, ziehen sie sich extrem stark an. Sie beginnen, sich rasend schnell im gemeinsamen Schwerpunkt zu umkreisen – wie zwei Eiskunstläufer auf einer Kreisbahn.
+        </p>
+        <h3>Bugwellen im Raumzeit-Netz</h3>
+        <p>
+            Da sich die Teilchen nahezu mit Lichtgeschwindigkeit ($v \approx c$) bewegen, erzeugen sie wie ein schnelles Boot auf dem Wasser Mach-artige <strong>Bugwellen</strong> im Raumzeit-Gewebe. Durch die Kreisbewegung überlagern und interferieren diese Raumzeit-Bugwellen kontinuierlich.
+        </p>
+        <h3>Der Undatron-Kollaps</h3>
+        <p>
+            Nähert sich der Bahnradius der kritischen Fundamentalgrenze des Raumes, lösen sich die punktförmigen Ladungszentren auf. Die Ruhemasse und Ladung schmelzen in einer konstruktiven Interferenz zusammen: Es entsteht das <strong>Undatron</strong> – ein kohärentes Lichtwellenpaket mit vollständigem Informationsgedächtnis (Spin, Energie, Phasenkopplung).
+        </p>
+    </div>
+
+    <!-- 3. Mathematische Herleitung -->
+    <div class="section">
+        <h2>3. Mathematische Herleitung des Kräftegleichgewichts</h2>
+        <p>
+            Für ein extrem relativistisches System aus Elektron und Positron steht die Zentrifugalkraft im exakten Gleichgewicht mit der Coulomb-Anziehungskraft (bei $v \approx c$):
+        </p>
+        
+        <div class="formula-box">
+            $$F_{\text{Zentrifugal}} = F_{\text{Coulomb}}$$
+            $$m_e \cdot \frac{c^2}{r} = \frac{1}{4\pi \varepsilon_0} \cdot \frac{e^2}{r^2}$$
+        </div>
+
+        <p>Durch Multiplikation mit $r^2$ und Freistellen des Radius $r$ erhalten wir:</p>
+
+        <div class="formula-box">
+            $$r = r_e = \frac{1}{4\pi \varepsilon_0} \frac{e^2}{m_e c^2} \approx 2{,}8179 \times 10^{-15} \text{ m}$$
+        </div>
+
+        <p>
+            Der sich ergebende Radius entspricht exakt dem <span class="highlight">klassischen Elektronenradius ($r_e$)</span>.
+        </p>
+    </div>
+
+    <!-- 4. Fundamentale Skalen & Ur-Konstanten -->
+    <div class="section">
+        <h2>4. Die Hierarchie der Raumzeit-Skalen</h2>
+        <p>
+            Über die Feinstrukturkonstante $\alpha = \frac{e^2}{4\pi \varepsilon_0 \hbar c}$ knüpft die WRZNT den klassischen Radius an die Quanten- und Raumzeit-Fundamentalgrenzen an:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Physikalische Größe</th>
+                    <th>Symbol & Formel</th>
+                    <th>Verhältnis / Wert</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Klassischer Elektronenradius</strong></td>
+                    <td>$r_e = \frac{1}{4\pi \varepsilon_0} \frac{e^2}{m_e c^2}$</td>
+                    <td>$r_e = \alpha \cdot \bar{\lambda}_C = \frac{\alpha}{2} \cdot R_{\text{min}}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Reduzierte Compton-Wellenlänge</strong></td>
+                    <td>$\bar{\lambda}_C = \frac{\hbar}{m_e c}$</td>
+                    <td>$\bar{\lambda}_C = \frac{R_{\text{min}}}{2} \approx 3{,}8616 \times 10^{-13} \text{ m}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Minimaler Struktur-Radius</strong></td>
+                    <td>$R_{\text{min}} = \frac{2\hbar}{m_e c}$</td>
+                    <td>$R_{\text{min}} \approx 7{,}716 \times 10^{-13} \text{ m}$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Die Ur-Konstanten der Wellenraumzeit</h3>
+        <ul>
+            <li><strong>Ur-Spannung ($\Xi$):</strong> $\Xi = \frac{m_e^2 \cdot c}{4\hbar} \approx 5{,}8974 \times 10^{-19} \text{ kg/m}$</li>
+            <li><strong>Raumzeit-Trägheit ($\eta$):</strong> $\eta = \frac{1}{2} m_e \approx 4{,}5543 \times 10^{-31} \text{ kg}$</li>
+            <li><strong>Der Lichtgeschwindigkeits-Zusammenhang:</strong> $c = \frac{\Xi}{\eta} \cdot R_{\text{min}} \approx 299.792.458 \text{ m/s}$</li>
+        </ul>
+    </div>
+
+    <!-- 5. Bugwellen-Geometrie & Undatron -->
+    <div class="section">
+        <h2>5. Bugwellen-Geometrie & Der Undatron-Mechanismus</h2>
+        <p>
+            Der Öffnungswinkel $\Theta$ der Raumzeit-Bugwelle (Mach-Effekt im Netz) wird über das Geschwindigkeitsverhältnis bestimmt:
+        </p>
+        <div class="formula-box">
+            $$\sin(\Theta) = \frac{v_{\text{Phase}}}{v} \quad \implies \quad \sec(\Theta) = \frac{1}{\cos(\Theta)}$$
+        </div>
+
+        <p>Die Überlagerung der Raumzeit-Wellenfunktionen ergibt:</p>
+
+        <div class="formula-box">
+            $$\Psi_{\text{Netz}}(x,y,z,t) = \left( \Psi_{e^-} + \Psi_{e^+} \right) \cdot \sec(\Theta)$$
+        </div>
+
+        <p>
+            Beim Zusammenfall unterhalb von $R_{\text{min}}$ entsteht die reine Energie des Undatrons:
+        </p>
+
+        <div class="formula-box">
+            $$E_{\text{Undatron}} = 2 \cdot m_e c^2 = \hbar \cdot \omega_{\text{Netz}} \approx 1{,}022 \text{ MeV}$$
+        </div>
+    </div>
+
+    <!-- 6. Physikalische Phänomene -->
+    <div class="section">
+        <h2>6. Erklärung klassischer & quantenmechanischer Phänomene</h2>
+        
+        <h3>Polarisation & Spin</h3>
+        <p>
+            Der intrinsische Photonen-Spin ($S = \pm 1$) repräsentiert die Chiralität (Rechts- oder Linksdrehung) der rotierenden Raumzeitkrümmungen. Die räumliche Orientierung der Rotationsachse manifestiert sich makroskopisch als lineare, zirkuläre oder elliptische Polarisation.
+        </p>
+
+        <h3>Doppelspaltexperiment & Messprozess</h3>
+        <p>
+            Die hochfrequente Gravitationswelle breitet sich kontinuierlich aus und durchquert beide Spalte gleichzeitig (Interferenzmuster). Beim Zusammentreffen mit einem Detektor wird die Raumzeitdeformation an einem Punkt lokalisiert (übertragener Impuls), was den scheinbaren „Kollaps der Wellenfunktion“ bewirkt.
+        </p>
+
+        <h3>Quantenverschränkung</h3>
+        <p>
+            Da das Elektron-Positron-Paar in einer gemeinsamen Raumzeit-Geometrie gekoppelt war, bleibt die Informationsstruktur im Wellenfeld gewoben. Dies ermöglicht nicht-lokale Phasenkorrelationen über große Distanzen.
+        </p>
+    </div>
+
+    <!-- 7. Ausblick & Offene Fragen -->
+    <div class="section">
+        <h2>7. Ausblick & Offene Fragen</h2>
+        <ul>
+            <li><strong>Natur der Zeit:</strong> Ist Zeit das sekundäre Taktsignal der internen Kreis- und Schwingungsfrequenzen des Netzes?</li>
+            <li><strong>Dunkle Materie / Energie:</strong> Welchen Anteil tragen ruhende, hoch-kohärente Undatron-Felder im Kosmos?</li>
+            <li><strong>Experimenteller Nachweis:</strong> Messung von Phasenmodulationen in hochenergetischen Laser-Interferometern.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        Wellenraumzeit-Theorie (WRZT) • Manifest der Einheitsphysik • @juppijo
+    </div>
+
+</div>
+
+</body>
+</html>
