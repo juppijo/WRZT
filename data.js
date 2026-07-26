@@ -148,8 +148,8 @@ const FILES = [
 {p:"wrzt_rmin3.html", t:"R_min-Simulation — Variante 4/4", c:"sim"},
 
 // ---------- SONSTIGES ----------
-{p:"index.html", t:"3D Lissajous-Figuren", c:"sonstiges", n:"⚠️ aktuell die GitHub-Pages-Startseite"},
-{p:"LisaK.html", t:"3D Lissajous-Figuren", c:"sonstiges", n:"Duplikat von index.html"},
+{p:"Lisa.html", t:"3D Lissajous-Figuren", c:"sonstiges", n:"⚠️ aktuell die GitHub-Pages-Startseite"},
+{p:"LisaK.html", t:"3D Lissajous-Figuren K", c:"sonstiges", n:"Duplikat von Lisa.html"},
 {p:"Physiker.html", t:"Große Physiker & Physikerinnen ab 1700", c:"sonstiges"},
 {p:"WRZT2/ico.html", t:"Meine Astronomie Seite", c:"sonstiges"},
 {p:"WRZT2/dreieck.html", t:"Dreieck-Testseite (kein Titel gesetzt)", c:"sonstiges"},
