@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreisbewegung mit fundamentalen Wechselwirkungen</title>
+
+    <!-- MathJax Config & Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-accent: #0b1120;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-cyan: #38bdf8;
+            --accent-teal: #2dd4bf;
+            --accent-amber: #fbbf24;
+            --border-color: #334155;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            color: var(--accent-teal);
+            font-size: 1.35rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-teal);
+            padding-left: 10px;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        .formula-box {
+            background-color: var(--bg-card-accent);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            text-align: center;
+            font-size: 1.15rem;
+            overflow-x: auto;
+        }
+
+        .step-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-card-accent);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .highlight {
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="subtitle">Herleitung & Mechanismus</div>
+        <h1>Kreisbewegung mit fundamentalen Wechselwirkungen</h1>
+    </header>
+
+    <div class="section">
+        <h2>1. Die Grundannahme</h2>
+        <p>
+            Wir betrachten die Bewegung eines Elektrons auf einer geschlossenen Kreisbahn, bei der die anziehende <strong>Coulomb-Kraft</strong> (elektromagnetische Wechselwirkung) als Zentripetalkraft wirkt und die <strong>Zentrifugalkraft</strong> (Trägheit der Bewegung) exakt im Gleichgewicht hält.
+        </p>
+        <p>
+            Als physikalische Randbedingung setzen wir für die Bahngeschwindigkeit die Grenzgeschwindigkeit des Universums an: $v = c$ (Lichtgeschwindigkeit), sowie die Elektronenmasse $m = m_e$.
+        </p>
+
+        <div class="formula-box">
+            $$F_{\text{Zentrifugal}} = F_{\text{Coulomb}}$$
+            $$m_e \cdot \frac{c^2}{r} = k \cdot \frac{e^2}{r^2}$$
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Schritt-für-Schritt Herleitung</h2>
+        <div class="step-list">
+            <div class="step-item">
+                <strong>Ausgangsgleichung aufstellen:</strong>
+                <div class="formula-box">
+                    $$m_e \cdot \frac{c^2}{r} = k \cdot \frac{e^2}{r^2}$$
+                </div>
+            </div>
+            <div class="step-item">
+                <strong>Beide Seiten mit $r^2$ multiplizieren:</strong>
+                <div class="formula-box">
+                    $$m_e \cdot c^2 \cdot r = k \cdot e^2$$
+                </div>
+            </div>
+            <div class="step-item">
+                <strong>Nach dem Radius $r$ auflösen:</strong>
+                <div class="formula-box">
+                    $$r = \frac{k \cdot e^2}{m_e \cdot c^2}$$
+                </div>
+            </div>
+            <div class="step-item">
+                <strong>Coulomb-Konstante $k = \frac{1}{4\pi \varepsilon_0}$ einsetzen:</strong>
+                <div class="formula-box">
+                    $$r = \frac{1}{4\pi \varepsilon_0} \cdot \frac{e^2}{m_e c^2}$$
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3. Tiefere physikalische Bedeutung</h2>
+        <p>
+            Der hergeleitete Ausdruck für $r$ ist genau der <span class="highlight">klassische Elektronenradius</span> (auch Lorentz-Radius genannt, $r_e \approx 2{,}8179 \times 10^{-15} \text{ m}$).
+        </p>
+        <p>
+            Verknüpft man diesen Ausdruck mit der <strong>Feinstrukturkonstanten</strong> $\alpha = \frac{e^2}{4\pi \varepsilon_0 \hbar c}$ und der <strong>reduzierten Compton-Wellenlänge</strong> $\bar{\lambda}_C = \frac{\hbar}{m_e c}$, zeigt sich die fundamentale Hierarchie der Quanten- und Raumzeitskalen:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Größe</th>
+                    <th>Formel</th>
+                    <th>Verhältnis</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Klassischer Elektronenradius ($r_e$)</strong></td>
+                    <td>$r_e = \frac{1}{4\pi \varepsilon_0} \frac{e^2}{m_e c^2}$</td>
+                    <td>$r_e = \alpha \cdot \bar{\lambda}_C = \frac{\alpha}{2} \cdot R_{\text{min}}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Reduzierte Compton-Wellenlänge ($\bar{\lambda}_C$)</strong></td>
+                    <td>$\bar{\lambda}_C = \frac{\hbar}{m_e c}$</td>
+                    <td>$\bar{\lambda}_C = \frac{R_{\text{min}}}{2} \approx 3{,}86 \times 10^{-13} \text{ m}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Minimaler Struktur-Radius ($R_{\text{min}}$)</strong></td>
+                    <td>$R_{\text{min}} = \frac{2\hbar}{m_e c}$</td>
+                    <td>$R_{\text{min}} \approx 7{,}716 \times 10^{-13} \text{ m}$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top: 1rem;">
+            ✨ <strong>Fazit:</strong> Der klassische Radius beschreibt die Skala, an der die elektrostatische Feldenergie der Ruheenergie entspricht ($E = m_e c^2$). In Kombination mit der Wellenraumzeit zeigt sich, dass $r_e$ über den Kopplungsfaktor $\alpha$ (die Feinstrukturkonstante) direkt an die fundamentale Raumzeit-Trägheit $R_{\text{min}}$ gekoppelt ist.
+        </p>
+    </div>
+
+        <div class="section">
+        <h2>4. Vergleich mit Photonen-Energie & Ruheenergie ($E = m_e c^2$)</h2>
+        <p>
+            Um den Bogen zur Quantenmechanik und zu Photonen-Wellenlängen zu spannen, vergleichen wir die Ruheenergie des Elektrons nach Einstein mit der Energie eines Photons nach Planck:
+        </p>
+        <div class="formula-box">
+            <span class="math">E<sub>Elektron</sub> = m<sub>e</sub> c<sup>2</sup></span>
+            &nbsp;&nbsp;&nbsp;↔&nbsp;&nbsp;&nbsp;
+            <span class="math">E<sub>Photon</sub> = h · ν = <span class="fraction"><span class="top">h · c</span><span class="bottom">λ</span></span> = <span class="fraction"><span class="top">ℏ · c</span><span class="bottom">λ̄</span></span></span>
+        </div>
+        <p>
+            Setzen wir die Ruheenergie des Elektrons gleich der Photonenenergie, erhalten wir die reduzierte Compton-Wellenlänge <span class="math">λ̄<sub>C</sub></span>:
+        </p>
+        <div class="formula-box">
+            <span class="math">m<sub>e</sub> c<sup>2</sup> = <span class="fraction"><span class="top">ℏ · c</span><span class="bottom">λ̄<sub>C</sub></span></span> &nbsp;⇒&nbsp; λ̄<sub>C</sub> = <span class="fraction"><span class="top">ℏ</span><span class="bottom">m<sub>e</sub> c</span></span> ≈ 3,8616 × 10<sup>−13</sup> m</span>
+        </div>
+        <p>
+            Die reduzierte Compton-Wellenlänge <span class="math">λ̄<sub>C</sub></span> markiert die Quantengrenze, an der die Lokalisierung eines Teilchens genügend Energie besitzt, um Paarerzeugung auszulösen.
+        </p>
+    </div>
+
+    <div class="footer">
+        Wellenraumzeit-Theorie (WRZT) • Herleitung Klassischer Radius
+    </div>
+
+</div>
+
+</body>
+</html>
