@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annihilation, Undatron und Wellenraumzeit-Mechanismus</title>
+
+    <!-- MathJax Config & Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-accent: #0b1120;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-cyan: #38bdf8;
+            --accent-teal: #2dd4bf;
+            --accent-amber: #fbbf24;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.65;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 2.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            color: var(--accent-teal);
+            font-size: 1.4rem;
+            border-left: 4px solid var(--accent-teal);
+            padding-left: 10px;
+        }
+
+        .formula-box {
+            background-color: var(--bg-card-accent);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            text-align: center;
+            font-size: 1.15rem;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-item::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-card-accent);
+            color: var(--accent-cyan);
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="subtitle">Wellenraumzeit-Netz-Theorie (WRZNT)</div>
+        <h1>Der Undatron-Mechanismus: Annihilation & Bugwellen-Interferenz</h1>
+    </header>
+
+    <div class="section">
+        <h2>1. Das fundamentale Kräftegleichgewicht</h2>
+        <p>
+            Ein Elektron ($e^-$) und ein Positron ($e^+$) umkreisen einander im gemeinsamen Schwerpunkt durch die anziehende Coulomb-Kraft mit annähernd Lichtgeschwindigkeit $v \approx c$.
+        </p>
+        <div class="formula-box">
+            $$F_{\text{Zentrifugal}} = F_{\text{Coulomb}}$$
+            $$m_e \cdot \frac{c^2}{r} = \frac{1}{4\pi \varepsilon_0} \cdot \frac{e^2}{r^2}$$
+        </div>
+        <p>
+            Aufgelöst nach dem Bahnradius $r$ ergibt sich der klassische Elektronenradius $r_e$:
+        </p>
+        <div class="formula-box">
+            $$r = r_e = \frac{1}{4\pi \varepsilon_0} \frac{e^2}{m_e c^2}$$
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Der Bugwellen-Winkel $\Theta$ und die Raumzeit-Geometrie</h2>
+        <p>
+            Durch die hochrelativistische Bewegung ($v \approx c$) erzeugen die geladenen Teilchen Mach-artige Raumzeit-Bugwellen. Der charakteristische Öffnungswinkel der Bugwelle wird bestimmt durch:
+        </p>
+        <div class="formula-box">
+            $$\sin(\Theta) = \frac{v_{\text{Phase}}}{v} \quad \implies \quad \sec(\Theta) = \frac{1}{\cos(\Theta)}$$
+        </div>
+        <p>
+            Die Funktion $\sec(\Theta)$ skaliert die Amplitudenverstärkung und Überlagerung der Wellenfronten im Netz.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>3. Schritt-für-Schritt Herleitung der Undatron-Bildung</h2>
+        <div class="step-item">
+            <strong>Schritt 1: Das Teilchenpaar im Orbit ($r \to r_e$)</strong>
+            <p>Elektron und Positron bilden ein relativistisches System bei $r = r_e = \frac{\alpha}{2} R_{\text{min}}$.</p>
+        </div>
+        <div class="step-item">
+            <strong>Schritt 2: Bugwellen-Überlagerung und Interferenz</strong>
+            <p>Die rotierenden Ladungszentren erzeugen kohärente Raumzeit-Störungen. Die Überlagerungsfunktion wird durch den Winkel $\Theta$ moduliert:</p>
+            <div class="formula-box">
+                $$\Psi_{\text{Netz}}(x,y,z,t) = \Psi_{e^-} \cdot \sec(\Theta) + \Psi_{e^+} \cdot \sec(\Theta)$$
+            </div>
+        </div>
+        <div class="step-item">
+            <strong>Schritt 3: Konstruktive Annihilation & Entstehung des Undatrons</strong>
+            <p>Unterhalb der kritischen Schwelle $R_{\text{min}}$ kollabiert die Teilchenlokalisierung. Die Punktmasse transformiert in ein reines Lichtwellenpaket mit vollständiger Teilcheninformation: das <strong>Undatron</strong>.</p>
+            <div class="formula-box">
+                $$E_{\text{Undatron}} = 2 \cdot m_e c^2 = \hbar \cdot \omega_{\text{Netz}}$$
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Wellenraumzeit-Netz-Theorie (WRZNT) • Undatron & Annihilation Herleitung
+    </div>
+
+</div>
+
+</body>
+</html>
