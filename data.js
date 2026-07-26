@@ -14,7 +14,7 @@ const CATS = {
 
 const FILES = [
 // ---------- MANIFEST & THEORIE ----------
-{p:"WRZNT/WRZTN3.html", t:"WRZNT — größte Manifest-Fassung (116K)", c:"manifest", n:"★ Kern · kein <title> gesetzt"},
+{p:"WRZNT/WRZTN3.html", t:"WRZNT — größte Manifest-Fassung (116K)", c:"manifest", n:"★ Kern · kein Titel-Tag gesetzt"},
 {p:"WRZNT_C/index.html", t:"WRZT – Wellenraumzeit-Theorie (poliertes Dark-Gold-Design, MathJax)", c:"manifest", n:"★ Kern · deine neueste Design-Version"},
 {p:"WRZNT_Buch_JZ.html", t:"WRZT - Das vollständige Universal-Manifest", c:"manifest", n:"★ Kern"},
 {p:"WRZNT/WRZNT.html", t:"WRZNT — Die Wellenraumzeit-Netz-Theorie", c:"manifest"},

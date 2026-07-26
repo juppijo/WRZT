@@ -7,6 +7,11 @@
     return p.split('/').map(encodeURIComponent).join('/');
   }
 
+  function esc(str){
+    if(!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   function renderStats(){
     const total = FILES.length;
     const dupCount = FILES.filter(f => f.n && f.n.toLowerCase().includes('duplikat')).length;
@@ -52,7 +57,7 @@
     let cls = 'badge-note';
     if(note.includes('★')) cls = 'badge-star';
     else if(note.toLowerCase().includes('duplikat') || note.toLowerCase().includes('kopie')) cls = 'badge-dup';
-    return `<span class="badge ${cls}">${note}</span>`;
+    return `<span class="badge ${cls}">${esc(note)}</span>`;
   }
 
   function render(){
@@ -82,10 +87,10 @@
         html += `<li class="file-item">
           <a class="file-link" href="${encodePath(f.p)}" target="_blank" rel="noopener">
             <div class="file-title-row">
-              <span class="file-title">${f.t}</span>
+              <span class="file-title">${esc(f.t)}</span>
               ${badgeFor(f.n)}
             </div>
-            <span class="file-path">${f.p}</span>
+            <span class="file-path">${esc(f.p)}</span>
           </a>
         </li>`;
       });
