@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellenraumzeit-Netz-Theorie (WRZNT) - Herleitung & Anschauliche Erklärung</title>
+
+    <!-- MathJax Config & Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\(', '\)']],
+                displayMath: [['$$', '$$'], ['\[', '\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-accent: #0b1120;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-cyan: #38bdf8;
+            --accent-teal: #2dd4bf;
+            --accent-amber: #fbbf24;
+            --border-color: #334155;
+        }
+
+        @page {
+            size: A4;
+            margin: 15mm;
+            background-color: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.65;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 2.1rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            color: var(--accent-teal);
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-teal);
+            padding-left: 10px;
+        }
+
+        h3 {
+            color: var(--accent-cyan);
+            font-size: 1.15rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        .formula-box {
+            background-color: var(--bg-card-accent);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            text-align: center;
+            font-size: 1.15rem;
+            overflow-x: auto;
+        }
+
+        .step-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item::before {
+            content: "➔";
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="subtitle">Wellenraumzeit-Netz-Theorie (WRZNT)</div>
+        <h1>Kreisbewegung & Undatron-Mechanismus</h1>
+    </header>
+
+    <!-- Ausführliche Erklärung -->
+    <div class="section">
+        <h2>Ausführliche anschauliche Erklärung</h2>
+
+        <h3>Die Grundidee: Was passiert hier eigentlich?</h3>
+        <p>
+            Stell dir vor, das gesamte Universum ist von einem feinen, unsichtbaren Netz durchzogen – der sogenannten Raumzeit. In diesem Netz existieren kleinste Teilchen wie das Elektron (das negativ geladen ist) und das Positron (sein positiv geladenes Gegenstück).
+        </p>
+        <p>
+            Wenn sich diese beiden Teilchen begegnen, ziehen sie sich extrem stark an. Es ist genau wie bei zwei Magneten, die sich gegenseitig anlocken. Durch diese Anziehungskraft beginnen sie, sich rasend schnell im Kreis zu umkreisen – wie zwei Eiskunstläufer, die sich an den Händen halten und sich immer schneller voreinander drehen.
+        </p>
+
+        <h3>Der Tanz an der Lichtgeschwindigkeit</h3>
+        <p>
+            Die beiden Teilchen werden auf ihrer Kreisbahn so schnell, dass sie sich fast mit Lichtgeschwindigkeit bewegen.
+        </p>
+        <p>
+            Normalerweise würde ein Objekt, das sich im Kreis dreht, durch die Fliehkraft (Zentrifugalkraft) nach außen geschleudert werden – genau wie man es in einem Kettenkarussell spürt. Die elektrische Anziehungskraft (Coulomb-Kraft) zieht die Teilchen jedoch genauso stark nach innen.
+        </p>
+        <p>
+            Wenn sich die Kraft, die nach außen drückt, und die Kraft, die nach innen zieht, exakt die Waage halten, entsteht eine stabile Kreisbahn. Wenn man berechnet, wie groß dieser Kreis bei Lichtgeschwindigkeit sein muss, stößt man auf eine ganz fundamentale Strecke der Physik: den sogenannten <strong>klassischen Elektronenradius</strong>. Das ist die kleinste natürliche Grenze, auf der sich diese Teilchen als feste Punkte bewegen können.
+        </p>
+
+        <h3>Die Bugwellen im Raumzeit-Netz</h3>
+        <p>
+            Jetzt kommt der entscheidende Kniff der Wellenraumzeit-Netz-Theorie:
+        </p>
+        <p>
+            Wenn sich ein Schiff sehr schnell durchs Wasser bewegt, erzeugt es an der Spitze eine Welle, die es vor sich her- und seitlich wegdrückt – eine <strong>Bugwelle</strong>.
+        </p>
+        <p>
+            Da sich Elektron und Positron fast mit Lichtgeschwindigkeit durch das Raumzeit-Netz bewegen, erzeugen sie genau solche Bugwellen im Raumzeit-Gewebe. Weil die beiden Teilchen sich auf einer Kreisbahn umeinander drehen, laufen ihre Bugwellen ständig umeinander herum und überlagern sich.
+        </p>
+
+        <h3>Die Überlagerung und das "Undatron"</h3>
+        <p>
+            Wenn zwei Wellen im Wasser aufeindertreffen, können sie sich gegenseitig verstärken. Genau das passiert hier: Die Bugwellen des Elektrons und des Positrons treffen aufeinander und bilden ein gemeinsames, hochkonzentriertes Wellenmuster (eine Interferenz).
+        </p>
+        <p>
+            Je enger die beiden Teilchen umeinander kreisen, desto kleiner wird der Abstand. Schließlich unterschreiten sie die minimale Grenze des Raumes. In diesem Moment passiert etwas Erstaunliches:
+        </p>
+        <ul>
+            <li>Die beiden festen Teilchen lösen sich auf.</li>
+            <li>Ihre Masse und ihre Energie schmelzen gewissermaßen zusammen.</li>
+            <li>Sie verwandeln sich vollständig in eine reine, hochfrequente Welle aus Licht und Raumzeit-Schwingung.</li>
+        </ul>
+        <p>
+            Dieses neu entstandene Lichtwellenpaket nennen wir das <strong>Undatron</strong>.
+        </p>
+
+        <h3>Das Besondere am Undatron: Ein Gedächtnis aus Licht</h3>
+        <p>
+            Das Faszinierende am Undatron ist, dass es kein gewöhnliches Licht ist. Es trägt die gesamte Information der beiden ursprünglichen Teilchen – also ihre Ladungen, ihren Spin und ihre Energie – in seinen Wellenmustern mit sich.
+        </p>
+        <p>
+            Das Undatron ist sozusagen ein Lichtstrahl, der genau weiß, woraus er entstanden ist. Die Theorie zeigt damit auf einfache Weise, wie aus fester Materie (Teilchen) reine Energie (Lichtwellen) wird und wie der Raum selbst diese Verwandlung durch seine geometrischen Bugwellen steuert.
+        </p>
+    </div>
+
+    <div class="footer">
+        Wellenraumzeit-Netz-Theorie (WRZNT) • Kreisbewegung & Undatron-Mechanismus
+    </div>
+
+</div>
+
+</body>
+</html>
