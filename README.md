@@ -12,8 +12,8 @@ Energie, Masse und Bewegung entstehen aus dynamischen Krümmungen eines kontinui
 ​Einheitliche Felddynamik: Das Ziel ist die mathematische Beschreibung einer tieferliegenden Struktur, die Elektromagnetismus und Raumgeometrie harmonisiert.
 ​"In der WRZT ist das Licht nicht nur ein Wanderer durch den Raum, sondern die Stimme des Raumes selbst."
 
-### STRUCKTUR  ! 
-# 🌌 WRZT & WRZNT – Wellenraumzeit-Theorie
+# STRUCKTUR  ! 
+## 🌌 WRZT & WRZNT – Wellenraumzeit-Theorie
 
 Willkommen im offiziellen Repository der **Wellenraumzeit-Theorie (WRZT)** und der **Wellenraumzeit-Netz-Theorie (WRZNT)**.
 
