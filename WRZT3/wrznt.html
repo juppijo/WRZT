@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRZNT — Die Wellenraumzeit-Netz-Theorie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root{
+  --bg:#0b0a08;
+  --bg-panel:#141210;
+  --bg-elevated:#1b1815;
+  --border:#2e2820;
+  --gold:#c9a227;
+  --gold-bright:#e6c34f;
+  --gold-dim:#8a6f1e;
+  --text:#ece5d6;
+  --text-dim:#a89f8c;
+  --text-faint:#6f6858;
+  --shadow: 0 10px 40px rgba(0,0,0,0.5);
+  --font-head:'Bebas Neue', sans-serif;
+  --font-body:'Barlow', sans-serif;
+  --tracking-head: 0.04em;
+}
+
+[data-theme="midnight"]{
+  --bg:#080b12;
+  --bg-panel:#0e131d;
+  --bg-elevated:#141b28;
+  --border:#212c3d;
+  --gold:#5fa8d3;
+  --gold-bright:#8ecae6;
+  --gold-dim:#3d7a9e;
+  --text:#e4ecf5;
+  --text-dim:#94a5bc;
+  --text-faint:#5c6b82;
+}
+
+[data-theme="emerald"]{
+  --bg:#070b09;
+  --bg-panel:#0d130f;
+  --bg-elevated:#141c16;
+  --border:#233026;
+  --gold:#4caf7d;
+  --gold-bright:#7bd6a7;
+  --gold-dim:#357657;
+  --text:#e2ece5;
+  --text-dim:#94ab9d;
+  --text-faint:#5b6e61;
+}
+
+[data-theme="crimson"]{
+  --bg:#0c0808;
+  --bg-panel:#150e0e;
+  --bg-elevated:#1d1414;
+  --border:#332120;
+  --gold:#c9564a;
+  --gold-bright:#e88377;
+  --gold-dim:#8f392f;
+  --text:#f0e4e0;
+  --text-dim:#b2988f;
+  --text-faint:#705f58;
+}
+
+[data-theme="parchment"]{
+  --bg:#efe8d8;
+  --bg-panel:#e7dec8;
+  --bg-elevated:#ddd1b3;
+  --border:#c9b98f;
+  --gold:#8a5a1f;
+  --gold-bright:#a8721f;
+  --gold-dim:#6b451a;
+  --text:#2b2418;
+  --text-dim:#5a4f3a;
+  --text-faint:#8a7d61;
+  --shadow: 0 10px 30px rgba(90,70,30,0.18);
+}
+
+[data-font="serif"]{
+  --font-body:'Spectral', serif;
+}
+[data-font="garamond"]{
+  --font-body:'Cormorant Garamond', serif;
+}
+[data-font="mono"]{
+  --font-body:'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.75;
+  transition:background .3s ease, color .3s ease;
+}
+
+/* ---------- Layout ---------- */
+.layout{
+  display:grid;
+  grid-template-columns: 300px 1fr;
+  min-height:100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
+  background:var(--bg-panel);
+  border-right:1px solid var(--border);
+  padding:28px 22px 60px;
+}
+.sidebar::-webkit-scrollbar{width:8px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  margin-bottom:8px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--border);
+}
+.brand .mark{
+  font-family:var(--font-head);
+  letter-spacing:var(--tracking-head);
+  font-size:34px;
+  color:var(--gold-bright);
+  line-height:1;
+}
+.brand .sub{
+  font-size:12.5px;
+  letter-spacing:0.08em;
+  color:var(--text-faint);
+  text-transform:uppercase;
+}
+
+.nav-group{margin-top:22px;}
+.nav-group-title{
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin:0 0 8px 2px;
+}
+.nav-link{
+  display:block;
+  padding:7px 10px;
+  border-radius:6px;
+  color:var(--text-dim);
+  text-decoration:none;
+  font-size:14.5px;
+  line-height:1.4;
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+}
+.nav-link:hover{
+  color:var(--gold-bright);
+  background:var(--bg-elevated);
+}
+.nav-link.active{
+  color:var(--gold-bright);
+  border-left-color:var(--gold);
+  background:var(--bg-elevated);
+}
+.nav-link.sub{
+  padding-left:22px;
+  font-size:13.5px;
+  color:var(--text-faint);
+}
+.nav-link.sub:hover, .nav-link.sub.active{color:var(--gold);}
+
+/* ---------- Main ---------- */
+.main{
+  padding:64px 64px 140px;
+  max-width:900px;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:40;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  padding:14px 18px;
+  background:linear-gradient(var(--bg) 65%, transparent);
+  margin:-64px -64px 0;
+}
+.icon-btn{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg-panel);
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.icon-btn:hover{color:var(--gold-bright);border-color:var(--gold-dim);}
+
+article{padding-top:8px;}
+
+h1.doc-title{
+  font-family:var(--font-head);
+  letter-spacing:var(--tracking-head);
+  font-size:58px;
+  line-height:1.05;
+  color:var(--gold-bright);
+  margin:6px 0 2px;
+}
+.doc-subtitle{
+  color:var(--text-dim);
+  font-size:17px;
+  font-style:italic;
+  margin:0 0 40px;
+}
+
+section.chapter{
+  padding-top:70px;
+  margin-top:-30px;
+  border-top:1px solid var(--border);
+}
+section.chapter:first-of-type{border-top:none;}
+
+h2.chapter-title{
+  font-family:var(--font-head);
+  letter-spacing:var(--tracking-head);
+  font-size:36px;
+  color:var(--gold-bright);
+  margin:0 0 22px;
+}
+h3.section-title{
+  font-family:var(--font-head);
+  letter-spacing:var(--tracking-head);
+  font-size:23px;
+  color:var(--gold);
+  margin:38px 0 12px;
+}
+h4.subsection-title{
+  font-size:16.5px;
+  font-weight:600;
+  color:var(--gold);
+  margin:26px 0 8px;
+}
+
+p{margin:0 0 16px;color:var(--text);}
+p.lead{
+  font-size:18px;
+  color:var(--text);
+}
+em.accent{color:var(--gold-bright);font-style:italic;}
+
+ul.plain, ol.plain{
+  margin:0 0 18px;
+  padding-left:22px;
+}
+ul.plain li, ol.plain li{
+  margin-bottom:7px;
+  color:var(--text);
+}
+ul.plain li::marker{color:var(--gold);}
+ol.plain li::marker{color:var(--gold);font-weight:600;}
+
+.definition-list{
+  margin:0 0 20px;
+  padding-left:0;
+  list-style:none;
+}
+.definition-list li{
+  padding:10px 0 10px 18px;
+  border-left:2px solid var(--border);
+  margin-bottom:6px;
+}
+.definition-list li strong{color:var(--gold-bright);font-weight:600;}
+
+.math-block{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-left:3px solid var(--gold-dim);
+  border-radius:6px;
+  padding:18px 22px;
+  margin:18px 0 22px;
+  overflow-x:auto;
+}
+
+blockquote.summary{
+  margin:26px 0;
+  padding:18px 24px;
+  background:var(--bg-panel);
+  border:1px solid var(--gold-dim);
+  border-radius:8px;
+  color:var(--text);
+  font-style:italic;
+}
+blockquote.summary p:last-child{margin-bottom:0;}
+
+hr.rule{
+  border:none;
+  border-top:1px solid var(--border);
+  margin:44px 0;
+}
+
+.toc-outline{
+  columns:1;
+  margin:0 0 20px;
+}
+.toc-chapter{
+  margin-bottom:16px;
+  padding:14px 18px;
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+.toc-chapter .num{
+  font-family:var(--font-head);
+  color:var(--gold);
+  letter-spacing:0.03em;
+  font-size:15px;
+}
+.toc-chapter ul{
+  margin:8px 0 0;
+  padding-left:18px;
+  color:var(--text-dim);
+  font-size:14px;
+}
+.toc-chapter ul li{margin-bottom:3px;}
+
+.badge{
+  display:inline-block;
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--gold-dim);
+  border:1px solid var(--gold-dim);
+  border-radius:20px;
+  padding:3px 10px;
+  margin-bottom:14px;
+}
+
+footer.doc-footer{
+  margin-top:80px;
+  padding-top:26px;
+  border-top:1px solid var(--border);
+  color:var(--text-faint);
+  font-size:13px;
+  text-align:center;
+}
+
+/* ---------- Style panel ---------- */
+.style-panel{
+  position:fixed;
+  top:64px;
+  right:20px;
+  width:270px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  padding:18px;
+  z-index:60;
+  display:none;
+}
+.style-panel.open{display:block;}
+.style-panel h5{
+  margin:0 0 10px;
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+}
+.style-panel h5:not(:first-child){margin-top:18px;}
+.swatch-row{display:flex;gap:8px;flex-wrap:wrap;}
+.swatch{
+  width:34px;height:34px;
+  border-radius:8px;
+  cursor:pointer;
+  border:2px solid transparent;
+  display:flex;align-items:center;justify-content:center;
+}
+.swatch.active{border-color:var(--text);}
+.swatch[data-theme-swatch="gold"]{background:linear-gradient(135deg,#0b0a08,#c9a227);}
+.swatch[data-theme-swatch="midnight"]{background:linear-gradient(135deg,#080b12,#5fa8d3);}
+.swatch[data-theme-swatch="emerald"]{background:linear-gradient(135deg,#070b09,#4caf7d);}
+.swatch[data-theme-swatch="crimson"]{background:linear-gradient(135deg,#0c0808,#c9564a);}
+.swatch[data-theme-swatch="parchment"]{background:linear-gradient(135deg,#efe8d8,#8a5a1f);}
+
+.font-opt{
+  display:block;
+  width:100%;
+  text-align:left;
+  padding:8px 10px;
+  margin-bottom:6px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--bg-panel);
+  color:var(--text-dim);
+  cursor:pointer;
+  font-size:13.5px;
+}
+.font-opt.active{border-color:var(--gold);color:var(--gold-bright);}
+
+.size-row{display:flex;align-items:center;gap:10px;}
+.size-row button{
+  width:30px;height:30px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--bg-panel);
+  color:var(--text-dim);
+  cursor:pointer;
+  font-size:15px;
+}
+.size-row span{color:var(--text-dim);font-size:13px;min-width:38px;text-align:center;}
+
+/* ---------- Mobile ---------- */
+.hamburger{display:none;}
+@media (max-width: 980px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{
+    position:fixed;
+    left:0;top:0;bottom:0;
+    width:280px;
+    transform:translateX(-100%);
+    transition:transform .25s ease;
+    z-index:80;
+    box-shadow:var(--shadow);
+  }
+  .sidebar.open{transform:translateX(0);}
+  .main{padding:60px 22px 100px;}
+  .topbar{margin:-60px -22px 0;padding-right:8px;}
+  h1.doc-title{font-size:38px;}
+  .hamburger{
+    display:flex;
+    position:fixed;
+    top:14px; left:14px;
+    z-index:90;
+  }
+  .style-panel{right:12px; left:12px; width:auto;}
+}
+
+/* fullscreen */
+:fullscreen{background:var(--bg);}
+</style>
+</head>
+<body data-theme="gold" data-font="barlow">
+
+<button class="icon-btn hamburger" id="hamburgerBtn" title="Navigation">☰</button>
+
+<div class="style-panel" id="stylePanel">
+  <h5>Farbschema</h5>
+  <div class="swatch-row" id="themeSwatches">
+    <div class="swatch active" data-theme-swatch="gold" title="Dark Gold"></div>
+    <div class="swatch" data-theme-swatch="midnight" title="Midnight Blue"></div>
+    <div class="swatch" data-theme-swatch="emerald" title="Deep Emerald"></div>
+    <div class="swatch" data-theme-swatch="crimson" title="Crimson"></div>
+    <div class="swatch" data-theme-swatch="parchment" title="Parchment"></div>
+  </div>
+  <h5>Schriftart (Fließtext)</h5>
+  <button class="font-opt active" data-font-opt="barlow">Barlow (Standard)</button>
+  <button class="font-opt" data-font-opt="serif">Spectral (Serif)</button>
+  <button class="font-opt" data-font-opt="garamond">Cormorant Garamond</button>
+  <button class="font-opt" data-font-opt="mono">JetBrains Mono</button>
+  <h5>Schriftgröße</h5>
+  <div class="size-row">
+    <button id="sizeMinus">−</button>
+    <span id="sizeLabel">17px</span>
+    <button id="sizePlus">+</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="mark">WRZNT</span>
+      <span class="sub">Wellenraumzeit-Netz-Theorie</span>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Überblick</div>
+      <a class="nav-link" href="#einleitung">Einleitung</a>
+      <a class="nav-link" href="#kapitelplan">Kapitelplan des Buches</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Manuskript</div>
+      <a class="nav-link" href="#kapitel1">Kapitel 1 — Grundprinzipien</a>
+      <a class="nav-link" href="#kapitel2">Kapitel 2 — Entstehung des Raumes aus Teilchen</a>
+      <a class="nav-link" href="#kapitel3">Kapitel 3 — Die Entstehung von Raum</a>
+      <a class="nav-link" href="#kapitel4">Kapitel 4 — Die Entstehung von Zeit</a>
+      <a class="nav-link" href="#kapitel5">Kapitel 5 — Licht und Undatrone</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Formaler Anhang</div>
+      <a class="nav-link" href="#formal">Formale Definition — Raum-Netz-Theorie</a>
+      <a class="nav-link sub" href="#f1">1. Grundobjekte &amp; Notation</a>
+      <a class="nav-link sub" href="#f2">2. Axiome</a>
+      <a class="nav-link sub" href="#f3">3. Kanten-Dynamik</a>
+      <a class="nav-link sub" href="#f4">4. Knotenkopplung</a>
+      <a class="nav-link sub" href="#f5">5. Knotendynamik &amp; WRZT</a>
+      <a class="nav-link sub" href="#f6">6. Photonen-Quantisierung</a>
+      <a class="nav-link sub" href="#f7">7. Emergente Metrik</a>
+      <a class="nav-link sub" href="#f8">8. Relativistische Effekte</a>
+      <a class="nav-link sub" href="#f9">9. Konservationsgesetze</a>
+      <a class="nav-link sub" href="#f10">10. Kontinuumsgrenzen</a>
+      <a class="nav-link sub" href="#f11">11. Offene Punkte</a>
+      <a class="nav-link sub" href="#kurzfassung">Kurzfassung</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="icon-btn" id="styleToggle" title="Darstellung anpassen">🎨</button>
+      <button class="icon-btn" id="fullscreenToggle" title="Vollbild">⛶</button>
+    </div>
+
+    <article>
+      <h1 class="doc-title">WRZNT</h1>
+      <p class="doc-subtitle">Die Wellenraumzeit-Netz-Theorie — ein Modell von Raum, Zeit, Licht und Materie als lebendigem Netz</p>
+
+      <section class="chapter" id="einleitung">
+        <span class="badge">Einleitung</span>
+        <p class="lead">Das Universum ist mehr als ein Raum, in dem Ereignisse geschehen. Es ist mehr als eine Bühne für Teilchen, Felder und Kräfte. Jenseits der bekannten Theorien der Physik — Relativität, Quantenmechanik, Feldtheorien — verbirgt sich ein tieferes, kohärentes Prinzip, das all diese Erscheinungen in einem einzigen Bild vereinen kann.</p>
+        <p>Die WRZNT — Wellenraumzeit-Netz-Theorie — ist ein Versuch, dieses umfassende Bild zu zeichnen. Sie beschreibt das Universum nicht als leeren Raum, sondern als ein lebendiges, vibrierendes Netz. In diesem Netz sind Raum, Zeit, Licht und Materie keine getrennten Entitäten, sondern verschiedene Ausdrucksformen einer einzigen Grundstruktur.</p>
+        <p>Dieses Kapitel stellt die grundlegenden Konzepte der WRZNT vor und legt damit das Fundament für das Verständnis eines Universums, das aus Verbindungen besteht — aus Spannung, Schwingung, Knoten und Wellen, die gemeinsam die Wirklichkeit formen.</p>
+
+        <blockquote class="summary">
+          <p>Das Universum ist wie ein Netz aus Energie.<br>
+          Die Undatrone bilden die Fäden,<br>
+          die Teilchen sind die Knoten,<br>
+          und aus diesem Netz entstehen Raum und Zeit.</p>
+        </blockquote>
+
+        <p>Stell dir das Universum wie ein großes, leuchtendes Energienetz vor. Die Undatrone sind die feinen, vibrierenden Fäden dieses Netzes. An den Stellen, wo sich viele Fäden kreuzen, entstehen die Teilchen — wie kleine Knoten aus Licht. Und aus dem Schwingen dieses Netzes wachsen Raum und Zeit wie Wellen auf einem ruhigen See.</p>
+        <p>In der WRZNT entsteht ein Universum, das kein leerer Raum ist, sondern ein atmendes Netzwerk aus Energie. Jeder Faden dieses Netzes besteht aus Undatronen — hochfeinen, schwingenden Energieimpulsen, die wie Lichtfäden den gesamten Kosmos durchziehen. Aus ihrem Pulsieren entspringen Raum und Zeit selbst; sie sind keine Bühne, sondern ein Ergebnis des Tanzes der Energie.</p>
+        <p>Elementarteilchen erscheinen in diesem Netz als Knotenpunkte, Verdichtungen, an denen sich mehrere Undatron-Fäden kreuzen. Diese Knoten stabilisieren Strukturen, bilden Materie, interagieren und erzeugen die Vielfalt der Welt.</p>
+        <p>In diesem Bild ist das Universum ein einziges, verbundenes Ganzes: ein Gewebe aus Energie, Schwingung, Beziehung — ein Intersein auf kosmischer Ebene.</p>
+      </section>
+
+      <section class="chapter" id="kapitelplan">
+        <h2 class="chapter-title">🜂 Vorschlag für die Kapitel des WRZNT-Buches</h2>
+        <div class="toc-outline">
+          <div class="toc-chapter"><span class="num">Kapitel 1</span> — Grundprinzipien der WRZNT
+            <ul>
+              <li>Das Universum als Netz</li>
+              <li>Zeit als Veränderung des Netzes</li>
+              <li>Licht als Netzschwingung</li>
+              <li>Teilchen als stabile Knotenstrukturen</li>
+              <li>Relativität als Netzverzerrung</li>
+              <li>Verbindung mit der WRZT</li>
+              <li>Ein lebendiges, verbundenes Universum</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 2</span> — Die Entstehung des Raumes aus einzelnen Teilchen
+            <ul>
+              <li>2.1 Das Teilchen als Ursprung einer lokalen Netzstruktur</li>
+              <li>2.2 Keine 0-Punkt-Teilchen</li>
+              <li>2.3 Der Raum eines Einzelteilchens</li>
+              <li>2.4 Beziehungen erweitern den Raum</li>
+              <li>2.5 Das Zusammenspiel aus Existenz und Beziehung</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 3</span> — Die Entstehung von Raum
+            <ul>
+              <li>Warum Raum kein Hintergrund ist, sondern ein emergentes Muster</li>
+              <li>Einzelne Teilchen als minimale Raumgeneratoren</li>
+              <li>Dynamische Erzeugung von Raum durch Wechselwirkungen</li>
+              <li>Unterschiede zwischen „ruhigem Netz" und „angeregtem Netz"</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 4</span> — Die Entstehung von Zeit
+            <ul>
+              <li>Zeit als Richtung der Netzveränderung</li>
+              <li>Wie „Kausalität" im WRZNT-Netz entsteht</li>
+              <li>Zeitverlangsamung (Lorentz-Faktor) als veränderte Knotendichte</li>
+              <li>Warum Zeit nur dort existiert, wo Netzaktivität besteht</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 5</span> — Licht und Undatrone im Wellenraumzeit-Netz
+            <ul>
+              <li>Photonen als sich ausbreitende Netzfäden, die mit dem Emissionsknoten verbunden bleiben</li>
+              <li>Klassische WRZT: Undatron-Welle</li>
+              <li>WRZNT: eine verknüpfte Raumzeitwelle</li>
+              <li>Polarisation, Interferenz und Verschränkung im Netzmodell</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 6</span> — Materie als stabile Knotenstrukturen
+            <ul>
+              <li>Warum Teilchen nicht punktförmig, sondern dynamische Netzwirbel sind</li>
+              <li>Wie Masse durch Netzspannung entsteht</li>
+              <li>Spin als Rotationsmuster eines Knotens</li>
+              <li>Der minimale Radius (WRZT) als grundlegende Knotengröße</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 7</span> — Gravitation und Raumkrümmung als Netzdeformation
+            <ul>
+              <li>Gravitationsfeld = Spannung, Verdichtung und Verzerrung</li>
+              <li>Warum „Fall" = Fließen entlang energetisch günstiger Fadenwege</li>
+              <li>Schwarzschild-Regionen im Netz</li>
+              <li>Schwarze Löcher als Loch im Netz — und warum dort kein Raum mehr existiert</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 8</span> — Schwarze Löcher und Hawking-Strahlung im Netz
+            <ul>
+              <li>Hawking-Strahlung als Faden-Neubildung an der Netzgrenze</li>
+              <li>Warum Teilchenpaare an der Grenze entstehen können</li>
+              <li>Was wirklich „im Loch" verschwindet — und was nicht</li>
+              <li>Netzrisse, Netzrekonstruktion, Informationsfluss</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 9</span> — Kosmologie der WRZNT
+            <ul>
+              <li>Wie das gesamte Universum als Netz begann</li>
+              <li>Warum die Expansion = Ausdünnung der Fäden bedeuten könnte</li>
+              <li>Dunkle Energie als Netzstreckung</li>
+              <li>Dunkle Materie als unsichtbare Knotenzellen</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 10</span> — Vergleich mit anderen modernen Theorien
+            <ul>
+              <li>Loop-Quantum-Gravity</li>
+              <li>Holografische Theorie</li>
+              <li>Stringtheorie</li>
+              <li>Emergent Gravity</li>
+              <li>Was WRZNT zusätzlich erklärt</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 11</span> — Mathematische Grundstruktur der WRZNT
+            <ul>
+              <li>Einführung der Knotenräume</li>
+              <li>Topologie der Fadenverbindungen</li>
+              <li>Energieflüsse, Tensoren, Netzspannungen</li>
+              <li>U-Tensor-Erweiterung für Netzstrukturen (Übergang aus WRZT)</li>
+            </ul>
+          </div>
+          <div class="toc-chapter"><span class="num">Kapitel 12</span> — Offene Fragen und Experimente
+            <ul>
+              <li>Was experimentell prüfbar ist</li>
+              <li>Welche Vorhersagen einzigartig sind</li>
+              <li>Welche offenen Fenster in die Zukunft zeigen</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="kapitel1">
+        <span class="badge">Kapitel 1</span>
+        <h2 class="chapter-title">Grundprinzipien der WRZNT</h2>
+
+        <h3 class="section-title">1. Das Universum als Netz</h3>
+        <p>Die WRZNT geht davon aus, dass der Raum nicht leer ist, sondern aus einem dichten und fein strukturierten Geflecht besteht. Dieses Wellenraumzeit-Netz besteht aus unvorstellbar kleinen Knotenpunkten, die durch elastische, informationsübertragende Fäden miteinander verbunden sind.</p>
+        <p>Diese Fäden bilden keine zufällige Struktur, sondern ein geordnetes, hochdynamisches Netzwerk. Jeder Punkt der Raumzeit ist ein Knoten dieses Netzes, und jeder Knoten ist Teil des großen Ganzen.</p>
+        <p>Der Raum wird dadurch zu einem Medium mit Eigenschaften — ähnlich einer gespannten Oberfläche oder einem Ozean, jedoch in viel feinerer, fundamentalerer Form.</p>
+
+        <h3 class="section-title">2. Zeit als Veränderung des Netzes</h3>
+        <p>Zeit ist in der WRZNT keine unabhängige Dimension oder äußere Größe. Sie entsteht aus der kontinuierlichen Veränderung des Zustands des Netzes. Jeder Schwingungsimpuls, jede Verschiebung eines Knotens, jede Welle im Netz trägt zum Fluss der Zeit bei.</p>
+        <p>Zeit ist das rhythmische Aktualisieren des universellen Gewebes. Sie ist der Takt, in dem das Netz sich selbst erneuert.</p>
+
+        <h3 class="section-title">3. Licht als Netzschwingung</h3>
+        <p>Ein Photon ist in der WRZNT keine abstrakte Wellenfunktion und kein isoliertes Partikel. Es ist eine Schwingung der Fäden, die sich im Netz ausbreitet.</p>
+        <p>Diese Schwingung bleibt stets mit ihrem Ursprung verbunden — ein grundlegendes Merkmal, das die außergewöhnlichen Eigenschaften des Lichts erklärt:</p>
+        <ul class="plain">
+          <li>seine konstante Geschwindigkeit,</li>
+          <li>seine Mischung aus Wellen- und Teilchencharakter,</li>
+          <li>seine Stabilität über große Distanzen,</li>
+          <li>seine unmittelbare Kohärenz.</li>
+        </ul>
+        <p>Licht ist die grundlegende Bewegungsform des Netzes selbst.</p>
+
+        <h3 class="section-title">4. Teilchen als stabile Knotenstrukturen</h3>
+        <p>Materie entsteht durch stabile Muster im Netz. Elementarteilchen sind verdichtete, rotierende oder wirbelnde Knoten, die ihre Struktur über die Zeit halten. Diese Knoten besitzen bestimmte Eigenschaften:</p>
+        <ul class="plain">
+          <li>Masse als lokale Netzspannung,</li>
+          <li>Ladung als gerichtete Verbindungsmuster,</li>
+          <li>Spin als interne Rotation,</li>
+          <li>Energie als Stabilität und Intensität der Struktur.</li>
+        </ul>
+        <p>Teilchen existieren nicht unabhängig vom Raum. Sie sind eine Form des Raumes.</p>
+
+        <h3 class="section-title">5. Relativität als Netzverzerrung</h3>
+        <p>Bewegung ist im Rahmen der WRZNT kein Durchschreiten leerer Weite, sondern ein aktiver Prozess, bei dem ein Knoten das Netz um sich herum umlenkt. Dadurch entstehen Effekte wie:</p>
+        <ul class="plain">
+          <li>Zeitdilatation,</li>
+          <li>Längenkontraktion,</li>
+          <li>Geschwindigkeitsgrenzen.</li>
+        </ul>
+        <p>Die Lichtgeschwindigkeit ist dabei keine willkürliche Grenze, sondern ergibt sich aus den physikalischen Eigenschaften der Netzfäden selbst. Sie ist die maximale Geschwindigkeit, mit der Schwingungen durch das Netz laufen können.</p>
+
+        <h3 class="section-title">6. Verbindung mit der WRZT</h3>
+        <p>Die WRZNT bildet den Hintergrund, in dem die Konzepte der WRZT — wie Undatrone, rotierende Energiekonfigurationen und Raumzeitdeformationen — verankert sind.</p>
+        <p>Die WRZT beschreibt die lokale Dynamik der Teilchen und Wellen. Die WRZNT liefert die globale Struktur, die diese Dynamik trägt.</p>
+        <p>Gemeinsam ergeben sie ein umfassendes Bild des Universums, das sowohl die Mikrostruktur der Teilchen als auch die großen kosmischen Bewegungen erklärt.</p>
+
+        <h3 class="section-title">7. Ein lebendiges, verbundenes Universum</h3>
+        <p>Die WRZNT zeichnet ein Universum, das sich durch Verbindung definiert — durch die Art und Weise, wie die Knoten und Fäden miteinander interagieren. Alles, was existiert, ist eingebunden in ein unendliches, vibrierendes Netz aus Energie und Beziehung.</p>
+        <p>Das Universum wird dadurch nicht nur erklärbar, sondern auch verständlich: ein harmonisches Zusammenspiel von Mustern, Wellen und Strukturen, die gemeinsam die Wirklichkeit formen.</p>
+
+        <blockquote class="summary">
+          <p>Dies ist der erste formale Rahmen der Wellenraumzeit-Netz-Theorie. In den folgenden Kapiteln wird präziser auf einzelne Aspekte eingegangen: die Natur der Knoten, die Eigenschaften der Netzfäden, die Wechselwirkungen, die Rolle der Undatrone und die Verbindung zur etablierten Physik.</p>
+        </blockquote>
+      </section>
+
+      <section class="chapter" id="kapitel2">
+        <span class="badge">Kapitel 2</span>
+        <h2 class="chapter-title">Die Entstehung des Raumes aus einzelnen Teilchen</h2>
+        <p>In der WRZNT wird Raum nicht als fertige Bühne verstanden, sondern als ein lebendiges Gefüge, das durch die Existenz und die Beziehungen seiner Knoten entsteht. Doch selbst ein einzelnes Teilchen — ein einzelner Knoten im Netz — erzeugt bereits eine grundlegende Form von Raum. Dies geschieht, weil es in der WRZNT keine absolut punktförmigen Objekte geben kann. Jedes Teilchen besitzt eine minimale Ausdehnung, ein eigenes Schwingungsfeld und eine intrinsische Struktur im Netz.</p>
+
+        <h3 class="section-title">2.1 Das Teilchen als Ursprung einer lokalen Netzstruktur</h3>
+        <p>Ein einzelner Knoten im Wellenraumzeit-Netz ist niemals vollständig isoliert. Er trägt in sich:</p>
+        <ul class="plain">
+          <li>eine minimale räumliche Ausdehnung,</li>
+          <li>eine innere Schwingung,</li>
+          <li>ein Feld, das sich über die benachbarten potenziellen Knoten ausbreitet.</li>
+        </ul>
+        <p>Dieser Prozess erzeugt eine elementare lokale Geometrie — den kleinsten möglichen „Raum". Dieser Raum ist nicht leer, sondern die unmittelbare Umgebung der Netzfäden, die vom Teilchen aktiviert werden. Die Existenz eines Teilchens ist also zugleich die Existenz eines Raumbereiches.</p>
+
+        <h3 class="section-title">2.2 Keine 0-Punkt-Teilchen</h3>
+        <p>Da die WRZNT postuliert, dass es keine punktförmigen Teilchen geben kann, besitzt jedes Teilchen:</p>
+        <ul class="plain">
+          <li>einen minimalen Radius,</li>
+          <li>eine rotierende oder schwingende Energieverteilung,</li>
+          <li>und eine interne Struktur, die im Netz verankert ist.</li>
+        </ul>
+        <p>Diese Eigenschaften erzeugen automatisch eine Netzregion, eine Zone, die durch die Präsenz des Teilchens definiert wird. Diese Zone bildet das Fundament des Raums, bevor überhaupt Wechselwirkungen mit anderen Teilchen stattfinden.</p>
+
+        <h3 class="section-title">2.3 Der Raum eines Einzelteilchens</h3>
+        <p>Auch ohne Wechselwirkung mit einem zweiten Knoten entsteht also ein lokaler, von der Teilchenstruktur definierter Raum. Dies ist der Keim des Raumbegriffes:</p>
+        <ul class="plain">
+          <li>Die inneren Schwingungen des Teilchens aktivieren die umliegenden Netzfäden.</li>
+          <li>Diese Aktivierung erschafft ein Feld, das sich radial ausbreitet.</li>
+          <li>Die Form und Stärke dieses Feldes bestimmen die lokale Raumgeometrie.</li>
+        </ul>
+        <p>Damit entsteht Raum bereits durch die Existenz eines Teilchens, nicht erst durch seine Relationen.</p>
+
+        <h3 class="section-title">2.4 Beziehungen erweitern den Raum</h3>
+        <p>Während ein einzelnes Teilchen nur einen minimalen Bereich des Raumes erschaffen kann, erweitern Wechselwirkungen und Verbindungen zwischen mehreren Teilchen diese Raumstruktur. Raum wird dadurch größer, tiefer, komplexer und dynamischer. Die Beziehungen fügen neue Dimensionen und Richtungen hinzu, die vorher nicht existierten. Damit gilt im Sinne der WRZNT:</p>
+        <ul class="plain">
+          <li>Ein einzelnes Teilchen erzeugt elementaren Raum.</li>
+          <li>Mehrere Teilchen erzeugen den erlebbaren, messbaren Raum des Universums.</li>
+          <li>Wechselwirkungen weben das Netz aus, das wir als Geometrie, Distanz und Struktur wahrnehmen.</li>
+        </ul>
+
+        <h3 class="section-title">2.5 Das Zusammenspiel aus Existenz und Beziehung</h3>
+        <p>Die Entstehung des Raumes ist damit ein zweifacher Prozess:</p>
+        <ol class="plain">
+          <li><strong>Existenz-Raum:</strong> Ein Teilchen erschafft aufgrund seiner minimalen Ausdehnung und inneren Dynamik einen elementaren lokalen Raum.</li>
+          <li><strong>Beziehungs-Raum:</strong> Durch Wechselwirkungen erweitern Teilchen die Netzstruktur und schaffen den makroskopischen Raum.</li>
+        </ol>
+        <p>Dieses Zusammenspiel macht die WRZNT zu einer Theorie, in der Raum nicht nur geometrisch ist, sondern lebendig, relational und grundlegend energetisch.</p>
+      </section>
+
+      <section class="chapter" id="kapitel3">
+        <span class="badge">Kapitel 3</span>
+        <h2 class="chapter-title">Die Entstehung von Raum</h2>
+        <p>In der WRZNT entsteht Raum nicht als vorgegebene Bühne, sondern als lebendiges Resultat der Aktivität des Wellenraumzeit-Netzes. Raum ist kein Behälter und kein Hintergrund — er ist ein Prozess. Ein atmendes Gewebe, das nur dort existiert, wo sich Teilchen, Knoten und Fäden gegenseitig beeinflussen.</p>
+
+        <h3 class="section-title">3.1 Raum als emergentes Netzphänomen</h3>
+        <p>Raum entsteht, wenn mindestens ein Teilchenknoten existiert. Auch ein einzelner Knoten erzeugt bereits eine minimale Raumblase, denn er spannt die Fäden des Netzes um sich herum. Ohne Teilchen gäbe es kein Netz und damit keinen Raum — das Universum wäre leer von Struktur.</p>
+        <p>Jeder Knoten dehnt das Netz um sich aus und erzeugt dadurch die Möglichkeit von Abstand, Richtung und Ausdehnung. Je mehr Wechselwirkungen stattfinden, desto feiner und dichter wird das lokale Netz, und desto klarer definieren sich Entfernungen.</p>
+
+        <h3 class="section-title">3.2 Wechselwirkung als Quelle von Raum</h3>
+        <p>Raum entsteht nicht nur durch Existenz, sondern durch Beziehung. Erst wenn Knoten miteinander interagieren, entsteht eine stabile räumliche Struktur. Ihre Verbindungslinien — die Fäden — definieren, wie weit Knoten voneinander entfernt sind und wie stark sie sich beeinflussen. Dadurch entsteht:</p>
+        <ul class="plain">
+          <li>lokale Geometrie,</li>
+          <li>Abstand,</li>
+          <li>Raumrichtung,</li>
+          <li>räumlicher Kontext.</li>
+        </ul>
+        <p>Ein Universum mit nur einem Knoten hätte eine Art „punktförmiges Netz", ein Raumkeimling. Doch sobald zwei oder mehr Knoten existieren, bildet sich ein Netzwerk — und damit ein messbarer Raum.</p>
+
+        <h3 class="section-title">3.3 Räume unterschiedlicher Dichte</h3>
+        <p>Die Dichte der Knoten und Fäden entscheidet über die Qualität des Raumes:</p>
+        <ul class="plain">
+          <li>dichte Netzregionen → hohe Krümmung, starke Gravitation,</li>
+          <li>dünne Netzregionen → expandierter, flacher Raum,</li>
+          <li>nahezu fadenlose Regionen → Vakuum mit minimaler Struktur.</li>
+        </ul>
+        <p>Die Expansion des Universums entspricht einer Ausdünnung der Fäden zwischen den Knoten. Je weiter Knoten voneinander entfernt werden, desto lockerer wird das Gewebe.</p>
+
+        <h3 class="section-title">3.4 Raum als dynamischer Prozess</h3>
+        <p>In der WRZNT ist Raum kein statisches Gebilde. Er verändert sich ständig durch:</p>
+        <ul class="plain">
+          <li>Bewegung der Teilchen,</li>
+          <li>Vibration der Fäden,</li>
+          <li>Spannungen im Netz,</li>
+          <li>Energieflüsse,</li>
+          <li>die Entstehung und das Vergehen von Knoten.</li>
+        </ul>
+        <p>Wenn sich ein Teilchen beschleunigt, verändert es das Netz um sich herum. Die Struktur zieht sich entlang der Bewegungsrichtung zusammen und dehnt sich quer dazu — ein natürliches, geometrisches Fundament für die relativistische Raumkontraktion.</p>
+
+        <h3 class="section-title">3.5 Raum ohne Hintergrund</h3>
+        <p>Im Gegensatz zu klassischen Modellen existiert in der WRZNT kein „leerer Raum" an sich. Raum ist immer dort, wo das Netz existiert. Und das Netz existiert nur durch Energie, Teilchen und ihre Beziehungen. Wo keine Knoten sind, gibt es keine Struktur und daher keinen Raum.</p>
+        <p>Auf diese Weise wird Raum zu einem Ausdruck des Seins selbst — nicht zu einem Ort, sondern zu einer Folge von Beziehungen und Wirkungen.</p>
+      </section>
+
+      <section class="chapter" id="kapitel4">
+        <span class="badge">Kapitel 4</span>
+        <h2 class="chapter-title">Die Entstehung von Zeit</h2>
+        <p>In der WRZNT ist Zeit kein universeller Fluss und keine unabhängige Dimension, sondern eine Erscheinung der fortlaufenden Veränderungen im Wellenraumzeit-Netz. Zeit entsteht dort, wo Fäden vibrieren, Knoten reagieren und Energie durch das Gewebe fließt. Ohne Veränderung gäbe es keine Zeit — so wie ohne Netz kein Raum entstehen kann.</p>
+
+        <h3 class="section-title">4.1 Zeit als Veränderungsrate des Netzes</h3>
+        <p>Zeit ist die Reihenfolge von Netzmustern. Wenn sich ein Knoten bewegt, wenn ein Faden schwingt oder wenn eine Netzspannung wandert, dann entstehen aufeinanderfolgende Konfigurationen. Die Abfolge dieser Muster bildet das, was wir als Zeit erleben.</p>
+        <p>Während Raum die Struktur des Netzes beschreibt, beschreibt Zeit seine Dynamik.</p>
+
+        <h3 class="section-title">4.2 Zeit existiert nur dort, wo Netzaktivität stattfindet</h3>
+        <p>Ein Teilchenknoten erzeugt nicht nur Raum — er erzeugt auch Zeit. Jede Veränderung eines Knotens ist ein „Zeitschritt", eine Bewegung im Netz. Daher ist Zeit immer lokal:</p>
+        <ul class="plain">
+          <li>Wo ein Knoten aktiv ist, vergeht Zeit.</li>
+          <li>Wo ein Netzbereich völlig leer oder inaktiv wäre, gäbe es keine Zeit.</li>
+        </ul>
+        <p>Das bedeutet: Zeit ist kein globaler Fluss. Verschiedene Bereiche des Netzes können unterschiedliche „Tempi" besitzen, abhängig von ihrer Aktivität, Dichte und Spannung.</p>
+
+        <h3 class="section-title">4.3 Der Lorentz-Faktor als Netzträgheit</h3>
+        <p>Wenn ein Knoten sich sehr schnell durch das Netz bewegt, spannt er die Fäden um sich zusammen. Das Netz verformt sich, und die Veränderungsrate des Knotens verlangsamt sich aus Sicht anderer Knoten. Dies zeigt sich als relativistische Zeitdilatation. Im WRZNT-Bild bedeutet das:</p>
+        <ul class="plain">
+          <li>Hohe Geschwindigkeit → stark deformiertes Netz → Knoten kann sich weniger schnell verändern.</li>
+          <li>Geringe Geschwindigkeit → ausgeglichenes Netz → Knoten verändert sich normal.</li>
+        </ul>
+        <p>Zeitdilatation ist somit keine magische Erscheinung, sondern eine natürliche Konsequenz aus der Netzspannung, die durch Bewegung entsteht.</p>
+
+        <h3 class="section-title">4.4 Zeitpfeil als Richtung von Energiefluss</h3>
+        <p>Energie breitet sich durch das Netz als Wellen, Muster und Schwingungen aus. Der Zeitpfeil entsteht aus der Tendenz des Netzes, Spannung abzubauen und energetisch stabilere Muster zu suchen.</p>
+        <p>Veränderung ist irreversibel, weil jedes Netz eine minimale Dissipation besitzt. Dadurch wird die Richtung von „vorher" nach „nachher" eindeutig.</p>
+
+        <h3 class="section-title">4.5 Zeit als Resonanz im Wellenraumzeit-Netz</h3>
+        <p>Jede Region des Netzes besitzt ihre eigene Eigenfrequenz, abhängig von:</p>
+        <ul class="plain">
+          <li>Knotendichte,</li>
+          <li>Fadenspannung,</li>
+          <li>Energieniveau,</li>
+          <li>lokaler Geometrie.</li>
+        </ul>
+        <p>Diese Eigenfrequenz bestimmt, wie schnell Ereignisse ablaufen. Dadurch erhält die Zeit im WRZNT-Modell eine natürliche, physische Grundlage: Sie ist der Rhythmus des Netzes.</p>
+
+        <h3 class="section-title">4.6 Zeit ohne Hintergrund</h3>
+        <p>So wie es keinen leeren Raum gibt, gibt es auch keine „absolute Zeit". Zeit ist immer an das Netz gebunden und entsteht durch die Aktivität der Teilchenknoten. Wo nichts geschieht, vergeht keine Zeit.</p>
+        <p>Damit wird die Zeit zu einem lebendigen Ausdruck der Netzbewegung — zu einer Schwingung des Universums selbst, einem tiefen Puls, der überall im Kosmos unterschiedlich schlagen kann.</p>
+      </section>
+
+      <section class="chapter" id="kapitel5">
+        <span class="badge">Kapitel 5</span>
+        <h2 class="chapter-title">Licht und Undatrone im Wellenraumzeit-Netz</h2>
+        <p>In der WRZNT erscheint Licht nicht mehr als unabhängiges Teilchen, das sich durch einen vorgegebenen Raum bewegt. Stattdessen wird es zu einer dynamischen Ausbreitung des Netzes selbst. Ein Photon ist in diesem Bild kein isolierter Punkt — sondern eine vibrierende Ausdehnung eines Knotens, ein lebendiger Faden, der sich durch das Wellenraumzeit-Netz fortsetzt, während er mit seinem Ursprung in Verbindung bleibt.</p>
+
+        <h3 class="section-title">5.1 Photonen als Faden-Ausbreitungen</h3>
+        <p>Ein Photon entsteht, wenn ein Teilchenknoten schwingt und eine Netzfaser in Bewegung setzt. Die Schwingung läuft entlang des Fadens und erzeugt die typische Wellennatur des Lichts. Die konstante Lichtgeschwindigkeit ergibt sich daraus, dass die Ausbreitungsrate die Eigenschaft des Netzes selbst ist — nicht des Photons.</p>
+
+        <h3 class="section-title">5.2 Ursprung und Verbindung</h3>
+        <p>Ein Photon bleibt über seinen Faden stets mit dem Ursprungsknoten verbunden. Dadurch kann es Informationen über seinen Ursprungszustand tragen und Interferenzmuster erzeugen, selbst wenn es einzeln ausgesandt wird.</p>
+
+        <h3 class="section-title">5.3 Undatrone als hochfrequente Netzschwingungen</h3>
+        <p>Undatrone sind eng gebündelte, hochfrequente Fadenmoden des Netzes — eine spezialisierte Form des Lichts, tief verankert in der Struktur der Raumzeit.</p>
+
+        <h3 class="section-title">5.4 Polarisation</h3>
+        <p>Polarisation entsteht durch die Orientierung der Fadenschwingung im Netz. Da ein Photon aus einem geometrischen Faden besteht, kann es mehrere Schwingungsmoden gleichzeitig tragen.</p>
+
+        <h3 class="section-title">5.5 Verschränkung</h3>
+        <p>Zwei Photonen sind verschränkt, wenn sie aus demselben Ursprungsknoten hervorgehen. Sie teilen dann eine gemeinsame Netzstruktur, die Messungen sofort miteinander verbindet — ganz ohne Überlichtgeschwindigkeit.</p>
+
+        <h3 class="section-title">5.6 Licht als Information des Netzes</h3>
+        <p>Licht transportiert Energie und Struktur — jede Photonenbewegung verändert das Netz minimal und trägt so Information durch das Universum.</p>
+      </section>
+
+      <section class="chapter" id="formal">
+        <span class="badge">Formaler Anhang</span>
+        <h2 class="chapter-title">Formale Definition — Raum-Netz-Theorie (erste, präzise Fassung)</h2>
+        <p>Ein kompakter, mathematisch formulierter Rahmen, der sich sowohl mit der WRZT als auch mit klassischer Feld-/Wellenphysik vereinbaren lässt.</p>
+
+        <h3 class="section-title" id="f1">1. Grundobjekte und Notation</h3>
+        <ul class="definition-list">
+          <li>Sei \(G=(V,E)\) ein (endlicher oder abzählbar unendlicher) einfacher Graph.</li>
+          <li>\(V=\{v_i\}\) sind Knoten (Teilchen).</li>
+          <li>\(E=\{e_{ij}\}\) sind Kanten (Fäden) zwischen Knoten \(v_i\) und \(v_j\).</li>
+          <li>Jedem Knoten \(v_i\) sind Zustandsgrößen zugeordnet:
+            <ul class="plain" style="margin-top:8px;">
+              <li>Ruheenergie / Ruhemasse \(m_i\) und zugehörige Ruheenergie \(E_{0,i}=m_i c^2\).</li>
+              <li>Rotations-/Interne Energie \(E_{\mathrm{rot},i}(t)\) (WRZT-Beitrag).</li>
+              <li>Gesamtenergiedichte/Belegung \(\mathcal{E}_i(t)\).</li>
+            </ul>
+          </li>
+          <li>Jede Kante \(e\) besitzt Eigenschaften:
+            <ul class="plain" style="margin-top:8px;">
+              <li>lineare Dichte \(\mu_e\) (Masse-/Trägheitsparameter der Faser),</li>
+              <li>Grundspannung \(T_e\) (Materialkonstante des Netzes),</li>
+              <li>Längeneigenschaft \(L_e\) (Skalierung; in diskreter Theorie kann dies eine effektive Länge sein),</li>
+              <li>Feld/Schwingungsfeld \(\psi_e(x,t)\) (Skala \(x\in[0,L_e]\) entlang der Kante).</li>
+            </ul>
+          </li>
+          <li>Universelle Konstanten: \(c\) wird später als makroskopische Ausbreitungsgeschwindigkeit definiert: \(c_e=\sqrt{T_e/\mu_e}\) für homogene Kanten → im makroskopischen Mittel \(c\) (Lichtgeschwindigkeit).</li>
+        </ul>
+
+        <h3 class="section-title" id="f2">2. Axiome / Grundannahmen</h3>
+        <ul class="definition-list">
+          <li><strong>Raum ist der Graph:</strong> Der physikalische Raum in diesem Modell ist die Menge der Knoten und Kanten — Geometrie ist emergent aus \(G\) und Gewichten \(\{T_e,\mu_e,L_e\}\).</li>
+          <li><strong>Teilchen = stabile Knoten:</strong> Ein Teilchen ist ein lokalisierter, stabiler Konfigurationszustand eines Knotens \(v_i\), charakterisiert durch stationäre Werte \((m_i, E_{\mathrm{rot},i})\).</li>
+          <li><strong>Photonen / Undatrone = Wellen auf Kanten:</strong> elektromagnetische Quanten sind Anregungen \(\psi_e\) entlang Kanten; ihre Energie entspricht einer Schwingungsenergie der Kante.</li>
+          <li><strong>Dynamik durch gekoppelte Wellengleichungen und Knotendynamik:</strong> Die zeitliche Entwicklung ist durch Wellengleichungen auf Kanten gekoppelt mit Energie-/Impulsstrombilanz an Knoten bestimmt.</li>
+          <li><strong>Erhaltung:</strong> Gesamtsystem erfüllt Energie- und Impulserhaltung (formal definiert), inkl. WRZT-Erhaltung \(E_{\mathrm{gesamt}}^2=\) konstant im passenden Rahmen.</li>
+        </ul>
+
+        <h3 class="section-title" id="f3">3. Kanten-Dynamik (Wellengleichung auf einer Kante)</h3>
+        <p>Für eine Kante \(e\) gilt (1D-Wellengleichung mit Quellen durch Knotenanschlüsse):</p>
+        <div class="math-block">
+          \[ \frac{1}{c_e^2}\frac{\partial^2 \psi_e(x,t)}{\partial t^2} - \frac{\partial^2 \psi_e(x,t)}{\partial x^2} = S_e(x,t) \]
+        </div>
+        <p>wobei \(c_e=\sqrt{T_e/\mu_e}\) und \(S_e\) Quellterme sind, die Kopplung zu Knoten und Nichtlinearitäten (z.&nbsp;B. durch WRZT-Rotation) modellieren. Am Kantenende \(x=0\) und \(x=L_e\) gelten Kopplungsbedingungen an die Knoten \(v_i, v_j\) (siehe §4).</p>
+
+        <h3 class="section-title" id="f4">4. Knotenkopplung (Randbedingungen / Kirchhoff-Bedingungen)</h3>
+        <p>Für einen Knoten \(v_i\) mit angrenzenden Kanten \(\{e\in\mathcal{N}(i)\}\) fordern wir:</p>
+        <ul class="definition-list">
+          <li><strong>Kontinuität des Felds (Phasenbedingung):</strong>
+            <div class="math-block">
+              \[ \psi_{e}(x_{i,e},t) = \Phi_i(t)\quad \forall e\in\mathcal{N}(i) \]
+            </div>
+            wobei \(x_{i,e}\) der Randpunkt auf \(e\) ist, der an \(v_i\) liegt, und \(\Phi_i\) eine Knotenpotenzial-Variable.
+          </li>
+          <li><strong>Flussbilanz (Kirchhoff-Bedingung mit Quelle):</strong>
+            <div class="math-block">
+              \[ \sum_{e\in\mathcal{N}(i)} \left.\frac{\partial \psi_e}{\partial n}\right|_{x_{i,e}} = Q_i(t) \]
+            </div>
+            wobei \(\partial/\partial n\) die Ableitung entlang der Kante zum Knoten ist und \(Q_i(t)\) Quellen/Senken enthält, die aus der Knotendynamik (z.&nbsp;B. Änderung von \(E_{\mathrm{rot},i}\)) resultieren.
+          </li>
+        </ul>
+        <p>Physikalisch: Summe der Impuls-/Energieflüsse an einem Knoten = Änderung der Knotenenergie.</p>
+
+        <h3 class="section-title" id="f5">5. Knotendynamik und WRZT-Einkopplung</h3>
+        <p>Knoten besitzen eine interne Dynamik; wir schreiben eine Energiebilanz:</p>
+        <div class="math-block">
+          \[ \frac{d\mathcal{E}_i}{dt} = -\sum_{e\in\mathcal{N}(i)} F_{i\leftarrow e}(t) + \mathcal{S}_{\mathrm{rot},i}(t) \]
+        </div>
+        <p>wobei \(F_{i\leftarrow e}\) der Energiefluss von Kante \(e\) in den Knoten ist und \(\mathcal{S}_{\mathrm{rot},i}\) die WRZT-Quelle/Umwandlungsrate (Rotation ↔ Welle).</p>
+        <p>In Übereinstimmung mit WRZT setzen wir für jeden Knoten:</p>
+        <div class="math-block">
+          \[ \mathcal{E}_i^2 = E_{\mathrm{rot},i}^2 + E_{\mathrm{kin},i}^2 + E_{\mathrm{feld},i}^2 = \mathrm{const.} \]
+        </div>
+        <p>(Interpretation: Erhaltungsrelation der Gesamtenergieform; kann verallgemeinert werden.)</p>
+
+        <h3 class="section-title" id="f6">6. Photonen-Quantisierung (Undatron)</h3>
+        <p>Eine stationäre Wellenlösung an einer Kante hat Form \(\psi_e \sim A \sin(\omega t - k x)\). Zuordnung zur Quantennatur:</p>
+        <div class="math-block">
+          \[ E_{\text{Undatron}} = \hbar \omega, \qquad p = \hbar k \]
+        </div>
+        <p>Die Amplitude \(A\) korreliert mit der Energiedichte auf der Kante. Quantisierung ergibt sich durch Randbedingungen/Topologie (z.&nbsp;B. diskrete Spektren auf geschlossenen Schleifen).</p>
+
+        <h3 class="section-title" id="f7">7. Emergente Metrik und Raumzeit</h3>
+        <p>Wir definieren auf dem Graphen eine effektive, diskrete Metrik \(g\) durch Kantenlängen und Gewichte:</p>
+        <div class="math-block">
+          \[ d_{ij} = f(L_{ij},T_{ij},\mu_{ij}) \]
+        </div>
+        <p>z.&nbsp;B. \(d_{ij}\propto L_{ij}\sqrt{\mu_{ij}/T_{ij}}\) als Maß für effektive Ausbreitungszeit zwischen Knoten. Im Kontinuumslimit (\(G\) feiner → Mannigfaltigkeit \(M\)) konvergiert \(d_{ij}\) gegen die Raumzeitmetrik \(g_{\mu\nu}\). Zeit entsteht als Parameter der Netzwerk-Evolution.</p>
+
+        <h3 class="section-title" id="f8">8. Relativistische Effekte (Skizze: Lorentz-Faktor)</h3>
+        <p>Hypothese: Bewegung eines Knotens verändert lokale Netzparameter; konkret erhöhte effektive Spannung \(T\) oder effektive Massendichte \(\mu\) entlang der dominanten Richtungen. Modellannahme:</p>
+        <div class="math-block">
+          \[ T(v) = T_0\,\Gamma(v),\qquad \Gamma(v)\ge 1 \]
+        </div>
+        <p>Wenn die lokale Ausbreitungsgeschwindigkeit \(c_{\mathrm{loc}}=\sqrt{T(v)/\mu(v)}\) konstant bleiben soll, dann müssen \(T\) und \(\mu\) gekoppelt variieren. Die Zeitdilatation ergibt sich dann aus der veränderten lokalen Zeitskala \(\tau_i \propto 1/\sqrt{T(v)}\) (oder äquivalenter Ableitungen). Ziel: eine konsistente Ableitung, die das klassische \(\gamma(v)=1/\sqrt{1-v^2/c^2}\) reproduziert. (Dieser Schritt kann formal ausgearbeitet werden — hier ist er als Plausibilitätskonstrukt festgelegt.)</p>
+
+        <h3 class="section-title" id="f9">9. Konservationsgesetze</h3>
+        <p>Gesamtenergieerhaltung:</p>
+        <div class="math-block">
+          \[ \frac{d}{dt}\Bigg(\sum_i \mathcal{E}_i(t) + \sum_{e}\mathcal{E}_e(t)\Bigg)=0 \]
+        </div>
+        <p>wobei \(\mathcal{E}_e\) die Energiedichte in der Kantenwelle ist. Ähnliche Aussagen gelten für Impuls, unter Berücksichtigung von Netzspannungen.</p>
+
+        <h3 class="section-title" id="f10">10. Kontinuumsgrenzen und Verbindung zu etablierten Theorien</h3>
+        <ul class="definition-list">
+          <li><strong>Kontinuumslimit:</strong> Für dichtes \(G\) und geeignete Skalierung konvergieren die Diskretgleichungen gegen Feldgleichungen auf einer Mannigfaltigkeit (z.&nbsp;B. Maxwell- und Einstein-artige Gleichungen mit effektiven Kopplungen).</li>
+          <li><strong>Relation zu WRZT:</strong> WRZT liefert lokale Knotenzustände (Rotation, Undatron-Erzeugung). Die Raum-Netz-Formalität ist das Medium, in dem diese lokalen Effekte wechselwirken und makroskopische Phänomene (Licht, Gravitation, Relativität) emergent hervorbringen.</li>
+        </ul>
+
+        <h3 class="section-title" id="f11">11. Offene Punkte (für die weitere, formale Arbeit)</h3>
+        <ol class="plain">
+          <li><strong>Präzise Ableitung des Lorentz-Faktors</strong> aus Netzparametern (herleitbare Funktion \(\Gamma(v)\) mit korrektem Grenzverhalten).</li>
+          <li><strong>Quantisierungsregel</strong> für die Kanten (wie entstehen diskrete Quanten und deren Statistik?).</li>
+          <li><strong>Wechselwirkungsterme</strong> zwischen Knoten (elektromagnetisch, schwach, stark analog?) — Modellierung der Ladung über topologische Eigenschaften der Knotenkopplung.</li>
+          <li><strong>Kontinuumslimit-Beweis:</strong> Wie und unter welchen Bedingungen konvergieren die diskreten Gleichungen gegen bekannte Feldgleichungen?</li>
+          <li><strong>Stabilität:</strong> Bedingungen, unter denen Knoten stabil sind (Teilchenpersistenz).</li>
+        </ol>
+
+        <h3 class="section-title" id="kurzfassung">Kurzfassung (ein Satz)</h3>
+        <blockquote class="summary">
+          <p>Das Modell definiert Raum als gewichteten Graphen \(G=(V,E)\), Teilchen als stabile Knoten \(v_i\), Photonen/Undatrone als Schwingungen \(\psi_e\) auf Kanten, und Relativität sowie Lichtgeschwindigkeit als emergente Eigenschaften der Netzparameter \((T_e,\mu_e,L_e)\), gekoppelt an die lokalen WRZT-Energiezustände der Knoten.</p>
+        </blockquote>
+      </section>
+
+      <footer class="doc-footer">
+        WRZNT — Wellenraumzeit-Netz-Theorie · privates Arbeitsmanuskript
+      </footer>
+    </article>
+  </main>
+</div>
+
+<script>
+// ---------- Sidebar mobile toggle ----------
+const sidebar = document.getElementById('sidebar');
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+hamburgerBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+document.querySelectorAll('.nav-link').forEach(a => {
+  a.addEventListener('click', () => sidebar.classList.remove('open'));
+});
+
+// ---------- Style panel ----------
+const styleToggle = document.getElementById('styleToggle');
+const stylePanel = document.getElementById('stylePanel');
+styleToggle.addEventListener('click', () => stylePanel.classList.toggle('open'));
+document.addEventListener('click', (e) => {
+  if (!stylePanel.contains(e.target) && !styleToggle.contains(e.target)) {
+    stylePanel.classList.remove('open');
+  }
+});
+
+// ---------- Theme switching ----------
+document.querySelectorAll('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    const theme = sw.dataset.themeSwatch;
+    document.body.setAttribute('data-theme', theme);
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    localStorage.setItem('wrznt-theme', theme);
+  });
+});
+
+// ---------- Font switching ----------
+document.querySelectorAll('.font-opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const font = btn.dataset.fontOpt;
+    document.body.setAttribute('data-font', font);
+    document.querySelectorAll('.font-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    localStorage.setItem('wrznt-font', font);
+  });
+});
+
+// ---------- Font size ----------
+let baseSize = 17;
+const sizeLabel = document.getElementById('sizeLabel');
+function applySize(){
+  document.body.style.fontSize = baseSize + 'px';
+  sizeLabel.textContent = baseSize + 'px';
+}
+document.getElementById('sizePlus').addEventListener('click', () => { baseSize = Math.min(22, baseSize+1); applySize(); });
+document.getElementById('sizeMinus').addEventListener('click', () => { baseSize = Math.max(14, baseSize-1); applySize(); });
+
+// ---------- Fullscreen ----------
+document.getElementById('fullscreenToggle').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+// ---------- Restore saved preferences ----------
+(function restore(){
+  const savedTheme = localStorage.getItem('wrznt-theme');
+  const savedFont = localStorage.getItem('wrznt-font');
+  if (savedTheme) {
+    document.body.setAttribute('data-theme', savedTheme);
+    document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.themeSwatch === savedTheme));
+  }
+  if (savedFont) {
+    document.body.setAttribute('data-font', savedFont);
+    document.querySelectorAll('.font-opt').forEach(b => b.classList.toggle('active', b.dataset.fontOpt === savedFont));
+  }
+})();
+
+// ---------- Active section highlighting ----------
+const sections = document.querySelectorAll('section.chapter');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

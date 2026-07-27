@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Wellenraumzeit-Berechnung & Vergleich</title>
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Theme 1: Dark Cosmic (Default) */
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #c9d1d9;
+            --heading-color: #58a6ff;
+            --accent-color: #1f6feb;
+            --border-color: #30363d;
+            --highlight-color: #79c0ff;
+            --box-bg: #0d1117;
+            --math-color: #a5d6ff;
+        }
+
+        /* Theme 2: Ocean Turquoise */
+        body.theme-2 {
+            --bg-color: #0b192c;
+            --card-bg: #1e3e62;
+            --text-color: #e2e8f0;
+            --heading-color: #00d8d6;
+            --accent-color: #0fbcf9;
+            --border-color: #2b5876;
+            --highlight-color: #4bc2c7;
+            --box-bg: #071322;
+            --math-color: #81ecec;
+        }
+
+        /* Theme 3: Clean Scientific Paper */
+        body.theme-3 {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --heading-color: #0f4c81;
+            --accent-color: #1f6feb;
+            --border-color: #dee2e6;
+            --highlight-color: #d9e2ec;
+            --box-bg: #f1f3f5;
+            --math-color: #0056b3;
+        }
+
+        /* Theme 4: High Contrast Gold */
+        body.theme-4 {
+            --bg-color: #050505;
+            --card-bg: #121212;
+            --text-color: #f0f0f0;
+            --heading-color: #ffb703;
+            --accent-color: #fb8500;
+            --border-color: #333333;
+            --highlight-color: #ffb703;
+            --box-bg: #1a1a1a;
+            --math-color: #ffd166;
+        }
+
+        /* Theme 5: Emerald Void */
+        body.theme-5 {
+            --bg-color: #061412;
+            --card-bg: #0b221f;
+            --text-color: #d1e7dd;
+            --heading-color: #2ec4b6;
+            --accent-color: #10b981;
+            --border-color: #155d53;
+            --highlight-color: #20e3b2;
+            --box-bg: #040e0d;
+            --math-color: #a7f3d0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            color: var(--heading-color);
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-style {
+            background-color: var(--box-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-style.active {
+            border-color: var(--heading-color);
+            color: var(--heading-color);
+            font-weight: bold;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--heading-color);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        .formula-box {
+            background-color: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            margin: 15px 0;
+            overflow-x: auto;
+            color: var(--math-color);
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .comparison-card {
+            background-color: var(--box-bg);
+            border: 2px solid var(--heading-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-box {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--heading-color);
+        }
+
+        .highlight-text {
+            color: var(--highlight-color);
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+            <div class="subtitle">Herleitung des Radius $r$ aus Energiegleichheit, Compton-Radius & $R_{\min}$</div>
+        </div>
+        <div class="controls">
+            <div class="style-selector">
+                <button class="btn-style active" onclick="setTheme(1)">Style 1</button>
+                <button class="btn-style" onclick="setTheme(2)">Style 2</button>
+                <button class="btn-style" onclick="setTheme(3)">Style 3</button>
+                <button class="btn-style" onclick="setTheme(4)">Style 4</button>
+                <button class="btn-style" onclick="setTheme(5)">Style 5</button>
+            </div>
+            <button class="btn" onclick="toggleFullscreen()">
+                <span id="fs-icon">⛶</span> Vollbild
+            </button>
+        </div>
+    </header>
+
+    <!-- SECTION 1: Herleitung aus Photonen- und Elektronenenergie -->
+    <section>
+        <h2>1. Radius-Berechnung aus Energiegleichheit ($E_{\text{Photon}} = E_{\text{Elektron}}$)</h2>
+        <p>Setzen wir die Ruheenergie des Elektrons $E_e = m \cdot c^2$ gleich der Energie eines Photons $E_\gamma = h \cdot f$, lässt sich der Schwingungsradius $r$ direkt herleiten:</p>
+
+        <div class="formula-box">
+            $$E_{\text{Elektron}} = E_{\text{Photon}} \implies m \cdot c^2 = h \cdot f$$
+        </div>
+
+        <p>Mit der Wellen-Beziehung bei Lichtgeschwindigkeit $c = f \cdot \lambda$ und dem Kreisumfang $\lambda = 2\pi \cdot r$ für die fundamentale Rotation folgt:</p>
+
+        <div class="formula-box">
+            $$m \cdot c^2 = h \cdot \frac{c}{\lambda} = \frac{h \cdot c}{2\pi \cdot r} = \frac{\hbar \cdot c}{r}$$
+        </div>
+
+        <p>Durch Umstellen nach dem Radius $r$ erhalten wir direkt die fundamentale Wellenlängen-Grenze bzw. den reduzierten Compton-Radius $\bar{\lambda}_e$:</p>
+
+        <div class="formula-box">
+            $$r = \frac{\hbar}{m \cdot c} = \bar{\lambda}_e$$
+        </div>
+        <p><em>Diese Herleitung zeigt, dass bei völliger Umwandlung der Ruheenergie in ein rotierendes Wellenfeld bei $v=c$ der Schwingungsradius exakt dem reduzierten Compton-Radius entspricht.</em></p>
+    </section>
+
+    <!-- SECTION 2: Kraft-Kopplung -->
+    <section>
+        <h2>2. Kraft-Kopplung über die Feinstrukturkonstante $\alpha$</h2>
+        <p>Alternative Herleitung über die Gleichsetzung von Zentripetalkraft $F_Z$ und Coulomb-Kraft $F_C$ unter Einbeziehung der Feinstrukturkonstante $\alpha$ bei $v = c$:</p>
+
+        <div class="formula-box">
+            $$F_Z = \frac{F_C}{2\alpha} \implies \frac{m \cdot c^2}{r} = \frac{1}{2\alpha} \cdot \frac{k \cdot e^2}{r^2}$$
+        </div>
+
+        <p>Da nach Definition $k \cdot e^2 = \alpha \cdot \hbar \cdot c$, vereinfacht sich der Coulomb-Term direkt:</p>
+
+        <div class="formula-box">
+            $$\frac{m \cdot c^2}{r} = \frac{\alpha \cdot \hbar \cdot c}{2\alpha \cdot r^2} = \frac{\hbar \cdot c}{2 \cdot r^2}$$
+        </div>
+
+        <p>Auch dieser Ansatz führt exakt auf denselben Radius:</p>
+        <div class="formula-box">
+            $$r = \bar{\lambda}_e = \frac{\hbar}{m \cdot c}$$
+        </div>
+
+        <p><strong>Exakte Naturkonstanten:</strong></p>
+        <ul>
+            <li>Reduziertes Plancksches Wirkungsquantum: $\hbar \approx 1{,}0545718 \times 10^{-34} \text{ J}\cdot\text{s}$</li>
+            <li>Masse des Elektrons: $m = 9{,}1093837 \times 10^{-31} \text{ kg}$</li>
+            <li>Lichtgeschwindigkeit: $c = 299.792.458 \text{ m/s}$</li>
+            <li>Feinstrukturkonstante: $\alpha \approx \frac{1}{137{,}036}$</li>
+        </ul>
+
+        <p>Einsetzen der Werte:</p>
+        <div class="formula-box">
+            $$r = \bar{\lambda}_e \approx \frac{1{,}05457 \times 10^{-34} \text{ J}\cdot\text{s}}{(9{,}10938 \times 10^{-31} \text{ kg}) \cdot (299.792.458 \text{ m/s})} \approx 3{,}8616 \times 10^{-13} \text{ m}$$
+        </div>
+        <p><em>(Der reduzierte Compton-Radius $r = \bar{\lambda}_e \approx 3{,}8616 \times 10^{-13} \text{ m}$ ersetzt hier den klassischen Elektronenradius $r_e = \alpha \cdot \bar{\lambda}_e \approx 2{,}8179 \times 10^{-15} \text{ m}$).</em></p>
+    </section>
+
+    <!-- SECTION 3: Umdrehungsfrequenz -->
+    <section>
+        <h2>3. Berechnung der Umdrehungsfrequenz</h2>
+        <p>Berechnung des Bahnumfangs $U$ mit dem berechneten Radius $r = 3{,}8616 \times 10^{-13} \text{ m}$:</p>
+        <div class="formula-box">
+            $$U = 2\pi \cdot r \approx 2\pi \cdot (3{,}8616 \times 10^{-13} \text{ m}) \approx 2{,}4263 \times 10^{-12} \text{ m}$$
+        </div>
+
+        <p>Daraus ergibt sich die fundamentale Rotations- bzw. Schwingungsfrequenz $f$ bei Lichtgeschwindigkeit $c$:</p>
+        <div class="formula-box">
+            $$f = \frac{c}{U} = \frac{299.792.458 \text{ m/s}}{2{,}4263 \times 10^{-12} \text{ m}} \approx 1{,}2356 \times 10^{20} \text{ Hz}$$
+        </div>
+    </section>
+
+    <!-- SECTION 4: Vergleich mit R_min -->
+    <section>
+        <div class="comparison-card">
+            <h2>4. Vergleich mit dem Minimal-Radius $R_{\min}$ der WRZT</h2>
+            <p>In der <strong>Wellenraumzeit-Theorie (WRZT)</strong> bildet die fundamentale Gitterkonstante den echten minimalen Schwingungsradius <span class="highlight-text">$R_{\min}$</span> des Mediums:</p>
+
+            <div class="formula-box">
+                $$R_{\min} = 7{,}716 \times 10^{-13} \text{ m}$$
+            </div>
+
+            <div class="comparison-grid">
+                <div class="metric-box">
+                    <div class="metric-title">Reduzierter Compton-Radius ($r = \bar{\lambda}_e$)</div>
+                    <div class="metric-value">3,862 × 10⁻¹³ m</div>
+                    <p style="font-size:0.85rem; margin-top:8px; opacity:0.9;">Errechnet über $E_\gamma = E_e$ bzw. $F_Z = F_C / 2\alpha$.</p>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-title">WRZT Minimal-Radius ($R_{\min}$)</div>
+                    <div class="metric-value">7,716 × 10⁻¹³ m</div>
+                    <p style="font-size:0.85rem; margin-top:8px; opacity:0.9;">Fundamentales Wellenraumzeit-Gitterraster.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <p><strong>Verhältnis-Analyse:</strong></p>
+                <div class="formula-box">
+                    $$\frac{R_{\min}}{\bar{\lambda}_e} = \frac{7{,}716 \times 10^{-13} \text{ m}}{3{,}8616 \times 10^{-13} \text{ m}} \approx 2{,}000$$
+                </div>
+                <p><strong>Physikalische Erkenntnis der WRZT:</strong><br>
+                Sowohl über den Ansatz der Energiegleichheit ($E_{\text{Photon}} = E_{\text{Elektron}}$) als auch über die Kraftkopplung ($F_Z = \frac{F_C}{2\alpha}$) zeigt sich die exakte geometrische Korrelation: Der minimale Radius der Raumzeit $R_{\min} = 7{,}716 \times 10^{-13} \text{ m}$ entspricht genau dem **doppelten Schwingungsradius** ($R_{\min} \approx 2 \cdot \bar{\lambda}_e$).
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        WRZT - Wellenraumzeit-Theorie | Jo D. (Jup)
+    </footer>
+</div>
+
+<script>
+    function setTheme(themeNum) {
+        document.body.className = '';
+        if (themeNum > 1) {
+            document.body.classList.add('theme-' + themeNum);
+        }
+        
+        const buttons = document.querySelectorAll('.btn-style');
+        buttons.forEach((btn, index) => {
+            if (index === themeNum - 1) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                alert(`Vollbild-Fehler: ${err.message}`);
+            });
+            document.getElementById('fs-icon').textContent = '⤓';
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                document.getElementById('fs-icon').textContent = '⛶';
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

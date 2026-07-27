@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elektron ↔ Photon — Frequenz &amp; Radius bei v = c</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+:root{
+  --bg:#0b0a08;
+  --bg-panel:#141210;
+  --bg-elevated:#1b1815;
+  --border:#2e2820;
+  --gold:#c9a227;
+  --gold-bright:#e6c34f;
+  --gold-dim:#8a6f1e;
+  --text:#ece5d6;
+  --text-dim:#a89f8c;
+  --text-faint:#6f6858;
+  --mono:'JetBrains Mono', monospace;
+  --shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+[data-theme="midnight"]{
+  --bg:#080b12; --bg-panel:#0e131d; --bg-elevated:#141b28; --border:#212c3d;
+  --gold:#5fa8d3; --gold-bright:#8ecae6; --gold-dim:#3d7a9e;
+  --text:#e4ecf5; --text-dim:#94a5bc; --text-faint:#5c6b82;
+}
+[data-theme="emerald"]{
+  --bg:#070b09; --bg-panel:#0d130f; --bg-elevated:#141c16; --border:#233026;
+  --gold:#4caf7d; --gold-bright:#7bd6a7; --gold-dim:#357657;
+  --text:#e2ece5; --text-dim:#94ab9d; --text-faint:#5b6e61;
+}
+[data-theme="crimson"]{
+  --bg:#0c0808; --bg-panel:#150e0e; --bg-elevated:#1d1414; --border:#332120;
+  --gold:#c9564a; --gold-bright:#e88377; --gold-dim:#8f392f;
+  --text:#f0e4e0; --text-dim:#b2988f; --text-faint:#705f58;
+}
+[data-theme="parchment"]{
+  --bg:#efe8d8; --bg-panel:#e7dec8; --bg-elevated:#ddd1b3; --border:#c9b98f;
+  --gold:#8a5a1f; --gold-bright:#a8721f; --gold-dim:#6b451a;
+  --text:#2b2418; --text-dim:#5a4f3a; --text-faint:#8a7d61;
+  --shadow: 0 10px 30px rgba(90,70,30,0.18);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Barlow', sans-serif;
+  font-size:17px;
+  line-height:1.7;
+  transition:background .3s ease, color .3s ease;
+}
+
+.topbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; justify-content:flex-end; gap:8px;
+  padding:16px 20px;
+  background:linear-gradient(var(--bg) 60%, transparent);
+}
+.icon-btn{
+  min-width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  gap:6px; padding:0 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--bg-panel);
+  color:var(--text-dim);
+  cursor:pointer;
+  font-family:'Barlow', sans-serif;
+  font-size:13.5px;
+  transition:all .15s ease;
+}
+.icon-btn:hover{color:var(--gold-bright);border-color:var(--gold-dim);}
+
+.style-panel{
+  position:fixed; top:64px; right:20px;
+  width:220px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  padding:16px;
+  z-index:60;
+  display:none;
+}
+.style-panel.open{display:block;}
+.style-panel h5{margin:0 0 10px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);}
+.swatch-row{display:flex;gap:8px;flex-wrap:wrap;}
+.swatch{width:36px;height:36px;border-radius:9px;cursor:pointer;border:2px solid transparent;}
+.swatch.active{border-color:var(--text);}
+.swatch[data-t="gold"]{background:linear-gradient(135deg,#0b0a08,#c9a227);}
+.swatch[data-t="midnight"]{background:linear-gradient(135deg,#080b12,#5fa8d3);}
+.swatch[data-t="emerald"]{background:linear-gradient(135deg,#070b09,#4caf7d);}
+.swatch[data-t="crimson"]{background:linear-gradient(135deg,#0c0808,#c9564a);}
+.swatch[data-t="parchment"]{background:linear-gradient(135deg,#efe8d8,#8a5a1f);}
+
+main{
+  max-width:840px;
+  margin:0 auto;
+  padding:10px 32px 120px;
+}
+
+h1.title{
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:.03em;
+  font-size:46px;
+  color:var(--gold-bright);
+  margin:10px 0 6px;
+  line-height:1.05;
+}
+p.subtitle{
+  color:var(--text-dim);
+  font-style:italic;
+  margin:0 0 36px;
+  font-size:16.5px;
+}
+
+h2.section-title{
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:.03em;
+  font-size:27px;
+  color:var(--gold-bright);
+  margin:50px 0 16px;
+  padding-top:26px;
+  border-top:1px solid var(--border);
+}
+h2.section-title:first-of-type{border-top:none;padding-top:0;margin-top:0;}
+
+.step{
+  display:flex;
+  gap:18px;
+  margin-bottom:38px;
+}
+.step-num{
+  flex:0 0 auto;
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1.5px solid var(--gold-dim);
+  color:var(--gold-bright);
+  font-family:'Bebas Neue', sans-serif;
+  font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+}
+.step-body{flex:1;min-width:0;}
+.step-title{
+  font-weight:600;
+  color:var(--gold);
+  font-size:17.5px;
+  margin:2px 0 8px;
+}
+p{margin:0 0 14px;}
+
+.math-block{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-left:3px solid var(--gold-dim);
+  border-radius:6px;
+  padding:16px 20px;
+  margin:12px 0 16px;
+  overflow-x:auto;
+}
+.calc-line{
+  font-family:var(--mono);
+  font-size:14.5px;
+  color:var(--text-dim);
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 14px;
+  margin:8px 0;
+  overflow-x:auto;
+}
+.result{
+  display:inline-block;
+  margin-top:6px;
+  padding:8px 16px;
+  background:var(--bg-elevated);
+  border:1px solid var(--gold-dim);
+  border-radius:8px;
+  color:var(--gold-bright);
+  font-weight:600;
+}
+
+table.const-table{
+  width:100%;
+  border-collapse:collapse;
+  margin:14px 0 20px;
+  font-size:14.5px;
+}
+table.const-table th, table.const-table td{
+  text-align:left;
+  padding:9px 12px;
+  border-bottom:1px solid var(--border);
+}
+table.const-table th{
+  color:var(--text-faint);
+  font-weight:600;
+  font-size:11.5px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+table.const-table td.sym{color:var(--gold);font-weight:600;}
+table.const-table td.val{font-family:var(--mono);color:var(--text);}
+
+.summary-card{
+  margin:26px 0 10px;
+  padding:26px 28px;
+  background:var(--bg-panel);
+  border:1px solid var(--gold-dim);
+  border-radius:12px;
+}
+.summary-card h3{
+  margin:0 0 14px;
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:.03em;
+  font-size:24px;
+  color:var(--gold-bright);
+}
+.compare-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin:16px 0;
+}
+.compare-box{
+  padding:16px 18px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+.compare-box .label{
+  font-size:11.5px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--text-faint);
+  margin-bottom:6px;
+}
+.compare-box .value{
+  font-family:var(--mono);
+  color:var(--gold-bright);
+  font-size:16px;
+}
+.ratio-line{
+  text-align:center;
+  margin:20px 0 4px;
+  font-size:19px;
+  color:var(--gold-bright);
+}
+
+footer.doc-footer{
+  margin-top:70px;
+  padding-top:22px;
+  border-top:1px solid var(--border);
+  color:var(--text-faint);
+  font-size:13px;
+  text-align:center;
+}
+
+@media (max-width:640px){
+  main{padding:10px 18px 100px;}
+  h1.title{font-size:32px;}
+  .compare-grid{grid-template-columns:1fr;}
+  .step{gap:12px;}
+}
+</style>
+</head>
+<body data-theme="gold">
+
+<div class="topbar">
+  <button class="icon-btn" id="styleToggle">🎨 Styles</button>
+  <button class="icon-btn" id="fullscreenToggle">⛶ Vollbild</button>
+</div>
+
+<div class="style-panel" id="stylePanel">
+  <h5>Farbschema</h5>
+  <div class="swatch-row">
+    <div class="swatch active" data-t="gold" title="Dark Gold"></div>
+    <div class="swatch" data-t="midnight" title="Midnight Blue"></div>
+    <div class="swatch" data-t="emerald" title="Deep Emerald"></div>
+    <div class="swatch" data-t="crimson" title="Crimson"></div>
+    <div class="swatch" data-t="parchment" title="Parchment"></div>
+  </div>
+</div>
+
+<main>
+  <h1 class="title">Elektron ↔ Photon</h1>
+  <p class="subtitle">Frequenz aus Energieäquivalenz, Radius bei v = c, und der Vergleich mit R<sub>min</sub> aus der WRZT.</p>
+
+  <h2 class="section-title">Grundidee</h2>
+  <p>Ein Photon mit derselben Energie wie die Ruheenergie eines Elektrons besitzt eine feste Frequenz \(f\) (Schritt 1–2). Denkt man sich diese Schwingung als eine Bewegung mit \(v=c\) auf einer geschlossenen Kreisbahn — eine Umdrehung pro Schwingungsperiode \(T=1/f\) — dann legt sie pro Periode genau die Strecke \(c\cdot T\) zurück. Diese Strecke ist der Umfang \(U\) der Bahn (Schritt 3). Aus dem Umfang folgt der Radius \(r=U/2\pi\) (Schritt 4). Dieser Radius wird abschließend mit dem minimalen Radius \(R_{\min}\) der WRZT verglichen (Schritt 5).</p>
+
+  <table class="const-table">
+    <tr><th>Größe</th><th>Symbol</th><th>Wert</th></tr>
+    <tr><td>Elektronenmasse</td><td class="sym">\(m_e\)</td><td class="val">9,1093837015 × 10⁻³¹ kg</td></tr>
+    <tr><td>Lichtgeschwindigkeit</td><td class="sym">\(c\)</td><td class="val">2,99792458 × 10⁸ m/s (exakt)</td></tr>
+    <tr><td>Planck-Konstante</td><td class="sym">\(h\)</td><td class="val">6,62607015 × 10⁻³⁴ J·s (exakt)</td></tr>
+    <tr><td>Reduzierte Planck-Konstante</td><td class="sym">\(\hbar\)</td><td class="val">1,054571817 × 10⁻³⁴ J·s</td></tr>
+  </table>
+
+  <h2 class="section-title">Schritt-für-Schritt-Rechnung</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Ruheenergie des Elektrons</div>
+      <p>Über die Masse-Energie-Äquivalenz:</p>
+      <div class="math-block">\[ E = m_e c^2 \]</div>
+      <div class="calc-line">E = 9,1093837015×10⁻³¹ kg × (2,99792458×10⁸ m/s)²
+  = 9,1093837015×10⁻³¹ kg × 8,9875517874×10¹⁶ m²/s²</div>
+      <div class="result">E = 8,1871057880 × 10⁻¹⁴ J &nbsp;=&nbsp; 0,5109989500 MeV</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Frequenz des energiegleichen Photons</div>
+      <p>Aus der Planck-Beziehung \(E=hf\) folgt für ein Photon mit exakt dieser Energie:</p>
+      <div class="math-block">\[ f = \frac{E}{h} = \frac{m_e c^2}{h} \]</div>
+      <div class="calc-line">f = 8,1871057880×10⁻¹⁴ J / 6,62607015×10⁻³⁴ J·s</div>
+      <div class="result">f = 1,235589965 × 10²⁰ Hz</div>
+      <p style="margin-top:10px;color:var(--text-dim);font-size:14.5px;">Dies ist die sogenannte <em>Compton-Frequenz</em> des Elektrons.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Umfang der Bahn bei v = c</div>
+      <p>Bei einer Umdrehung pro Schwingungsperiode \(T=1/f\) und einer Bahngeschwindigkeit \(v=c\) legt die Welle pro Periode die Strecke \(U=c\cdot T=c/f\) zurück — das ist zugleich die Wellenlänge \(\lambda\):</p>
+      <div class="math-block">\[ U = \lambda = \frac{c}{f} = \frac{h}{m_e c} \]</div>
+      <div class="calc-line">U = 2,99792458×10⁸ m/s / 1,235589965×10²⁰ Hz</div>
+      <div class="result">U = λ = 2,42631023867 × 10⁻¹² m &nbsp;(Compton-Wellenlänge λ_C)</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">Radius aus dem Umfang</div>
+      <p>Der Radius einer Kreisbahn ergibt sich aus dem Umfang über \(U = 2\pi r\):</p>
+      <div class="math-block">\[ r = \frac{U}{2\pi} = \frac{h}{2\pi\, m_e c} = \frac{\hbar}{m_e c} \]</div>
+      <div class="calc-line">r = 2,42631023867×10⁻¹² m / (2π)
+  = 2,42631023867×10⁻¹² m / 6,283185307</div>
+      <div class="result">r = 3,8615926796 × 10⁻¹³ m &nbsp;(reduzierte Compton-Wellenlänge ƛ_C)</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <div class="step-title">Vergleich mit R<sub>min</sub> aus der WRZT</div>
+      <p>In der WRZT ist der minimale Radius über die Ur-Konstanten definiert als:</p>
+      <div class="math-block">\[ R_{\min} = \frac{2\hbar}{m_e c} \]</div>
+      <div class="calc-line">R_min = 2 × 1,054571817×10⁻³⁴ J·s / (9,1093837015×10⁻³¹ kg × 2,99792458×10⁸ m/s)
+      = 2,109143634×10⁻³⁴ / 2,730924490×10⁻²²</div>
+      <div class="result">R_min = 7,7231853592 × 10⁻¹³ m</div>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <h3>Ergebnis des Vergleichs</h3>
+    <div class="compare-grid">
+      <div class="compare-box">
+        <div class="label">Radius aus Photon-Frequenz (Schritt 4)</div>
+        <div class="value">r = 3,8615926796 × 10⁻¹³ m</div>
+      </div>
+      <div class="compare-box">
+        <div class="label">R<sub>min</sub> aus der WRZT</div>
+        <div class="value">R_min = 7,7231853592 × 10⁻¹³ m</div>
+      </div>
+    </div>
+    <div class="ratio-line">\( \dfrac{r}{R_{\min}} = \dfrac{\hbar/(m_ec)}{2\hbar/(m_ec)} = \dfrac{1}{2} \)</div>
+    <p style="margin-top:18px;">Der aus der Photon-Elektron-Energieäquivalenz und \(v=c\) hergeleitete Radius \(r\) ist <strong style="color:var(--gold-bright);">exakt halb so groß</strong> wie \(R_{\min}\) der WRZT — nicht nur näherungsweise, sondern algebraisch, da \(R_{\min}=2\hbar/(m_ec)=2r\) per Definition. Der WRZT-Minimalradius entspricht damit dem <strong style="color:var(--gold-bright);">Durchmesser</strong> der hier berechneten Bahn, bzw. \(r\) ist ihr Radius.</p>
+  </div>
+
+  <footer class="doc-footer">
+    Elektron-Photon-Äquivalenz · Rechnung mit CODATA-Konstanten
+  </footer>
+</main>
+
+<script>
+document.getElementById('styleToggle').addEventListener('click', () => {
+  document.getElementById('stylePanel').classList.toggle('open');
+});
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('stylePanel');
+  const btn = document.getElementById('styleToggle');
+  if (!panel.contains(e.target) && !btn.contains(e.target)) panel.classList.remove('open');
+});
+document.querySelectorAll('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.body.setAttribute('data-theme', sw.dataset.t);
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+  });
+});
+document.getElementById('fullscreenToggle').addEventListener('click', () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+});
+</script>
+
+</body>
+</html>

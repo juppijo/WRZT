@@ -1,0 +1,31 @@
+[
+  {
+    "id": "custom_1785090383111",
+    "cat": "WRZT",
+    "name": "c",
+    "expr": "c = ( Ξ  / η ) * Rmin",
+    "displayExpr": "c = ( Ξ  / η ) * Rmin",
+    "desc": "C",
+    "vars": [
+      {
+        "sym": "Ξ",
+        "name": "",
+        "unit": ""
+      },
+      {
+        "sym": "η",
+        "name": "",
+        "unit": ""
+      },
+      {
+        "sym": "Rmin",
+        "name": "",
+        "unit": ""
+      }
+    ],
+    "formula": "( Ξ  / η ) * Rmin",
+    "resultUnit": "m/s",
+    "resultName": "c",
+    "isCustom": true
+  }
+]

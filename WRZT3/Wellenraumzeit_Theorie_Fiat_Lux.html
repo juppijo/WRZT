@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiat Lux – Wellenraumzeit-Theorie (WRZT)</title>
+    <!-- MathJax 3 Configuration & Script -->
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-blue: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-red: #f87171;
+            --t\text-main: #e6edf3;
+            --t\text-muted: #8b949e;
+            --border-color: #30363d;
+            --code-bg: #21262d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--t\text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            t\text-align: center;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: var(--accent-green);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: var(--t\text-muted);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--accent-green);
+            margin-top: 25px;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            t\text-align: justify;
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        blockquote {
+            background: var(--card-bg);
+            border-left: 4px solid var(--accent-blue);
+            margin: 20px 0;
+            padding: 15px 20px;
+            font-style: italic;
+            color: #c9d1d9;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .quote-author {
+            display: block;
+            t\text-align: right;
+            font-weight: bold;
+            color: var(--accent-green);
+            margin-top: 8px;
+        }
+
+        .math-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .highlight-box {
+            background-color: rgba(56, 189, 248, 0.08);
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .svg-container {
+            t\text-align: center;
+            margin: 30px 0;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .spectrum-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .spectrum-list li {
+            background: var(--card-bg);
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        footer {
+            t\text-align: center;
+            padding-top: 40px;
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+            color: var(--t\text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Fiat Lux – „Es werde Licht“</h1>
+        <div class="subtitle">Licht – Eine neue Perspektive (Wellenraumzeit-Theorie)</div>
+        <div class="meta-info">Vers 1.0 &bull; 08-11-2024 03:30 &bull; @juppijo &bull; Jo D.</div>
+    </header>
+
+    <div class="svg-container">
+        <svg viewBox="0 0 500 250" width="100%" height="220">
+            <!-- Background grid effect -->
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#21262d" stroke-width="1"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" rx="10"/>
+
+            <!-- Left circle and sine wave -->
+            <circle cx="140" cy="125" r="80" fill="none" stroke="#38bdf8" stroke-width="4"/>
+            <circle cx="140" cy="125" r="7" fill="#f87171"/>
+            <path d="M 10,125 Q 75,50 140,125 T 270,125" fill="none" stroke="#4ade80" stroke-width="3"/>
+
+            <!-- Right dashed circles -->
+            <circle cx="360" cy="125" r="80" fill="none" stroke="#4ade80" stroke-width="2" stroke-dasharray="6,6"/>
+            <circle cx="360" cy="125" r="55" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,5"/>
+            <circle cx="360" cy="125" r="12" fill="#ff4500"/>
+
+            <!-- Connecting Wave -->
+            <path d="M 270,125 C 310,220 380,240 480,180" fill="none" stroke="#38bdf8" stroke-width="3"/>
+
+            <t\text x="20" y="155" fill="#38bdf8" font-family="sans-serif" font-size="16" font-weight="bold">Wellenraumzeit-Theorie</t\text>
+        </svg>
+    </div>
+
+    <p>
+        Diese Wellenraumzeit-Theorie beschreibt Licht als hochfrequente Gravitationswelle, die aus der Rotation von Teilchen-Antiteilchen-Paaren oder der Schwingung von Elektronen entsteht. Diese Theorie vereint die Konzepte der Quantenmechanik und Relativität, indem sie Licht als eine dynamische Raumzeitverzerrung interpretiert. Sie erklärt die Wellen- und Teilcheneigenschaften des Lichts als Ausdruck der Raumzeitkrümmungen.
+    </p>
+
+    <h2>1. Einleitung: Was ist Licht?</h2>
+    <p>
+        Licht ist seit Jahrhunderten eines der faszinierendsten Phänomene, die Wissenschaftler, Philosophen und Denker untersucht haben. Von den ersten Überlegungen zur Natur des Lichts als Welle bis hin zur Entdeckung seiner Dualität als Teilchen und Welle hat die Menschheit stetig versucht, seine wahre Natur zu begreifen. In der klassischen Physik wird Licht als elektromagnetische Welle beschrieben, die sich durch den Raum bewegt. Die Quantenmechanik ergänzt dies, indem sie Licht als eine Ansammlung von Photonen beschreibt – Teilchen mit einer bestimmten Energie und einem Spin.
+    </p>
+    <p>
+        Doch was wäre, wenn Licht mehr als nur ein Zusammenspiel elektrischer und magnetischer Felder ist? Was, wenn Licht selbst eine Form der Raumzeitdeformation darstellt – eine Gravitationswelle? Diese neue Theorie könnte nicht nur unser Verständnis von Licht verändern, sondern auch tiefergehende Fragen über die Verbindung von Gravitation und Quantenmechanik beantworten.
+    </p>
+    <p>
+        In dieser neuen Theorie wird Licht als eine hochfrequente Gravitationswelle beschrieben, die durch die schnelle Rotation von Teilchen-Antiteilchen-Paaren oder durch die starke Schwingung von Elektronen entsteht. In dieser Theorie stellen wir uns jedes <em>Teilchen als eine Raumzeitkrümmung</em> und jedes <em>Antiteilchen als eine Raumzeit-Wölbung</em> vor. Wenn diese Paare mit hoher Geschwindigkeit umeinander rotieren, erzeugen sie eine spezielle Art von Gravitationswelle, die wir als Licht wahrnehmen.
+    </p>
+    <div class="highlight-box">
+        *Dabei sind die Vertiefungen und Wölbungen eher als elektromagnetische Effekte dargestellt, die sich auf die Raumzeit auswirken, und sollten nicht direkt mit klassischer Gravitation oder Antigravitation verwechselt werden.
+    </div>
+    <p>
+        Hochfrequente Gravitationswellen könnten jedoch auch entstehen, wenn ein Elektron stark genug hin und her schwingt. Diese Wellen könnten erklären, warum das Licht der Sonne ein breites Spektrum abdeckt und wie sich die Eigenschaften des Lichts, wie Polarisation und Spin, aus einer neuen Perspektive verstehen lassen.
+    </p>
+    <p>
+        Wie bei jeder neuen Idee müssen wir jedoch offen dafür sein, dass Theorien sich weiterentwickeln. „Man sollte eine Theorie nicht vorschnell verwerfen, nur weil sie Fehler zeigt – sie könnte den Weg zu tieferem Verständnis ebnen.“ Dieser Gedanke ist der Leitfaden für die Erforschung neuer Konzepte, die bestehende Annahmen herausfordern und unser Wissen erweitern.
+    </p>
+
+    <h2>2. Das Teilchen-Antiteilchen-Konzept</h2>
+    <h3>1. Teilchen und Antiteilchen als Raumzeitdeformationen</h3>
+    <p>
+        Teilchen werden in dieser Theorie als winzige Regionen der Raumzeit betrachtet, die eine Krümmung erzeugen – eine Art „Vertiefung“ in der Raumstruktur. Antiteilchen hingegen verursachen eine entgegengesetzte „Wölbung“, die die Raumzeit in die andere Richtung verzerrt. Diese beiden Formen ergänzen sich und schaffen eine dynamische Interaktion, die die Grundlage für die Gravitationswellenbildung bildet.
+    </p>
+
+    <h3>2. Rotation und die Entstehung von Gravitationswellen</h3>
+    <p>
+        Wenn ein Teilchen und ein Antiteilchen ein Paar bilden und sich mit hoher Geschwindigkeit um ihren gemeinsamen Schwerpunkt rotieren, entsteht eine Wellenbewegung in der Raumzeit. Diese Bewegung führt zur Emission hochfrequenter Gravitationswellen, die wir als Licht wahrnehmen. Die Frequenz und Amplitude dieser Wellen hängen von der Rotationsgeschwindigkeit und der Masse der beteiligten Teilchen ab.
+    </p>
+
+    <h3>3. Schwingung von Elektronen als alternative Quelle</h3>
+    <p>
+        Neben der Rotation von Teilchen-Antiteilchen-Paaren könnte auch die starke Schwingung eines Elektrons, das durch äußere Einflüsse in Bewegung gesetzt wird, zur Erzeugung hochfrequenter Gravitationswellen führen. Diese Wellen tragen die Energie und die Eigenschaften des Lichts und manifestieren sich als elektromagnetische Strahlung.
+    </p>
+
+    <h3>4. Kohärenz und Stabilität</h3>
+    <p>
+        Die Synchronisation der Rotation mehrerer solcher Teilchen-Antiteilchen-Paare könnte zur Entstehung kohärenter Gravitationswellen führen, ähnlich wie bei der Erzeugung von kohärentem Licht in Lasern. Diese kohärenten Wellen würden eine gleichmäßige und verstärkte Emission ermöglichen, was eine stabile Lichtquelle schaffen würde.
+    </p>
+
+    <h2>3. Eigenschaften des Lichts in dieser neuen Perspektive</h2>
+    <h3>1. Wellenlänge und Frequenz</h3>
+    <p>
+        Die Drehbewegung des Teilchen-Antiteilchen-Paares beeinflusst die Wellenlänge und Frequenz des Lichts. Je schneller sich das Paar dreht, desto höher ist die Frequenz der erzeugten Gravitationswelle, was mit Licht im höheren Energiespektrum wie ultravioletter oder Röntgenstrahlung übereinstimmt. Langsamere Rotationen führen entsprechend zu niederfrequenterem Licht wie Infrarot- oder Radiowellen.
+    </p>
+
+    <h3>2. Polarisation</h3>
+    <p><strong>Wie entsteht Polarisation?</strong></p>
+    <ul>
+        <li><strong>Reflexion:</strong> Wenn Licht auf eine glatte Oberfläche trifft, wird es teilweise polarisiert, da die parallel zur Oberfläche schwingenden Komponenten stärker reflektiert werden.</li>
+        <li><strong>Brechung:</strong> Beim Durchgang durch bestimmte Kristalle (z. B. Kalkspat) kann Licht durch Doppelbrechung aufgeteilt werden.</li>
+        <li><strong>Streuung:</strong> Die Streuung an Luftmolekülen in der Atmosphäre führt zur Polarisation des Himmelslichts.</li>
+    </ul>
+
+    <p><strong>Die physikalische Interpretation in dieser Theorie:</strong></p>
+    <p>
+        Die Schwingungsrichtung der Gravitationswellen resultiert aus der Orientierung der Rotationsachse des Teilchen-Antiteilchen-Paares. Je nach Ausrichtung dieser Achse zeigt die modulierte Raumzeitwelle lineare, zirkulare oder elliptische Polarisationseigenschaften.
+    </p>
+
+    <h3>3. Streuung, Beugung, Reflexion und Brechung</h3>
+    <p>
+        Trifft das Licht auf Materie, verändert sich die Anordnung und Bewegung der rotierenden Paare. Die Wechselwirkung zwischen der Raumzeitwelle und den Teilchen des Mediums führt zu den bekannten Phänomenen wie Rayleigh-Streuung, Spaltbeugung sowie Lichtbrechung und -reflexion an Grenzflächen.
+    </p>
+
+    <h2>4. Spin von Photonen im Kont\text dieser Theorie</h2>
+    <p>
+        Der intrinsische Spin des Photons spiegelt die Drehrichtung des Paares wider:
+    </p>
+    <ul>
+        <li><strong>Rechtsdrehende Rotation:</strong> Erzeugt Photonen mit Spin $+1$ (rechtshändig).</li>
+        <li><strong>Linksdrehende Rotation:</strong> Erzeugt Photonen mit Spin $-1$ (linkshändig).</li>
+    </ul>
+    <p>
+        Da der Spin quantisiert ist, beschreibt die quantisierte Energie der Raumzeitwelle den intrinsischen Spin, wobei die Rotationssymmetrie die Ganzzahligkeit des Spins erklärt.
+    </p>
+
+    <h2>5. Weitere Eigenschaften des Lichts</h2>
+    <h3>1. Die Information in der Gravitationswelle</h3>
+    <p>
+        Jedes rotierende Paar moduliert die Raumzeit und kodiert somit energetische Strukturen, Frequenz und Polarisation als Informationsträger in der Gravitationswelle.
+    </p>
+
+    <h3>2. Wechselwirkung mit Elektronen und neue Wellen</h3>
+    <p>
+        Trifft diese Gravitationswelle auf ein Elektron, versetzt sie dieses in Schwingung (Anregung). Das angeregte Elektron emittiert wiederum neue Wellen. Dies erklärt die Absorption und Emission von Licht in Atomen auf fundamentaler gravitativer Ebene.
+    </p>
+
+    <h2>6. Vergleich mit der klassischen Physik</h2>
+    <h3>1. Das Doppelspaltexperiment</h3>
+    <p>
+        Im Doppelspaltexperiment breitet sich die Gravitationswelle ungestört aus und geht durch beide Spalten gleichzeitig (Interferenzmuster). Erst bei der punktuellen Wechselwirkung mit einem Detektor wird die Raumzeitverzerrung lokalisiert – die Energy wird übertragen und manifestiert sich als lokalisierter Impuls (Teilcheneigenschaft). Die Beobachtung lokalisiert die Raumzeitdeformation vorab und zerstört die kohärente Ausbreitung.
+    </p>
+
+    <h3>2. Quantenverschränkung</h3>
+    <p>
+        Da das Licht aus einem verschränkten Teilchen-Antiteilchen-Paar besteht, ist die im Raumzeitfeld kodierte Information nicht-lokal verknüpft. Zustandsänderungen korrelieren instantan über das gemeinsame Raumzeit-Wellenfeld.
+    </p>
+
+    <h2>7. Erweiterte Perspektive: Raumzeitgeometrie</h2>
+    <p>
+        Ein <strong>Teilchen</strong> entspricht einer Raumzeitkrümmung (Vertiefung/Singularität), während ein <strong>Antiteilchen</strong> einer Raumzeit-Wölbung entspricht. Bei der Begegnung beider Strukturen gleichen sich Krümmung und Wölbung aus (Annihilation), was zur vollständigen Umwandlung der Geometrie in freigesetzte Strahlungsenergie führt.
+    </p>
+
+    <h2>8. Energieabgabe und Annihilation</h2>
+    <p>
+        Durch die stetige Abstrahlung von Gravitationswellen verliert das rotierende Paar kinetische Energie:
+    </p>
+    <div class="math-box">
+        $$E = 2 m_e c^2 \approx 1{,}022 	\text{ MeV}$$
+    </div>
+    <p>
+        Mit nachlassender Energie verlangsamt sich die Rotation, bis das Paar sich auflöst und vollends in Strahlung übergeht.
+    </p>
+
+    <h2>9. Das Licht der Sonne</h2>
+    <p>
+        In der \textremen Umgebung des Sonnenkerns entstehen durch Kernfusion kontinuierlich unzählige Teilchen-Antiteilchen-Paare. Durch die breite Verteilung ihrer Rotationsgeschwindigkeiten emittieren sie das gesamte kontinuierliche Spektrum der Sonne – von Infrarot über sichtbares Licht bis hin zu UV- und Röntgenstrahlung.
+    </p>
+
+    <h2>10. Hochfrequente Gravitationswellen</h2>
+    <p>
+        Bewegen sich Teilchen und Antiteilchen mit nahezu Lichtgeschwindigkeit umeinander, verhindern relativistische Effekte eine sofortige klassische Explosion. Stattdessen entsteht eine hochfrequente, \textrem energiereiche Gravitationswelle, die als Brücke zwischen Quantenmechanik und Allgemeine Relativitätstheorie dient.
+    </p>
+
+    <h2>11. Konsequenzen des Modells</h2>
+    <ul>
+        <li><strong>Neues Energieverständnis:</strong> Licht als gravitative Energiequelle neben elektromagnetischen Feldern.</li>
+        <li><strong>Erweiterung der Raumzeit:</strong> Innige Verwebung von Elektromagnetismus und Gravitation.</li>
+        <li><strong>Technologische Messverfahren:</strong> Neue Möglichkeiten zur Hochpräzisionsmessung ultra-hochfrequenter Gravitationswellen.</li>
+    </ul>
+
+    <h2>12. Schlusswort & Ausblick</h2>
+    <p>
+        Licht kann je nach physikalischer Disziplin als elektromagnetische Welle, Photonenstrom oder Raumzeitkrümmung beschrieben werden. Die Wellenraumzeit-Theorie bietet eine synthetische Perspektive, die diese Welten vereint.
+    </p>
+
+    <blockquote>
+        „Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“
+        <span class="quote-author">– Thich Nhat Hanh</span>
+    </blockquote>
+
+    <h2>13. Noch offene Fragen</h2>
+    <ol>
+        <li><strong>Was ist Zeit?</strong> Ist Zeit eine Konsequenz der Wechselwirkung von Raumzeitkrümmungen und -wölbungen?</li>
+        <li><strong>Dunkle Materie & Energie:</strong> Welchen Bezug haben rotierende Paare zu dunklen Komponenten des Universums?</li>
+        <li><strong>Experimenteller Nachweis:</strong> Wie lassen sich hochfrequente Gravitationswellen im Labor oder astrophysikalisch nachweisen?</li>
+    </ol>
+
+    <h2>14. Anhang: Mathematische Herleitungen & Berechnungen</h2>
+
+    <h3>1. Elektromagnetisches Spektrum (Übersicht)</h3>
+    <ul class="spectrum-list">
+        <li><strong>Radiowellen:</strong> $3 	\times 10^3 	\text{ Hz}$ bis $3 	\times 10^8 	\text{ Hz}$</li>
+        <li><strong>Mikrowellen:</strong> $3 	\times 10^9 	\text{ Hz}$ bis $3 	\times 10^{12} 	\text{ Hz}$</li>
+        <li><strong>Infrarot:</strong> $3 	\times 10^{11} 	\text{ Hz}$ bis $4 	\times 10^{14} 	\text{ Hz}$</li>
+        <li><strong>Sichtbares Licht:</strong> $4 	\times 10^{14} 	\text{ Hz}$ bis $7{,}5 	\times 10^{14} 	\text{ Hz}$</li>
+        <li><strong>Ultraviolett:</strong> $7{,}5 	\times 10^{14} 	\text{ Hz}$ bis $3 	\times 10^{16} 	\text{ Hz}$</li>
+        <li><strong>Röntgenstrahlen:</strong> $3 	\times 10^{16} 	\text{ Hz}$ bis $3 	\times 10^{19} 	\text{ Hz}$</li>
+        <li><strong>Gammastrahlen:</strong> $10^{19} 	\text{ Hz}$ bis $10^{24} 	\text{ Hz}$</li>
+    </ul>
+
+    <h3>2. Umdrehungsfrequenz eines Positrons um ein Elektron</h3>
+    <p><strong>Modell 1: Klassische Bohr-Analogie ($v \approx 2{,}18 	\times 10^6 	\text{ m/s}, r \approx 5{,}29 	\times 10^{-11} 	\text{ m}$)</strong></p>
+    <div class="math-box">
+        $$	\text{Umfang} = 2\pi r = 2\pi 	\times 5{,}29 	\times 10^{-11} 	\text{ m} \approx 3{,}32 	\times 10^{-10} 	\text{ m}$$
+        $$f = \frac{v}{	\text{Umfang}} = \frac{2{,}18 	\times 10^6 	\text{ m/s}}{3{,}32 	\times 10^{-10} 	\text{ m}} \approx 6{,}57 	\times 10^{15} 	\text{ Umdrehungen/s}$$
+    </div>
+
+    <p><strong>Modell 2: Halber Radius ($r \approx 2{,}65 	\times 10^{-11} 	\text{ m}, v \approx 4{,}36 	\times 10^6 	\text{ m/s}$)</strong></p>
+    <div class="math-box">
+        $$	\text{Umfang} = 2\pi 	\times 2{,}65 	\times 10^{-11} 	\text{ m} \approx 1{,}67 	\times 10^{-10} 	\text{ m}$$
+        $$f = \frac{4{,}36 	\times 10^6 	\text{ m/s}}{1{,}67 	\times 10^{-10} 	\text{ m}} \approx 2{,}61 	\times 10^{16} 	\text{ Umdrehungen/s}$$
+    </div>
+
+    <h3>3. Klassischer Punktladungsradius (Herleitung)</h3>
+    <p>
+        Gleichgewicht von Zentripetalkraft und Coulomb-Anziehungskraft für ein System aus Elektron und Positron:
+    </p>
+    <div class="math-box">
+        $$\frac{m v^2}{r} = \frac{k e^2}{r^2} \implies r = \frac{k e^2}{m v^2}$$
+    </div>
+    <p>
+        Nimmt man als Grenzfall hypothetisch die Lichtgeschwindigkeit $v = c$ an:
+    </p>
+    <div class="math-box">
+        $$r = \frac{k e^2}{m c^2}$$
+    </div>
+    <p>Mit den Naturkonstanten:</p>
+    <ul>
+        <li>Coulomb-Konstante: $k = 8{,}99 	\times 10^9 	\text{ N m}^2/	\text{C}^2$</li>
+        <li>Elementarladung: $e = 1{,}602 	\times 10^{-19} 	\text{ C}$</li>
+        <li>Elektronenmasse: $m = 9{,}109 	\times 10^{-31} 	\text{ kg}$</li>
+        <li>Lichtgeschwindigkeit: $c = 2{,}998 	\times 10^8 	\text{ m/s}$</li>
+    </ul>
+
+    <div class="math-box">
+        $$r \approx \frac{(8{,}99 	\times 10^9)(1{,}602 	\times 10^{-19})^2}{(9{,}109 	\times 10^{-31})(2{,}998 	\times 10^8)^2}$$
+        $$r \approx \frac{2{,}307 	\times 10^{-28}}{8{,}187 	\times 10^{-14}} \approx 2{,}818 	\times 10^{-15} 	\text{ m}$$
+    </div>
+
+    <div class="highlight-box">
+        <strong>Ergebnis:</strong> Dieser Wert entspricht genau dem <strong>klassischen Punktladungsradius / Elektronenradius</strong>:
+        $$	\text{Klassischer Punktladungsradius } (r): \approx 2{,}818 	\times 10^{-15} 	\text{ m}$$
+    </div>
+
+    <p><strong>Dugehörige Umdrehungsfrequenz bei Lichtgeschwindigkeit $c$:</strong></p>
+    <div class="math-box">
+        $$	\text{Umfang} = 2\pi r = 2\pi 	\times 2{,}818 	\times 10^{-15} 	\text{ m} \approx 1{,}77 	\times 10^{-14} 	\text{ m}$$
+        $$f = \frac{c}{	\text{Umfang}} = \frac{3 	\times 10^8 	\text{ m/s}}{1{,}77 	\times 10^{-14} 	\text{ m}} \approx 1{,}69 	\times 10^{22} 	\text{ Hz}$$
+    </div>
+
+    <footer>
+        <p>&copy; 2024-2026 Wellenraumzeit-Theorie (WRZT) &bull; Jo D. (@juppijo)</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

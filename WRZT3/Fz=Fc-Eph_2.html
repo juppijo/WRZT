@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>WRZT – Vergleich zwischen Photonenradius und Minimalradius</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:40px;
+    background:#07131f;
+    color:#eef8ff;
+    font-family:"Segoe UI",Arial,sans-serif;
+    line-height:1.75;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+h1{
+    color:#78d9ff;
+    text-align:center;
+    margin-bottom:50px;
+}
+
+h2{
+    color:#84e5ff;
+    border-left:6px solid #45b7ff;
+    padding-left:15px;
+    margin-top:55px;
+}
+
+.box{
+    background:#102235;
+    border-radius:14px;
+    padding:22px;
+    margin-top:25px;
+    border-left:5px solid #58c7ff;
+}
+
+.math{
+    text-align:center;
+    font-size:1.18em;
+    margin:18px;
+}
+
+.result{
+    background:#173850;
+    border:2px solid #7de6ff;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    margin-top:25px;
+    font-size:1.18em;
+}
+
+.compare{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+    margin-top:40px;
+}
+
+.card{
+    background:#102235;
+    border-radius:15px;
+    padding:25px;
+    border-top:5px solid #56c5ff;
+}
+
+table{
+    width:100%;
+    margin-top:40px;
+    border-collapse:collapse;
+}
+
+th{
+    background:#214968;
+    color:white;
+    padding:15px;
+}
+
+td{
+    background:#112638;
+    border:1px solid #355978;
+    padding:15px;
+}
+
+.note{
+    margin-top:40px;
+    background:#1a3144;
+    border-left:6px solid orange;
+    border-radius:10px;
+    padding:22px;
+}
+
+.highlight{
+    color:#8df1ff;
+    font-weight:bold;
+}
+
+footer{
+    margin-top:60px;
+    text-align:center;
+    color:#7dbddc;
+}
+
+</style>
+
+<script>
+window.MathJax = {
+tex:{
+inlineMath:[['$','$'],['\\(','\\)']],
+displayMath:[['$$','$$']]
+}
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+WRZT – Vergleich zwischen Photonenradius und WRZT-Minimalradius
+</h1>
+
+<div class="box">
+
+Diese Gegenüberstellung zeigt den Zusammenhang zwischen dem
+Radius, der sich aus der Photonenenergie ergibt,
+und dem in der WRZT verwendeten Minimalradius.
+
+Der auffällige Zusammenhang besteht darin,
+dass der WRZT-Minimalradius exakt dem
+<strong>doppelten reduzierten Compton-Radius</strong> entspricht.
+
+</div>
+
+
+<h2>1. Photonenradius aus der Energie eines Elektrons</h2>
+
+Aus der Planck-Beziehung
+
+<div class="math">
+
+$$
+E_\gamma=hf
+$$
+
+</div>
+
+und
+
+<div class="math">
+
+$$
+E_\gamma=m_ec^2
+$$
+
+</div>
+
+folgt
+
+<div class="math">
+
+$$
+f=\frac{m_ec^2}{h}
+$$
+
+</div>
+
+Der Kreisradius ergibt sich aus
+
+<div class="math">
+
+$$
+r=\frac{c}{2\pi f}
+$$
+
+</div>
+
+Damit erhält man
+
+<div class="math">
+
+$$
+r_\gamma
+=
+\frac{\hbar}{m_ec}
+$$
+
+</div>
+
+<div class="result">
+
+$$
+\boxed{
+r_\gamma
+=
+\frac{\hbar}{m_ec}
+=
+3.86159268\times10^{-13}\,\text{m}
+}
+$$
+
+</div>
+
+
+<h2>2. WRZT-Minimalradius</h2>
+
+In der WRZT wird der Minimalradius über das
+Kräftegleichgewicht zwischen
+Zentrifugalkraft und Coulombkraft hergeleitet.
+
+<div class="math">
+
+$$
+F_Z=F_C
+$$
+
+</div>
+
+Die Herleitung führt auf
+
+<div class="math">
+
+$$
+R_{\min}
+=
+\frac{2\hbar}{m_ec}
+$$
+
+</div>
+
+<div class="result">
+
+$$
+\boxed{
+R_{\min}
+=
+\frac{2\hbar}{m_ec}
+=
+7.72318536\times10^{-13}\,\text{m}
+}
+$$
+
+</div>
+
+
+<h2>Vergleich</h2>
+
+<div class="compare">
+
+<div class="card">
+
+<h3>Standardphysik</h3>
+
+$$
+r_\gamma
+=
+\frac{\hbar}{m_ec}
+$$
+
+Dies ist exakt der
+
+<strong>reduzierte Compton-Radius</strong>
+
+des Elektrons.
+
+</div>
+
+<div class="card">
+
+<h3>WRZT</h3>
+
+$$
+R_{\min}
+=
+\frac{2\hbar}{m_ec}
+$$
+
+Der WRZT-Minimalradius besitzt
+
+<strong>den doppelten reduzierten
+Compton-Radius.</strong>
+
+</div>
+
+</div>
+
+
+
+<table>
+
+<tr>
+
+<th>Größe</th>
+
+<th>Wert</th>
+
+</tr>
+
+<tr>
+
+<td>Reduzierter Compton-Radius</td>
+
+<td>
+
+$$
+\frac{\hbar}{m_ec}
+=
+3.86159268\times10^{-13}\,\text{m}
+$$
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>WRZT-Minimalradius</td>
+
+<td>
+
+$$
+\frac{2\hbar}{m_ec}
+=
+7.72318536\times10^{-13}\,\text{m}
+$$
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Verhältnis</td>
+
+<td>
+
+$$
+R_{\min}=2\,r_\gamma
+$$
+
+</td>
+
+</tr>
+
+</table>
+
+
+
+<div class="note">
+
+<h2>Interpretation innerhalb der WRZT</h2>
+
+Die Standardphysik liefert aus
+
+$$
+E_\gamma=m_ec^2
+$$
+
+den reduzierten Compton-Radius
+
+$$
+r_\gamma=\frac{\hbar}{m_ec}.
+$$
+
+Die WRZT interpretiert den Minimalradius dagegen
+als charakteristische Größe eines
+Elektron-Positron-Systems.
+
+Dadurch ergibt sich
+
+$$
+R_{\min}
+=
+2\,r_\gamma.
+$$
+
+Mit anderen Worten:
+
+<div class="math">
+
+$$
+\boxed{
+R_{\min}
+=
+\frac{2\hbar}{m_ec}
+}
+$$
+
+</div>
+
+Der WRZT-Minimalradius entspricht somit
+<strong>genau dem doppelten reduzierten
+Compton-Radius.</strong>
+
+Diese Beziehung stellt innerhalb der WRZT
+eine grundlegende geometrische Eigenschaft
+des Elektron-Positron-Systems dar.
+
+</div>
+
+
+<footer>
+
+WRZT – Wellenraumzeit-Theorie • Vergleich zwischen Standardphysik und WRZT
+
+</footer>
+
+</div>
+
+</body>
+</html>
