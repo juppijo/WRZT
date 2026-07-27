@@ -32,7 +32,6 @@ const FILES = [
 {p:"WRZTNetz.html", t:"WRZT – Zusammenfassung", c:"manifest"},
 {p:"WRZT_Calc/wrzt_zusammenfassung.html", t:"Zusammenfassung der WRZNT (mit LaTeX)", c:"manifest"},
 {p:"wrzt_theorie_2.html", t:"WRZT Theorie-Seite (kurz)", c:"manifest"},
-{p:"wrztbugwelle.html", t:"WRZT - Finales Modell", c:"manifest"},
 
 {p:"WRZT3/wrzt_berechnung_g.html", t:"Wellenraumzeit-Theorie (WRZT)", c:"manifest"},
 {p:"WRZT3/Fz=Fc-Eph_2.html", t:"WRZT - Photonenradius", c:"manifest"},
@@ -157,6 +156,7 @@ const FILES = [
 {p:"wrzt_rmin1.html", t:"R_min-Simulation — Variante 2/4", c:"sim"},
 {p:"wrzt_rmin2.html", t:"R_min-Simulation — Variante 3/4", c:"sim"},
 {p:"wrzt_rmin3.html", t:"R_min-Simulation — Variante 4/4", c:"sim"},
+{p:"wrztbugwelle.html", t:"WRZT - Bugwelle", c:"sim"},
 
 // ---------- SONSTIGES ----------
 {p:"Lisa.html", t:"3D Lissajous-Figuren", c:"sonstiges", n:"⚠️ aktuell die GitHub-Pages-Startseite"},
