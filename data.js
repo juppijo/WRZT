@@ -34,6 +34,17 @@ const FILES = [
 {p:"wrzt_theorie_2.html", t:"WRZT Theorie-Seite (kurz)", c:"manifest"},
 {p:"wrztbugwelle.html", t:"WRZT - Finales Modell", c:"manifest"},
 
+{p:"WRZT3/wrzt_berechnung_g.html", t:"Wellenraumzeit-Theorie (WRZT)", c:"manifest"},
+{p:"WRZT3/Fz=Fc-Eph_2.html", t:"WRZT - Photonenradius", c:"manifest"},
+{p:"WRZT3/elektron-photon-radius-3.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/Wellenraumzeit_Theorie_Fiat_Lux.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/wrznt.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/Neu.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/Neu.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/Neu.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/Neu.html", t:"WRZT - NEU Modell", c:"manifest"},
+{p:"WRZT3/Neu.html", t:"WRZT - NEU Modell", c:"manifest"},
+
 // ---------- HERLEITUNGEN ----------
 {p:"HT/GravitationTrägheit.html", t:"Gravitation, Trägheit und Lichtgeschwindigkeit in der Wellenraumzeit (164K)", c:"herleitung", n:"umfangreichstes Kapitel"},
 {p:"HT/Wellenraumzeit.html", t:"Gravitation, Trägheit und Lichtgeschwindigkeit (92K)", c:"herleitung", n:"Duplikat/Variante von GravitationTrägheit.html"},

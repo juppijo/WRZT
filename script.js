@@ -22,6 +22,11 @@
       <div class="stat"><span class="num">${dupCount}</span><span class="lbl">erkannte Duplikate</span></div>
       <div class="stat"><span class="num">${starCount}</span><span class="lbl">Kern-Dokumente</span></div>
     `;
+    // Ergänzung in script.js innerhalb von renderStats():
+    const heroCountEl = document.getElementById('heroFileCount');
+    if (heroCountEl) {
+      heroCountEl.textContent = total;
+    }
     document.getElementById('statRow').innerHTML = html;
   }
 
