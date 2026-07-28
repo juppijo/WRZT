@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Design Studio v2.6</title>
+    <title>HTML Design Studio v2.7</title>
 
     <!-- Google Fonts Erweiterung -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -183,10 +183,17 @@
             transform: translateY(-1px);
         }
 
+        .view-toggle-btn {
+            background: var(--primary) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            box-shadow: 0 0 10px rgba(77, 163, 255, 0.4);
+        }
+
         /* Layout */
         .layout { display: flex; min-height: calc(100vh - 60px); position: relative; z-index: 1; }
 
-        /* Sidebar fixiert (scrollt nicht mehr mit) */
+        /* FIXIERTE SIDEBAR */
         .sidebar {
             width: 290px;
             padding: 18px;
@@ -194,12 +201,10 @@
             border-right: 1px solid var(--border);
             flex-shrink: 0;
             transition: transform 0.3s ease;
-
-            /* Neu: Fixierung auf Bildschirmhöhe */
             position: sticky;
-            top: 60px; /* Höhe der Topbar */
-            height: calc(100vh - 60px); /* Nimmt genau den restlichen Bildschirm ein */
-            overflow-y: auto; /* Falls der Inhalt der Sidebar mal höher als das Bild ist */
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
         }
         .sidebar h2 {
             margin-bottom: 10px;
@@ -286,7 +291,7 @@
         }
 
         /* Main Content */
-        .content { flex: 1; padding: 35px; max-width: 1150px; margin: 0 auto; }
+        .content { flex: 1; padding: 35px; max-width: 1150px; margin: 0 auto; width: 100%; }
 
         .hero {
             background: var(--gradient);
@@ -417,6 +422,87 @@
             box-shadow: 0 0 25px color-mix(in srgb, var(--primary), transparent 60%);
         }
 
+        /* ======================================================
+           SUBLIME TEXT CODE EDITOR STYLE
+        ====================================================== */
+        #editorContainer {
+            display: none;
+            flex: 1;
+            padding: 25px;
+            max-width: 1150px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sublime-editor-window {
+            background: #272822;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid #3e3d32;
+            overflow: hidden;
+            font-family: 'Fira Code', 'JetBrains Mono', monospace;
+        }
+
+        .sublime-header {
+            background: #1e1f1c;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #3e3d32;
+        }
+
+        .sublime-dots { display: flex; gap: 8px; }
+        .sublime-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .sublime-dot.red { background: #ff5f56; }
+        .sublime-dot.yellow { background: #ffbd2e; }
+        .sublime-dot.green { background: #27c93f; }
+
+        .sublime-tabs { display: flex; gap: 4px; }
+        .sublime-tab {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 5px 15px;
+            border-radius: 6px 6px 0 0;
+            font-size: 12px;
+            border: 1px solid #3e3d32;
+            border-bottom: none;
+        }
+
+        .sublime-body {
+            display: flex;
+            min-height: 550px;
+            background: #272822;
+            color: #f8f8f2;
+        }
+
+        .line-numbers {
+            width: 45px;
+            background: #1e1f1c;
+            color: #75715e;
+            padding: 15px 5px;
+            text-align: right;
+            font-size: 13px;
+            line-height: 1.5;
+            user-select: none;
+            border-right: 1px solid #3e3d32;
+        }
+
+        #codeEditor {
+            flex: 1;
+            background: transparent;
+            color: #a6e22e; /* Sublime Green Highlight */
+            border: none;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            outline: none;
+            resize: vertical;
+            white-space: pre;
+            tab-size: 4;
+        }
+
         /* Lesemodus Klasseneigenschaften */
         body.reader-mode .sidebar,
         body.reader-mode .topbar,
@@ -465,7 +551,7 @@
             }
             .toolbar.active button { width: 100%; text-align: left; }
             .layout { flex-direction: column; }
-            .sidebar { width: 100%; display: none; }
+            .sidebar { width: 100%; display: none; position: relative; top: 0; height: auto; }
             .sidebar.active { display: block; }
             .content { padding: 18px; }
             .hero h1 { font-size: 28px; }
@@ -473,9 +559,9 @@
 
         @media print {
             body { background: white !important; color: black !important; }
-            .topbar, .sidebar, footer, .mobile-menu-btn, .reader-exit-btn, #cosmosCanvas { display: none !important; }
+            .topbar, .sidebar, footer, .mobile-menu-btn, .reader-exit-btn, #cosmosCanvas, #editorContainer { display: none !important; }
             .layout { display: block !important; }
-            .content { padding: 0 !important; max-width: 100% !important; }
+            .content { padding: 0 !important; max-width: 100% !important; display: block !important; }
             .card, .demo, .hero, .formula-box {
                 background: white !important;
                 color: black !important;
@@ -500,6 +586,7 @@
         🌌 HTML Design Studio
     </div>
     <nav class="toolbar" id="topToolbar">
+        <button id="toggleViewBtn" class="view-toggle-btn">💻 Code Editor</button>
         <button id="readerModeBtn">📖 Lesemodus</button>
         <button id="printBtn">🖨 Druck / PDF</button>
         <button id="exportTheme">💾 Export</button>
@@ -511,7 +598,7 @@
 </header>
 
 <div class="layout">
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (FIXED) -->
     <aside class="sidebar" id="sidebar">
         <h2>🎨 Theme Engine</h2>
 
@@ -632,8 +719,8 @@
         </div>
     </aside>
 
-    <!-- HAUPTBEREICH -->
-    <main class="content">
+    <!-- HAUPTBEREICH: VORSCHAU -->
+    <main class="content" id="previewContainer">
         <section class="hero">
             <h1>HTML Design Studio</h1>
             <p>Ein modulares Design-System mit animierten Theme-Effekten, LaTeX-Formelunterstützung, erweiterter Typografie und Print/PDF-Export.</p>
@@ -739,10 +826,30 @@ function calculateXi(me, c, hBar) {
             </div>
         </section>
     </main>
+
+    <!-- HAUPTBEREICH: SUBLIME CODE EDITOR -->
+    <div id="editorContainer">
+        <div class="sublime-editor-window">
+            <div class="sublime-header">
+                <div class="sublime-dots">
+                    <div class="sublime-dot red"></div>
+                    <div class="sublime-dot yellow"></div>
+                    <div class="sublime-dot green"></div>
+                </div>
+                <div class="sublime-tabs">
+                    <div class="sublime-tab">index.html (Live Editor)</div>
+                </div>
+            </div>
+            <div class="sublime-body">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <textarea id="codeEditor" spellcheck="false"></textarea>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer>
-    HTML Design Studio &bull; Theme Engine v2.6
+    HTML Design Studio &bull; Theme Engine v2.7
 </footer>
 
 <!-- JAVASCRIPT ENGINE -->
@@ -767,7 +874,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("sidebar");
     const topToolbar = document.getElementById("topToolbar");
 
-    // Erweiterte Font Mapping Tabelle
+    // Editor & View Elements
+    const toggleViewBtn = document.getElementById("toggleViewBtn");
+    const previewContainer = document.getElementById("previewContainer");
+    const editorContainer = document.getElementById("editorContainer");
+    const codeEditor = document.getElementById("codeEditor");
+    const lineNumbers = document.getElementById("lineNumbers");
+
+    let isEditorMode = false;
+
+    // Font Mapping
     const fonts = {
         'inter': '"Inter", sans-serif',
         'nunito': '"Nunito", sans-serif',
@@ -787,6 +903,34 @@ document.addEventListener("DOMContentLoaded", () => {
         'pacifico': '"Pacifico", cursive',
         'lobster': '"Lobster", display'
     };
+
+    // CODE / VORSCHAU TOGGLE
+    toggleViewBtn.addEventListener("click", () => {
+        isEditorMode = !isEditorMode;
+        if (isEditorMode) {
+            codeEditor.value = previewContainer.innerHTML;
+            updateLineNumbers();
+            previewContainer.style.display = "none";
+            editorContainer.style.display = "block";
+            toggleViewBtn.innerHTML = "👁 Vorschau";
+        } else {
+            previewContainer.innerHTML = codeEditor.value;
+            editorContainer.style.display = "none";
+            previewContainer.style.display = "block";
+            toggleViewBtn.innerHTML = "💻 Code Editor";
+            if (window.MathJax) { MathJax.typesetPromise(); }
+        }
+    });
+
+    // SUBLIME EDITOR LINE NUMBERS & LIVE SYNC
+    codeEditor.addEventListener("input", () => {
+        updateLineNumbers();
+    });
+
+    function updateLineNumbers() {
+        const lines = codeEditor.value.split("\n").length;
+        lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join("<br>");
+    }
 
     // Theme Cards Auswahl
     const themeCards = document.querySelectorAll(".theme-card-btn");
