@@ -68,10 +68,17 @@
     blockCount: document.getElementById('blockCount'),
     previewFrame: document.getElementById('previewFrame'),
     themeSelect: document.getElementById('themeSelect'),
+    btnViewPreview: document.getElementById('btnViewPreview'),
+    btnViewCode: document.getElementById('btnViewCode'),
+    codeView: document.getElementById('codeView'),
+    previewWrap: document.querySelector('.preview-frame-wrap'),
+    codeWrap: document.querySelector('.code-wrap'),
   };
 
   let blocks = [];
   let currentTheme = DEFAULT_THEME;
+  let manualOverride = null; // rohe, manuell editierte HTML — überschreibt die generierte Ausgabe
+  let currentView = 'preview'; // 'preview' | 'code'
 
   // ---------- Persistenz ----------
 
@@ -143,6 +150,7 @@
   }
 
   function afterChange() {
+    manualOverride = null;
     saveToStorage();
     renderList();
     renderPreview();
@@ -260,8 +268,15 @@ ${sections || '  <!-- Keine Abschnitte -->'}
 </html>`;
   }
 
+  function getPreviewHtml() {
+    return manualOverride !== null ? manualOverride : buildMergedHtml();
+  }
+
   function renderPreview() {
-    els.previewFrame.srcdoc = buildMergedHtml();
+    els.previewFrame.srcdoc = getPreviewHtml();
+    if (currentView === 'code') {
+      els.codeView.value = getPreviewHtml();
+    }
   }
 
   function escapeHtml(str) {
@@ -275,7 +290,7 @@ ${sections || '  <!-- Keine Abschnitte -->'}
   // ---------- Speichern ----------
 
   function saveFile() {
-    const html = buildMergedHtml();
+    const html = getPreviewHtml();
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -329,6 +344,20 @@ ${sections || '  <!-- Keine Abschnitte -->'}
     };
   }
 
+  // ---------- Vorschau / Code umschalten ----------
+
+  function setView(view) {
+    currentView = view;
+    const isCode = view === 'code';
+    els.previewWrap.classList.toggle('hidden', isCode);
+    els.codeWrap.classList.toggle('hidden', !isCode);
+    els.btnViewPreview.classList.toggle('active', !isCode);
+    els.btnViewCode.classList.toggle('active', isCode);
+    if (isCode) {
+      els.codeView.value = getPreviewHtml();
+    }
+  }
+
   // ---------- Vollbild ----------
 
   function toggleFullscreen() {
@@ -357,6 +386,12 @@ ${sections || '  <!-- Keine Abschnitte -->'}
   els.themeSelect.addEventListener('change', () => {
     currentTheme = els.themeSelect.value;
     afterChange();
+  });
+  els.btnViewPreview.addEventListener('click', () => setView('preview'));
+  els.btnViewCode.addEventListener('click', () => setView('code'));
+  els.codeView.addEventListener('input', () => {
+    manualOverride = els.codeView.value;
+    els.previewFrame.srcdoc = manualOverride;
   });
 
   // ---------- Init ----------

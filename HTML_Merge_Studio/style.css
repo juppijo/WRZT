@@ -151,6 +151,73 @@ h1, h2 {
   color: var(--text-dim);
 }
 
+.pane-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border: none;
+  background: var(--bg-panel-alt);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+
+.toggle-btn + .toggle-btn {
+  border-left: 1px solid var(--border);
+}
+
+.toggle-btn:hover {
+  color: var(--text);
+}
+
+.toggle-btn.active {
+  background: var(--gold);
+  color: #1a1610;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.code-wrap {
+  flex: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+#codeView {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: none;
+  padding: 18px;
+  background: #0d0c0b;
+  color: #d8d2c4;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+#codeView:focus {
+  outline: none;
+}
+
 .theme-select {
   font-family: 'Barlow', sans-serif;
   font-size: 13px;

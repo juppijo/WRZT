@@ -42,10 +42,19 @@
     <section class="pane pane-preview">
       <div class="pane-header">
         <h2>Vorschau</h2>
-        <select id="themeSelect" class="theme-select"></select>
+        <div class="pane-header-actions">
+          <div class="view-toggle">
+            <button id="btnViewPreview" class="toggle-btn active" type="button">👁 Vorschau</button>
+            <button id="btnViewCode" class="toggle-btn" type="button">&lt;/&gt; Code</button>
+          </div>
+          <select id="themeSelect" class="theme-select"></select>
+        </div>
       </div>
       <div class="preview-frame-wrap">
         <iframe id="previewFrame" title="Vorschau der zusammengeführten Seite"></iframe>
+      </div>
+      <div class="code-wrap hidden">
+        <textarea id="codeView" spellcheck="false"></textarea>
       </div>
     </section>
 

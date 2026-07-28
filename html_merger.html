@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Merger & Workspace</title>
+    <title>HTML Merger Studio Studio v2</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -86,7 +86,7 @@
             background-color: #b91c1c;
         }
 
-        /* Main Workspace */
+        /* Workspace */
         .workspace {
             display: flex;
             flex: 1;
@@ -99,6 +99,7 @@
             flex-direction: column;
             border-right: 1px solid var(--border-color);
             background-color: var(--panel-bg);
+            width: 50%;
         }
 
         .panel:last-child {
@@ -106,7 +107,7 @@
         }
 
         .panel-header {
-            padding: 10px 15px;
+            padding: 8px 15px;
             background-color: rgba(0, 0, 0, 0.2);
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -116,7 +117,29 @@
             font-weight: 600;
         }
 
-        /* Editor Panel (Left) */
+        /* Mode Switcher Tabs */
+        .view-switcher {
+            display: flex;
+            background-color: #0f172a;
+            border-radius: 6px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #94a3b8;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Textareas & Containers */
         textarea {
             flex: 1;
             background-color: #090d16;
@@ -137,11 +160,13 @@
             justify-content: flex-end;
         }
 
-        /* Preview Panel (Right) */
-        .preview-container {
+        /* Right Area Stack */
+        .output-container {
             flex: 1;
-            background-color: #ffffff;
             position: relative;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
         }
 
         iframe {
@@ -151,7 +176,12 @@
             background-color: #ffffff;
         }
 
-        /* File Input Hide */
+        #masterCodeEditor {
+            width: 100%;
+            height: 100%;
+            display: none; /* Standardmäßig ausgeblendet */
+        }
+
         #fileInput {
             display: none;
         }
@@ -160,7 +190,7 @@
 <body>
 
     <header>
-        <h1>HTML Merger Studio</h1>
+        <h1>HTML Merger Studio v2</h1>
         <div class="action-btns">
             <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">
                 📂 HTML Laden
@@ -178,12 +208,12 @@
     </header>
 
     <div class="workspace">
-        <!-- Linkes Fenster: Eingabe -->
+        <!-- Linkes Fenster: Schnelleingabe -->
         <div class="panel">
             <div class="panel-header">
-                <span>Eingabe (Neues HTML / Code-Snippet)</span>
+                <span>Eingabe (Neues HTML / Fragment)</span>
             </div>
-            <textarea id="inputCode" placeholder="Füge hier deinen HTML-Code (inkl. <style> oder Skripten) ein..."></textarea>
+            <textarea id="inputCode" placeholder="Füge hier neuen HTML-Code (oder Snippets mit <style>) ein..."></textarea>
             <div class="editor-controls">
                 <button onclick="appendHtml()">
                     ➕ In Gesamtdokument einfügen &rArr;
@@ -191,16 +221,20 @@
             </div>
         </div>
 
-        <!-- Rechtes Fenster: Vorschau & Zusammenführung -->
+        <!-- Rechtes Fenster: Vorschau & Editierbarer Master-Code -->
         <div class="panel">
             <div class="panel-header">
-                <span>Zusammengefügtes Gesamtdokument</span>
+                <div class="view-switcher">
+                    <button id="btnViewPreview" class="tab-btn active" onclick="switchRightView('preview')">👁️ Vorschau</button>
+                    <button id="btnViewCode" class="tab-btn" onclick="switchRightView('code')">💻 Code-Editor</button>
+                </div>
                 <button class="btn-secondary" onclick="toggleFullscreen()">
                     ⛶ Vollbild
                 </button>
             </div>
-            <div class="preview-container" id="previewContainer">
+            <div class="output-container" id="outputContainer">
                 <iframe id="previewIframe"></iframe>
+                <textarea id="masterCodeEditor" placeholder="Hier steht der Gesamthandler-Code..." oninput="syncFromCodeEditor()"></textarea>
             </div>
         </div>
     </div>
@@ -214,23 +248,22 @@
 
         const inputCodeEl = document.getElementById('inputCode');
         const iframe = document.getElementById('previewIframe');
+        const masterCodeEditor = document.getElementById('masterCodeEditor');
+        
+        let currentRightView = 'preview'; // 'preview' oder 'code'
 
-        // Initialisiere die Vorschau
-        updatePreview();
+        // Initialisierung
+        updateAllOutputs();
 
-        // Extrahiert <style>-Tags und gibt den verbleibenden Body-Inhalt zurück
+        // Extrahiert <style>-Tags und Body-Inhalte
         function parseInput(rawHtml) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(rawHtml, 'text/html');
             
-            // Style-Blöcke sammeln
             const styles = Array.from(doc.querySelectorAll('style')).map(s => s.innerHTML);
-            
-            // Wenn der Nutzer ein komplettes Document eingefügt hat, nimm den Body-Inhalt
-            // Sonst nutze den gesamten Text als Fragment
             let bodyHTML = doc.body ? doc.body.innerHTML : rawHtml;
 
-            // Falls DOMParser Styles aus dem Fragment gelöscht hat (weil kein Head da war), Styles per RegEx sichern
+            // Fallback RegEx für Styles
             const styleRegEx = /<style[\s\S]*?>([\s\S]*?)<\/style>/gi;
             let match;
             while ((match = styleRegEx.exec(rawHtml)) !== null) {
@@ -239,37 +272,33 @@
                 }
             }
             
-            // Entferne <style> Tags aus dem Body Content, um Dopplungen zu vermeiden
             bodyHTML = bodyHTML.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '');
 
             return { styles, bodyHTML };
         }
 
-        // Fügt das linke Fenster zum rechten Gesamtdokument hinzu
+        // Fügt das linke Fragment rechts hinzu
         function appendHtml() {
             const rawCode = inputCodeEl.value.trim();
             if (!rawCode) return;
 
             const parsed = parseInput(rawCode);
 
-            // Styles hinzufügen
             parsed.styles.forEach(css => {
                 masterDocument.styles.push(css);
             });
 
-            // HTML Body-Inhalt anhängen
             masterDocument.bodyContent += (masterDocument.bodyContent ? "\n\n<!-- Neues Element -->\n" : "") + parsed.bodyHTML;
 
-            // Input leeren und Vorschau aktualisieren
             inputCodeEl.value = "";
-            updatePreview();
+            updateAllOutputs();
         }
 
-        // Rendert das Gesamtdokument im iFrame
+        // Generiert den vollständigen HTML-String
         function generateFullDocument() {
             const combinedStyles = masterDocument.styles.join("\n\n");
             return `<!DOCTYPE html>
-<lang="de">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -284,17 +313,58 @@ ${masterDocument.bodyContent}
 </html>`;
         }
 
-        function updatePreview() {
+        // Aktualisiert sowohl iFrame als auch Code-Editor
+        function updateAllOutputs() {
             const fullDoc = generateFullDocument();
+            
+            // 1. iFrame aktualisieren
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
             iframeDoc.open();
             iframeDoc.write(fullDoc);
             iframeDoc.close();
+
+            // 2. Editor im rechten Fenster aktualisieren
+            masterCodeEditor.value = fullDoc;
         }
 
-        // Datei speichern
+        // Wenn direkt im rechten Code-Editor getippt wird
+        function syncFromCodeEditor() {
+            const editedCode = masterCodeEditor.value;
+            
+            // iFrame direkt live aktualisieren
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(editedCode);
+            iframeDoc.close();
+
+            // Interne Struktur synchronisieren
+            const parsed = parseInput(editedCode);
+            masterDocument.styles = parsed.styles;
+            masterDocument.bodyContent = parsed.bodyHTML;
+        }
+
+        // Umschalten zwischen Vorschau und Code-Editor
+        function switchRightView(mode) {
+            currentRightView = mode;
+            const btnPreview = document.getElementById('btnViewPreview');
+            const btnCode = document.getElementById('btnViewCode');
+
+            if (mode === 'preview') {
+                iframe.style.display = 'block';
+                masterCodeEditor.style.display = 'none';
+                btnPreview.classList.add('active');
+                btnCode.classList.remove('active');
+            } else {
+                iframe.style.display = 'none';
+                masterCodeEditor.style.display = 'block';
+                btnPreview.classList.remove('active');
+                btnCode.classList.add('active');
+            }
+        }
+
+        // Datei speichern (Nimmt immer den aktuellen Stand aus dem Textarea/Master)
         function downloadCombinedHtml() {
-            const fullDoc = generateFullDocument();
+            const fullDoc = masterCodeEditor.value || generateFullDocument();
             const blob = new Blob([fullDoc], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -314,19 +384,18 @@ ${masterDocument.bodyContent}
                 const content = e.target.result;
                 const parsed = parseInput(content);
                 
-                // Speicher zurücksetzen und neue Datei laden
                 masterDocument.styles = parsed.styles;
                 masterDocument.bodyContent = parsed.bodyHTML;
                 
-                updatePreview();
+                updateAllOutputs();
             };
             reader.readAsText(file);
-            event.target.value = ''; // Reset input
+            event.target.value = '';
         }
 
-        // Vollbild umschalten für die Vorschau
+        // Vollbild umschalten für den rechten Ausgabebereich
         function toggleFullscreen() {
-            const container = document.getElementById('previewContainer');
+            const container = document.getElementById('outputContainer');
             if (!document.fullscreenElement) {
                 if (container.requestFullscreen) {
                     container.requestFullscreen();
@@ -345,7 +414,7 @@ ${masterDocument.bodyContent}
             if (confirm("Möchtest du das gesamte Dokument wirklich zurücksetzen?")) {
                 masterDocument = { styles: [], bodyContent: "" };
                 inputCodeEl.value = "";
-                updatePreview();
+                updateAllOutputs();
             }
         }
     </script>
