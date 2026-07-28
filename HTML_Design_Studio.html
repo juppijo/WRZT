@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="midnight-blue" data-font="inter" data-animation="smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Design Studio v2.6</title>
+
+    <!-- Google Fonts Erweiterung -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cinzel:wght@400;700&family=Fira+Code:wght@300;400;700&family=Inter:wght@100..900&family=JetBrains+Mono:wght@300;400;700&family=Lobster&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Montserrat:ital,wght@0,300;0,400;0,700;1,400&family=Nunito:ital,wght@0,300;0,400;0,700;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,700;1,400&family=Orbitron:wght@400;700;900&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;700&family=Roboto:ital,wght@0,300;0,400;0,700;1,400&family=Source+Code+Pro:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- MathJax für professionelle LaTeX Formeln -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* ======================================================
+           THEME ENGINE & BASIS VARIABLEN
+        ====================================================== */
+        :root {
+            --bg: #06101d;
+            --surface: #10243b;
+            --surface-2: #173654;
+            --text: #eaf5ff;
+            --text-light: #9bb8d5;
+            --primary: #4da3ff;
+            --secondary: #5ee7ff;
+            --success: #36d399;
+            --warning: #fbbf24;
+            --danger: #fb7185;
+            --border: rgba(120, 190, 255, 0.2);
+            --shadow: 0 20px 50px rgba(0,0,0,.35);
+            --radius: 18px;
+            --font-body: 'Inter', sans-serif;
+            --font-title: 'Playfair Display', serif;
+            --gradient: linear-gradient(140deg, #06101d, #12345a, #174d80);
+        }
+
+        html[data-theme="light"] {
+            --bg:#f4f7fb; --surface:#ffffff; --surface-2:#e8eef7;
+            --text:#1e293b; --text-light:#64748b; --primary:#2563eb; --secondary:#06b6d4;
+            --border:#dbe3ef; --shadow:0 15px 35px rgba(0,0,0,.12);
+            --gradient:linear-gradient(135deg, #ffffff, #eaf2ff);
+        }
+
+        html[data-theme="dark"] {
+            --bg:#111111; --surface:#1d1d1d; --surface-2:#292929;
+            --text:#f5f5f5; --text-light:#aaaaaa; --primary:#60a5fa; --secondary:#22d3ee;
+            --border:#3f3f3f; --gradient:linear-gradient(135deg, #111111, #303030);
+        }
+
+        html[data-theme="cosmos"] {
+            --bg:#05020c; --surface:#150d28; --surface-2:#281845;
+            --text:#f7f0ff; --text-light:#c6b8df; --primary:#9b87ff; --secondary:#ee7cff;
+            --border:rgba(180,140,255,.25); --gradient:linear-gradient(145deg, #05020c, #1e0d3d, #421e78);
+        }
+
+        html[data-theme="ocean"] {
+            --bg:#04151d; --surface:#0c2b38; --surface-2:#12495c;
+            --text:#eaffff; --text-light:#a5d5df; --primary:#00c8ff; --secondary:#35ffd0;
+            --border:rgba(0,200,255,.2); --gradient:linear-gradient(140deg, #04151d, #07506b, #0098b8);
+        }
+
+        html[data-theme="zen"] {
+            --bg:#edf5ef; --surface:#ffffff; --surface-2:#deeee3;
+            --text:#263b30; --text-light:#607568; --primary:#4fa978; --secondary:#8ad8ad;
+            --border:#cfe1d4; --shadow:0 15px 40px rgba(30,80,50,.15);
+            --gradient:linear-gradient(135deg, #edf5ef, #d9eee0);
+        }
+
+        html[data-theme="forest"] {
+            --bg:#07150d; --surface:#123021; --surface-2:#1c4530;
+            --text:#effff5; --text-light:#acd1bb; --primary:#55d977; --secondary:#6ee7b7;
+            --border:rgba(85,217,119,.2); --gradient:linear-gradient(140deg, #07150d, #17452c);
+        }
+
+        html[data-theme="sunset"] {
+            --bg:#28110b; --surface:#462018; --surface-2:#633124;
+            --text:#fff3ec; --text-light:#e6b6a3; --primary:#ff9147; --secondary:#ffd166;
+            --border:rgba(255,145,71,.25); --gradient:linear-gradient(140deg, #28110b, #71331f, #b85b32);
+        }
+
+        html[data-theme="ruby"] {
+            --bg:#21070d; --surface:#3b1019; --surface-2:#571622;
+            --text:#fff0f3; --text-light:#dcaeba; --primary:#ff5277; --secondary:#ff8ca5;
+            --border:rgba(255,82,119,.25); --gradient:linear-gradient(140deg, #21070d, #681b2b);
+        }
+
+        html[data-theme="parchment"] {
+            --bg:#f4eddf; --surface:#fffaf0; --surface-2:#eadcc4;
+            --text:#46372a; --text-light:#796957; --primary:#986b42; --secondary:#c99b68;
+            --border:#ddc9a7; --shadow:0 15px 35px rgba(80,50,20,.18);
+            --gradient:linear-gradient(135deg, #f4eddf, #fffaf0);
+        }
+
+        /* ======================================================
+           GRUNDLAYOUT & STYLES
+        ====================================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { min-height: 100%; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            transition: background .4s ease, color .4s ease;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Canvas für Cosmos Sternenhimmel */
+        #cosmosCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            display: none;
+        }
+        html[data-theme="cosmos"] #cosmosCanvas { display: block; }
+
+        /* Topbar & Header */
+        .topbar {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-title);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .toolbar { display: flex; gap: 6px; align-items: center; }
+        .toolbar button {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 7px 12px;
+            border-radius: calc(var(--radius) * 0.75);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all .2s ease;
+            font-size: 13px;
+        }
+        .toolbar button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Layout */
+        .layout { display: flex; min-height: calc(100vh - 60px); position: relative; z-index: 1; }
+
+        /* Sidebar fixiert (scrollt nicht mehr mit) */
+        .sidebar {
+            width: 290px;
+            padding: 18px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+
+            /* Neu: Fixierung auf Bildschirmhöhe */
+            position: sticky;
+            top: 60px; /* Höhe der Topbar */
+            height: calc(100vh - 60px); /* Nimmt genau den restlichen Bildschirm ein */
+            overflow-y: auto; /* Falls der Inhalt der Sidebar mal höher als das Bild ist */
+        }
+        .sidebar h2 {
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-family: var(--font-title);
+            font-size: 18px;
+        }
+        .sidebar label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            color: var(--text-light);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sidebar select, .sidebar input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            outline: none;
+            font-size: 13px;
+        }
+
+        /* SCHLANKERE & KLEINERE THEME CARDS */
+        .theme-cards-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .theme-card-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 6px 9px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .theme-card-btn:hover, .theme-card-btn.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px var(--border);
+            transform: translateY(-1px);
+        }
+        .theme-card-btn.active {
+            background: color-mix(in srgb, var(--primary) 20%, var(--surface-2));
+            font-weight: 700;
+        }
+        .theme-preview-dots {
+            display: flex;
+            gap: 3px;
+            flex-shrink: 0;
+            margin-left: 4px;
+        }
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Main Content */
+        .content { flex: 1; padding: 35px; max-width: 1150px; margin: 0 auto; }
+
+        .hero {
+            background: var(--gradient);
+            padding: 35px;
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .hero h1 {
+            font-family: var(--font-title);
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+        .hero p { font-size: 16px; color: var(--text-light); max-width: 750px; }
+
+        /* Grid & Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .card, .demo {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            transition: transform .3s ease, box-shadow .3s ease;
+            margin-bottom: 22px;
+        }
+        .card:hover, .demo:hover { transform: translateY(-3px); }
+
+        h2 { font-family: var(--font-title); color: var(--primary); margin-bottom: 14px; }
+
+        /* WRZT LaTeX Formelboxen */
+        .formula-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 22px;
+            margin: 18px 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .formula-box .formula-title {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .formula-box .math-display {
+            font-size: 20px;
+            margin-top: 10px;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        pre {
+            background: #05080d;
+            color: #8be9fd;
+            padding: 18px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+        }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: var(--surface-2); color: var(--primary); padding: 10px; border-bottom: 2px solid var(--border); font-size: 14px; }
+        td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 14px; }
+
+        /* Buttons & Alerts */
+        .primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+        .primary:hover { opacity: 0.9; transform: scale(1.02); }
+
+        .info, .success, .warning, .error {
+            padding: 10px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .info { background: rgba(77, 163, 255, 0.15); border-left: 4px solid var(--primary); color: var(--text); }
+        .success { background: rgba(54, 211, 153, 0.15); border-left: 4px solid var(--success); color: var(--text); }
+        .warning { background: rgba(251, 191, 36, 0.15); border-left: 4px solid var(--warning); color: var(--text); }
+        .error { background: rgba(251, 113, 133, 0.15); border-left: 4px solid var(--danger); color: var(--text); }
+
+        /* Palette */
+        .palette { display: flex; gap: 10px; }
+        .color { width: 42px; height: 42px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+        .color:nth-child(1) { background: var(--primary); }
+        .color:nth-child(2) { background: var(--secondary); }
+        .color:nth-child(3) { background: var(--success); }
+        .color:nth-child(4) { background: var(--warning); }
+        .color:nth-child(5) { background: var(--danger); }
+
+        /* Typography Grid */
+        .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .demo-font-card { background: var(--surface-2); padding: 12px; border-radius: 8px; font-size: 13px; }
+
+        /* Effekte */
+        .glass {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        }
+        .glow .card, .glow .hero, .glow .demo, .glow .formula-box {
+            box-shadow: 0 0 25px color-mix(in srgb, var(--primary), transparent 60%);
+        }
+
+        /* Lesemodus Klasseneigenschaften */
+        body.reader-mode .sidebar,
+        body.reader-mode .topbar,
+        body.reader-mode footer {
+            display: none !important;
+        }
+        body.reader-mode .content {
+            padding: 50px 20px;
+            max-width: 800px;
+        }
+        .reader-exit-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 13px;
+        }
+        body.reader-mode .reader-exit-btn { display: block; }
+
+        footer { text-align: center; padding: 25px; color: var(--text-light); border-top: 1px solid var(--border); font-size: 13px; }
+
+        /* ======================================================
+           MOBILE & PRINT STYLES
+        ====================================================== */
+        @media(max-width: 900px) {
+            .mobile-menu-btn { display: block; }
+            .toolbar { display: none; }
+            .toolbar.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                left: 0;
+                background: var(--surface);
+                padding: 12px;
+                border-bottom: 1px solid var(--border);
+            }
+            .toolbar.active button { width: 100%; text-align: left; }
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; display: none; }
+            .sidebar.active { display: block; }
+            .content { padding: 18px; }
+            .hero h1 { font-size: 28px; }
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .topbar, .sidebar, footer, .mobile-menu-btn, .reader-exit-btn, #cosmosCanvas { display: none !important; }
+            .layout { display: block !important; }
+            .content { padding: 0 !important; max-width: 100% !important; }
+            .card, .demo, .hero, .formula-box {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+                break-inside: avoid;
+            }
+            h1, h2, .formula-title { color: black !important; }
+            pre { background: #f5f5f5 !important; color: black !important; border: 1px solid #ccc; }
+            th { background: #eee !important; color: black !important; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="cosmosCanvas"></canvas>
+<button class="reader-exit-btn" id="exitReaderBtn">✕ Lesemodus beenden</button>
+
+<header class="topbar">
+    <div class="logo">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        🌌 HTML Design Studio
+    </div>
+    <nav class="toolbar" id="topToolbar">
+        <button id="readerModeBtn">📖 Lesemodus</button>
+        <button id="printBtn">🖨 Druck / PDF</button>
+        <button id="exportTheme">💾 Export</button>
+        <button id="importThemeButton">📂 Import</button>
+        <button id="resetTheme">↺ Reset</button>
+        <button id="fullscreenBtn">⛶ Vollbild</button>
+        <input type="file" id="importFile" accept=".json" hidden>
+    </nav>
+</header>
+
+<div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <h2>🎨 Theme Engine</h2>
+
+        <label>Theme Auswählen</label>
+        <div class="theme-cards-list">
+            <div class="theme-card-btn" data-theme="midnight-blue" title="Midnight Blue">
+                <span>Midnight</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#06101d"></div>
+                    <div class="dot" style="background:#4da3ff"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="cosmos" title="Cosmos">
+                <span>Cosmos</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#05020c"></div>
+                    <div class="dot" style="background:#9b87ff"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="ocean" title="Ocean">
+                <span>Ocean</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#04151d"></div>
+                    <div class="dot" style="background:#00c8ff"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="zen" title="Zen">
+                <span>Zen</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#edf5ef"></div>
+                    <div class="dot" style="background:#4fa978"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="forest" title="Forest">
+                <span>Forest</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#07150d"></div>
+                    <div class="dot" style="background:#55d977"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="sunset" title="Sunset">
+                <span>Sunset</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#28110b"></div>
+                    <div class="dot" style="background:#ff9147"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="ruby" title="Ruby">
+                <span>Ruby</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#21070d"></div>
+                    <div class="dot" style="background:#ff5277"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="parchment" title="Parchment">
+                <span>Parchment</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#f4eddf"></div>
+                    <div class="dot" style="background:#986b42"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="light" title="Light">
+                <span>Light</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#ffffff"></div>
+                    <div class="dot" style="background:#2563eb"></div>
+                </div>
+            </div>
+            <div class="theme-card-btn" data-theme="dark" title="Dark">
+                <span>Dark</span>
+                <div class="theme-preview-dots">
+                    <div class="dot" style="background:#111111"></div>
+                    <div class="dot" style="background:#60a5fa"></div>
+                </div>
+            </div>
+        </div>
+
+        <label>Haupt-Schriftart</label>
+        <select id="fontSelect">
+            <optgroup label="Sans-Serif (Modern)">
+                <option value="inter">Inter (Standard)</option>
+                <option value="nunito">Nunito (Soft & Round)</option>
+                <option value="poppins">Poppins (Geometric)</option>
+                <option value="roboto">Roboto (Clean)</option>
+                <option value="montserrat">Montserrat (Grotesque)</option>
+                <option value="open-sans">Open Sans (Neutral)</option>
+            </optgroup>
+            <optgroup label="Serif (Klassisch / Buch)">
+                <option value="playfair">Playfair Display (Elegant)</option>
+                <option value="merriweather">Merriweather (Editorial)</option>
+                <option value="lora">Lora (Contemporary Serif)</option>
+                <option value="cinzel">Cinzel (Römisch / Monumental)</option>
+            </optgroup>
+            <optgroup label="Monospace (Code / Tech)">
+                <option value="fira">Fira Code (Code)</option>
+                <option value="jetbrains">JetBrains Mono (Modern Code)</option>
+                <option value="source-code">Source Code Pro (Terminal)</option>
+            </optgroup>
+            <optgroup label="Display & Handschrift">
+                <option value="orbitron">Orbitron (Sci-Fi / Modern)</option>
+                <option value="caveat">Caveat (Handschriftlich)</option>
+                <option value="pacifico">Pacifico (Fluid Script)</option>
+                <option value="lobster">Lobster (Bold Accent)</option>
+            </optgroup>
+        </select>
+
+        <label>Eckenabrundung (Radius)</label>
+        <input type="range" id="radiusSlider" min="0" max="40" value="18">
+
+        <label>Visuelle Effekte</label>
+        <div class="toggle-group">
+            <input type="checkbox" id="glassToggle">
+            <span>Glassmorphism</span>
+        </div>
+        <div class="toggle-group">
+            <input type="checkbox" id="glowToggle">
+            <span>Glow-Einfluss</span>
+        </div>
+    </aside>
+
+    <!-- HAUPTBEREICH -->
+    <main class="content">
+        <section class="hero">
+            <h1>HTML Design Studio</h1>
+            <p>Ein modulares Design-System mit animierten Theme-Effekten, LaTeX-Formelunterstützung, erweiterter Typografie und Print/PDF-Export.</p>
+            <br>
+            <button class="primary">Start Studio</button>
+        </section>
+
+        <section class="cards">
+            <div class="card">
+                <h2>🌌 Cosmos Mode</h2>
+                <p>Features einen echten Canvas-Sternenhimmel mit funkelnden Sternen im Hintergrund.</p>
+            </div>
+            <div class="card">
+                <h2>🧮 MathJax Integration</h2>
+                <p>Native Render-Unterstützung für wissenschaftliche LaTeX-Formeln und Gleichungen.</p>
+            </div>
+            <div class="card">
+                <h2>📄 Reader & Print</h2>
+                <p>Perfekt für fokussierte Lese-Sessions oder saubere PDF-Ausdrucke.</p>
+            </div>
+        </section>
+
+        <!-- WRZT LaTeX Formeln Showcase -->
+        <section class="demo">
+            <h2>WRZT – Wissenschaftliche Formeln (LaTeX)</h2>
+
+            <div class="formula-box">
+                <span class="formula-title">WRZT Fundamental-Spannung ($\Xi$)</span>
+                <div class="math-display">
+                    $$\Xi = \frac{m_e^2 \cdot c}{4 \cdot \hbar}$$
+                </div>
+            </div>
+
+            <div class="formula-box">
+                <span class="formula-title">Lichtgeschwindigkeit-Herleitung ($c$)</span>
+                <div class="math-display">
+                    $$c = \frac{\Xi}{\eta} \cdot R_{\min} \approx 299.792.458 \text{ m/s}$$
+                </div>
+            </div>
+
+            <div class="formula-box">
+                <span class="formula-title">Minimal-Radius ($R_{\min}$) & Compton-Beziehung</span>
+                <div class="math-display">
+                    $$R_{\min} = \frac{2\hbar}{m_e \cdot c} \approx 7,716 \times 10^{-13} \text{ m}$$
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Beispiel -->
+        <section class="demo">
+            <h2>Code Syntax Highlighting</h2>
+<pre><code>const c = 299792458; // Lichtgeschwindigkeit in m/s
+const hBar = 1.054571817e-34; // Reduziertes Wirkungsquantum
+
+function calculateXi(me, c, hBar) {
+    return (Math.pow(me, 2) * c) / (4 * hBar);
+}</code></pre>
+        </section>
+
+        <!-- Typografie Gewichte -->
+        <section class="demo">
+            <h2>Schriftarten-Vorschau</h2>
+            <div class="demo-grid">
+                <div class="demo-font-card" style="font-weight: 300;">Light 300<br>WRZT Wellenraumzeit</div>
+                <div class="demo-font-card" style="font-weight: 400;">Regular 400<br>WRZT Wellenraumzeit</div>
+                <div class="demo-font-card" style="font-weight: 700;">Bold 700<br>WRZT Wellenraumzeit</div>
+            </div>
+        </section>
+
+        <!-- Tabelle -->
+        <section class="demo">
+            <h2>Fundamentalkonstanten</h2>
+            <table>
+                <thead>
+                    <tr><th>Parameter</th><th>Symbol</th><th>Wert</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ur-Spannung</td><td>$\Xi$</td><td>$5,897427 \times 10^{-19} \text{ kg/m}$</td></tr>
+                    <tr><td>Raumzeit-Trägheit</td><td>$\eta$</td><td>$4,5543 \times 10^{-31} \text{ kg}$</td></tr>
+                    <tr><td>Minimal-Radius</td><td>$R_{\min}$</td><td>$7,716 \times 10^{-13} \text{ m}$</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Alert-Komponenten -->
+        <section class="demo">
+            <h2>Status & Komponenten</h2>
+            <div class="info">ℹ Information: MathJax verarbeitet alle LaTeX-Formeln automatisch beim Wechseln.</div>
+            <div class="success">✔ Erfolg: Themes werden synchronisiert und lokal im Speicher vorgehalten.</div>
+            <div class="warning">⚠ Warnung: Die Cosmos-Animation nutzt eine HTML5 Canvas Render-Schleife.</div>
+            <div class="error">✖ Fehler: Dokument konnte nicht im PDF-Modus verarbeitet werden.</div>
+        </section>
+
+        <!-- Farbpalette -->
+        <section class="demo">
+            <h2>Aktive Farbpalette</h2>
+            <div class="palette">
+                <div class="color" title="Primary"></div>
+                <div class="color" title="Secondary"></div>
+                <div class="color" title="Success"></div>
+                <div class="color" title="Warning"></div>
+                <div class="color" title="Danger"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<footer>
+    HTML Design Studio &bull; Theme Engine v2.6
+</footer>
+
+<!-- JAVASCRIPT ENGINE -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const html = document.documentElement;
+
+    // Elemente
+    const fontSelect = document.getElementById("fontSelect");
+    const radiusSlider = document.getElementById("radiusSlider");
+    const glassToggle = document.getElementById("glassToggle");
+    const glowToggle = document.getElementById("glowToggle");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const exportBtn = document.getElementById("exportTheme");
+    const importBtn = document.getElementById("importThemeButton");
+    const importFile = document.getElementById("importFile");
+    const resetBtn = document.getElementById("resetTheme");
+    const printBtn = document.getElementById("printBtn");
+    const readerModeBtn = document.getElementById("readerModeBtn");
+    const exitReaderBtn = document.getElementById("exitReaderBtn");
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const sidebar = document.getElementById("sidebar");
+    const topToolbar = document.getElementById("topToolbar");
+
+    // Erweiterte Font Mapping Tabelle
+    const fonts = {
+        'inter': '"Inter", sans-serif',
+        'nunito': '"Nunito", sans-serif',
+        'poppins': '"Poppins", sans-serif',
+        'roboto': '"Roboto", sans-serif',
+        'montserrat': '"Montserrat", sans-serif',
+        'open-sans': '"Open Sans", sans-serif',
+        'playfair': '"Playfair Display", serif',
+        'merriweather': '"Merriweather", serif',
+        'lora': '"Lora", serif',
+        'cinzel': '"Cinzel", serif',
+        'fira': '"Fira Code", monospace',
+        'jetbrains': '"JetBrains Mono", monospace',
+        'source-code': '"Source Code Pro", monospace',
+        'orbitron': '"Orbitron", sans-serif',
+        'caveat': '"Caveat", cursive',
+        'pacifico': '"Pacifico", cursive',
+        'lobster': '"Lobster", display'
+    };
+
+    // Theme Cards Auswahl
+    const themeCards = document.querySelectorAll(".theme-card-btn");
+    themeCards.forEach(card => {
+        card.addEventListener("click", () => {
+            const theme = card.dataset.theme;
+            html.dataset.theme = theme;
+            updateActiveThemeCard(theme);
+            save();
+        });
+    });
+
+    function updateActiveThemeCard(theme) {
+        themeCards.forEach(c => {
+            c.classList.toggle("active", c.dataset.theme === theme);
+        });
+    }
+
+    // Font wechseln
+    if (fontSelect) {
+        fontSelect.addEventListener("change", () => {
+            const fontKey = fontSelect.value;
+            if (fonts[fontKey]) {
+                document.body.style.fontFamily = fonts[fontKey];
+                html.dataset.font = fontKey;
+                save();
+            }
+        });
+    }
+
+    // Radius dynamisch setzen
+    if (radiusSlider) {
+        radiusSlider.addEventListener("input", () => {
+            html.style.setProperty("--radius", radiusSlider.value + "px");
+            save();
+        });
+    }
+
+    // Glassmorphism toggle
+    if (glassToggle) {
+        glassToggle.addEventListener("change", () => {
+            toggleGlass(glassToggle.checked);
+            save();
+        });
+    }
+
+    function toggleGlass(state) {
+        document.querySelectorAll(".card, .demo, .hero, .formula-box").forEach(el => {
+            el.classList.toggle("glass", state);
+        });
+    }
+
+    // Glow toggle
+    if (glowToggle) {
+        glowToggle.addEventListener("change", () => {
+            document.body.classList.toggle("glow", glowToggle.checked);
+            save();
+        });
+    }
+
+    // Mobile Navigation Toggle
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("active");
+            topToolbar.classList.toggle("active");
+        });
+    }
+
+    // Lesemodus
+    if (readerModeBtn && exitReaderBtn) {
+        readerModeBtn.addEventListener("click", () => {
+            document.body.classList.add("reader-mode");
+        });
+        exitReaderBtn.addEventListener("click", () => {
+            document.body.classList.remove("reader-mode");
+        });
+    }
+
+    // Druck / PDF Modus
+    if (printBtn) {
+        printBtn.addEventListener("click", () => {
+            window.print();
+        });
+    }
+
+    // Vollbild
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                fullscreenBtn.innerHTML = "🡼 Beenden";
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.innerHTML = "⛶ Vollbild";
+            }
+        });
+    }
+
+    // Export als JSON-Datei
+    if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+            const settings = getSettings();
+            const blob = new Blob([JSON.stringify(settings, null, 4)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "design-studio-theme.json";
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    // Import über JSON
+    if (importBtn && importFile) {
+        importBtn.addEventListener("click", () => importFile.click());
+        importFile.addEventListener("change", () => {
+            const file = importFile.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const settings = JSON.parse(e.target.result);
+                    applySettings(settings);
+                    save();
+                } catch (err) {
+                    alert("Fehler beim Importieren der JSON-Datei.");
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    // Reset
+    if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+            localStorage.removeItem("designStudio");
+            location.reload();
+        });
+    }
+
+    // Speichern & Laden
+    function getSettings() {
+        return {
+            theme: html.dataset.theme || "midnight-blue",
+            font: fontSelect ? fontSelect.value : "inter",
+            radius: radiusSlider ? radiusSlider.value + "px" : "18px",
+            glass: glassToggle ? glassToggle.checked : false,
+            glow: glowToggle ? glowToggle.checked : false
+        };
+    }
+
+    function save() {
+        localStorage.setItem("designStudio", JSON.stringify(getSettings()));
+    }
+
+    function applySettings(settings) {
+        if (settings.theme) {
+            html.dataset.theme = settings.theme;
+            updateActiveThemeCard(settings.theme);
+        }
+        if (settings.font && fonts[settings.font]) {
+            html.dataset.font = settings.font;
+            document.body.style.fontFamily = fonts[settings.font];
+            if (fontSelect) fontSelect.value = settings.font;
+        }
+        if (settings.radius) {
+            html.style.setProperty("--radius", settings.radius);
+            if (radiusSlider) radiusSlider.value = parseInt(settings.radius);
+        }
+        if (settings.glass !== undefined) {
+            toggleGlass(settings.glass);
+            if (glassToggle) glassToggle.checked = settings.glass;
+        }
+        if (settings.glow !== undefined) {
+            document.body.classList.toggle("glow", settings.glow);
+            if (glowToggle) glowToggle.checked = settings.glow;
+        }
+    }
+
+    function load() {
+        const data = localStorage.getItem("designStudio");
+        if (data) {
+            try { applySettings(JSON.parse(data)); } catch(e){}
+        } else {
+            updateActiveThemeCard(html.dataset.theme);
+        }
+    }
+
+    load();
+
+    // ======================================================
+    // CANVAS COSMOS ANIMATED STARS ENGINE
+    // ======================================================
+    const canvas = document.getElementById("cosmosCanvas");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+    const numStars = 120;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    class Star {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 1.8 + 0.2;
+            this.alpha = Math.random();
+            this.speed = Math.random() * 0.02 + 0.005;
+        }
+        update() {
+            this.alpha += this.speed;
+            if (this.alpha >= 1 || this.alpha <= 0) {
+                this.speed = -this.speed;
+            }
+        }
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(this.alpha)})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < numStars; i++) {
+        stars.push(new Star());
+    }
+
+    function animateCosmos() {
+        if (html.dataset.theme === "cosmos") {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+        }
+        requestAnimationFrame(animateCosmos);
+    }
+    animateCosmos();
+});
+</script>
+</body>
+</html>
