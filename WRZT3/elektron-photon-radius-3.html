@@ -377,34 +377,38 @@ footer.doc-footer{
   </div>
 
   <h2 class="section-title">Zweite Herleitung: R<sub>min</sub> über das Kräftegleichgewicht F<sub>z</sub> = F<sub>C</sub></h2>
-  <p>In der WRZT wird R<sub>min</sub> alternativ nicht relativistisch (über \(v=c\)), sondern über ein <em>Kräftegleichgewicht</em> hergeleitet: Zentripetalkraft F<sub>z</sub> gleich Coulombkraft F<sub>C</sub> zwischen Elektron und Positron auf der Umlaufbahn, kombiniert mit der Drehimpulsquantisierung. Das ist eine völlig andere physikalische Bedingung als Schritt 5 — hier bestimmt nicht die Lichtgeschwindigkeit die Grenze, sondern das Kräftegleichgewicht selbst.</p>
+  <p>In der WRZT wird R<sub>min</sub> alternativ nicht relativistisch (über \(v=c\)), sondern über ein <em>Kräftegleichgewicht</em> hergeleitet: Zentripetalkraft F<sub>z</sub> gleich Coulombkraft F<sub>C</sub> zwischen Elektron und Positron auf der Umlaufbahn, kombiniert mit der Drehimpulsquantisierung. Das ist eine völlig andere physikalische Bedingung als Schritt 5 — hier bestimmt nicht die Lichtgeschwindigkeit die Grenze, sondern das Kräftegleichgewicht selbst. Als Bahnvariable dient hier durchgängig der tatsächliche Abstand \(d\) zwischen Elektron und Positron (jedes Teilchen kreist auf einer Bahn mit Radius \(d/2\) um den gemeinsamen Schwerpunkt) — so bleiben α (Lorentzkraft) und der Faktor 2 (Zwei-Teilchen-System) sauber getrennt sichtbar.</p>
 
   <div class="step">
     <div class="step-num">6a</div>
     <div class="step-body">
-      <div class="step-title">Kräftegleichgewicht ansetzen</div>
-      <p>Zentripetalkraft der reduzierten Masse \(\mu = m_e/2\) (Zwei-Körper-System Elektron–Positron) gegen die Coulombkraft bei Ladungsabstand \(2r\):</p>
-      <div class="math-block">\[ F_z = F_C \quad\Longrightarrow\quad \mu\, r\, \omega^2 = \frac{e^2}{4\pi\varepsilon_0 (2r)^2} = \frac{e^2}{16\pi\varepsilon_0 r^2} \]</div>
+      <div class="step-title">Kräftegleichgewicht ansetzen — mit α direkt in F<sub>C</sub></div>
+      <p>Zentripetalkraft auf ein Teilchen (Masse \(m_e\), Bahnradius \(d/2\)) gegen die Coulombkraft zwischen den Ladungen im Abstand \(d\). Mit \(\alpha=e^2/(4\pi\varepsilon_0\hbar c)\), also \(e^2/(4\pi\varepsilon_0)=\alpha\hbar c\), lässt sich \(F_C\) direkt über α schreiben — die Coulombkraft ist der elektrostatische Grenzfall der Lorentzkraft, und α ist genau deren Kopplungsstärke:</p>
+      <div class="math-block">\[ F_C = \frac{e^2}{4\pi\varepsilon_0\,d^2} = \frac{\alpha\hbar c}{d^2} \]</div>
+      <div class="math-block">\[ F_z = F_C \quad\Longrightarrow\quad m_e\,\frac{d}{2}\,\omega^2 = \frac{\alpha\hbar c}{d^2} \]</div>
+      <p style="color:var(--text-dim);font-size:14.5px;">Hier steht α ohne Beiwerk direkt in der Kraftgleichung — nicht erst im Endergebnis versteckt hinter \(\varepsilon_0\) und \(e^2\).</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-num">6b</div>
     <div class="step-body">
-      <div class="step-title">Drehimpulsquantisierung (Grundzustand n = 1)</div>
-      <div class="math-block">\[ L = \mu r^2 \omega = \hbar \quad\Longrightarrow\quad \omega = \frac{\hbar}{\mu r^2} \]</div>
+      <div class="step-title">Drehimpulsquantisierung — hier kommt der Faktor 2 herein</div>
+      <p>Der Gesamtdrehimpuls des Zweiteilchensystems um den Schwerpunkt wird mit der reduzierten Masse \(\mu=m_e/2\) beschrieben (zwei gleich schwere Teilchen — Elektron und Positron):</p>
+      <div class="math-block">\[ L = \mu\, d^2 \omega = \hbar,\quad \mu=\frac{m_e}{2} \quad\Longrightarrow\quad \omega = \frac{\hbar}{\mu d^2} = \frac{2\hbar}{m_e d^2} \]</div>
+      <p style="color:var(--text-dim);font-size:14.5px;">Für ein einzelnes Elektron um einen ruhenden Kern (Standard-Wasserstoff) wäre \(\mu\to m_e\) statt \(m_e/2\) — die Verdopplung hier ist exakt die Signatur des Elektron-Positron-Paares.</p>
     </div>
   </div>
 
   <div class="step">
     <div class="step-num">6c</div>
     <div class="step-body">
-      <div class="step-title">Einsetzen und nach r auflösen</div>
-      <div class="math-block">\[ \mu r \left(\frac{\hbar}{\mu r^2}\right)^{\!2} = \frac{e^2}{16\pi\varepsilon_0 r^2} \;\;\Longrightarrow\;\; \frac{\hbar^2}{\mu r} = \frac{e^2}{16\pi\varepsilon_0} \;\;\Longrightarrow\;\; r = \frac{16\pi\varepsilon_0\hbar^2}{\mu e^2} \]</div>
-      <p>Mit \(\mu = m_e/2\) eingesetzt:</p>
-      <div class="math-block">\[ R_{\min,\,F_z=F_C} = \frac{16\pi\varepsilon_0\hbar^2}{(m_e/2)\,e^2} = \frac{32\pi\varepsilon_0\hbar^2}{m_e e^2} = 2\cdot\frac{4\pi\varepsilon_0\hbar^2}{m_e e^2} = 2\,a_0 \]</div>
-      <p style="color:var(--text-dim);font-size:14.5px;">Der Ausdruck \(a_0=4\pi\varepsilon_0\hbar^2/(m_e e^2)\) ist der Bohr-Radius. Das Kräftegleichgewicht liefert also genau den <em>doppelten Bohr-Radius</em>.</p>
-      <div class="calc-line">a₀ = 4π × 8,8541878128×10⁻¹² F/m × (1,054571817×10⁻³⁴ J·s)² / (9,1093837015×10⁻³¹ kg × (1,602176634×10⁻¹⁹ C)²)
+      <div class="step-title">Einsetzen und nach d auflösen</div>
+      <div class="math-block">\[ m_e\,\frac{d}{2}\left(\frac{2\hbar}{m_e d^2}\right)^{\!2} = \frac{\alpha\hbar c}{d^2} \;\;\Longrightarrow\;\; \frac{2\hbar^2}{m_e d^3} = \frac{\alpha\hbar c}{d^2} \;\;\Longrightarrow\;\; \frac{2\hbar}{m_e d} = \alpha c \]</div>
+      <div class="math-block">\[ R_{\min,\,F_z=F_C} \;:=\; d = \frac{2\hbar}{\alpha\, m_e c} \]</div>
+      <p>Beide gesuchten Faktoren stehen jetzt sichtbar im selben Ausdruck: die <strong style="color:var(--gold-bright);">2</strong> kommt direkt aus der reduzierten Masse \(\mu=m_e/2\) (Schritt 6b, Zwei-Teilchen-System), das <strong style="color:var(--gold-bright);">α</strong> direkt aus der Lorentz-/Coulombkraft (Schritt 6a). Der Ausdruck \(a_0=\hbar/(\alpha m_e c)=4\pi\varepsilon_0\hbar^2/(m_e e^2)\) ist der Bohr-Radius, also:</p>
+      <div class="math-block">\[ R_{\min,\,F_z=F_C} = 2\,a_0 \]</div>
+      <div class="calc-line">a₀ = ħ/(α·me·c) = 1,054571817×10⁻³⁴ J·s / (7,2973525693×10⁻³ × 9,1093837015×10⁻³¹ kg × 2,99792458×10⁸ m/s)
      = 5,29177210903×10⁻¹¹ m</div>
       <div class="result">R_min,F_z=F_C = 2 · a₀ = 1,058354421806 × 10⁻¹⁰ m</div>
     </div>
@@ -430,9 +434,9 @@ footer.doc-footer{
     </div>
 
     <div class="ratio-line">\( \dfrac{r}{R_{\min,\,\mathrm{rel}}} = \dfrac{1}{2} \)</div>
-    <div class="ratio-line">\( \dfrac{R_{\min,\,F_z=F_C}}{R_{\min,\,\mathrm{rel}}} = \dfrac{2a_0}{2\hbar/(m_ec)} = \dfrac{a_0}{\hbar/(m_ec)} = \dfrac{1}{\alpha} \approx 137{,}036 \)</div>
+    <div class="ratio-line">\( \dfrac{R_{\min,\,F_z=F_C}}{R_{\min,\,\mathrm{rel}}} = \dfrac{2a_0}{2\hbar/(m_ec)} = \dfrac{2\hbar/(\alpha m_ec)}{2\hbar/(m_ec)} = \dfrac{1}{\alpha} \approx 137{,}036 \)</div>
 
-    <p style="margin-top:18px;">Beide R<sub>min</sub>-Formeln der WRZT hängen exakt über die Feinstrukturkonstante \(\alpha\) zusammen: Der über das Kräftegleichgewicht \(F_z=F_C\) hergeleitete Radius ist um den Faktor \(1/\alpha\approx137{,}036\) <strong style="color:var(--gold-bright);">größer</strong> als der relativistische R<sub>min</sub> aus Schritt 5 — er liegt auf der atomaren Skala (Bohr-Radius), während der relativistische Wert auf der Compton-Skala des Elektrons liegt. Das deckt sich mit der bekannten WRZT-Hierarchie der charakteristischen Längen \(r_0 : \lambda_C : a_0 = \alpha^2 : \alpha : 1\), bei der jede Stufe etwa den Faktor 137 zur nächsten trennt.</p>
+    <p style="margin-top:18px;">Beide R<sub>min</sub>-Formeln der WRZT hängen exakt über die Feinstrukturkonstante \(\alpha\) zusammen: Der über das Kräftegleichgewicht \(F_z=F_C\) hergeleitete Radius ist um den Faktor \(1/\alpha\approx137{,}036\) <strong style="color:var(--gold-bright);">größer</strong> als der relativistische R<sub>min</sub> aus Schritt 5 — er liegt auf der atomaren Skala (Bohr-Radius), während der relativistische Wert auf der Compton-Skala des Elektrons liegt. Das deckt sich mit der bekannten WRZT-Hierarchie der charakteristischen Längen \(r_0 : \lambda_C : a_0 = \alpha^2 : \alpha : 1\).</p>
     <p>Der aus der Photon-Elektron-Energieäquivalenz hergeleitete Radius \(r\) (Schritt 4) bleibt dabei exakt bei der Hälfte des relativistischen R<sub>min</sub>, also bei \(\alpha/2 \approx 1/274{,}07\) des Kräftegleichgewichts-Radius.</p>
   </div>
 
@@ -444,10 +448,8 @@ footer.doc-footer{
       <div class="step-title">α — die Kopplungskonstante der Lorentzkraft</div>
       <p>Die Coulombkraft \(F_C\) ist der elektrostatische Grenzfall der Lorentzkraft — genau sie taucht im Kräftegleichgewicht \(F_z=F_C\) auf (Schritt 6a), im rein relativistischen R<sub>min</sub> (Schritt 5) dagegen <strong>gar nicht</strong>: dort stehen nur \(\hbar\), \(m_e\) und \(c\), keine elektrische Ladung \(e\) und keine Feldkonstante \(\varepsilon_0\). Die Feinstrukturkonstante</p>
       <div class="math-block">\[ \alpha = \frac{e^2}{4\pi\varepsilon_0\,\hbar c} \]</div>
-      <p>ist genau die dimensionslose Kopplungsstärke dieser (Lorentz-/Coulomb-)Kraft, gemessen relativ zur relativistisch-quantenmechanischen Naturskala \(\hbar c\). Setzt man sie in den Bohr-Radius ein, löst sich das \(e^2\) und \(\varepsilon_0\) vollständig zugunsten von α auf:</p>
-      <div class="math-block">\[ a_0 = \frac{4\pi\varepsilon_0\hbar^2}{m_e e^2} = \frac{\hbar}{\alpha\, m_e c} \]</div>
-      <p>Damit lässt sich der kraftbasierte Radius direkt als relativistischer Radius <em>geteilt durch α</em> schreiben:</p>
-      <div class="math-block">\[ R_{\min,\,F_z=F_C} = 2a_0 = \frac{2\hbar}{\alpha\, m_e c} = \frac{R_{\min,\,\mathrm{rel}}}{\alpha} \]</div>
+      <p>ist genau die dimensionslose Kopplungsstärke dieser (Lorentz-/Coulomb-)Kraft, gemessen relativ zur relativistisch-quantenmechanischen Naturskala \(\hbar c\). Weil Schritt 6a \(F_C\) direkt über α ausdrückt, taucht α automatisch im Endergebnis auf — nicht erst nachträglich, sondern schon in der Kraftgleichung selbst:</p>
+      <div class="math-block">\[ R_{\min,\,F_z=F_C} = 2\,a_0 = \frac{2\hbar}{\alpha\, m_e c} = \frac{R_{\min,\,\mathrm{rel}}}{\alpha} \]</div>
       <p style="color:var(--text-dim);font-size:14.5px;">α erscheint hier also nicht zufällig, sondern weil Schritt 6 die elektromagnetische (Lorentz-)Wechselwirkung als Kraft ins Gleichgewicht einbaut, während Schritt 5 rein kinematisch (\(v=c\)) ist, ganz ohne Ladung.</p>
     </div>
   </div>
@@ -456,11 +458,9 @@ footer.doc-footer{
     <div class="step-num">7b</div>
     <div class="step-body">
       <div class="step-title">Der Faktor 2 — Elektron und Positron als Zweiteilchensystem</div>
-      <p>Der Standard-Bohr-Radius \(a_0\) beschreibt ein Elektron, das um einen (ruhenden) Kern kreist — ein Einteilchenproblem. Hier kreisen jedoch <strong>zwei gleich schwere</strong> Teilchen, Elektron und Positron, umeinander. Das bringt den Faktor 2 an zwei Stellen zugleich ins Spiel:</p>
-      <div class="math-block">\[ \mu = \frac{m_e}{2} \quad\text{(reduzierte Masse zweier gleicher Massen)}, \qquad d = 2r \quad\text{(Ladungsabstand = doppelter Bahnradius)} \]</div>
-      <p>Beide Effekte wirken in dieselbe Richtung. In Schritt 6c sieht man das direkt an der Stelle, an der \(\mu=m_e/2\) eingesetzt wird:</p>
-      <div class="math-block">\[ R_{\min,\,F_z=F_C} = \frac{16\pi\varepsilon_0\hbar^2}{\mu\, e^2} = \frac{16\pi\varepsilon_0\hbar^2}{(m_e/2)\,e^2} = 2\cdot\underbrace{\frac{4\pi\varepsilon_0\hbar^2}{m_e e^2}}_{=\,a_0} \]</div>
-      <p style="color:var(--text-dim);font-size:14.5px;">Würde man das Elektron stattdessen um einen unendlich schweren, ruhenden Kern kreisen lassen (Standard-Wasserstoffmodell), fiele \(\mu\to m_e\) und der Faktor 2 verschwände — man erhielte exakt \(a_0\) statt \(2a_0\). Der Faktor 2 ist damit unmittelbar die Signatur des Elektron-Positron-Paares (des „Undatrons") und nicht der Kopplungskonstante α zuzuschreiben.</p>
+      <p>Der Standard-Bohr-Radius \(a_0\) beschreibt ein Elektron, das um einen (unendlich schweren, ruhenden) Kern kreist — ein Einteilchenproblem. Hier kreisen jedoch <strong>zwei gleich schwere</strong> Teilchen, Elektron und Positron, umeinander. Das bringt den Faktor 2 über die reduzierte Masse ins Spiel:</p>
+      <div class="math-block">\[ \underbrace{\mu=\frac{m_e}{2}}_{\text{reduzierte Masse zweier gleicher Massen}} \;\;\Longrightarrow\;\; R_{\min,\,F_z=F_C} = \frac{\hbar}{\mu\,\alpha c} = \frac{2\hbar}{m_e\,\alpha c} = 2\,a_0 \]</div>
+      <p style="color:var(--text-dim);font-size:14.5px;">Würde stattdessen ein einzelnes Elektron um einen ruhenden Kern kreisen (Standard-Wasserstoffmodell, \(\mu\to m_e\)), verschwände der Faktor 2 — man erhielte exakt \(a_0\) statt \(2a_0\). Der Faktor 2 ist damit unmittelbar die Signatur des Elektron-Positron-Paares (des „Undatrons"), während α die Signatur der Lorentzkraft ist — beide sind unabhängige, klar unterscheidbare Ursachen, die im selben Ausdruck \(R_{\min,F_z=F_C}=2\hbar/(\alpha m_ec)\) zusammenkommen.</p>
     </div>
   </div>
 
