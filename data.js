@@ -38,11 +38,11 @@ const FILES = [
 {p:"WRZT3/elektron-photon-radius-3.html", t:"Elektron ↔ Photon", c:"manifest"},
 {p:"WRZT3/Wellenraumzeit_Theorie_Fiat_Lux.html", t:"WRZT3 - Fiat Lux", c:"manifest"},
 {p:"WRZT3/wrznt.html", t:"WRZNT", c:"manifest"},
-{p:"WRZT3/wrznt.html", t:"WRZNT -1", c:"manifest"},
-{p:"WRZT3/wrznt.html", t:"WRZNT -2", c:"manifest"},
-{p:"WRZT3/wrznt.html", t:"WRZNT -3", c:"manifest"},
-{p:"WRZT3/wrznt.html", t:"WRZNT -4", c:"manifest"},
-{p:"WRZT3/wrznt.html", t:"WRZNT -5", c:"manifest"},
+{p:"Fiat-Lux–Einheits-Manifest.html", t:"WRZNT- Fiat Manifest", c:"manifest"},
+{p:"Fiat_lux.html", t:"WRZNT - Fiat_lux", c:"manifest"},
+{p:"Index_Dashboard.html", t:"Index_Dashboard", c:"manifest"},
+{p:"Index.html", t:"Dieses Dasbord", c:"manifest"},
+{p:"WRZT3/wrznt.html", t:"WRZNT - Frei", c:"manifest"},
 
 // ---------- HERLEITUNGEN ----------
 {p:"HT/GravitationTrägheit.html", t:"Gravitation, Trägheit und Lichtgeschwindigkeit in der Wellenraumzeit (164K)", c:"herleitung", n:"umfangreichstes Kapitel"},
