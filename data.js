@@ -41,8 +41,8 @@ const FILES = [
 {p:"Fiat-Lux–Einheits-Manifest.html", t:"WRZNT- Fiat Manifest", c:"manifest"},
 {p:"Fiat_lux.html", t:"WRZNT - Fiat_lux", c:"manifest"},
 {p:"Index_Dashboard.html", t:"Index_Dashboard", c:"manifest"},
-{p:"Index.html", t:"Dieses Dasbord", c:"manifest"},
-{p:"WRZT3/wrznt.html", t:"WRZNT - Frei", c:"manifest"},
+{p:"HTML_Merge_Studio/index.html", t:"HTML Merger", c:"manifest"},
+{p:"html_merger.html", t:"HTML_Merger_Studio", c:"manifest"},
 
 // ---------- HERLEITUNGEN ----------
 {p:"HT/GravitationTrägheit.html", t:"Gravitation, Trägheit und Lichtgeschwindigkeit in der Wellenraumzeit (164K)", c:"herleitung", n:"umfangreichstes Kapitel"},
