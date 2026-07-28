@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Merger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <header class="topbar">
+    <h1>HTML <span>Merger</span></h1>
+    <div class="toolbar">
+      <button id="btnLoad" class="btn" title="Datei laden">📂 Laden</button>
+      <input type="file" id="fileInput" accept=".html,.htm" hidden>
+      <button id="btnSave" class="btn" title="Als HTML-Datei speichern">💾 Speichern</button>
+      <button id="btnClear" class="btn btn-ghost" title="Alles löschen">🗑 Leeren</button>
+      <button id="btnFullscreen" class="btn btn-gold" title="Vollbild">⛶ Vollbild</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+
+    <section class="pane pane-input">
+      <div class="pane-header">
+        <h2>HTML einfügen</h2>
+      </div>
+      <input type="text" id="blockTitle" placeholder="Titel des Abschnitts (optional)">
+      <textarea id="htmlInput" placeholder="&lt;div&gt;Deinen HTML-Code hier einfügen...&lt;/div&gt;"></textarea>
+      <button id="btnAdd" class="btn btn-gold btn-wide">+ Zur Seite hinzufügen</button>
+
+      <div class="pane-header block-list-header">
+        <h2>Abschnitte <span id="blockCount" class="count">0</span></h2>
+      </div>
+      <ul id="blockList" class="block-list"></ul>
+    </section>
+
+    <section class="pane pane-preview">
+      <div class="pane-header">
+        <h2>Vorschau</h2>
+        <select id="themeSelect" class="theme-select"></select>
+      </div>
+      <div class="preview-frame-wrap">
+        <iframe id="previewFrame" title="Vorschau der zusammengeführten Seite"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

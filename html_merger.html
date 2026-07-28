@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Merger & Workspace</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --accent-color: #0284c7;
+            --accent-hover: #0369a1;
+            --text-color: #f8fafc;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: var(--panel-bg);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button.btn-secondary {
+            background-color: #475569;
+        }
+
+        button.btn-secondary:hover {
+            background-color: #334155;
+        }
+
+        button.btn-danger {
+            background-color: #dc2626;
+        }
+
+        button.btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Main Workspace */
+        .workspace {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 57px);
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            background-color: var(--panel-bg);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Editor Panel (Left) */
+        textarea {
+            flex: 1;
+            background-color: #090d16;
+            color: #e2e8f0;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+
+        .editor-controls {
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Preview Panel (Right) */
+        .preview-container {
+            flex: 1;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #ffffff;
+        }
+
+        /* File Input Hide */
+        #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HTML Merger Studio</h1>
+        <div class="action-btns">
+            <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">
+                📂 HTML Laden
+            </button>
+            <input type="file" id="fileInput" accept=".html,.htm" onchange="loadCombinedHtml(event)">
+
+            <button class="btn-secondary" onclick="downloadCombinedHtml()">
+                💾 HTML Speichern
+            </button>
+            
+            <button class="btn-danger" onclick="clearAll()">
+                🗑️ Zurücksetzen
+            </button>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- Linkes Fenster: Eingabe -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>Eingabe (Neues HTML / Code-Snippet)</span>
+            </div>
+            <textarea id="inputCode" placeholder="Füge hier deinen HTML-Code (inkl. <style> oder Skripten) ein..."></textarea>
+            <div class="editor-controls">
+                <button onclick="appendHtml()">
+                    ➕ In Gesamtdokument einfügen &rArr;
+                </button>
+            </div>
+        </div>
+
+        <!-- Rechtes Fenster: Vorschau & Zusammenführung -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>Zusammengefügtes Gesamtdokument</span>
+                <button class="btn-secondary" onclick="toggleFullscreen()">
+                    ⛶ Vollbild
+                </button>
+            </div>
+            <div class="preview-container" id="previewContainer">
+                <iframe id="previewIframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interner Speicher für das Gesamtdokument
+        let masterDocument = {
+            styles: [],
+            bodyContent: ""
+        };
+
+        const inputCodeEl = document.getElementById('inputCode');
+        const iframe = document.getElementById('previewIframe');
+
+        // Initialisiere die Vorschau
+        updatePreview();
+
+        // Extrahiert <style>-Tags und gibt den verbleibenden Body-Inhalt zurück
+        function parseInput(rawHtml) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rawHtml, 'text/html');
+            
+            // Style-Blöcke sammeln
+            const styles = Array.from(doc.querySelectorAll('style')).map(s => s.innerHTML);
+            
+            // Wenn der Nutzer ein komplettes Document eingefügt hat, nimm den Body-Inhalt
+            // Sonst nutze den gesamten Text als Fragment
+            let bodyHTML = doc.body ? doc.body.innerHTML : rawHtml;
+
+            // Falls DOMParser Styles aus dem Fragment gelöscht hat (weil kein Head da war), Styles per RegEx sichern
+            const styleRegEx = /<style[\s\S]*?>([\s\S]*?)<\/style>/gi;
+            let match;
+            while ((match = styleRegEx.exec(rawHtml)) !== null) {
+                if (!styles.includes(match[1])) {
+                    styles.push(match[1]);
+                }
+            }
+            
+            // Entferne <style> Tags aus dem Body Content, um Dopplungen zu vermeiden
+            bodyHTML = bodyHTML.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '');
+
+            return { styles, bodyHTML };
+        }
+
+        // Fügt das linke Fenster zum rechten Gesamtdokument hinzu
+        function appendHtml() {
+            const rawCode = inputCodeEl.value.trim();
+            if (!rawCode) return;
+
+            const parsed = parseInput(rawCode);
+
+            // Styles hinzufügen
+            parsed.styles.forEach(css => {
+                masterDocument.styles.push(css);
+            });
+
+            // HTML Body-Inhalt anhängen
+            masterDocument.bodyContent += (masterDocument.bodyContent ? "\n\n<!-- Neues Element -->\n" : "") + parsed.bodyHTML;
+
+            // Input leeren und Vorschau aktualisieren
+            inputCodeEl.value = "";
+            updatePreview();
+        }
+
+        // Rendert das Gesamtdokument im iFrame
+        function generateFullDocument() {
+            const combinedStyles = masterDocument.styles.join("\n\n");
+            return `<!DOCTYPE html>
+<lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zusammengefügtes Dokument</title>
+    <style>
+${combinedStyles}
+    </style>
+</head>
+<body>
+${masterDocument.bodyContent}
+</body>
+</html>`;
+        }
+
+        function updatePreview() {
+            const fullDoc = generateFullDocument();
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(fullDoc);
+            iframeDoc.close();
+        }
+
+        // Datei speichern
+        function downloadCombinedHtml() {
+            const fullDoc = generateFullDocument();
+            const blob = new Blob([fullDoc], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zusammengefuegt.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Datei laden
+        function loadCombinedHtml(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const parsed = parseInput(content);
+                
+                // Speicher zurücksetzen und neue Datei laden
+                masterDocument.styles = parsed.styles;
+                masterDocument.bodyContent = parsed.bodyHTML;
+                
+                updatePreview();
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input
+        }
+
+        // Vollbild umschalten für die Vorschau
+        function toggleFullscreen() {
+            const container = document.getElementById('previewContainer');
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Alles zurücksetzen
+        function clearAll() {
+            if (confirm("Möchtest du das gesamte Dokument wirklich zurücksetzen?")) {
+                masterDocument = { styles: [], bodyContent: "" };
+                inputCodeEl.value = "";
+                updatePreview();
+            }
+        }
+    </script>
+</body>
+</html>
