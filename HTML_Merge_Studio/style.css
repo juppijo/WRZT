@@ -198,24 +198,41 @@ h1, h2 {
   border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--border);
+  position: relative;
 }
 
-#codeView {
-  width: 100%;
+.code-wrap .CodeMirror {
   height: 100%;
-  resize: none;
-  border: none;
-  padding: 18px;
-  background: #0d0c0b;
-  color: #d8d2c4;
   font-family: 'SFMono-Regular', Consolas, monospace;
   font-size: 13px;
   line-height: 1.55;
-  tab-size: 2;
+  background: #0d0c0b;
 }
 
-#codeView:focus {
-  outline: none;
+.code-wrap .CodeMirror-gutters {
+  background: #131211;
+  border-right: 1px solid var(--border);
+}
+
+.code-wrap .CodeMirror-linenumber {
+  color: #5c584d;
+  padding: 0 10px 0 12px;
+}
+
+.code-wrap .CodeMirror-cursor {
+  border-left: 2px solid var(--gold);
+}
+
+.code-wrap .CodeMirror-selected {
+  background: rgba(201, 162, 39, 0.18);
+}
+
+.code-wrap .cm-matchhighlight {
+  background: rgba(201, 162, 39, 0.15);
+}
+
+#codeView {
+  display: none;
 }
 
 .theme-select {

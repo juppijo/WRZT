@@ -79,6 +79,23 @@
   let currentTheme = DEFAULT_THEME;
   let manualOverride = null; // rohe, manuell editierte HTML — überschreibt die generierte Ausgabe
   let currentView = 'preview'; // 'preview' | 'code'
+  let codeEditor = null;
+
+  function initCodeEditor() {
+    codeEditor = CodeMirror.fromTextArea(els.codeView, {
+      mode: 'htmlmixed',
+      theme: 'dracula',
+      lineNumbers: true,
+      lineWrapping: true,
+      tabSize: 2,
+      indentUnit: 2,
+      viewportMargin: Infinity,
+    });
+    codeEditor.on('change', () => {
+      manualOverride = codeEditor.getValue();
+      els.previewFrame.srcdoc = manualOverride;
+    });
+  }
 
   // ---------- Persistenz ----------
 
@@ -274,8 +291,9 @@ ${sections || '  <!-- Keine Abschnitte -->'}
 
   function renderPreview() {
     els.previewFrame.srcdoc = getPreviewHtml();
-    if (currentView === 'code') {
-      els.codeView.value = getPreviewHtml();
+    if (currentView === 'code' && codeEditor) {
+      const html = getPreviewHtml();
+      if (codeEditor.getValue() !== html) codeEditor.setValue(html);
     }
   }
 
@@ -354,7 +372,9 @@ ${sections || '  <!-- Keine Abschnitte -->'}
     els.btnViewPreview.classList.toggle('active', !isCode);
     els.btnViewCode.classList.toggle('active', isCode);
     if (isCode) {
-      els.codeView.value = getPreviewHtml();
+      const html = getPreviewHtml();
+      if (codeEditor.getValue() !== html) codeEditor.setValue(html);
+      requestAnimationFrame(() => codeEditor.refresh());
     }
   }
 
@@ -389,15 +409,12 @@ ${sections || '  <!-- Keine Abschnitte -->'}
   });
   els.btnViewPreview.addEventListener('click', () => setView('preview'));
   els.btnViewCode.addEventListener('click', () => setView('code'));
-  els.codeView.addEventListener('input', () => {
-    manualOverride = els.codeView.value;
-    els.previewFrame.srcdoc = manualOverride;
-  });
 
   // ---------- Init ----------
 
   loadFromStorage();
   populateThemeSelect();
+  initCodeEditor();
   renderList();
   renderPreview();
 })();

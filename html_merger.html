@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Merger Studio Studio v2</title>
+    <title>HTML Merger Studio v3.1 (Sublime Edition)</title>
+    
+    <!-- CodeMirror Core & Monokai Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+
     <style>
         :root {
             --bg-color: #0f172a;
@@ -12,6 +17,7 @@
             --accent-hover: #0369a1;
             --text-color: #f8fafc;
             --border-color: #334155;
+            --sublime-bg: #272822;
         }
 
         * {
@@ -30,7 +36,7 @@
             overflow: hidden;
         }
 
-        /* Top Bar */
+        /* Header */
         header {
             background-color: var(--panel-bg);
             padding: 12px 20px;
@@ -66,27 +72,13 @@
             gap: 6px;
         }
 
-        button:hover {
-            background-color: var(--accent-hover);
-        }
+        button:hover { background-color: var(--accent-hover); }
+        button.btn-secondary { background-color: #475569; }
+        button.btn-secondary:hover { background-color: #334155; }
+        button.btn-danger { background-color: #dc2626; }
+        button.btn-danger:hover { background-color: #b91c1c; }
 
-        button.btn-secondary {
-            background-color: #475569;
-        }
-
-        button.btn-secondary:hover {
-            background-color: #334155;
-        }
-
-        button.btn-danger {
-            background-color: #dc2626;
-        }
-
-        button.btn-danger:hover {
-            background-color: #b91c1c;
-        }
-
-        /* Workspace */
+        /* Workspace Layout */
         .workspace {
             display: flex;
             flex: 1;
@@ -102,9 +94,7 @@
             width: 50%;
         }
 
-        .panel:last-child {
-            border-right: none;
-        }
+        .panel:last-child { border-right: none; }
 
         .panel-header {
             padding: 8px 15px;
@@ -117,7 +107,7 @@
             font-weight: 600;
         }
 
-        /* Mode Switcher Tabs */
+        /* Tabs */
         .view-switcher {
             display: flex;
             background-color: #0f172a;
@@ -139,18 +129,19 @@
             color: white;
         }
 
-        /* Textareas & Containers */
-        textarea {
-            flex: 1;
-            background-color: #090d16;
-            color: #e2e8f0;
-            border: none;
-            padding: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
+        /* CodeMirror Overrides für Höhe und Schriftart */
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
             line-height: 1.5;
-            resize: none;
-            outline: none;
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--sublime-bg);
         }
 
         .editor-controls {
@@ -158,9 +149,10 @@
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: flex-end;
+            background-color: var(--panel-bg);
         }
 
-        /* Right Area Stack */
+        /* Output Container */
         .output-container {
             flex: 1;
             position: relative;
@@ -176,21 +168,19 @@
             background-color: #ffffff;
         }
 
-        #masterCodeEditor {
+        #masterEditorWrapper {
+            display: none;
             width: 100%;
             height: 100%;
-            display: none; /* Standardmäßig ausgeblendet */
         }
 
-        #fileInput {
-            display: none;
-        }
+        #fileInput { display: none; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>HTML Merger Studio v2</h1>
+        <h1>HTML Merger Studio v3.1 <span style="font-size:0.7em; color:#a6e22e;">[Sublime Monokai]</span></h1>
         <div class="action-btns">
             <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">
                 📂 HTML Laden
@@ -208,12 +198,16 @@
     </header>
 
     <div class="workspace">
-        <!-- Linkes Fenster: Schnelleingabe -->
+        <!-- Linkes Fenster: Eingabe -->
         <div class="panel">
             <div class="panel-header">
                 <span>Eingabe (Neues HTML / Fragment)</span>
             </div>
-            <textarea id="inputCode" placeholder="Füge hier neuen HTML-Code (oder Snippets mit <style>) ein..."></textarea>
+            
+            <div class="editor-container">
+                <textarea id="inputCode"></textarea>
+            </div>
+
             <div class="editor-controls">
                 <button onclick="appendHtml()">
                     ➕ In Gesamtdokument einfügen &rArr;
@@ -221,7 +215,7 @@
             </div>
         </div>
 
-        <!-- Rechtes Fenster: Vorschau & Editierbarer Master-Code -->
+        <!-- Rechtes Fenster: Vorschau & Editierbarer Code -->
         <div class="panel">
             <div class="panel-header">
                 <div class="view-switcher">
@@ -234,28 +228,63 @@
             </div>
             <div class="output-container" id="outputContainer">
                 <iframe id="previewIframe"></iframe>
-                <textarea id="masterCodeEditor" placeholder="Hier steht der Gesamthandler-Code..." oninput="syncFromCodeEditor()"></textarea>
+                
+                <div class="editor-container" id="masterEditorWrapper">
+                    <textarea id="masterCodeEditor"></textarea>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+
     <script>
-        // Interner Speicher für das Gesamtdokument
-        let masterDocument = {
-            styles: [],
-            bodyContent: ""
-        };
+        let masterDocument = { styles: [], bodyContent: "" };
 
-        const inputCodeEl = document.getElementById('inputCode');
         const iframe = document.getElementById('previewIframe');
-        const masterCodeEditor = document.getElementById('masterCodeEditor');
-        
-        let currentRightView = 'preview'; // 'preview' oder 'code'
+        const masterEditorWrapper = document.getElementById('masterEditorWrapper');
 
-        // Initialisierung
-        updateAllOutputs();
+        // Initialize CodeMirror Editors
+        const inputEditor = CodeMirror.fromTextArea(document.getElementById("inputCode"), {
+            mode: "htmlmixed",
+            theme: "monokai",
+            lineNumbers: true,
+            lineWrapping: true,
+            tabSize: 2
+        });
 
-        // Extrahiert <style>-Tags und Body-Inhalte
+        const masterEditor = CodeMirror.fromTextArea(document.getElementById("masterCodeEditor"), {
+            mode: "htmlmixed",
+            theme: "monokai",
+            lineNumbers: true,
+            lineWrapping: true,
+            tabSize: 2
+        });
+
+        // Event: Live sync when typing in master editor
+        masterEditor.on("change", function(cm, changeObj) {
+            if (changeObj.origin !== "setValue") {
+                const editedCode = masterEditor.getValue();
+                
+                // Update iFrame live
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(editedCode);
+                iframeDoc.close();
+
+                // Sync internal structure
+                const parsed = parseInput(editedCode);
+                masterDocument.styles = parsed.styles;
+                masterDocument.bodyContent = parsed.bodyHTML;
+            }
+        });
+
+        // Parse HTML Code
         function parseInput(rawHtml) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(rawHtml, 'text/html');
@@ -263,7 +292,6 @@
             const styles = Array.from(doc.querySelectorAll('style')).map(s => s.innerHTML);
             let bodyHTML = doc.body ? doc.body.innerHTML : rawHtml;
 
-            // Fallback RegEx für Styles
             const styleRegEx = /<style[\s\S]*?>([\s\S]*?)<\/style>/gi;
             let match;
             while ((match = styleRegEx.exec(rawHtml)) !== null) {
@@ -277,9 +305,9 @@
             return { styles, bodyHTML };
         }
 
-        // Fügt das linke Fragment rechts hinzu
+        // Append Fragment
         function appendHtml() {
-            const rawCode = inputCodeEl.value.trim();
+            const rawCode = inputEditor.getValue().trim();
             if (!rawCode) return;
 
             const parsed = parseInput(rawCode);
@@ -290,11 +318,11 @@
 
             masterDocument.bodyContent += (masterDocument.bodyContent ? "\n\n<!-- Neues Element -->\n" : "") + parsed.bodyHTML;
 
-            inputCodeEl.value = "";
+            inputEditor.setValue("");
             updateAllOutputs();
         }
 
-        // Generiert den vollständigen HTML-String
+        // Generate full HTML
         function generateFullDocument() {
             const combinedStyles = masterDocument.styles.join("\n\n");
             return `<!DOCTYPE html>
@@ -313,58 +341,42 @@ ${masterDocument.bodyContent}
 </html>`;
         }
 
-        // Aktualisiert sowohl iFrame als auch Code-Editor
+        // Update Outputs
         function updateAllOutputs() {
             const fullDoc = generateFullDocument();
             
-            // 1. iFrame aktualisieren
+            // iFrame update
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
             iframeDoc.open();
             iframeDoc.write(fullDoc);
             iframeDoc.close();
 
-            // 2. Editor im rechten Fenster aktualisieren
-            masterCodeEditor.value = fullDoc;
+            // CodeMirror Master Editor update
+            masterEditor.setValue(fullDoc);
         }
 
-        // Wenn direkt im rechten Code-Editor getippt wird
-        function syncFromCodeEditor() {
-            const editedCode = masterCodeEditor.value;
-            
-            // iFrame direkt live aktualisieren
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            iframeDoc.open();
-            iframeDoc.write(editedCode);
-            iframeDoc.close();
-
-            // Interne Struktur synchronisieren
-            const parsed = parseInput(editedCode);
-            masterDocument.styles = parsed.styles;
-            masterDocument.bodyContent = parsed.bodyHTML;
-        }
-
-        // Umschalten zwischen Vorschau und Code-Editor
+        // Switch View
         function switchRightView(mode) {
-            currentRightView = mode;
             const btnPreview = document.getElementById('btnViewPreview');
             const btnCode = document.getElementById('btnViewCode');
 
             if (mode === 'preview') {
                 iframe.style.display = 'block';
-                masterCodeEditor.style.display = 'none';
+                masterEditorWrapper.style.display = 'none';
                 btnPreview.classList.add('active');
                 btnCode.classList.remove('active');
             } else {
                 iframe.style.display = 'none';
-                masterCodeEditor.style.display = 'block';
+                masterEditorWrapper.style.display = 'block';
                 btnPreview.classList.remove('active');
                 btnCode.classList.add('active');
+                masterEditor.refresh(); // Refresh layout when visible
             }
         }
 
-        // Datei speichern (Nimmt immer den aktuellen Stand aus dem Textarea/Master)
+        // Download
         function downloadCombinedHtml() {
-            const fullDoc = masterCodeEditor.value || generateFullDocument();
+            const fullDoc = masterEditor.getValue() || generateFullDocument();
             const blob = new Blob([fullDoc], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -374,7 +386,7 @@ ${masterDocument.bodyContent}
             URL.revokeObjectURL(url);
         }
 
-        // Datei laden
+        // Load
         function loadCombinedHtml(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -393,7 +405,7 @@ ${masterDocument.bodyContent}
             event.target.value = '';
         }
 
-        // Vollbild umschalten für den rechten Ausgabebereich
+        // Fullscreen
         function toggleFullscreen() {
             const container = document.getElementById('outputContainer');
             if (!document.fullscreenElement) {
@@ -409,14 +421,17 @@ ${masterDocument.bodyContent}
             }
         }
 
-        // Alles zurücksetzen
+        // Clear All
         function clearAll() {
             if (confirm("Möchtest du das gesamte Dokument wirklich zurücksetzen?")) {
                 masterDocument = { styles: [], bodyContent: "" };
-                inputCodeEl.value = "";
+                inputEditor.setValue("");
                 updateAllOutputs();
             }
         }
+
+        // Initial render
+        updateAllOutputs();
     </script>
 </body>
 </html>
