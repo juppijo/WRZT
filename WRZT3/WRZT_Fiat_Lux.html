@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WRZT - Fiat Lux – Licht als hochfrequente Gravitationswelle</title>
+    <link rel="icon" type="image/png" href="favicon.png">
 
     <!-- MathJax for rendering LaTeX equations -->
     <script>
@@ -175,10 +176,18 @@
         }
 
         header {
-            border-bottom: 2px solid var(--accent-cyan);
+            border-bottom: 1.8px solid var(--accent-cyan);
             padding-bottom: 30px;
             margin-bottom: 40px;
             text-align: center;
+        }
+
+        /* Formatierung für das kleine Titelbild */
+        .header-img {
+            height: 190px;          
+            width: auto;
+            border-radius: 4px;      /* Leicht abgerundete Ecken */
+            object-fit: cover;
         }
 
         .meta-tag {
@@ -373,7 +382,7 @@
 
     <!-- Fixed Toolbar -->
     <div class="toolbar">
-        <div class="toolbar-title">WRZT — Wellenraumzeit-Theorie</div>
+        <div class="toolbar-title">🌌 WRZT — Wellenraumzeit-Theorie 🌀</div>
         <div class="controls">
             <label for="themeSelect" style="font-size: 0.85rem; font-weight: 600;">Design:</label>
             <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
@@ -386,9 +395,12 @@
     </div>
 
     <header>
-        <div class="meta-tag">Wellenraumzeit-Theorie (WRZT)</div>
-        <h1 class="fiat-lux">Fiat Lux</h1>
-        <div class="subtitle">„Es Werde Licht“ – Licht: Eine neue Perspektive</div>
+        <div class="meta-tag">🌌 Wellenraumzeit-Theorie (WRZT) 🌀</div>
+        
+        <h1 class="fiat-lux">💡 Fiat Lux</h1>
+        <img src="titelbild.jpeg" alt="Titelbild" class="header-img">
+
+        <div class="subtitle">„Es Werde Licht“ – Licht: Eine neue Perspektive </div>
         <div class="author-info">
             <span>Vers 1.0 (08-11-2024)</span>
             <span>Vers 2.0 (02-08-2026)</span>
