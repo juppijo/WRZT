@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT – Wellenraumzeit-Theorie: Einleitung & Grundlagen</title>
+    <!-- MathJax for rendering LaTeX equations -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            /* Theme 1: Cyan / Turquoise Light (Default - User Preference) */
+            --bg-primary: #e6f4f8;
+            --bg-card: #ffffff;
+            --text-primary: #0f2c3b;
+            --text-secondary: #3a6073;
+            --accent-color: #008b8b;
+            --accent-hover: #006666;
+            --border-color: #b2d8d8;
+            --highlight-bg: #d0efff;
+            --header-bg: linear-gradient(135deg, #008b8b 0%, #164e63 100%);
+            --header-text: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 139, 139, 0.15);
+        }
+
+        [data-theme="dark-space"] {
+            /* Theme 2: Deep Space Dark */
+            --bg-primary: #0b1120;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border-color: #334155;
+            --highlight-bg: #0f172a;
+            --header-bg: linear-gradient(135deg, #0284c7 0%, #1e1b4b 100%);
+            --header-text: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="paper-classic"] {
+            /* Theme 3: Scientific Paper Classic */
+            --bg-primary: #fcfbf9;
+            --bg-card: #ffffff;
+            --text-primary: #1c1917;
+            --text-secondary: #44403c;
+            --accent-color: #78350f;
+            --accent-hover: #451a03;
+            --border-color: #e7e5e4;
+            --highlight-bg: #f5f5f4;
+            --header-bg: linear-gradient(135deg, #451a03 0%, #78350f 100%);
+            --header-text: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Fixed Navigation Toolbar */
+        .toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--bg-card);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            letter-spacing: 0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-select, .btn-fullscreen {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .btn-fullscreen {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-fullscreen:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 960px;
+            margin: 90px auto 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Header / Banner */
+        .header-banner {
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-banner h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .header-banner h2 {
+            font-size: 1.4rem;
+            font-weight: 400;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .header-meta {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Section Cards */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        h2.section-title {
+            color: var(--accent-color);
+            font-size: 1.6rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        h3.subsection-title {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            text-align: justify;
+        }
+
+        /* Quote Callout */
+        .quote-box {
+            background-color: var(--highlight-bg);
+            border-left: 5px solid var(--accent-color);
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        /* Formula Display Box */
+        .formula-box {
+            background-color: var(--highlight-bg);
+            border: 1px dashed var(--accent-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background-color: var(--highlight-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .toc h3 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 0.4rem;
+        }
+
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-title">WRZT — Wellenraumzeit-Theorie</div>
+        <div class="controls">
+            <label for="themeSelect" style="font-size: 0.85rem; font-weight: 600;">Design:</label>
+            <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
+                <option value="cyan-light">Cyan-Türkis (Standard)</option>
+                <option value="dark-space">Deep Space (Dunkel)</option>
+                <option value="paper-classic">Klassisch (Papier)</option>
+            </select>
+            <button class="btn-fullscreen" onclick="toggleFullScreen()">Vollbild Mode ⛶</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header Banner -->
+        <header class="header-banner">
+            <h1>Fiat Lux – Es Werde Licht</h1>
+            <h2>Das Einheits-Manifest der Wellenraumzeit-Theorie (WRZT)</h2>
+            <div class="header-meta">
+                Version 2.0 (Neufassung) | Datum: 08.11.2024 / Aktualisiert 2026 | Autor: Jo D. (@juppijo)
+            </div>
+        </header>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>Inhaltsverzeichnis (Kapitelübersicht)</h3>
+            <ul>
+                <li><a href="#sec1">1. Einleitung: Was ist Licht?</a></li>
+                <li><a href="#sec2">2. Das Teilchen-Antiteilchen-Konzept</a></li>
+                <li><a href="#sec3">3. Eigenschaften des Lichts in dieser neuen Perspektive</a></li>
+                <li><a href="#sec4">4. Spin von Photonen im Kontext der Theorie</a></li>
+                <li><a href="#sec5">5. Weitere Eigenschaften: Information & Wechselwirkung</a></li>
+                <li><a href="#sec6">6. Vergleich mit der klassischen Quantenphysik</a></li>
+                <li><a href="#sec7">7. Erweiterte Perspektive: Raumzeitkrümmung vs. Raumzeit-Wölbung</a></li>
+                <li><a href="#sec8">8. Energieabgabe & Annihilation</a></li>
+                <li><a href="#sec9">9. Das Licht der Sonne</a></li>
+                <li><a href="#sec10">10. Hochfrequente Gravitationswellen durch schnelle Rotation</a></li>
+                <li><a href="#sec11">11. Konsequenzen des Modells</a></li>
+                <li><a href="#sec12">12. Schlusswort</a></li>
+                <li><a href="#sec13">13. Zusammenfassung der Beschreibungsformen</a></li>
+                <li><a href="#sec14">14. Offene Fragen & Ausblick</a></li>
+                <li><a href="#sec15">15. Anhang & Mathematische Herleitungen</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content Cards -->
+        
+        <!-- Section 1 -->
+        <section id="sec1" class="card">
+            <h2 class="section-title">1. Einleitung: Was ist Licht?</h2>
+            <p>
+                Licht ist seit Jahrhunderten eines der faszinierendsten Phänomene, die Wissenschaftler, Philosophen und Denker untersucht haben. Von den ersten Überlegungen zur Natur des Lichts als Welle bis hin zur Entdeckung seiner Dualität als Teilchen und Welle hat die Menschheit stetig versucht, seine wahre Natur zu begreifen. In der klassischen Physik wird Licht als elektromagnetische Welle beschrieben, die sich durch den Raum bewegt. Die Quantenmechanik ergänzt dies, indem sie Licht als eine Ansammlung von Photonen beschreibt – Teilchen mit einer bestimmten Energie und einem Spin.
+            </p>
+            <p>
+                Doch was wäre, wenn Licht mehr als nur ein Zusammenspiel elektrischer und magnetischer Felder ist? Was, wenn Licht selbst eine Form der Raumzeitdeformation darstellt – eine <strong>hochfrequente Gravitationswelle</strong>? Diese neue Theorie könnte nicht nur unser Verständnis von Licht verändern, sondern auch tiefergehende Fragen über die Verbindung von Gravitation und Quantenmechanik beantworten.
+            </p>
+            <p>
+                In dieser Wellenraumzeit-Theorie (WRZT) wird Licht als eine hochfrequente Gravitationswelle beschrieben, die durch die schnelle Rotation von Teilchen-Antiteilchen-Paaren oder durch die starke Schwingung von Elektronen entsteht.
+            </p>
+            <div class="quote-box">
+                "In dieser Theorie stellen wir uns jedes Teilchen als eine Raumzeitkrümmung und jedes Antiteilchen als eine Raumzeit-Wölbung vor. Wenn diese Paare mit hoher Geschwindigkeit umeinander rotieren, erzeugen sie eine spezielle Art von Gravitationswelle, die wir als Licht wahrnehmen."
+            </div>
+            <p>
+                <em>Hinweis:</em> Dabei sind die Vertiefungen und Wölbungen eher elektromagnetische Effekte dargestellt, die sich auf die Raumzeit auswirken, und sollten nicht direkt mit makroskopischer Gravitation oder Antigravitation verwechselt werden.
+            </p>
+            <p>
+                Wie bei jeder neuen Idee müssen wir offen dafür sein, dass Theorien sich weiterentwickeln:
+            </p>
+            <div class="quote-box">
+                „Man sollte eine Theorie nicht vorschnell verwerfen, nur weil sie Fehler zeigt – sie könnte den Weg zu tieferem Verständnis ebnen.“
+            </div>
+            <p>
+                Darüber hinaus bettet diese Theorie das Licht so in die Raumzeitstruktur ein, dass Phänomene wie Energieabgabe, Brechung, der Phasenwinkel $\theta$ und die Fundamentalkonstanten ($\Xi$, $\eta$, $R_{\min}$) auf eine gemeinsame geometrische Ursache zurückgeführt werden.
+            </p>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="sec2" class="card">
+            <h2 class="section-title">2. Das Teilchen-Antiteilchen-Konzept</h2>
+            <h3 class="subsection-title">2.1 Deformationen der Raumzeit</h3>
+            <p>
+                Teilchen werden in dieser Theorie als winzige Regionen der Raumzeit betrachtet, die eine lokale Krümmung erzeugen – eine Art „Vertiefung“ in der Raumstruktur. Antiteilchen hingegen verursachen eine entgegengesetzte „Wölbung“. Diese beiden Formen ergänzen sich und schaffen eine dynamische Interaktion, die die Grundlage für die Gravitationswellenbildung bildet.
+            </p>
+
+            <h3 class="subsection-title">2.2 Rotation und Wellenemission</h3>
+            <p>
+                Wenn ein Teilchen und ein Antiteilchen ein Paar bilden und sich mit hoher Geschwindigkeit um ihren gemeinsamen Schwerpunkt rotieren, entsteht eine fortlaufende Schwingung in der Raumzeit. Die Frequenz $f$ und die Energie $E$ dieser Wellen sind direkt an die Rotationsfrequenz gekoppelt.
+            </p>
+
+            <h3 class="subsection-title">2.3 Elektronenschwingung als alternative Quelle</h3>
+            <p>
+                Neben der Paar-Rotation führt auch die starke Schwingung eines einzelnen Elektrons im Atombund zu einer periodischen Deformation der Raumzeit, wodurch hochfrequente Wellen emittiert werden.
+            </p>
+
+            <h3 class="subsection-title">2.4 Kohärenz und Stabilität</h3>
+            <p>
+                Die Synchronisation der Rotation mehrerer solcher Teilchen-Antiteilchen-Paare erzeugt kohärente Gravitationswellen – analog zur Erzeugung von kohärentem Licht in Lasern.
+            </p>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="sec3" class="card">
+            <h2 class="section-title">3. Eigenschaften des Lichts in dieser neuen Perspektive</h2>
+            <h3 class="subsection-title">3.1 Wellenlänge und Frequenz</h3>
+            <p>
+                Je schneller sich das rotierende Paar bewegt, desto höher ist die Frequenz der erzeugten Gravitationswelle. Dies deckt das gesamte elektromagnetische Spektrum ab – von Infrarot bis hin zu Röntgen- und Gammastrahlung.
+            </p>
+
+            <h3 class="subsection-title">3.2 Polarisation</h3>
+            <p>
+                Die Polarisation ergibt sich direkt aus der räumlichen Orientierung der Rotationsachse des Paares. Eine Schwingung in einer Ebene erzeugt lineare Polarisation, während eine präzedierende Achse zirkulare oder elliptische Polarisation bewirkt.
+            </p>
+
+            <h3 class="subsection-title">3.3 Streuung, Beugung, Reflexion & Brechung</h3>
+            <p>
+                Trifft die rotierende Raumzeitwelle auf Materie, passt das Teilchen-Antiteilchen-Paar seine Bewegungsdynamik an die Umgebung an. Die Übergänge zwischen Medien entsprechen Änderungen im lokalen Krümmungswiderstand der Raumzeit.
+            </p>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="sec4" class="card">
+            <h2 class="section-title">4. Spin von Photonen im Kontext der Theorie</h2>
+            <p>
+                Der intrinsische Spin des Photons ($\pm 1$) wird in diesem Modell als Repräsentation der Drehrichtung der rotierenden Paar-Komponenten erklärt:
+            </p>
+            <ul>
+                <li><strong>Rechtsdrehende Rotation:</strong> Photonen mit Spin $+1$ (rechtshändig).</li>
+                <li><strong>Linksdrehende Rotation:</strong> Photonen mit Spin $-1$ (linkshändig).</li>
+            </ul>
+            <p>
+                Da die Quantisierung der Energie an die Raumzeit-Trägheit $\eta$ gebunden ist, bleibt auch der quantisierte Drehimpuls strikt auf ganzzahlige Werte beschränkt.
+            </p>
+        </section>
+
+        <!-- Section 15 Anhang -->
+        <section id="sec15" class="card">
+            <h2 class="section-title">15. Anhang: Mathematische Berechnungen & Fundamentalkonstanten</h2>
+            <p>
+                Untersuchen wir die hypothetische Umdrehungsfrequenz eines Positron-Elektron-Systems nahe der Lichtgeschwindigkeit $c$:
+            </p>
+
+            <div class="formula-box">
+                $$E = 2 m_e c^2 \approx 1{,}022 \text{ MeV}$$
+            </div>
+
+            <h3 class="subsection-title">Berechnung des klassischen Grenzradius und der Frequenz:</h3>
+            <p>
+                Gleichsetzen von Coulomb-Kraft und Zentripetalkraft bei $v \to c$:
+            </p>
+
+            <div class="formula-box">
+                $$\frac{m_e c^2}{r} = \frac{k e^2}{r^2} \implies r = \frac{k e^2}{m_e c^2} \approx 2{,}817 \times 10^{-15} \text{ m}$$
+            </div>
+
+            <p>
+                Der Umfang der Bahn ergibt sich zu:
+            </p>
+
+            <div class="formula-box">
+                $$U = 2 \pi r \approx 2 \pi \times 2{,}817 \times 10^{-15} \text{ m} \approx 1{,}77 \times 10^{-14} \text{ m}$$
+            </div>
+
+            <p>
+                Die Frequenz $f$ bei Lichtgeschwindigkeit $c = 3 \times 10^8 \text{ m/s}$:
+            </p>
+
+            <div class="formula-box">
+                $$f = \frac{c}{U} = \frac{3 \times 10^8 \text{ m/s}}{1{,}77 \times 10^{-14} \text{ m}} \approx 1{,}69 \times 10^{22} \text{ Umdrehungen/Sekunde}$$
+            </div>
+
+            <h3 class="subsection-title">Fundamentale Ur-Konstanten der WRZT:</h3>
+            <p>
+                In der Wellenraumzeit-Theorie verbinden sich die Raumzeit-Eigenschaften über drei zentrale Ur-Konstanten zur Lichtgeschwindigkeit $c$:
+            </p>
+            <ul>
+                <li><strong>Ur-Spannung ($\Xi$):</strong> $\Xi \approx 5{,}8993 \times 10^{-19} \text{ kg/m}$ (Formel: $\Xi = \frac{m_e^2 c}{4 \hbar}$)</li>
+                <li><strong>Raumzeit-Trägheit ($\eta$):</strong> $\eta \approx 4{,}5543 \times 10^{-31} \text{ kg}$</li>
+                <li><strong>Minimal-Radius ($R_{\min}$):</strong> $R_{\min} \approx 7{,}716 \times 10^{-13} \text{ m}$</li>
+            </ul>
+
+            <div class="formula-box">
+                $$c = \frac{\Xi}{\eta} \cdot R_{\min} \approx 299.792.458 \text{ m/s}$$
+            </div>
+        </section>
+
+        <!-- Section 12 / Conclusion -->
+        <section id="sec12" class="card">
+            <h2 class="section-title">12. Schlusswort & Zitat</h2>
+            <div class="quote-box">
+                „Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“<br>
+                <span style="display:block; text-align:right; font-weight:bold; margin-top:0.5rem;">— Thich Nhat Hanh</span>
+            </div>
+            <p>
+                Die WRZT eröffnet eine neue, harmonische Synthese aus Relativitätsgeometrie und Quantendynamik. Licht ist kein von der Raumzeit getrenntes Medium, sondern die vibrierende Raumzeit selbst.
+            </p>
+        </section>
+
+        <footer>
+            <p>WRZT – Wellenraumzeit-Theorie | Einheits-Manifest &copy; 2026 Jo D. (Jup)</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript for Dynamic Interactions -->
+    <script>
+        function changeTheme(themeName) {
+            if (themeName === 'dark-space') {
+                document.documentElement.setAttribute('data-theme', 'dark-space');
+            } else if (themeName === 'paper-classic') {
+                document.documentElement.setAttribute('data-theme', 'paper-classic');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
