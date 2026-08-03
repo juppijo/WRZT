@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Wellenraumzeit-Gitter-Simulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --card-bg: #0f172a;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-pink: #ff007f;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 900px;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        p.subtitle {
+            color: var(--accent-blue);
+            font-size: 1.05rem;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .canvas-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            background: #030712;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .controls-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls-card h2 {
+            color: var(--accent-cyan);
+            font-size: 1.3rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        label span {
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #1e293b;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #1e293b;
+            transition: .3s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-cyan);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .info-box {
+            background: rgba(0, 242, 254, 0.05);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            background: #030712;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot.elec { background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
+        .dot.posi { background: var(--accent-pink); box-shadow: 0 0 8px var(--accent-pink); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+        <p class="subtitle">Dynamisches 3D-Gittermodell der Raumzeit-Wellenfeldkrümmung</p>
+    </header>
+
+    <div class="main-layout">
+        <div class="canvas-card">
+            <canvas id="wrztCanvas" width="700" height="600"></canvas>
+        </div>
+
+        <div class="controls-card">
+            <h2>WRZT Parameter</h2>
+
+            <div class="control-group">
+                <label>Radius \( R_{\min} \): <span id="rVal">60</span> px</label>
+                <input type="range" id="radius" min="20" max="120" value="60">
+            </div>
+
+            <div class="control-group">
+                <label>Bug-Winkel \( 	heta \): <span id="thetaVal">25</span>°</label>
+                <input type="range" id="theta" min="0" max="60" value="25">
+            </div>
+
+            <div class="control-group">
+                <label>Ur-Spannung \( \Xi \): <span id="xiVal">1.2</span></label>
+                <input type="range" id="xi" min="0.2" max="3.0" step="0.1" value="1.2">
+            </div>
+
+            <div class="control-group">
+                <label>Frequenz \( \omega \): <span id="freqVal">1.0</span></label>
+                <input type="range" id="freq" min="0.1" max="2.5" step="0.1" value="1.0">
+            </div>
+
+            <div class="toggle-group">
+                <span style="font-size: 0.9rem;">Partikel anzeigen</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="showParticles" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="dot elec"></div>
+                    <span>Teilchen (\(m_e\))</span>
+                </div>
+                <div class="legend-item">
+                    <div class="dot posi"></div>
+                    <span>Antiteilchen (\(m_e\))</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Gitter-Dynamik:</strong><br>
+                Das Raumzeit-Netz reagiert auf das rotierende Paar. Die Auslenkung stellt die Krümmung \( F_L(	heta, t) \) unter dem Bug-Winkel \( 	heta \) dar.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('wrztCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // UI Parameter Controls
+        const radiusInput = document.getElementById('radius');
+        const thetaInput = document.getElementById('theta');
+        const xiInput = document.getElementById('xi');
+        const freqInput = document.getElementById('freq');
+        const showParticlesInput = document.getElementById('showParticles');
+
+        // Interactive Camera Settings
+        let rotX = 0.6; // Tilt angle
+        let rotZ = 0.78; // Rotation angle around Z
+        let isDragging = false;
+        let lastMouseX, lastMouseY;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - lastMouseX;
+            const dy = e.clientY - lastMouseY;
+            rotZ += dx * 0.008;
+            rotX += dy * 0.008;
+            rotX = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, rotX));
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        // Grid Configuration
+        const gridCols = 41;
+        const gridRows = 41;
+        const spacing = 16;
+        let time = 0;
+
+        // Project 3D coordinate to 2D canvas with camera rotation
+        function project(x, y, z) {
+            // Center around origin
+            const cx = x - (gridCols * spacing) / 2;
+            const cy = y - (gridRows * spacing) / 2;
+
+            // Z Rotation
+            const x1 = cx * Math.cos(rotZ) - cy * Math.sin(rotZ);
+            const y1 = cx * Math.sin(rotZ) + cy * Math.cos(rotZ);
+
+            // X Rotation (Tilt)
+            const y2 = y1 * Math.cos(rotX) - z * Math.sin(rotX);
+            const z2 = y1 * Math.sin(rotX) + z * Math.cos(rotX);
+
+            // Perspective Projection
+            const scale = 500 / (500 + z2);
+            const px = canvas.width / 2 + x1 * scale;
+            const py = canvas.height / 2 + y2 * scale;
+
+            return { x: px, y: py, scale: scale, depth: z2 };
+        }
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const R_min = parseFloat(radiusInput.value);
+            const thetaDeg = parseFloat(thetaInput.value);
+            const theta = (thetaDeg * Math.PI) / 180;
+            const Xi = parseFloat(xiInput.value);
+            const freq = parseFloat(freqInput.value);
+            const showParticles = showParticlesInput.value === 'on' || showParticlesInput.checked;
+
+            // Update Labels
+            document.getElementById('rVal').innerText = R_min;
+            document.getElementById('thetaVal').innerText = thetaDeg;
+            document.getElementById('xiVal').innerText = Xi.toFixed(1);
+            document.getElementById('freqVal').innerText = freq.toFixed(1);
+
+            time += 0.03 * freq;
+
+            // Rotating centers of mass (Teilchen & Antiteilchen)
+            const centerGridX = (gridCols * spacing) / 2;
+            const centerGridY = (gridRows * spacing) / 2;
+
+            const p1x = centerGridX + R_min * Math.cos(time);
+            const p1y = centerGridY + R_min * Math.sin(time);
+
+            const p2x = centerGridX - R_min * Math.cos(time);
+            const p2y = centerGridY - R_min * Math.sin(time);
+
+            // Calculate grid 3D points
+            const points = [];
+            for (let r = 0; r < gridRows; r++) {
+                points[r] = [];
+                for (let c = 0; c < gridCols; c++) {
+                    const gx = c * spacing;
+                    const gy = r * spacing;
+
+                    // Distances to orbiting centers
+                    const d1 = Math.hypot(gx - p1x, gy - p1y);
+                    const d2 = Math.hypot(gx - p2x, gy - p2y);
+
+                    // Wave deformation logic according to WRZT (Xi & theta bug-angle influence)
+                    const wavelength = 45;
+                    const wave1 = Math.sin(d1 / wavelength - time) * Math.exp(-d1 * 0.004);
+                    const wave2 = -Math.sin(d2 / wavelength - time) * Math.exp(-d2 * 0.004);
+
+                    const BugWinkelEffect = Math.cos(theta);
+                    const z = (wave1 + wave2) * Xi * 35 * BugWinkelEffect;
+
+                    points[r][c] = {
+                        proj: project(gx, gy, z),
+                        zVal: z
+                    };
+                }
+            }
+
+            // Draw grid lines (Columns)
+            for (let r = 0; r < gridRows; r++) {
+                for (let c = 0; c < gridCols - 1; c++) {
+                    const pA = points[r][c];
+                    const pB = points[r][c + 1];
+
+                    ctx.beginPath();
+                    ctx.moveTo(pA.proj.x, pA.proj.y);
+                    ctx.lineTo(pB.proj.x, pB.proj.y);
+
+                    const avgZ = (pA.zVal + pB.zVal) / 2;
+                    if (avgZ > 2) {
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${Math.min(0.8, 0.2 + avgZ / 30)})`;
+                    } else if (avgZ < -2) {
+                        ctx.strokeStyle = `rgba(255, 0, 127, ${Math.min(0.8, 0.2 - avgZ / 30)})`;
+                    } else {
+                        ctx.strokeStyle = 'rgba(30, 58, 138, 0.4)';
+                    }
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+
+            // Draw grid lines (Rows)
+            for (let c = 0; c < gridCols; c++) {
+                for (let r = 0; r < gridRows - 1; r++) {
+                    const pA = points[r][c];
+                    const pB = points[r + 1][c];
+
+                    ctx.beginPath();
+                    ctx.moveTo(pA.proj.x, pA.proj.y);
+                    ctx.lineTo(pB.proj.x, pB.proj.y);
+
+                    const avgZ = (pA.zVal + pB.zVal) / 2;
+                    if (avgZ > 2) {
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${Math.min(0.8, 0.2 + avgZ / 30)})`;
+                    } else if (avgZ < -2) {
+                        ctx.strokeStyle = `rgba(255, 0, 127, ${Math.min(0.8, 0.2 - avgZ / 30)})`;
+                    } else {
+                        ctx.strokeStyle = 'rgba(30, 58, 138, 0.4)';
+                    }
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+
+            // Render Particle-Antiparticle pair on top of grid if toggled
+            if (showParticles) {
+                const z1 = Xi * 20 * Math.cos(theta);
+                const projP1 = project(p1x, p1y, z1);
+                const projP2 = project(p2x, p2y, -z1);
+
+                // Particle 1 (Teilchen - Cyan)
+                ctx.beginPath();
+                ctx.arc(projP1.x, projP1.y, 7 * projP1.scale, 0, Math.PI * 2);
+                ctx.fillStyle = '#00f2fe';
+                ctx.shadowColor = '#00f2fe';
+                ctx.shadowBlur = 15;
+                ctx.fill();
+
+                // Particle 2 (Antiteilchen - Pink)
+                ctx.beginPath();
+                ctx.arc(projP2.x, projP2.y, 7 * projP2.scale, 0, Math.PI * 2);
+                ctx.fillStyle = '#ff007f';
+                ctx.shadowColor = '#ff007f';
+                ctx.shadowBlur = 15;
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+            }
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+    </script>
+</body>
+</html>
