@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT Vers 3.03 – Das Einheits-Manifest: Relativistische Herleitung & Lorentz-Dynamik</title>
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'has_am'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            /* Theme 1: Cyan / Turquoise Light (Standard) */
+            --bg-primary: #e6f4f8;
+            --bg-card: #ffffff;
+            --text-primary: #0f2c3b;
+            --text-secondary: #3a6073;
+            --accent-color: #008b8b;
+            --accent-hover: #006666;
+            --accent-gold: #d97706;
+            --accent-purple: #7c3aed;
+            --accent-red: #dc2626;
+            --border-color: #b2d8d8;
+            --highlight-bg: #d0efff;
+            --header-bg: linear-gradient(135deg, #008b8b 0%, #164e63 100%);
+            --header-text: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 139, 139, 0.15);
+            --code-bg: #f0fdfa;
+        }
+
+        [data-theme="dark-space"] {
+            /* Theme 2: Deep Space Dark */
+            --bg-primary: #0b1120;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --accent-gold: #f2cc60;
+            --accent-purple: #bc8cff;
+            --accent-red: #ff7b72;
+            --border-color: #334155;
+            --highlight-bg: rgba(56, 139, 253, 0.1);
+            --header-bg: linear-gradient(135deg, #0284c7 0%, #1e1b4b 100%);
+            --header-text: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --code-bg: #0d1117;
+        }
+
+        [data-theme="paper-classic"] {
+            /* Theme 3: Scientific Paper Classic */
+            --bg-primary: #fcfbf9;
+            --bg-card: #ffffff;
+            --text-primary: #1c1917;
+            --text-secondary: #44403c;
+            --accent-color: #78350f;
+            --accent-hover: #451a03;
+            --accent-gold: #b45309;
+            --accent-purple: #6b21a8;
+            --accent-red: #991b1b;
+            --border-color: #e7e5e4;
+            --highlight-bg: #f5f5f4;
+            --header-bg: linear-gradient(135deg, #451a03 0%, #78350f 100%);
+            --header-text: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --code-bg: #f5f5f4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.75;
+            padding: 0;
+            margin: 0;
+        }
+
+        .toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--bg-card);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            letter-spacing: 0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-select, .btn-fullscreen {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .btn-fullscreen {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-fullscreen:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 90px auto 40px auto;
+            padding: 0 20px;
+        }
+
+        .header-banner {
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-banner h1 {
+            font-size: 2.3rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .header-banner h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            opacity: 0.95;
+            font-style: italic;
+        }
+
+        .header-meta {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .intro-box {
+            background: var(--highlight-bg);
+            border-left: 5px solid var(--accent-color);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        h2.section-title {
+            color: var(--accent-color);
+            font-size: 1.6rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        h3.subsection-title {
+            color: var(--accent-gold);
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            text-align: justify;
+        }
+
+        .formula-box {
+            background-color: var(--code-bg);
+            border: 1px dashed var(--accent-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--highlight-bg);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .value-highlight {
+            color: var(--accent-gold);
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .quote-box {
+            background-color: var(--highlight-bg);
+            border-left: 5px solid var(--accent-purple);
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        .conclusion-box {
+            background: var(--highlight-bg);
+            border: 1px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-em { background: rgba(56, 189, 248, 0.2); color: var(--accent-color); }
+        .badge-quant { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+        .badge-rel { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+
+        .toc {
+            background-color: var(--highlight-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .toc h3 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 0.4rem;
+        }
+
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
+        }
+
+        :fullscreen .container {
+            max-width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body class="has_am">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-title">WRZT — Wellenraumzeit-Theorie (Vers 3.03)</div>
+        <div class="controls">
+            <label for="themeSelect" style="font-size: 0.85rem; font-weight: 600;">Design:</label>
+            <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
+                <option value="cyan-light">Cyan-Türkis (Standard)</option>
+                <option value="dark-space">Deep Space (Dunkel)</option>
+                <option value="paper-classic">Klassisch (Papier)</option>
+            </select>
+            <button class="btn-fullscreen" onclick="toggleFullScreen()">Vollbild Mode ⛶</button>
+        </div>
+    </div>
+
+    <div class="container" id="document-root">
+        <!-- Header -->
+        <header class="header-banner">
+            <h1>Fiat Lux – Es Werde Licht</h1>
+            <h2>Das Einheits-Manifest der Wellenraumzeit-Theorie (WRZT Vers 3.03)</h2>
+            <div class="header-meta">
+                Relativistische Korrekturfasssung 2026 | Autoren: Jo D. (@juppijo) & Zaminia
+            </div>
+        </header>
+
+        <div class="intro-box">
+            <strong>Korrekturhinweis Vers 3.03:</strong> Das bisherige Kapitel 2 wurde aufgrund physikalischer Unstimmigkeiten durch die präzise relativistische Herleitung unter Einbeziehung des Lorentz-Faktors $\gamma$, der Feinstrukturkonstante $\alpha$ und der Quanten-Grenzmaße erneuert.
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>Inhaltsverzeichnis (Kapitelübersicht)</h3>
+            <ul>
+                <li><a href="#sec1">1. Einleitung: Was ist Licht?</a></li>
+                <li><a href="#sec2">2. Relativistische Herleitung: Lorentz-Faktor $\gamma$, $R_{\text{min}}$ & Grenzübergang</a></li>
+                <li><a href="#sec3">3. Eigenschaften des Lichts: Frequenz, Polarisation & Brechung</a></li>
+                <li><a href="#sec4">4. Spin von Photonen & Quantisierte Rotation</a></li>
+                <li><a href="#sec5">5. Die Rolle der Feinstrukturkonstante $\alpha$ & Der Bug-Winkel $\theta$</a></li>
+                <li><a href="#sec6">6. Vergleich mit der klassischen Quantenphysik & Elektrodynamik</a></li>
+                <li><a href="#sec7">7. Erweiterte Perspektive: Raumzeitkrümmung vs. Raumzeit-Wölbung</a></li>
+                <li><a href="#sec8">8. Energieabgabe, Annihilation & Massendefekt</a></li>
+                <li><a href="#sec9">9. Das Licht der Sonne: Fusion als Raumzeit-Umpolung</a></li>
+                <li><a href="#sec10">10. Hochfrequente Gravitationswellen durch schnelle Rotation</a></li>
+                <li><a href="#sec11">11. Konsequenzen des Modells für die Kosmologie</a></li>
+                <li><a href="#sec12">12. Zusammenfassung der Beschreibungsformen</a></li>
+                <li><a href="#sec13">13. Offene Fragen, Ausblick & Mathematisches Fazit</a></li>
+            </ul>
+        </div>
+
+        <!-- Kapitel 1 -->
+        <section id="sec1" class="card">
+            <h2 class="section-title">1. Einleitung: Was ist Licht?</h2>
+            <p>
+                Licht wird in der Wellenraumzeit-Theorie (WRZT) als eine hochfrequente Gravitationswelle bzw. Pulsation des elastischen Raumzeit-Netzes beschrieben. Während Teilchen lokale Vertiefungen im Netz darstellen, bilden Antiteilchen lokale Wölbungen. Rotieren diese Strukturen mit hoher Geschwindigkeit umeinander, emittieren sie dynamische Raumzeit-Wellen, die makroskopisch als Licht wahrgenommen werden.
+            </p>
+        </section>
+
+        <!-- Kapitel 2 (Vollständig Erneuert) -->
+        <section id="sec2" class="card">
+            <h2 class="section-title">2. Relativistische Herleitung: Lorentz-Faktor $\gamma$, $R_{\text{min}}$ & Grenzübergang</h2>
+            
+            <h3 class="subsection-title">2.1 Ausgangspunkt & Energie-Kopplung</h3>
+            <p>
+                Um den Minimal-Radius $R_{\text{min}}$ und das dynamische Verhalten der Raumzeit-Rotatoren herzuleiten, verknüpfen wir die relativistische Energie des rotierenden Systems mit der Quantenenergie des emittierten Photons:
+            </p>
+            <div class="formula-box">
+                $$E = \gamma \, m_e \, c^2 = \hbar \cdot \omega$$
+            </div>
+            <p>
+                Hierbei stellt $\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$ den relativistischen **Lorentz-Faktor** dar.
+            </p>
+
+            <h3 class="subsection-title">2.2 Geometrische Rotationskopplung & Dynamischer Radius</h3>
+            <p>
+                Die Raumzeit-Verzerrungen bewegen sich auf einer Kreisbahn mit dem Radius $R$ und der Bahngeschwindigkeit $v$. Mit der geometrischen Beziehung $\omega = \frac{v}{R}$ folgt:
+            </p>
+            <div class="formula-box">
+                $$\gamma \, m_e \, c^2 = \hbar \cdot \frac{v}{R} \implies R = \frac{\hbar \cdot v}{\gamma \, m_e \, c^2}$$
+            </div>
+            <p>
+                Im relativistischen Grenzübergang ($v \to c$) schrumpft der effektive Rotationsradius infolge der Lorentz-Kontraktion des Raumzeit-Netzes dynamisch:
+            </p>
+            <div class="formula-box">
+                $$R(\gamma) = \frac{\hbar \cdot c}{\gamma \, m_e \, c^2} = \frac{\hbar}{\gamma \, m_e \, c} = \frac{\bar{\lambda}_c}{\gamma}$$
+            </div>
+
+            <h3 class="subsection-title">2.3 Der Schnittstellen-Übergang von $r_e$ zu $R_{\text{min}}$</h3>
+            <p>
+                Der klassische Elektronenradius $r_e \approx 2{,}818 \times 10^{-15} \text{ m}$ ist ein rein elektrostatisch-makroskopisches Grenzmaß. Unter Berücksichtigung der Heisenberg’schen Unschärferelation geht dieser über die Feinstrukturkonstante $\alpha \approx \frac{1}{137{,}036}$ direkt in das Quanten-Raumzeit-Grenzmaß über:
+            </p>
+            <div class="formula-box">
+                $$r_e = \alpha \cdot \bar{\lambda}_c$$
+            </div>
+            <p>
+                Betrachtet man das gebundene Zwei-Körper-System als Rotator um das gemeinsame Zentrum, ergibt sich der ununterbrechbare Minimal-Radius $R_{\text{min}}$ an der reinen Quantengrenze als halbe reduzierte Compton-Wellenlänge:
+            </p>
+            <div class="formula-box">
+                $$\boxed{R_{\text{min}} = \frac{\bar{\lambda}_c}{2} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}}$$
+            </div>
+
+            <h3 class="subsection-title">2.4 Systemkonstanten und Längenskalen</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Größe / Konstante</th>
+                        <th>Symbol / Formel</th>
+                        <th>Exakter / Präziser Wert</th>
+                        <th>Typus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Klassischer Elektronenradius</td>
+                        <td>$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td>
+                        <td><span class="value-highlight">2,817 940 x 10⁻¹⁵ m</span></td>
+                        <td><span class="badge badge-em">Elektromagnetisch</span></td>
+                    </tr>
+                    <tr>
+                        <td>Dynamischer Radius ($\gamma$)</td>
+                        <td>$R(\gamma) = \frac{\bar{\lambda}_c}{\gamma}$</td>
+                        <td><span class="value-highlight">Skaliert mit $\gamma^{-1}$</span></td>
+                        <td><span class="badge badge-rel">Relativistisch</span></td>
+                    </tr>
+                    <tr>
+                        <td>Quanten-Ruheradius</td>
+                        <td>$R_{\text{min}} = \frac{\bar{\lambda}_c}{2}$</td>
+                        <td><span class="value-highlight">1,930 796 x 10⁻¹³ m</span></td>
+                        <td><span class="badge badge-quant">Raumzeit-Grenzfall</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Kapitel 3 -->
+        <section id="sec3" class="card">
+            <h2 class="section-title">3. Eigenschaften des Lichts: Frequenz, Polarisation & Brechung</h2>
+            <p>
+                Wellenlänge und Frequenz der Raumzeit-Welle hängen direkt von der Rotationsdynamik des Paares ab. Der Übergang zwischen verschiedenen optischen Medien entspricht einer Verfälschung der lokalen Raumzeit-Spannung $\Xi$, was die Ausbreitungsgeschwindigkeit beeinflusst.
+            </p>
+        </section>
+
+        <!-- Kapitel 4 -->
+        <section id="sec4" class="card">
+            <h2 class="section-title">4. Spin von Photonen & Quantisierte Rotation</h2>
+            <p>
+                Der intrinsische Spin $S = \pm 1$ repräsentiert die Chiralität (Drehsinn) der rotierenden Raumzeit-Verzerrungen: Rechtshändige Rotationen induzieren Spin $+1$, linksdrehende Rotationen Spin $-1$.
+            </p>
+        </section>
+
+        <!-- Kapitel 5 -->
+        <section id="sec5" class="card">
+            <h2 class="section-title">5. Die Rolle der Feinstrukturkonstante $\alpha$ & Der Bug-Winkel $\theta$</h2>
+            <p>
+                Die Feinstrukturkonstante verbindet Ladung und Raumzeit-Geometrie ($r_e = 2 \alpha R_{\text{min}}$). Die Wellenausbreitung bildet zusätzlich einen Phasen-Bugwinkel $\theta$ aus:
+            </p>
+            <div class="formula-box">
+                $$\sin(\theta) = \frac{1}{\gamma}$$
+            </div>
+        </section>
+
+        <!-- Kapitel 6 bis 12 -->
+        <section id="sec6" class="card">
+            <h2 class="section-title">6. Vergleich mit der Quantenmechanik</h2>
+            <p>
+                Die WRZT bettet die Ergebnisse der Standard-Quantenelektrodynamik in ein anschauliches, netzmechanisches Modell ein, ohne deren mathematische Vorhersagekraft zu verletzen.
+            </p>
+        </section>
+
+        <section id="sec7" class="card">
+            <h2 class="section-title">7. Raumzeitkrümmung vs. Raumzeit-Wölbung</h2>
+            <p>
+                Masse bildet Vertiefungen, während Antimaterie Erhebungen (Wölbungen) im Netz erzeugt. Dies sichert das fundamentale Vakuumelement vor dem geometrischen Kollaps.
+            </p>
+        </section>
+
+        <section id="sec8" class="card">
+            <h2 class="section-title">8. Energieabgabe & Annihilation</h2>
+            <p>
+                Bei der Paarvernichtung wird die im gebundenen Zustand gespeicherte Deformationsenergie vollständig als freie Raumzeit-Pulsation frei.
+            </p>
+        </section>
+
+        <section id="sec9" class="card">
+            <h2 class="section-title">9. Das Licht der Sonne</h2>
+            <p>
+                Fusion stellt eine energetische Umschichtung der Raumzeit-Verzerrungen dar; der Massendefekt wird als Lichtenergie emittiert.
+            </p>
+        </section>
+
+        <section id="sec10" class="card">
+            <h2 class="section-title">10. Hochfrequente Gravitationswellen</h2>
+            <p>
+                Wegen der winzigen Massenträgheit $\eta$ emittieren mikroskopische Rotatoren hochfrequente Schwingungen im Frequenzbereich der elektromagnetischen Wellen.
+            </p>
+        </section>
+
+        <section id="sec11" class="card">
+            <h2 class="section-title">11. Kosmologische Konsequenzen</h2>
+            <p>
+                Die Dehnung des Raumzeit-Netzes über große Distanzen erklärt die kosmologische Rotverschiebung als kontinuierliche Wellenlängenanpassung.
+            </p>
+        </section>
+
+        <section id="sec12" class="card">
+            <h2 class="section-title">12. Zusammenfassung der Beschreibungsformen</h2>
+            <p>
+                Licht ist geometrisch betrachtet die propagierende Pulsation eines gekoppelten Raumzeit-Netzes mit definierter Trägheit $\eta$ und Spannung $\Xi$.
+            </p>
+        </section>
+
+        <!-- Kapitel 13 -->
+        <section id="sec13" class="card">
+            <h2 class="section-title">13. Offene Fragen, Ausblick & Mathematisches Fazit</h2>
+            <div class="conclusion-box">
+                <h3>Fazit der WRZT Version 3.03</h3>
+                <p>
+                    Durch die Eliminierung fehlerhafter Modellansätze und die konsistente Einarbeitung des Lorentz-Faktors $\gamma$ beschreibt die WRZT nun nahtlos den relativistischen Grenzübergang von makroskopischer Elektrodynamik zu quantisierter Raumzeit-Mechanik.
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <p>WRZT – Wellenraumzeit-Theorie | Einheits-Manifest &copy; 2026 Jo D. (@juppijo) & Zaminia — Vers 3.03 Relativistic Corrected Edition</p>
+        </footer>
+    </div>
+
+    <script>
+        function changeTheme(themeName) {
+            if (themeName === 'dark-space') {
+                document.documentElement.setAttribute('data-theme', 'dark-space');
+            } else if (themeName === 'paper-classic') {
+                document.documentElement.setAttribute('data-theme', 'paper-classic');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
