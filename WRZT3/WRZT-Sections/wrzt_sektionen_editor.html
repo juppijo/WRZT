@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT - Sektions & Formel Editor</title>
+  
+  <!-- MathJax 3 for LaTeX Rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      /* Ocean Blue Theme (Default) */
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-color: #06b6d4;
+      --accent-hover: #0891b2;
+      --header-bg: #1e293b;
+      --input-bg: #0f172a;
+      --input-border: #475569;
+      --code-bg: #0f172a;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Light Theme */
+    body.theme-light {
+      --bg-color: #f0f9ff;
+      --card-bg: #ffffff;
+      --card-border: #bae6fd;
+      --text-color: #0f172a;
+      --text-muted: #64748b;
+      --accent-color: #0284c7;
+      --accent-hover: #0369a1;
+      --header-bg: #e0f2fe;
+      --input-bg: #f8fafc;
+      --input-border: #cbd5e1;
+      --code-bg: #f1f5f9;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Emerald Theme */
+    body.theme-emerald {
+      --bg-color: #064e3b;
+      --card-bg: #065f46;
+      --card-border: #047857;
+      --text-color: #ecfdf5;
+      --text-muted: #a7f3d0;
+      --accent-color: #10b981;
+      --accent-hover: #059669;
+      --header-bg: #065f46;
+      --input-bg: #064e3b;
+      --input-border: #059669;
+      --code-bg: #022c22;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Bar */
+    header {
+      background-color: var(--header-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .title-editor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-editor input {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      background: transparent;
+      border: 1px dashed transparent;
+      padding: 4px 8px;
+      border-radius: 6px;
+      width: 360px;
+      transition: border 0.2s, background 0.2s;
+    }
+
+    .title-editor input:hover, .title-editor input:focus {
+      border-color: var(--accent-color);
+      background-color: var(--input-bg);
+      outline: none;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--card-bg);
+    }
+
+    /* Main Layout */
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Add Section Input Box */
+    .add-box {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .add-box h3 {
+      margin-bottom: 1rem;
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-box textarea {
+      width: 100%;
+      height: 130px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-color);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.95rem;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    .add-box textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    /* Section Cards */
+    .sections-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .wrzt-section-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 2rem;
+      position: relative;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .wrzt-section-card:hover {
+      border-color: var(--accent-color);
+    }
+
+    .card-controls {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 6px;
+      background: var(--card-bg);
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      z-index: 10;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .btn-icon:hover {
+      color: var(--accent-color);
+      background-color: var(--input-bg);
+    }
+
+    /* Content Typography inside Sections */
+
+    .wrzt-section h1 {
+      font-size: 2.1rem;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 6px;
+    }
+
+    .wrzt-section h2 {
+      font-size: 1.8rem;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 6px;
+    }
+
+    .wrzt-section h3 {
+      font-size: 1.3rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-color);
+    }
+
+    .wrzt-section h4 {
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent-color);
+    }
+
+    .wrzt-section p {
+      margin-bottom: 1rem;
+      color: var(--text-color);
+    }
+
+    .wrzt-section ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .wrzt-section li {
+      margin-bottom: 0.5rem;
+    }
+
+    .wrzt-section hr {
+      border: 0;
+      height: 1px;
+      background: var(--card-border);
+      margin: 1.5rem 0;
+    }
+
+    .wrzt-section code {
+      background-color: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      color: var(--accent-color);
+      border: 1px solid var(--card-border);
+    }
+
+    .formula-block, .unit-check {
+      background-color: var(--input-bg);
+      border-left: 4px solid var(--accent-color);
+      padding: 1rem 1.2rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.2rem 0;
+    }
+
+    .equation {
+      font-size: 1.1rem;
+      text-align: center;
+      padding: 0.8rem 0;
+      overflow-x: auto;
+    }
+
+    /* Fullscreen Mode Styling */
+    :fullscreen body {
+      overflow-y: auto;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--card-border);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body class="theme-ocean">
+
+  <!-- Header / Navigation Toolbar -->
+  <header>
+    <div class="title-editor">
+      <input type="text" id="document-title" value="WRZT - Wellenraumzeit Dokument" title="Klicken zum Bearbeiten des Titels">
+    </div>
+
+    <div class="toolbar">
+      <!-- File Loader Button -->
+      <label class="btn btn-secondary" style="margin: 0; cursor: pointer;">
+        📂 Sektion / HTML Laden
+        <input type="file" id="file-loader" accept=".html,.htm" multiple style="display: none;" onchange="loadHTMLFiles(event)">
+      </label>
+
+      <!-- Theme Switcher Button -->
+      <button class="btn btn-secondary" onclick="cycleTheme()">
+        🎨 Style: <span id="current-theme-name">Ocean Blue</span>
+      </button>
+
+      <!-- Render LaTeX Button -->
+      <button class="btn btn-secondary" onclick="renderLaTeX()">
+        $$\sqrt{x}$$ LaTeX Rendern
+      </button>
+
+      <!-- Fullscreen Toggle Button -->
+      <button class="btn btn-secondary" onclick="toggleFullscreen()">
+        ⛶ Vollbild
+      </button>
+
+      <!-- Export/Download HTML File Button -->
+      <button class="btn" onclick="exportHTML()">
+        💾 Als HTML Speichern
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <div class="container">
+    
+    <!-- Input Box for New Sections -->
+    <div class="add-box">
+      <h3>➕ Neue Sektion manuell einfügen (HTML / LaTeX)</h3>
+      <textarea id="section-input" placeholder='Füge hier deinen <section class="wrzt-section">...</section> HTML-Code ein...'></textarea>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">
+          Unterstützt korrigierten LaTeX-Code in <code>$...$</code> oder <code>$$...$$</code>.
+        </span>
+        <button class="btn" onclick="addSectionFromInput()">Sektion Hinzufügen</button>
+      </div>
+    </div>
+
+    <!-- Container for dynamic sections -->
+    <div id="sections-container" class="sections-wrapper">
+      <!-- Default Section populated by JS on load -->
+    </div>
+
+  </div>
+
+  <footer>
+    <p>Wellenraumzeit-Theorie (WRZT) &bull; Dynamisches HTML &amp; LaTeX Dokumentensystem</p>
+  </footer>
+
+  <script>
+    // Korrigierter LaTeX-Quellcode (Gescapte Backslashes für JavaScript Strings)
+    const initialSectionContent = `<section id="wrzt-test" class="wrzt-section">
+    <h1>Test Wellenraumzeit (WRZT)</h1>
+    <h2>Test Wellenraumzeit (WRZT)</h2></section>`;
+
+    // Themes Setup
+    const themes = [
+      { id: 'theme-ocean', name: 'Ocean Blue' },
+      { id: 'theme-light', name: 'Light Mode' },
+      { id: 'theme-emerald', name: 'Emerald Dark' }
+    ];
+    let currentThemeIndex = 0;
+
+    // Load Initial Content
+    window.addEventListener('DOMContentLoaded', () => {
+      createSectionCard(initialSectionContent);
+    });
+
+    // Function to add a section card
+    function createSectionCard(htmlContent) {
+      const container = document.getElementById('sections-container');
+      
+      const card = document.createElement('div');
+      card.className = 'wrzt-section-card';
+      
+      // Control Buttons (Up, Down, Delete)
+      const controls = document.createElement('div');
+      controls.className = 'card-controls';
+      controls.innerHTML = `
+        <button class="btn-icon" onclick="moveSection(this, -1)" title="Nach oben verschieben">▲</button>
+        <button class="btn-icon" onclick="moveSection(this, 1)" title="Nach unten verschieben">▼</button>
+        <button class="btn-icon" onclick="deleteSection(this)" title="Sektion löschen" style="color:#ef4444;">✕</button>
+      `;
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'card-content';
+      contentDiv.innerHTML = htmlContent;
+
+      card.appendChild(controls);
+      card.appendChild(contentDiv);
+      container.appendChild(card);
+
+      renderLaTeX();
+    }
+
+    // Load Local HTML / Section Files via FileReader
+    function loadHTMLFiles(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const fileText = e.target.result;
+          
+          // Check if file contains full HTML or just <section>
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(fileText, 'text/html');
+          const sections = doc.querySelectorAll('section');
+
+          if (sections.length > 0) {
+            sections.forEach(sec => createSectionCard(sec.outerHTML));
+          } else if (doc.body && doc.body.innerHTML.trim() !== '') {
+            createSectionCard(doc.body.innerHTML);
+          } else {
+            createSectionCard(fileText);
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      // Reset file input value so same file can be reloaded if needed
+      event.target.value = '';
+    }
+
+    // Add Section from Textarea Input
+    function addSectionFromInput() {
+      const textarea = document.getElementById('section-input');
+      const val = textarea.value.trim();
+      if (!val) {
+        alert('Bitte füge zuerst HTML-Code oder Text in das Eingabefeld ein.');
+        return;
+      }
+      createSectionCard(val);
+      textarea.value = '';
+    }
+
+    // Reorder Sections
+    function moveSection(button, direction) {
+      const card = button.closest('.wrzt-section-card');
+      if (direction === -1 && card.previousElementSibling) {
+        card.parentNode.insertBefore(card, card.previousElementSibling);
+      } else if (direction === 1 && card.nextElementSibling) {
+        card.parentNode.insertBefore(card.nextElementSibling, card);
+      }
+    }
+
+    // Delete Section
+    function deleteSection(button) {
+      if (confirm('Möchtest du diese Sektion wirklich entfernen?')) {
+        const card = button.closest('.wrzt-section-card');
+        card.remove();
+      }
+    }
+
+    // Cycle Through Themes
+    function cycleTheme() {
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+      const theme = themes[currentThemeIndex];
+      document.body.className = theme.id;
+      document.getElementById('current-theme-name').innerText = theme.name;
+    }
+
+    // Fullscreen Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Trigger MathJax Re-rendering for LaTeX
+    function renderLaTeX() {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise().catch(err => console.log('MathJax Error:', err));
+      }
+    }
+
+    // Export Document as Clean HTML File
+    function exportHTML() {
+      const docTitle = document.getElementById('document-title').value || 'WRZT_Dokument';
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${docTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
