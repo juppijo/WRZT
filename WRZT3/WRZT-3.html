@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT Vers 3.02 – Das Einheits-Manifest: Relativistische Herleitung & Lorentz-Dynamik</title>
+    <!-- MathJax Configuration (Using modern CDN, explicit no polyfill.io) -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'has_am'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --accent-gold: #f2cc60;
+            --accent-blue: #58a6ff;
+            --accent-cyan: #39c5cf;
+            --accent-purple: #bc8cff;
+            --accent-red: #ff7b72;
+            --text-primary: #c9d1d9;
+            --text-heading: #ffffff;
+            --text-muted: #8b949e;
+            --highlight-bg: rgba(56, 139, 253, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(135deg, #2ea043, #3fb950);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 160, 67, 0.4);
+        }
+
+        header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            padding-right: 140px;
+        }
+
+        h1 {
+            color: var(--text-heading);
+            font-size: 1.95rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(90deg, #58a6ff, #bc8cff, #f2cc60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .intro-box {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
+        }
+
+        section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            color: var(--accent-cyan);
+            font-size: 1.45rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            color: var(--accent-gold);
+            font-size: 1.15rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .formula-card {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: #0d1117;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: rgba(56, 139, 253, 0.15);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .value-highlight {
+            color: var(--accent-gold);
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-em { background: rgba(88, 166, 255, 0.2); color: var(--accent-blue); }
+        .badge-quant { background: rgba(188, 140, 255, 0.2); color: var(--accent-purple); }
+        .badge-rel { background: rgba(255, 123, 114, 0.2); color: var(--accent-red); }
+
+        .conclusion-box {
+            background: rgba(242, 204, 96, 0.08);
+            border: 1px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .conclusion-box h3 {
+            color: var(--accent-gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .quote-box {
+            background-color: rgba(188, 140, 255, 0.08);
+            border-left: 4px solid var(--accent-purple);
+            padding: 1rem 1.2rem;
+            margin: 1.2rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        :fullscreen .container {
+            max-width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            border-radius: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1.5rem; }
+            header { padding-right: 0; margin-top: 40px; }
+            .fullscreen-btn { top: 10px; right: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="document-root">
+    <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Vollbildmodus umschalten">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        </svg>
+        <span>Vollbild</span>
+    </button>
+
+    <header>
+        <h1>Wellenraumzeit-Theorie (WRZT) – Vers 3.02</h1>
+        <div class="subtitle">Das Einheits-Manifest: Vollständige Herleitung im relativistischen Bereich unter Berücksichtigung des Lorentz-Faktors ($\gamma$)</div>
+    </header>
+
+    <div class="intro-box">
+        <strong>Zentrale relativistische Erkenntnis (Vers 3.02):</strong> Im extrem-relativistischen Grenzbereich bewirkt die kinetische Massenzunahme $m_{\text{rel}} = \gamma \cdot m_e$ eine Kontraktion des Wirkungsradius der Raumzeit-Pulsation. Der dynamische Radius $R(\gamma) = \frac{\hbar}{\gamma m_e c}$ skaliert invers mit dem Lorentz-Faktor $\gamma$. Der klassische Quantenradius $R_{\text{min}} = \frac{\bar{\lambda}_c}{2}$ markiert dabei den ruhenden/minimalen Phasen-Grenzfall des gebundenen Systems, an dem die Raumzeit-Trägheit $\eta$ und die Ur-Spannung $\Xi$ die Lichtgeschwindigkeit $c$ exakt generieren.
+    </div>
+
+    <section>
+        <h2>1. Grundlagen der WRZT & Die Ur-Konstanten der Raumzeit</h2>
+        <p>
+            Die Wellenraumzeit-Theorie (WRZT) beschreibt das Universum als ein dynamisches, elastisches Raumzeit-Netz. Teilchen und Antiteilchen sind in diesem Bild keine punktförmigen Festkörper, sondern lokalisierte Vertiefungen (Krümmungen) bzw. Wölbungen im Raumzeit-Gitter.
+        </p>
+        <p>
+            Die Eigenschaften dieses Netzes werden durch drei fundamentale Ur-Konstanten bestimmt:
+        </p>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ur-Konstante</th>
+                    <th>Symbol</th>
+                    <th>Formel / Exakter Wert</th>
+                    <th>Physikalische Bedeutung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ur-Spannung der Raumzeit</td>
+                    <td>$\Xi$</td>
+                    <td><span class="value-highlight">5,897 427 x 10⁻¹⁹ kg/m</span></td>
+                    <td>Spannungsdichte des Raumzeit-Netzes ($\Xi = \frac{m_e^2 c}{4\hbar}$)</td>
+                </tr>
+                <tr>
+                    <td>Raumzeit-Trägheit</td>
+                    <td>$\eta$</td>
+                    <td><span class="value-highlight">4,554 300 x 10⁻³¹ kg</span></td>
+                    <td>Inhärente Masse-Resonanz der Wölbung ($\eta = \frac{m_e}{2}$)</td>
+                </tr>
+                <tr>
+                    <td>Minimal-Radius (Ruhe-Quantengrenze)</td>
+                    <td>$R_{\text{min}}$</td>
+                    <td><span class="value-highlight">1,930 796 x 10⁻¹³ m</span></td>
+                    <td>Halbe reduzierte Compton-Wellenlänge ($R_{\text{min}} = \frac{\hbar}{2 m_e c}$)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            Aus dem Zusammenspiel dieser Grundgrößen ergibt sich die makroskopische Lichtgeschwindigkeit $c$ direkt aus der Raumzeit-Struktur:
+        </p>
+        <div class="formula-card">
+            $$c = \frac{\Xi}{\eta} \cdot R_{\text{min}} \approx 299.792.458 \text{ m/s}$$
+        </div>
+    </section>
+
+    <section>
+        <h2>2. Relativistische Mechanik & Der Lorentz-Faktor $\gamma$</h2>
+        <p>
+            Bewegt sich ein rotierendes Teilchen-Antiteilchen-System mit der Relativgeschwindigkeit $v$, tritt die Spezial-Relativitätstheorie in Kraft. Der <strong>Lorentz-Faktor $\gamma$</strong> ist definiert als:
+        </p>
+        <div class="formula-card">
+            $$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$
+        </div>
+        <p>
+            Die Gesamtenergie des relativistisch rotierenden Paares setzt sich aus der relativistischen Ruhe- und Kinetik-Komponente zusammen und koppelt direkt an die Frequenz $\omega$ der emittierten Raumzeit-Welle:
+        </p>
+        <div class="formula-card">
+            $$E_{\text{rel}} = \gamma \cdot m_e c^2 = \hbar \cdot \omega$$
+        </div>
+        <p>
+            Da die Geometrie der Raumzeit-Wölbung eine Rotationsbewegung mit der Bahngeschwindigkeit $v$ und der Winkelgeschwindigkeit $\omega = \frac{v}{R}$ erfordert, folgt durch Einsetzen:
+        </p>
+        <div class="formula-card">
+            $$\gamma \cdot m_e c^2 = \hbar \cdot \frac{v}{R(\gamma)} \implies R(\gamma) = \frac{\hbar \cdot v}{\gamma \cdot m_e c^2}$$
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Relativistischer Grenzübergang ($v \to c$) & Raumzeit-Kontraktion</h2>
+        <p>
+            Nähert sich die Bahngeschwindigkeit $v$ der Raumzeit-Fluktuation der Lichtgeschwindigkeit $c$ an ($v \to c$), vereinfacht sich die relativistische Radien-Formel zur exakten Grenzbeziehung:
+        </p>
+        <div class="formula-card">
+            $$R(\gamma) = \frac{\hbar \cdot c}{\gamma \cdot m_e c^2} = \frac{\hbar}{\gamma \cdot m_e c} = \frac{\bar{\lambda}_c}{\gamma}$$
+        </div>
+        <p>
+            Hierbei ist $\bar{\lambda}_c = \frac{\hbar}{m_e c} \approx 3{,}861593 \times 10^{-13} \text{ m}$ die reduzierte Compton-Wellenlänge des Elektrons.
+        </p>
+
+        <div class="quote-box">
+            "Je höher die relativistische Energie $E = \gamma m_e c^2$ des Systems ist, desto stärker zieht sich der Rotationsradius $R(\gamma)$ infolge der Lorentz-Kontraktion des Raumes zusammen. Auf der reinen Quantenseite des ruhenden Zwei-Körper-Rotators ($\gamma = 2$ für den Schwerpunkts-Spin) geht dies exakt in den Quanten-Minimalradius $R_{\text{min}} = \frac{\bar{\lambda}_c}{2}$ über."
+        </div>
+
+        <h3>Synthese der Skalenbereiche (Klassisch bis Relativistisch)</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Regime</th>
+                    <th>Mathematische Formel</th>
+                    <th>Zahlenwert (m)</th>
+                    <th>Physikalische Zustandsklasse</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Klassisches EM-Grenzmaß ($r_e$)</td>
+                    <td>$r_e = \alpha \cdot \bar{\lambda}_c = \frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td>
+                    <td><span class="value-highlight">2,817 940 x 10⁻¹⁵</span></td>
+                    <td><span class="badge badge-em">Elektromagnetisch</span></td>
+                </tr>
+                <tr>
+                    <td>Relativistischer Radius $R(\gamma)$</td>
+                    <td>$R(\gamma) = \frac{\bar{\lambda}_c}{\gamma} = \frac{\hbar}{\gamma m_e c}$</td>
+                    <td><span class="value-highlight">Dynamisch ($\propto \gamma^{-1}$)</span></td>
+                    <td><span class="badge badge-rel">Relativistisch</span></td>
+                </tr>
+                <tr>
+                    <td>WRZT Quanten-Ruheradius ($R_{\text{min}}$)</td>
+                    <td>$R_{\text{min}} = \frac{\bar{\lambda}_c}{2} = \frac{\hbar}{2 m_e c}$</td>
+                    <td><span class="value-highlight">1,930 796 x 10⁻¹³</span></td>
+                    <td><span class="badge badge-quant">Quanten-Raumzeit</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>4. Die Rolle der Feinstrukturkonstante $\alpha$ & Der Bug-Winkel $\theta$</h2>
+        <p>
+            Die Feinstrukturkonstante $\alpha \approx \frac{1}{137{,}036}$ dient in der WRZT als geometrischer Übersetzungsfaktor zwischen dem klassischen Ladungsradius $r_e$ und der Wellengeometrie der Raumzeit:
+        </p>
+        <div class="formula-card">
+            $$r_e = \alpha \cdot \bar{\lambda}_c = 2 \cdot \alpha \cdot R_{\text{min}}$$
+        </div>
+        <p>
+            Bei der Ausbreitung der Raumzeit-Pulsation bildet sich analog zu einer Mach’schen Stoßwelle ein charakteristischer <strong>Wellen-Bugwinkel $\theta$</strong> aus, der die Phasenbeziehung im Raumzeit-Netz bestimmt:
+        </p>
+        <div class="formula-card">
+            $$\sin(\theta) = \frac{v_{\text{Phase}}}{c} = \frac{1}{\gamma}$$
+        </div>
+    </section>
+
+    <div class="conclusion-box">
+        <h3>Fazit & Physikalische Gesamtsynthese (Vers 3.02)</h3>
+        <p>
+            <strong>1. Relativistische Skalierung:</strong> Der Lorentz-Faktor $\gamma$ steuert die geometrische Kompression von Raumzeit-Wölbungen. Ein Hochenergie-System schrumpft im Wirkungsradius gemäß $R(\gamma) = \frac{\bar{\lambda}_c}{\gamma}$.
+        </p>
+        <p>
+            <strong>2. Fundamentale Untergrenze:</strong> Die Entstehung von Licht als hochfrequente Gravitationswelle beruht auf der Kopplung von Ur-Spannung $\Xi$ und Trägheit $\eta$. Die Formel $\boxed{R_{\text{min}} = \frac{\hbar}{2 m_e c}}$ stellt das stabile Fundament des Wellenraumzeit-Netzes dar.
+        </p>
+    </div>
+
+    <footer>
+        <span>WRZT Vers 3.02 (Relativistische Neufassung 2026) | Autor: Jo D. (@juppijo) &amp; Zaminia</span>
+        <span>MathJax 3.2.2 (CDNJS) | Polyfill.io strikt ausgeschlossen</span>
+    </footer>
+</div>
+
+<script>
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

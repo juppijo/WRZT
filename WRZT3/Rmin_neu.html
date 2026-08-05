@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT – Das Einheits-Manifest: Herleitung von R_min</title>
+
+  <!-- MathJax integration via CDN (CDNJS) as polyfill.io is strictly excluded -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    :root {
+      --bg-dark: #0a0f1d;
+      --card-bg: #121a2d;
+      --accent-blue: #00d2ff;
+      --accent-cyan: #3a7bd5;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border-color: #1e293b;
+      --highlight: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+    }
+
+    header {
+      border-bottom: 2px solid var(--accent-cyan);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(45deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .btn-fullscreen {
+      background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+    }
+
+    .btn-fullscreen:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5);
+    }
+
+    section {
+      margin-bottom: 35px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: var(--accent-blue);
+      margin-bottom: 15px;
+      border-left: 4px solid var(--accent-blue);
+      padding-left: 10px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      color: #cbd5e1;
+    }
+
+    .math-block {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(58, 123, 213, 0.2);
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+
+    .highlight-box {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--highlight);
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: rgba(15, 23, 42, 0.8);
+      color: var(--accent-blue);
+    }
+
+    footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .security-note {
+      color: #10b981;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="document-root">
+  <header>
+    <div>
+      <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+      <div class="subtitle">Herleitung des Minimal-Radius $R_{\text{min}}$ & Quanten-Skalierung</div>
+    </div>
+    <button class="btn-fullscreen" onclick="toggleFullScreen()">Vollbild Modus</button>
+  </header>
+
+  <section>
+    <h2>1. Ausgangspunkt & Grundgleichungen</h2>
+    <p>
+      Um den Minimal-Radius $R_{\text{min}}$ im Rahmen der Wellenraumzeit-Theorie (WRZT) herzuleiten, knüpfen wir an die fundamentale Verknüpfung von relativistischer Teilchenenergie $E = \gamma \, m_e \, c^2$ mit der Photonen- bzw. Wellenenergie $E = h \cdot f = \hbar \cdot \omega$ an.
+    </p>
+    
+    <p>Relativistische Energie des rotierenden Paares:</p>
+    <div class="math-block">
+      $$E = \gamma \, m_e \, c^2$$
+    </div>
+    <p>Wobei $\gamma = \frac{1}{\sqrt{1 - v^2/c^2}}$ den Lorentz-Faktor darstellt.</p>
+
+    <p>Quanten- / Wellenenergie des emittierten Photons:</p>
+    <div class="math-block">
+      $$E = h \cdot f = \hbar \cdot \omega$$
+    </div>
+    <p>Mit $\hbar = \frac{h}{2\pi}$ und $\omega = 2\pi f$.</p>
+
+    <p>Gleichsetzung der beiden Energiefelder:</p>
+    <div class="math-block">
+      $$\gamma \, m_e \, c^2 = \hbar \cdot \omega$$
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Geometrische Rotationskopplung</h2>
+    <p>
+      In der WRZT bewegen sich die gegenseitigen Raumzeit-Verzerrungen (z. B. Elektron-Positron-Paare) auf einer stabilen Kreisbahn mit dem Radius $R$ und der Bahngeschwindigkeit $v$. Die Winkelgeschwindigkeit ergibt sich rein geometrisch zu:
+    </p>
+    <div class="math-block">
+      $$\omega = \frac{v}{R}$$
+    </div>
+    <p>Durch Einsetzen von $\omega$ in die Energie-Gleichsetzung erhalten wir:</p>
+    <div class="math-block">
+      $$\gamma \, m_e \, c^2 = \hbar \cdot \frac{v}{R}$$
+    </div>
+    <p>Umgestellt nach dem Rotationsradius $R$:</p>
+    <div class="math-block">
+      $$R = \frac{\hbar \cdot v}{\gamma \, m_e \, c^2}$$
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Grenzübergang zum Minimal-Radius $R_{\text{min}}$</h2>
+    <p>
+      Der minimal mögliche Radius $R_{\text{min}}$ tritt im extrem-relativistischen Grenzfall auf, wenn sich die Rotationsgeschwindigkeit der Raumzeit-Wölbungen der Lichtgeschwindigkeit annähert ($v \to c$).
+    </p>
+    <div class="math-block">
+      $$R = \frac{\hbar \cdot c}{\gamma \, m_e \, c^2} = \frac{\hbar}{\gamma \, m_e \, c} = \frac{\bar{\lambda}_c}{\gamma}$$
+    </div>
+    <p>
+      Hierbei bezeichnet $\bar{\lambda}_c = \frac{\hbar}{m_e c}$ die reduzierte Compton-Wellenlänge des Elektrons.
+    </p>
+
+    <h3>Fundamentale Systemkonstanten der WRZT</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Konstante / Parameter</th>
+          <th>Symbol</th>
+          <th>Exakter / Verwendeter Wert</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ur-Spannung der Raumzeit</td>
+          <td>$\Xi$</td>
+          <td>$5,897427 \times 10^{-19} \text{ kg/m}$ (bzw. $5,8993 \times 10^{-19} \text{ kg/m}$)</td>
+        </tr>
+        <tr>
+          <td>Raumzeit-Trägheit</td>
+          <td>$\eta$</td>
+          <td>$4,5543 \times 10^{-31} \text{ kg}$</td>
+        </tr>
+        <tr>
+          <td>Lichtgeschwindigkeit</td>
+          <td>$c$</td>
+          <td>$2,99792458 \times 10^8 \text{ m/s}$</td>
+        </tr>
+        <tr>
+          <td>Reduziertes Plancksch Wirkungsquantum</td>
+          <td>$\hbar$</td>
+          <td>$1,0545718 \times 10^{-34} \text{ J s}$</td>
+        </tr>
+        <tr>
+          <td>Elektronenmasse</td>
+          <td>$m_e$</td>
+          <td>$9,1093837 \times 10^{-31} \text{ kg}$</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Betrachtung auf reiner Quantenskala (Geometrische Kopplung über $\alpha$ / Feinstruktur):</p>
+    <div class="math-block">
+      $$R_{\text{min}} = \frac{\hbar}{2 \, m_e \, c} = \frac{\bar{\lambda}_c}{2} \approx 1,93 \times 10^{-13} \text{ m}$$
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Geschlossene Formel & Physikalische Interpretation</h2>
+    <div class="highlight-box">
+      <p><strong>Geschlossene Herleitung:</strong></p>
+      <div class="math-block">
+        $$\boxed{R_{\text{min}} = \frac{\hbar \cdot v}{\gamma \, m_e \, c^2}}$$
+      </div>
+      <p>Im relativistischen Grenzfall ($v \approx c$):</p>
+      <div class="math-block">
+        $$\boxed{R_{\text{min}} = \frac{\hbar}{\gamma_{\text{max}} \, m_e \, c}}$$
+      </div>
+    </div>
+
+    <p>
+      <strong>Physikalische Interpretation:</strong><br>
+      Je höher die Energie $E = \gamma m_e c^2$ des Systems ist (größeres $\gamma$), desto stärker zieht sich die Rotationsbahn infolge der Lorentz-Kontraktion des Raumes im Wellenfeld zusammen. Die untere Schranke $R_{\text{min}}$ verhindert das kollapsartige Zusammenfallen der Struktur in eine mathematische Singularität. Sie definiert die fundamentale Untergrenze des Raumzeit-Gitters, an der hochfrequente Gravitationswellen als Photonen emittiert werden.
+    </p>
+  </section>
+
+  <footer>
+    <div>Vers 2.0 (02-08-2026) | WRZT - Das Einheits-Manifest</div>
+    <div class="security-note">✓ CDN-Ressourcen: MathJax 3.2.2 via cdnjs (polyfill.io vollständig entfernt)</div>
+  </footer>
+</div>
+
+<script>
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
