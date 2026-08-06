@@ -250,6 +250,110 @@ $$r_e = \alpha \cdot \bar{\lambda}_C \approx \frac{1}{137} \cdot 3{,}8616 \times
 
 > Der Ansatz $R = \frac{\lambda}{2\pi}$ bildet die direkte Brücke zwischen der linearen Ausbreitungswellenlänge $\lambda$ und dem Effektivradius einer rotierenden Welle.
 ---
+Bei diesem Wellenradius $R = \frac{\lambda}{2\pi}$ beträgt die Umlaufgeschwindigkeit exakt die **Lichtgeschwindigkeit $c$** ($\approx 299.792.458\text{ m/s}$).
+
+---
+
+### Schritt-für-Schritt-Herleitung
+
+**1. Umfang der Kreisbahn ($U$)**
+Wird die Wellenlänge $\lambda$ als geschlossene Kreisbahn aufgefasst, entspricht der Umfang $U$ genau einer Wellenlänge:
+
+$$U = 2\pi \cdot R = 2\pi \cdot \left(\frac{\lambda}{2\pi}\right) = \lambda$$
+
+**2. Umlaufszeit ($T$)**
+Die Zeit $T$ für einen vollständigen Umlauf ist die Periodendauer der Schwingung, die über die Frequenz $\nu$ und die Lichtgeschwindigkeit $c$ definiert ist:
+
+$$T = \frac{1}{\nu} = \frac{\lambda}{c}$$
+
+**3. Umlaufgeschwindigkeit ($v$)**
+Die Umlaufgeschwindigkeit $v$ berechnet sich aus dem Weg (Umfang $U$) geteilt durch die Zeit (Periodendauer $T$):
+
+$$v = \frac{U}{T} = \frac{\lambda}{\frac{\lambda}{c}} = \lambda \cdot \frac{c}{\lambda} = c$$
+
+---
+
+### Physikalische Bedeutung
+
+* **Phasenumlauf mit $c$:** Wenn eine Lichtwelle der Wellenlänge $\lambda$ auf einen Kreis mit dem Radius $R = \bar{\lambda}$ gebogen wird, bewegt sich die Welle auf dieser Bahn exakt mit Lichtgeschwindigkeit $c$.
+* **Winkelfrequenz und Spin:** Über die Winkelfrequenz $\omega = 2\pi \nu = \frac{c}{R}$ ergibt sich die Tangentialgeschwindigkeit ebenfalls direkt aus:
+$$v = \omega \cdot R = \left(\frac{c}{R}\right) \cdot R = c$$
+
+
+
+>Der Radius $R = \frac{\hbar}{m_e c}$ markiert damit genau den geometrischen Abstand, bei dem eine Massen- bzw. Energieoszillation mit Lichtgeschwindigkeit rotieren kann, um den Drehimpuls (Spin) $\hbar$ zu erzeugen.
+---
+Der scheinbare Widerspruch löst sich auf, wenn man zwischen der **lokalen Ausbreitungsgeschwindigkeit der Welle** und der **Bewegung des Gesamtschwerpunkts** unterscheidet.
+
+Ein Objekt mit einer Ruhemasse $m_0 > 0$ kann sich als Ganzes nicht mit Lichtgeschwindigkeit durch den Raum bewegen. Wenn jedoch energiegefüllte Felder auf einer geschlossenen Kreisbahn rotieren, gilt Folgendes:
+
+---
+
+### 1. Die Feldkomponente besitzt lokal keine Ruhemasse ($m_0 = 0$)
+
+Die Welle selbst – also das elektromagnetische Feld bzw. die Quantenfeld-Erregung – transportiert reine Bewegungs- und Schwingungsenergie. Feldwellen besitzen lokal keine Ruhemasse und bewegen sich im Vakuum daher ausnahmslos mit $v = c$.
+
+Solange die Welle frei läuft, ist sie ein Photon mit $m_0 = 0$ und $v = c$.
+
+---
+
+### 2. Ruhemasse entsteht erst durch Lokalisierung („Gefangene Energie“)
+
+Wird diese feldförmige Energie auf einem engen Raum (z. B. auf dem Radius $R = \frac{\hbar}{m_0 c}$) gebunden oder zu einer stehenden Kreiswelle geformt, ändert sich das Systemverhalten nach außen:
+
+* **Relativgeschwindigkeit des Schwerpunkts:** Der Mittelpunkt (Schwerpunkt) der rotierenden Welle kann im Raum stillstehen ($v_\text{Schwerpunkt} = 0$).
+* **Entstehung von Trägheit:** Versucht man nun, dieses lokalisierte Wellensystem als Ganzes zu beschleunigen, leistet die rotierende Feldenergie Widerstand gegen die Richtungsänderung.
+* **Äquivalenz:** Diese im Kreis gefangene Energie $E$ wirkt für einen äußeren Beobachter exakt wie eine punktförmige Ruhemasse:
+
+$$m_0 = \frac{E}{c^2}$$
+
+---
+
+### 3. Analogie und Quantenmechanik (Dirac-Zitterbewegung)
+
+* **Die Box-Analogie:** Stellt man sich einen perfekten Spiegelkasten vor, der innen masselose Photonen enthält, erhöht die im Kasten gefangene Strahlung die Trägheit (Masse) des Kastens. Die Photonen im Inneren bewegen sich weiterhin mit $c$, aber der Kasten als Gesamtsystem hat eine Ruhemasse $m_0 = \frac{E_{\text{Photonen}}}{c^2}$ und kann ruhen.
+* **Dirac-Theorie des Elektrons:** In der relativistischen Quantenmechanik zeigt der Geschwindigkeitsoperator des Elektrons, dass die momentane innere Geschwindigkeit der Komponente stets $\pm c$ beträgt (bekannt als *Zitterbewegung*). Erst durch die Überlagerung dieser inneren Bewegung mit $c$ entsteht makroskopisch ein Teilchen, das eine Ruhemasse $m_e$ besitzt und sich im Raum langsamer als $c$ bewegt.
+
+---
+
+>Die Ruhemasse $m_0$ gehört somit nicht den einzelnen Wellenfronten, die mit $c$ rotieren, sondern ist das makroskopische Ergebnis der in sich geschlossenen, lokal gebundenen Feldenergie.
+---
+Der scheinbare Widerspruch löst sich auf, wenn man zwischen der **lokalen Ausbreitungsgeschwindigkeit der Welle** und der **Bewegung des Gesamtschwerpunkts** unterscheidet.
+
+Ein Objekt mit einer Ruhemasse $m_0 > 0$ kann sich als Ganzes nicht mit Lichtgeschwindigkeit durch den Raum bewegen. Wenn jedoch energiegefüllte Felder auf einer geschlossenen Kreisbahn rotieren, gilt Folgendes:
+
+---
+
+### 1. Die Feldkomponente besitzt lokal keine Ruhemasse ($m_0 = 0$)
+
+Die Welle selbst – also das elektromagnetische Feld bzw. die Quantenfeld-Erregung – transportiert reine Bewegungs- und Schwingungsenergie. Feldwellen besitzen lokal keine Ruhemasse und bewegen sich im Vakuum daher ausnahmslos mit $v = c$.
+
+Solange die Welle frei läuft, ist sie ein Photon mit $m_0 = 0$ und $v = c$.
+
+---
+
+### 2. Ruhemasse entsteht erst durch Lokalisierung („Gefangene Energie“)
+
+Wird diese feldförmige Energie auf einem engen Raum (z. B. auf dem Radius $R = \frac{\hbar}{m_0 c}$) gebunden oder zu einer stehenden Kreiswelle geformt, ändert sich das Systemverhalten nach außen:
+
+* **Relativgeschwindigkeit des Schwerpunkts:** Der Mittelpunkt (Schwerpunkt) der rotierenden Welle kann im Raum stillstehen ($v_\text{Schwerpunkt} = 0$).
+* **Entstehung von Trägheit:** Versucht man nun, dieses lokalisierte Wellensystem als Ganzes zu beschleunigen, leistet die rotierende Feldenergie Widerstand gegen die Richtungsänderung.
+* **Äquivalenz:** Diese im Kreis gefangene Energie $E$ wirkt für einen äußeren Beobachter exakt wie eine punktförmige Ruhemasse:
+
+$$m_0 = \frac{E}{c^2}$$
+
+---
+
+### 3. Analogie und Quantenmechanik (Dirac-Zitterbewegung)
+
+* **Die Box-Analogie:** Stellt man sich einen perfekten Spiegelkasten vor, der innen masselose Photonen enthält, erhöht die im Kasten gefangene Strahlung die Trägheit (Masse) des Kastens. Die Photonen im Inneren bewegen sich weiterhin mit $c$, aber der Kasten als Gesamtsystem hat eine Ruhemasse $m_0 = \frac{E_{\text{Photonen}}}{c^2}$ und kann ruhen.
+* **Dirac-Theorie des Elektrons:** In der relativistischen Quantenmechanik zeigt der Geschwindigkeitsoperator des Elektrons, dass die momentane innere Geschwindigkeit der Komponente stets $\pm c$ beträgt (bekannt als *Zitterbewegung*). Erst durch die Überlagerung dieser inneren Bewegung mit $c$ entsteht makroskopisch ein Teilchen, das eine Ruhemasse $m_e$ besitzt und sich im Raum langsamer als $c$ bewegt.
+
+---
+
+Die Ruhemasse $m_0$ gehört somit nicht den einzelnen Wellenfronten, die mit $c$ rotieren, sondern ist das makroskopische Ergebnis der in sich geschlossenen, lokal gebundenen Feldenergie.
+
+---
 
 <footer style="text-align:center; color:#888; font-size:0.9em; margin-top:40px;">
     🌀 🌌  ✨  © 2026 Jo D. & Zaminia – WRZT – Wellen-Raumzeit-Theorie. Vers 3.05  🌀 🌌  ✨ 
