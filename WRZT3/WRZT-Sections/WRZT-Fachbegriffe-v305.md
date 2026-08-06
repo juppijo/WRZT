@@ -355,6 +355,77 @@ Die Ruhemasse $m_0$ gehört somit nicht den einzelnen Wellenfronten, die mit $c$
 
 ---
 
+Setzt man die mechanische Zentrifugalkraft eines mit Lichtgeschwindigkeit $c$ rotierenden Wellen-Wirbels gleich der elektrostattischen Coulomb-Kraft, erhält man exakt den **klassischen Elektronenradius** $r_e \approx 2{,}8179 \times 10^{-15}\text{ m}$.
+
+---
+
+### Schritt-für-Schritt-Herleitung
+
+#### 1. Ansätze für die Kräfte
+
+* **Zentrifugalkraft $F_Z$:** Für eine rotierende Welle/Masse $m_e$ mit Umlaufgeschwindigkeit $v = c$ auf einem Radius $R$ gilt:
+
+$$F_Z = \frac{m_e \cdot c^2}{R}$$
+
+
+* **Coulomb-Kraft $F_C$:** Die elektrostatische Eigenenergie bzw. Anziehungskraft der Ladung $e$ auf den Radius $R$ ist:
+
+$$F_C = \frac{e^2}{4\pi \varepsilon_0 \cdot R^2}$$
+
+
+
+---
+
+#### 2. Gleichsetzen der Kräfte ($F_Z = F_C$)
+
+$$\frac{m_e \cdot c^2}{R} = \frac{e^2}{4\pi \varepsilon_0 \cdot R^2}$$
+
+Multipliziert man die Gleichung mit $R^2$ und teilt durch $m_e c^2$, erhält man für den inneren Radius $R$:
+
+$$R = \frac{e^2}{4\pi \varepsilon_0 \cdot m_e c^2} = r_e$$
+
+---
+
+#### 3. Zahlenwert berechnen
+
+Setzt man die Naturkonstanten ein:
+
+* Elementarladung $e \approx 1{,}6022 \times 10^{-19}\text{ C}$
+* Elektronenmasse $m_e \approx 9{,}1094 \times 10^{-31}\text{ kg}$
+* Lichtgeschwindigkeit $c \approx 2{,}9979 \times 10^8\text{ m/s}$
+* Elektrische Feldkonstante $\varepsilon_0 \approx 8{,}8542 \times 10^{-12}\text{ F/m}$
+
+$$r_e \approx \frac{(1{,}6022 \times 10^{-19})^2}{4\pi \cdot (8{,}8542 \times 10^{-12}) \cdot (9{,}1094 \times 10^{-31}) \cdot (2{,}9979 \times 10^8)^2}$$
+
+$$r_e \approx 2{,}8179 \times 10^{-15}\text{ m} \quad (2{,}8179\text{ Femtometer / fm})$$
+
+---
+
+### Verknüpfung mit den beiden Radien des Modells
+
+Damit ergibt sich ein faszinierendes zweistufiges Bild des Elektronenwirbels:
+
+1. **Äußerer Radius (Wellen- / Spin-Radius):**
+
+$$R_{\text{außen}} = \bar{\lambda}_C = \frac{\hbar}{m_e c} \approx 3{,}8616 \times 10^{-13}\text{ m}$$
+
+
+
+Hier bestimmt der **Spin ($\hbar$)** und der Phasenumlauf mit $c$ die räumliche Ausdehnung der Quantenwelle.
+2. **Innerer Radius (Coulomb- / Ladungskern):**
+
+$$R_{\text{innen}} = r_e = \alpha \cdot \bar{\lambda}_C \approx 2{,}8179 \times 10^{-15}\text{ m}$$
+
+
+
+Hier stellt sich das Gleichgewicht zwischen der elektrostatischen Ladungsabstoßung/Feldkraft und der Zentrifugalkraft der Strömung ein.
+
+Das Verhältnis beider Radien entspricht exakt der **Feinstrukturkonstante $\alpha \approx \frac{1}{137{,}036}$**:
+
+$$\frac{R_{\text{innen}}}{R_{\text{außen}}} = \frac{r_e}{\bar{\lambda}_C} = \alpha$$
+
+---
+
 <footer style="text-align:center; color:#888; font-size:0.9em; margin-top:40px;">
     🌀 🌌  ✨  © 2026 Jo D. & Zaminia – WRZT – Wellen-Raumzeit-Theorie. Vers 3.05  🌀 🌌  ✨ 
 </footer>
