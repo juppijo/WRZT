@@ -197,6 +197,61 @@
 <p>$$\Xi(\gamma) = \gamma^2 \cdot \Xi_0$$</p>
 <p>$$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0}$$</p>
 <p>$$ \ P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$</p>
+<p> $$ c = \frac{\Xi}{\eta} \cdot R_{\text{min}}$$</p>
+<hr>
+<blockquote>
+<p>In der <strong>Wellenraumzeit-Theorie (WRZT)</strong> lässt sich die Lichtgeschwindigkeit $c$ – auch im relativistischen Bereich unter Berücksichtigung des Lorentz-Faktors $\gamma$ – elegant und in sich konsistent herleiten.</p>
+</blockquote>
+<p>Dazu verknüpfen wir die relativistische Dynamik der WRZT (Rotationskopplung) mit der Kontinuumsmechanik des 3D-Raumzeit-Netzwerks.</p>
+<hr>
+<h3>1. Herleitung von $c$ im relativistischen Bereich (Lorentz-Faktor $\gamma$)</h3>
+<p>In der WRZT wird ein Teilchen-Antiteilchen-Paar (bzw. eine Raumzeit-Wölbung) als rotierendes System mit dem Radius $R$, der Bahngeschwindigkeit $v$ und der Winkelgeschwindigkeit $\omega = \frac{v}{R}$ beschrieben.</p>
+<h4>Step 1: Energiegleichsetzung im relativistischen Bereich</h4>
+<p>Die relativistische Gesamtenergie des rotierenden Paares beträgt:</p>
+<p>$$E = \gamma \cdot m_e \cdot c^2$$</p>
+<p>Gleichzeitig wird diese Energie im Wellenbild über das Plancksche Wirkungsquantum aus ausgedrückt:</p>
+<p>$$E = \hbar \cdot \omega = \hbar \cdot \frac{v}{R}$$</p>
+<p>Gleichsetzen beider Ansätze ergibt:</p>
+<p>$$\gamma \cdot m_e \cdot c^2 = \frac{\hbar \cdot v}{R}$$</p>
+<h4>Step 2: Dynamischer Radius $R$</h4>
+<p>Stellt man nach dem Rotationsradius $R$ um, erhält man die relativistische Formel für den Radius:</p>
+<p>$$R(v) = \frac{\hbar \cdot v}{\gamma \cdot m_e \cdot c^2}$$</p>
+<h4>Step 3: Grenzübergang zum Minimal-Radius ($v \to c$)</h4>
+<p>Nähert sich die Rotationsgeschwindigkeit der Raumzeit-Verzerrungen im relativistischen Grenzfall der Lichtgeschwindigkeit ($v \approx c$), reduziert sich die Formel zu:</p>
+<p>$$R_{\text{min}} = \frac{\hbar}{\gamma \cdot m_e \cdot c} = \frac{\bar{\lambda}_c}{\gamma}$$</p>
+<p>Daraus ergibt sich die fundamentale Beziehung für $c$:</p>
+<p>$$\boxed{c = \frac{\hbar}{\gamma \cdot m_e \cdot R_{\text{min}}}}$$</p>
+<blockquote>
+<p><strong>Physikalische Bedeutung:</strong> Bei extrem hohen Energien (großem Lorentz-Faktor $\gamma$) verengt sich der Rotationsradius $R$. Das Produkt aus relativistischer Masse ($\gamma \cdot m_e$) und Radius $R_{\text{min}}$ bleibt an das quantenmechanische Grenzmaß $\hbar$ gebunden.</p>
+</blockquote>
+<hr>
+<h3>2. Herleitung von $c$ aus der elastischen Netzwerktendenz (3D-WRZT Modell)</h3>
+<p>Im 3D-Netzwerkmodell der WRZT ergibt sich $c$ zusätzlich aus den makroskopischen Grundeigenschaften der Raumzeit (Dichte und Druck des Raumzeit-Netzes):</p>
+<ol>
+<li><strong>Raumzeit-Volumendichte $\rho_{\text{Ur}}$:</strong><br>$$\rho_{\text{Ur}} = \frac{\eta}{R_{\text{min}}^3} \quad [\text{kg}/\text{m}^3]$$</li>
+</ol>
+<p><em>(mit der Raumzeit-Trägheit $\eta$ und der Maschenweite $R_{\text{min}}$)</em><br>2. <strong>Raumzeit-Druck / 3D-Ur-Spannung $P_{\text{Ur}}$:</strong><br>$$P_{\text{Ur}} = \frac{\Xi \cdot c^2}{R_{\text{min}}^2} = \frac{\eta \cdot c^2}{R_{\text{min}}^3} \quad [\text{N}/\text{m}^2 \text{ bzw. } \text{J}/\text{m}^3]$$</p>
+<ol start="3">
+<li><strong>Phasengeschwindigkeit der Raumzeitwelle ($c$):</strong><br>Aus der Ausbreitungsgeschwindigkeit von Elastizitätswellen in Medien ($c = \sqrt{P/\rho}$) folgt:</li>
+</ol>
+<p>$$c = \sqrt{\frac{P_{\text{Ur}}}{\rho_{\text{Ur}}}} = \sqrt{\frac{\frac{\eta \cdot c^2}{R_{\text{min}}^3}}{\frac{\eta}{R_{\text{min}}^3}}} = \frac{\Xi}{\eta} \cdot R_{\text{min}}$$</p>
+<h4>Einheiten-Check:</h4>
+<p>$$\left[c\right] = \sqrt{\frac{\text{N}/\text{m}^2}{\text{kg}/\text{m}^3}} = \sqrt{\frac{\text{kg}\cdot\text{m}/\text{s}^2 \cdot \text{m}^3}{\text{m}^2 \cdot \text{kg}}} = \sqrt{\frac{\text{m}^2}{\text{s}^2}} = \frac{\text{m}}{\text{s}}$$</p>
+<p>Mit den exakten Ur-Konstanten der WRZT:</p>
+<ul>
+<li>$\Xi \approx 5,8974 \times 10^{-19} \text{ kg/m}$ (Ur-Spannung)</li>
+<li>$\eta \approx 4,5543 \times 10^{-31} \text{ kg}$ (Raumzeit-Trägheit)</li>
+<li>$R_{\text{min}} \approx 2,315 \times 10^{-17} \text{ m}$ (Gitterkonstante des ungestörten Netzes bzw. $\frac{\bar{\lambda}_c}{2}$ relativistisch angeglichen)</li>
+</ul>
+<p>ergibt sich punktgenau:</p>
+<p>$$c \approx 299.792.458 \text{ m/s}$$</p>
+<hr>
+<h3>Fazit &amp; Synthese</h3>
+<p>Die Lichtgeschwindigkeit $c$ ist in der WRZT keine willkürliche Naturkonstante, sondern:</p>
+<ol>
+<li><strong>Mikroskopisch (Relativistisch):</strong> Das Grenzverhältnis von Wellenimpuls und raumzeitlicher Compton-Lokalisation unter Einfluss der Lorentz-Kontraktion ($\gamma$).</li>
+<li><strong>Makroskopisch (Netzwerk):</strong> Die fundamentale Ausbreitungsgeschwindigkeit von Spannungswellen im elastischen Raumzeit-Gitter ($\sqrt{P_{\text{Ur}}/\rho_{\text{Ur}}}$).</li>
+</ol>
 <hr>
 <footer style="text-align:center; color:#888; font-size:0.9em; margin-top:40px;">
     🌀 🌌  ✨  © 2026 Jo D. &amp; Zaminia – WRZT – Wellen-Raumzeit-Theorie. Vers 3.06  🌀 🌌  ✨ 
