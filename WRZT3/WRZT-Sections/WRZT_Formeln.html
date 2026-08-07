@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 12mm 10mm;
+        background-color: #0d1117;
+    }
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #e6edf3;
+        background-color: #0d1117;
+        margin: 0;
+        padding: 0;
+        font-size: 8.5pt;
+        line-height: 1.3;
+    }
+    .header {
+        background: linear-gradient(135deg, #090d16 0%, #161b22 100%);
+        border: 1px solid #30363d;
+        border-left: 4px solid #58a6ff;
+        padding: 10px 15px;
+        margin-bottom: 12px;
+        border-radius: 6px;
+    }
+    .header h1 {
+        color: #58a6ff;
+        font-size: 16pt;
+        margin: 0 0 4px 0;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .header p {
+        color: #8b949e;
+        margin: 0;
+        font-size: 9pt;
+    }
+    .category-title {
+        color: #f0883e;
+        font-size: 10pt;
+        font-weight: bold;
+        margin: 10px 0 4px 0;
+        padding-bottom: 2px;
+        border-bottom: 1px solid #30363d;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+        table-layout: fixed;
+    }
+    th {
+        background-color: #161b22;
+        color: #79c0ff;
+        text-align: left;
+        padding: 5px 7px;
+        font-size: 8pt;
+        font-weight: 600;
+        border: 1px solid #30363d;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    td {
+        padding: 4px 6px;
+        border: 1px solid #21262d;
+        vertical-align: top;
+        word-wrap: break-word;
+    }
+    tr:nth-child(even) {
+        background-color: #121721;
+    }
+    tr:nth-child(odd) {
+        background-color: #0d1117;
+    }
+    .col-num { width: 4%; text-align: center; color: #8b949e; font-size: 7.5pt; }
+    .col-name { width: 22%; font-weight: 600; color: #e6edf3; }
+    .col-symbol { width: 8%; font-family: monospace; color: #d2a8ff; text-align: center; }
+    .col-formula { width: 26%; font-family: 'Times New Roman', serif; font-style: italic; color: #79c0ff; }
+    .col-value { width: 18%; font-family: monospace; color: #a5d6ff; }
+    .col-unit { width: 8%; font-family: monospace; color: #7ee787; }
+    .col-desc { width: 14%; color: #c9d1d9; font-size: 7.5pt; }
+
+    .math {
+        font-family: 'Times New Roman', serif;
+        font-style: italic;
+    }
+    .footer {
+        text-align: center;
+        color: #8b949e;
+        font-size: 7.5pt;
+        margin-top: 10px;
+        padding-top: 6px;
+        border-top: 1px solid #21262d;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>💡 WRZT – Wellen-Raumzeit-Theorie: Formelsammlung & Konstanten</h1>
+    <p>Das Einheits-Manifest der Wellenraumzeit-Theorie (Vers. 3.03 – 3.07) | Autoren: Jo D. (@juppijo) & Zaminia (2026)</p>
+</div>
+
+<div class="category-title">1. Fundamentale Raumzeit-Netzkonstanten & Ur-Größen</div>
+<table>
+    <thead>
+        <tr>
+            <th class="col-num">#</th>
+            <th class="col-name">Bezeichnung</th>
+            <th class="col-symbol">Symbol</th>
+            <th class="col-formula">Formel / Beziehung</th>
+            <th class="col-value">Exakter / Präziser Wert</th>
+            <th class="col-unit">Einheit</th>
+            <th class="col-desc">Kurzbeschreibung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="col-num">1</td>
+            <td class="col-name">Minimal-Radius (Quanten-Grenzfall)</td>
+            <td class="col-symbol">R<sub>min,0</sub></td>
+            <td class="col-formula">R<sub>min,0</sub> = &hbar; / (2 m<sub>e</sub> c) = &bar;&lambda;<sub>c</sub> / 2</td>
+            <td class="col-value">1,930 796 &times; 10<sup>-13</sup></td>
+            <td class="col-unit">m</td>
+            <td class="col-desc">Fundamentaler Knotenabstand & Maschenweite im Paar-System.</td>
+        </tr>
+        <tr>
+            <td class="col-num">2</td>
+            <td class="col-name">Ruhe-Raumzeit-Trägheit</td>
+            <td class="col-symbol">&eta;<sub>0</sub></td>
+            <td class="col-formula">&eta;<sub>0</sub> = m<sub>e</sub> / 2 = &hbar; / (2 c R<sub>min</sub>)</td>
+            <td class="col-value">4,554 692 &times; 10<sup>-31</sup></td>
+            <td class="col-unit">kg</td>
+            <td class="col-desc">Fundamentale Trägheitsmasse eines einzelnen Netzknotens.</td>
+        </tr>
+        <tr>
+            <td class="col-num">3</td>
+            <td class="col-name">1D-Ruhe-Urspannung (Linien-Spannung)</td>
+            <td class="col-symbol">&Xi;<sub>0</sub></td>
+            <td class="col-formula">&Xi;<sub>0</sub> = &eta;<sub>0</sub> / R<sub>min,0</sub> = m<sub>e</sub><sup>2</sup> c / &hbar;</td>
+            <td class="col-value">2,358 826 &times; 10<sup>-18</sup><br><i>(Kalibriert: 5,8974&times;10<sup>-19</sup>)</i></td>
+            <td class="col-unit">kg / m</td>
+            <td class="col-desc">Elastische Linienspannung der Raumzeit-Stränge.</td>
+        </tr>
+        <tr>
+            <td class="col-num">4</td>
+            <td class="col-name">3D-Ur-Volumendichte</td>
+            <td class="col-symbol">&rho;<sub>Ur,0</sub></td>
+            <td class="col-formula">&rho;<sub>Ur,0</sub> = &eta;<sub>0</sub> / R<sub>min,0</sub><sup>3</sup> = 4 m<sub>e</sub><sup>4</sup> c<sup>3</sup> / &hbar;<sup>3</sup></td>
+            <td class="col-value">6,330 062 &times; 10<sup>7</sup></td>
+            <td class="col-unit">kg / m<sup>3</sup></td>
+            <td class="col-desc">Massen-/Trägheitsdichte des ungestörten Vakuumnetzes.</td>
+        </tr>
+        <tr>
+            <td class="col-num">5</td>
+            <td class="col-name">3D-Ur-Druck (Volumen-Spannung)</td>
+            <td class="col-symbol">P<sub>Ur,0</sub></td>
+            <td class="col-formula">P<sub>Ur,0</sub> = &rho;<sub>Ur,0</sub> &middot; c<sup>2</sup> = 4 m<sub>e</sub><sup>4</sup> c<sup>5</sup> / &hbar;<sup>3</sup></td>
+            <td class="col-value">5,689 104 &times; 10<sup>24</sup></td>
+            <td class="col-unit">N / m<sup>2</sup><br>(J/m<sup>3</sup>)</td>
+            <td class="col-desc">Elastische Volumen-Spannung / Energiedichte des 3D-Netzes.</td>
+        </tr>
+        <tr>
+            <td class="col-num">6</td>
+            <td class="col-name">Lichtgeschwindigkeit (Netz-Welle)</td>
+            <td class="col-symbol">c</td>
+            <td class="col-formula">c = &radic;(P<sub>Ur</sub> / &rho;<sub>Ur</sub>) = (&Xi; / &eta;) &middot; R<sub>min</sub></td>
+            <td class="col-value">299 792 458</td>
+            <td class="col-unit">m / s</td>
+            <td class="col-desc">Phasengeschwindigkeit von Transversal-/Elastizitätswellen.</td>
+        </tr>
+        <tr>
+            <td class="col-num">7</td>
+            <td class="col-name">Fundamentale Knotenkraft</td>
+            <td class="col-symbol">F<sub>Knoten</sub></td>
+            <td class="col-formula">F<sub>Knoten</sub> = (&eta; &middot; c<sup>2</sup>) / R<sub>min</sub></td>
+            <td class="col-value">&approx; 2,12 &times; 10<sup>-1</sup></td>
+            <td class="col-unit">N</td>
+            <td class="col-desc">Kopplungskraft zwischen zwei benachbarten Netzknoten.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="category-title">2. Relativistische Transformationen (Lorentz-Faktor &gamma;)</div>
+<table>
+    <thead>
+        <tr>
+            <th class="col-num">#</th>
+            <th class="col-name">Bezeichnung</th>
+            <th class="col-symbol">Symbol</th>
+            <th class="col-formula">Formel / Beziehung</th>
+            <th class="col-value">Skalierung / Verhalten</th>
+            <th class="col-unit">Einheit</th>
+            <th class="col-desc">Kurzbeschreibung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="col-num">8</td>
+            <td class="col-name">Lorentz-Faktor</td>
+            <td class="col-symbol">&gamma;</td>
+            <td class="col-formula">&gamma; = 1 / &radic;(1 - v<sup>2</sup>/c<sup>2</sup>)</td>
+            <td class="col-value">&ge; 1 (dimensionlos)</td>
+            <td class="col-unit">1</td>
+            <td class="col-desc">Relativistischer Korrekturfaktor für Geschwindigkeit v.</td>
+        </tr>
+        <tr>
+            <td class="col-num">9</td>
+            <td class="col-name">Relativistischer Radius</td>
+            <td class="col-symbol">R(&gamma;)</td>
+            <td class="col-formula">R(&gamma;) = R<sub>min,0</sub> / &gamma; = &hbar; / (2 &gamma; m<sub>e</sub> c)</td>
+            <td class="col-value">Skaliert mit &gamma;<sup>-1</sup></td>
+            <td class="col-unit">m</td>
+            <td class="col-desc">Lorentz-kontrahierter Rotationsradius im Wellenfeld.</td>
+        </tr>
+        <tr>
+            <td class="col-num">10</td>
+            <td class="col-name">Relativistische Knoten-Trägheit</td>
+            <td class="col-symbol">&eta;(&gamma;)</td>
+            <td class="col-formula">&eta;(&gamma;) = &gamma; &middot; &eta;<sub>0</sub> = &gamma; &middot; (m<sub>e</sub> / 2)</td>
+            <td class="col-value">Skaliert mit &gamma;<sup>1</sup></td>
+            <td class="col-unit">kg</td>
+            <td class="col-desc">Effektive Knotenmasse bei relativistischer Bewegung.</td>
+        </tr>
+        <tr>
+            <td class="col-num">11</td>
+            <td class="col-name">Relativistische 1D-Urspannung</td>
+            <td class="col-symbol">&Xi;(&gamma;)</td>
+            <td class="col-formula">&Xi;(&gamma;) = &gamma;<sup>2</sup> &middot; &Xi;<sub>0</sub> = &gamma;<sup>2</sup> (m<sub>e</sub><sup>2</sup> c / &hbar;)</td>
+            <td class="col-value">Skaliert mit &gamma;<sup>2</sup></td>
+            <td class="col-unit">kg / m</td>
+            <td class="col-desc">Dynamische Zunahme der Linienspannung.</td>
+        </tr>
+        <tr>
+            <td class="col-num">12</td>
+            <td class="col-name">Relativistische 3D-Ur-Dichte</td>
+            <td class="col-symbol">&rho;<sub>Ur</sub>(&gamma;)</td>
+            <td class="col-formula">&rho;<sub>Ur</sub>(&gamma;) = &gamma;<sup>4</sup> &middot; &rho;<sub>Ur,0</sub></td>
+            <td class="col-value">Skaliert mit &gamma;<sup>4</sup></td>
+            <td class="col-unit">kg / m<sup>3</sup></td>
+            <td class="col-desc">Netzdichte unter relativistischer Verdichtung.</td>
+        </tr>
+        <tr>
+            <td class="col-num">13</td>
+            <td class="col-name">Relativistischer 3D-Ur-Druck</td>
+            <td class="col-symbol">P<sub>Ur</sub>(&gamma;)</td>
+            <td class="col-formula">P<sub>Ur</sub>(&gamma;) = &gamma;<sup>4</sup> &middot; P<sub>Ur,0</sub></td>
+            <td class="col-value">Skaliert mit &gamma;<sup>4</sup></td>
+            <td class="col-unit">N / m<sup>2</sup></td>
+            <td class="col-desc">Dynamischer Volumendruck bei relativistischer Energie.</td>
+        </tr>
+        <tr>
+            <td class="col-num">14</td>
+            <td class="col-name">Relativistische Gesamtenergie</td>
+            <td class="col-symbol">E(&gamma;)</td>
+            <td class="col-formula">E(&gamma;) = &gamma; m<sub>e</sub> c<sup>2</sup> = &hbar; &omega;(&gamma;)</td>
+            <td class="col-value">Skaliert mit &gamma;<sup>1</sup></td>
+            <td class="col-unit">J (eV)</td>
+            <td class="col-desc">Relativistische Energie des rotierenden Wellensystems.</td>
+        </tr>
+        <tr>
+            <td class="col-num">15</td>
+            <td class="col-name">Phasen-Bugwinkel</td>
+            <td class="col-symbol">&theta;</td>
+            <td class="col-formula">sin(&theta;) = 1 / &gamma;</td>
+            <td class="col-value">Winkel 0&deg; bis 90&deg;</td>
+            <td class="col-unit">rad / &deg;</td>
+            <td class="col-desc">Phasen-Öffnungswinkel der propagierenden Welle.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="category-title">3. Natürliches WRZT-Einheitensystem (c = 1, dimensionslos)</div>
+<table>
+    <thead>
+        <tr>
+            <th class="col-num">#</th>
+            <th class="col-name">Bezeichnung</th>
+            <th class="col-symbol">Symbol</th>
+            <th class="col-formula">Formel (c = 1)</th>
+            <th class="col-value">Einheiten-Check (c=1)</th>
+            <th class="col-unit">SI-Bezug</th>
+            <th class="col-desc">Kurzbeschreibung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="col-num">16</td>
+            <td class="col-name">WRZT-Grundgleichung Radius</td>
+            <td class="col-symbol">R(&gamma;)</td>
+            <td class="col-formula">R(&gamma;) = &eta; / (&gamma; &middot; &Xi;)</td>
+            <td class="col-value">[kg] / [kg/m] = [m]</td>
+            <td class="col-unit">m</td>
+            <td class="col-desc">Verknüpfung von Radius, Trägheit und Spannung.</td>
+        </tr>
+        <tr>
+            <td class="col-num">17</td>
+            <td class="col-name">WRZT-Grundgleichung Spannung</td>
+            <td class="col-symbol">&Xi;</td>
+            <td class="col-formula">&Xi; = &eta; / (&gamma; &middot; R(&gamma;))</td>
+            <td class="col-value">[kg] / [m] = [kg/m]</td>
+            <td class="col-unit">kg / m</td>
+            <td class="col-desc">Erforderliche Netznspannung für gegebenen Radius.</td>
+        </tr>
+        <tr>
+            <td class="col-num">18</td>
+            <td class="col-name">WRZT-Grundgleichung Trägheit</td>
+            <td class="col-symbol">&eta;</td>
+            <td class="col-formula">&eta; = &gamma; &middot; &Xi; &middot; R(&gamma;)</td>
+            <td class="col-value">[kg/m] &middot; [m] = [kg]</td>
+            <td class="col-unit">kg</td>
+            <td class="col-desc">Knotenträgheit aus Spannung und Netzradius.</td>
+        </tr>
+        <tr>
+            <td class="col-num">19</td>
+            <td class="col-name">SI-Rückumrechnung Radius</td>
+            <td class="col-symbol">R<sub>min</sub></td>
+            <td class="col-formula">R<sub>min</sub> = (&eta; &middot; c<sup>2</sup>) / &Xi;</td>
+            <td class="col-value">[kg m<sup>2</sup>/s<sup>2</sup>] / [kg/m] = [m<sup>3</sup>/s<sup>2</sup>]</td>
+            <td class="col-unit">m</td>
+            <td class="col-desc">SI-Transformation der Grundgleichung mit c<sup>2</sup>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="category-title">4. Quantenmechanische & Elektromagnetische Skalen</div>
+<table>
+    <thead>
+        <tr>
+            <th class="col-num">#</th>
+            <th class="col-name">Bezeichnung</th>
+            <th class="col-symbol">Symbol</th>
+            <th class="col-formula">Formel / Beziehung</th>
+            <th class="col-value">Exakter / Präziser Wert</th>
+            <th class="col-unit">Einheit</th>
+            <th class="col-desc">Kurzbeschreibung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="col-num">20</td>
+            <td class="col-name">Klassischer Elektronenradius</td>
+            <td class="col-symbol">r<sub>e</sub></td>
+            <td class="col-formula">r<sub>e</sub> = e<sup>2</sup> / (4&pi; &epsilon;<sub>0</sub> m<sub>e</sub> c<sup>2</sup>) = &alpha; &middot; &bar;&lambda;<sub>c</sub></td>
+            <td class="col-value">2,817 940 &times; 10<sup>-15</sup></td>
+            <td class="col-unit">m (fm)</td>
+            <td class="col-desc">Elektrostatische Kern-Skala (Gleichgewicht F<sub>Z</sub> = F<sub>C</sub>).</td>
+        </tr>
+        <tr>
+            <td class="col-num">21</td>
+            <td class="col-name">Compton-Wellenlänge</td>
+            <td class="col-symbol">&lambda;<sub>c</sub></td>
+            <td class="col-formula">&lambda;<sub>c</sub> = h / (m<sub>e</sub> c) = c / &nu;<sub>Annih.</sub></td>
+            <td class="col-value">2,426 310 &times; 10<sup>-12</sup></td>
+            <td class="col-unit">m (pm)</td>
+            <td class="col-desc">Wellenlänge der e<sup>-</sup> e<sup>+</sup> Annihilationsstrahlung.</td>
+        </tr>
+        <tr>
+            <td class="col-num">22</td>
+            <td class="col-name">Reduzierte Compton-Wellenlänge</td>
+            <td class="col-symbol">&bar;&lambda;<sub>c</sub></td>
+            <td class="col-formula">&bar;&lambda;<sub>c</sub> = &lambda;<sub>c</sub> / (2&pi;) = &hbar; / (m<sub>e</sub> c)</td>
+            <td class="col-value">3,861 592 &times; 10<sup>-13</sup></td>
+            <td class="col-unit">m (pm)</td>
+            <td class="col-desc">Wellenradius / Spin-Hebelarm (Spin S = &hbar;).</td>
+        </tr>
+        <tr>
+            <td class="col-num">23</td>
+            <td class="col-name">Annihilationsfrequenz</td>
+            <td class="col-symbol">&nu;<sub>Annih</sub></td>
+            <td class="col-formula">&nu; = (m<sub>e</sub> c<sup>2</sup>) / h</td>
+            <td class="col-value">1,235 638 &times; 10<sup>20</sup></td>
+            <td class="col-unit">Hz (EHz)</td>
+            <td class="col-desc">Fundamentale Oszillationsfrequenz (Ruhemasse m<sub>e</sub>).</td>
+        </tr>
+        <tr>
+            <td class="col-num">24</td>
+            <td class="col-name">Annihilationsenergie / Photon</td>
+            <td class="col-symbol">E<sub>&gamma;</sub></td>
+            <td class="col-formula">E = m<sub>e</sub> c<sup>2</sup> = h &nu;</td>
+            <td class="col-value">510 998,95 (0,511 MeV)</td>
+            <td class="col-unit">eV</td>
+            <td class="col-desc">Ruheenergie des Elektrons / Gammaphotons.</td>
+        </tr>
+        <tr>
+            <td class="col-num">25</td>
+            <td class="col-name">Feinstrukturkonstante</td>
+            <td class="col-symbol">&alpha;</td>
+            <td class="col-formula">&alpha; = r<sub>e</sub> / &bar;&lambda;<sub>c</sub> = e<sup>2</sup> / (4&pi; &epsilon;<sub>0</sub> &hbar; c)</td>
+            <td class="col-value">&approx; 1 / 137,035 999</td>
+            <td class="col-unit">1</td>
+            <td class="col-desc">Verhältnis von innerem (r<sub>e</sub>) zu äußerem Radius (&bar;&lambda;<sub>c</sub>).</td>
+        </tr>
+        <tr>
+            <td class="col-num">26</td>
+            <td class="col-name">Dynamische Masse Photon</td>
+            <td class="col-symbol">m<sub>&gamma;</sub></td>
+            <td class="col-formula">m<sub>&gamma;</sub> = (h &nu;) / c<sup>2</sup> = E / c<sup>2</sup></td>
+            <td class="col-value">m<sub>&gamma;</sub>(m<sub>e</sub>) = 9,109&times;10<sup>-31</sup></td>
+            <td class="col-unit">kg</td>
+            <td class="col-desc">Relativistische Masse eines Photons (Ruhemasse m<sub>0</sub> = 0).</td>
+        </tr>
+        <tr>
+            <td class="col-num">27</td>
+            <td class="col-name">Photonenimpuls</td>
+            <td class="col-symbol">p<sub>&gamma;</sub></td>
+            <td class="col-formula">p = m<sub>&gamma;</sub> &middot; c = h / &lambda; = E / c</td>
+            <td class="col-value">Skaliert mit &lambda;<sup>-1</sup></td>
+            <td class="col-unit">kg m / s</td>
+            <td class="col-desc">Bewegungsgröße / Ursache des Strahlungsdrucks.</td>
+        </tr>
+        <tr>
+            <td class="col-num">28</td>
+            <td class="col-name">Elektronenvolt Umrechnung</td>
+            <td class="col-symbol">1 eV</td>
+            <td class="col-formula">1 eV = e &middot; 1 V</td>
+            <td class="col-value">1,602 176 634 &times; 10<sup>-19</sup></td>
+            <td class="col-unit">J</td>
+            <td class="col-desc">Kinetische Energie eines Elektrons bei 1 V Spannung.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="footer">
+    🌀 🌌 ✨ Wellen-Raumzeit-Theorie (WRZT) – Alle Formeln, Werte, Einheiten und Beschreibungen aus den Manifest-Versionen 3.03 – 3.07 | © 2026 Jo D. & Zaminia ✨ 🌌 🌀
+</div>
+
+</body>
+</html>
