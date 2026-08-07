@@ -9,8 +9,8 @@
   <script>
     window.MathJax = {
       tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        inlineMath: [['$', '$'], ['\(', '\)']],
+        displayMath: [['$$', '$$'], ['\[', '\]']],
         processEscapes: true
       },
       options: {
@@ -19,6 +19,9 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Turndown.js for HTML to Markdown Conversion -->
+  <script src="https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.js"></script>
 
   <style>
     :root {
@@ -387,6 +390,11 @@
       <button class="btn" onclick="exportHTML()">
         💾 Als HTML Speichern
       </button>
+
+      <!-- Export/Download MD File Button -->
+      <button class="btn btn-secondary" onclick="exportMarkdown()">
+        📝 Als MD Speichern
+      </button>
     </div>
   </header>
 
@@ -562,6 +570,55 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    // Export Document as Markdown (.md) File
+    function exportMarkdown() {
+      const docTitle = document.getElementById('document-title').value || 'WRZT_Dokument';
+      const cards = document.querySelectorAll('#sections-container .card-content');
+      
+      let fullHtml = '';
+      cards.forEach(card => {
+        // Clone card content to avoid modifying live DOM
+        const clone = card.cloneNode(true);
+        // Clean up any MathJax rendered elements back to plain text if needed, or get raw html
+        const mathJaxElements = clone.querySelectorAll('.MathJax, .mjx-chtml, script[type="math/tex"]');
+        mathJaxElements.forEach(el => el.remove());
+        
+        fullHtml += clone.innerHTML + '\n\n';
+      });
+
+      // Initialize Turndown service for HTML to Markdown conversion
+      if (typeof TurndownService !== 'undefined') {
+        const turndownService = new TurndownService({
+          headingStyle: 'atx',
+          codeBlockStyle: 'fenced'
+        });
+
+        // Custom rule to keep raw LaTeX blocks intact
+        turndownService.addRule('keepMath', {
+          filter: function (node) {
+            return node.classList && (node.classList.contains('equation') || node.classList.contains('formula-block'));
+          },
+          replacement: function (content, node) {
+            return '\n\n' + node.innerText.trim() + '\n\n';
+          }
+        });
+
+        let markdown = '# ' + docTitle + '\n\n' + turndownService.turndown(fullHtml);
+
+        const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${docTitle.toLowerCase().replace(/[^a-z0-9]/g, '_')}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        alert('Turndown-Bibliothek konnte nicht geladen werden. Bitte Internetverbindung prüfen.');
+      }
     }
   </script>
 </body>
