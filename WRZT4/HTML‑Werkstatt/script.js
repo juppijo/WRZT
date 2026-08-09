@@ -48,13 +48,13 @@ h1 {
       name: 'Formular',
       desc: 'Einfaches Kontaktformular mit Name, E-Mail, Nachricht.',
       code: `<form style="display:flex;flex-direction:column;gap:10px;max-width:360px;">
-  <label style="font-size:13px;">Name
+  <label style="font-size:14px;">Name
     <input type="text" name="name" style="display:block;width:100%;padding:8px 10px;margin-top:4px;border:1px solid #ccc;border-radius:5px;">
   </label>
-  <label style="font-size:13px;">E-Mail
+  <label style="font-size:14px;">E-Mail
     <input type="email" name="email" style="display:block;width:100%;padding:8px 10px;margin-top:4px;border:1px solid #ccc;border-radius:5px;">
   </label>
-  <label style="font-size:13px;">Nachricht
+  <label style="font-size:14px;">Nachricht
     <textarea name="message" rows="4" style="display:block;width:100%;padding:8px 10px;margin-top:4px;border:1px solid #ccc;border-radius:5px;"></textarea>
   </label>
   <button type="submit" style="background:#c9a227;color:#161200;border:none;border-radius:6px;padding:10px 16px;font-weight:600;cursor:pointer;">Absenden</button>
@@ -124,6 +124,7 @@ h1 {
   const previewWrap = document.getElementById('previewWrap');
   const deviceSwitch = document.getElementById('deviceSwitch');
   const btnInspector = document.getElementById('btnInspector');
+  const btnSyncScroll = document.getElementById('btnSyncScroll');
   const inspectorPanel = document.getElementById('inspectorPanel');
   const inspectorTarget = document.getElementById('inspectorTarget');
   const inspectorDeselect = document.getElementById('inspectorDeselect');
@@ -229,8 +230,70 @@ h1 {
     cursorPosEl.textContent = `Zeile ${pos.line + 1}, Spalte ${pos.ch + 1}`;
   });
 
+  /* ===================== ZEILEN-TAGGER FÜR ECHTE SYNCHRONISATION ===================== */
+  function tagSourceWithLines(html) {
+    let line = 1;
+    let out = '';
+    let i = 0;
+    const len = html.length;
+    while (i < len) {
+      const ch = html[i];
+      if (ch === '\n') { line++; out += ch; i++; continue; }
+      if (ch === '<') {
+        if (html.startsWith('<!--', i)) {
+          const end = html.indexOf('-->', i);
+          const seg = end === -1 ? html.slice(i) : html.slice(i, end + 3);
+          line += (seg.match(/\n/g) || []).length;
+          out += seg;
+          i += seg.length;
+          continue;
+        }
+        if (html[i + 1] === '/' || html[i + 1] === '!' || html[i + 1] === '?') {
+          const end = html.indexOf('>', i);
+          const seg = end === -1 ? html.slice(i) : html.slice(i, end + 1);
+          line += (seg.match(/\n/g) || []).length;
+          out += seg;
+          i += seg.length;
+          continue;
+        }
+        const m = /^<([a-zA-Z][a-zA-Z0-9-]*)/.exec(html.slice(i));
+        if (m) {
+          const tagName = m[1];
+          const startLine = line;
+          let j = i + m[0].length;
+          let inQuote = null;
+          while (j < len) {
+            const c = html[j];
+            if (inQuote) { if (c === inQuote) inQuote = null; }
+            else if (c === '"' || c === "'") { inQuote = c; }
+            else if (c === '>') { break; }
+            if (c === '\n') line++;
+            j++;
+          }
+          const insertion = ` data-hw-line="${startLine}"`;
+          out += html.slice(i, i + m[0].length) + insertion + html.slice(i + m[0].length, j + 1);
+          i = j + 1;
+          if (/^(script|style|textarea|title)$/i.test(tagName)) {
+            const closeRe = new RegExp('</' + tagName + '\\s*>', 'i');
+            const rest = html.slice(i);
+            const closeMatch = closeRe.exec(rest);
+            const rawEnd = closeMatch ? closeMatch.index : rest.length;
+            const rawContent = rest.slice(0, rawEnd);
+            line += (rawContent.match(/\n/g) || []).length;
+            out += rawContent;
+            i += rawContent.length;
+          }
+          continue;
+        }
+      }
+      out += ch;
+      i++;
+    }
+    return out;
+  }
+
   function updatePreview() {
-    previewFrame.srcdoc = editor.getValue();
+    previewFrame.srcdoc = tagSourceWithLines(editor.getValue());
   }
 
   /* ===================== TOAST / STATUS ===================== */
@@ -494,13 +557,102 @@ h1 {
     previewWrap.classList.add('device-' + btn.dataset.device);
   });
 
+  /* ===================== SYNCHRONES SCROLLEN (ZEILENGENAU) ===================== */
+  let syncScrollEnabled = true;
+  let isSyncingScroll = false;
+  let tickingEditorScroll = false;
+  let tickingPreviewScroll = false;
+
+  function getLineElements(doc) {
+    return Array.from(doc.querySelectorAll('[data-hw-line]'))
+      .map((el) => ({ el, line: parseInt(el.getAttribute('data-hw-line'), 10) }))
+      .filter((x) => !isNaN(x.line));
+  }
+
+  function findElementForLine(entries, targetLine) {
+    let best = null;
+    for (const e of entries) {
+      if (e.line <= targetLine && (!best || e.line > best.line)) best = e;
+    }
+    return best;
+  }
+
+  function getEditorTopLine() {
+    const info = editor.getScrollInfo();
+    return editor.lineAtHeight(info.top, 'local') + 1;
+  }
+
+  function getTopVisibleLine(doc, win) {
+    const entries = getLineElements(doc);
+    let best = null;
+    for (const { el, line } of entries) {
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < win.innerHeight) {
+        if (best === null || rect.top < best.top) best = { line, top: rect.top };
+      }
+    }
+    return best ? best.line : null;
+  }
+
+  function syncPreviewFromEditor() {
+    if (!syncScrollEnabled) return;
+    const win = previewFrame.contentWindow;
+    const doc = previewFrame.contentDocument;
+    if (!win || !doc || !doc.documentElement) return;
+    const targetLine = getEditorTopLine();
+    const match = findElementForLine(getLineElements(doc), targetLine);
+    if (!match) return;
+    const rect = match.el.getBoundingClientRect();
+    isSyncingScroll = true;
+    win.scrollTo(0, Math.max(0, win.scrollY + rect.top));
+    requestAnimationFrame(() => { isSyncingScroll = false; });
+  }
+
+  function syncEditorFromPreview() {
+    if (!syncScrollEnabled) return;
+    const win = previewFrame.contentWindow;
+    const doc = previewFrame.contentDocument;
+    if (!win || !doc) return;
+    const line = getTopVisibleLine(doc, win);
+    if (line === null) return;
+    const top = editor.heightAtLine(line - 1, 'local');
+    isSyncingScroll = true;
+    editor.scrollTo(null, top);
+    requestAnimationFrame(() => { isSyncingScroll = false; });
+  }
+
+  editor.on('scroll', () => {
+    if (isSyncingScroll || tickingEditorScroll) return;
+    tickingEditorScroll = true;
+    requestAnimationFrame(() => { syncPreviewFromEditor(); tickingEditorScroll = false; });
+  });
+
+  function attachPreviewScrollSync() {
+    const win = previewFrame.contentWindow;
+    if (!win || win.__hwScrollBound) return;
+    win.addEventListener('scroll', () => {
+      if (isSyncingScroll || tickingPreviewScroll) return;
+      tickingPreviewScroll = true;
+      requestAnimationFrame(() => { syncEditorFromPreview(); tickingPreviewScroll = false; });
+    });
+    win.__hwScrollBound = true;
+  }
+
+  btnSyncScroll.addEventListener('click', () => {
+    syncScrollEnabled = !syncScrollEnabled;
+    btnSyncScroll.classList.toggle('active', syncScrollEnabled);
+  });
+
   /* ===================== STYLE-INSPEKTOR (VORSCHAU) ===================== */
   let inspectorActive = false;
   let selectedEl = null;
   let selectedPath = null;
   let commitTimer = null;
 
-  previewFrame.addEventListener('load', () => { if (inspectorActive) setupInspector(); });
+  previewFrame.addEventListener('load', () => {
+    attachPreviewScrollSync();
+    if (inspectorActive) setupInspector();
+  });
 
   function getPath(el) {
     if (!el || el.nodeType !== 1) return '';
@@ -608,6 +760,7 @@ h1 {
     doc.querySelectorAll('.hw-hover-outline, .hw-selected-outline').forEach((el) => {
       el.classList.remove('hw-hover-outline', 'hw-selected-outline');
     });
+    doc.querySelectorAll('[data-hw-line]').forEach((el) => el.removeAttribute('data-hw-line'));
     const html = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
     editor.setValue(html);
   }

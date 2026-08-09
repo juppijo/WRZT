@@ -12,7 +12,7 @@
   --radius: 6px;
   --mono: 'JetBrains Mono', monospace;
   --editor-font: 'JetBrains Mono', monospace;
-  --editor-size: 13px;
+  --editor-size: 14px;
   --editor-lh: 1.55;
 }
 
@@ -104,10 +104,10 @@ svg{
   background:transparent;
   border:1px solid var(--border);
   color:var(--text-dim);
-  padding:8px 13px;
+  padding:8px 12px;
   border-radius:var(--radius);
   font-family:'Barlow', sans-serif;
-  font-size:13px;
+  font-size:12px;
   font-weight:600;
   letter-spacing:.02em;
   cursor:pointer;
@@ -194,7 +194,7 @@ svg{
 }
 .popover-row select{
   padding:7px 9px;
-  font-size:13px;
+  font-size:14px;
 }
 .popover-row input[type=range]{
   width:100%;
@@ -789,7 +789,7 @@ textarea{ min-height:140px; }
   color:var(--text);
   padding:10px 18px;
   border-radius:var(--radius);
-  font-size:13px;
+  font-size:14px;
   opacity:0;
   pointer-events:none;
   transition:opacity .2s, transform .2s;
