@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML-Werkstatt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ===== KOPFLEISTE ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <h1>HTML‑Werkstatt</h1>
+    </div>
+
+    <div class="toolbar">
+      <input type="file" id="fileInput" accept=".html,.htm" hidden>
+      <button class="btn" id="btnLoad" title="HTML-Datei laden">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+        <span>Laden</span>
+      </button>
+      <button class="btn" id="btnSave" title="Als HTML speichern">
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        <span>Speichern</span>
+      </button>
+      <span class="sep"></span>
+      <button class="btn" id="btnMarkdown" title="Markdown einfügen">
+        <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M6 15V9l3 3 3-3v6M17 9v6M14.5 12.5L17 15l2.5-2.5"/></svg>
+        <span>Markdown</span>
+      </button>
+      <button class="btn" id="btnScriptBtn" title="Script-Button einfügen">
+        <svg viewBox="0 0 24 24"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+        <span>Script&#8209;Button</span>
+      </button>
+      <button class="btn" id="btnStyles" title="Styles bearbeiten">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+        <span>Styles</span>
+      </button>
+      <span class="sep"></span>
+      <button class="btn" id="btnLayout" title="Ansicht wechseln">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16"/><rect x="13" y="4" width="8" height="16"/></svg>
+        <span>Ansicht</span>
+      </button>
+      <button class="btn" id="btnFullscreen" title="Vollbild">
+        <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg>
+        <span>Vollbild</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== HAUPTBEREICH ===== -->
+  <main class="workspace" id="workspace">
+    <section class="pane pane-editor" id="paneEditor">
+      <div class="pane-head">
+        <span class="pane-title">Quellcode</span>
+        <span class="filename" id="filename">unbenannt.html</span>
+      </div>
+      <div class="editor-host" id="editorHost"></div>
+    </section>
+
+    <div class="resizer" id="resizer"></div>
+
+    <section class="pane pane-preview" id="panePreview">
+      <div class="pane-head">
+        <span class="pane-title">Vorschau</span>
+        <button class="btn-ghost" id="btnRefreshPreview" title="Vorschau aktualisieren">
+          <svg viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5.5 9a7 7 0 0113-3M18.5 15a7 7 0 01-13 3"/></svg>
+        </button>
+      </div>
+      <iframe id="previewFrame" class="preview-frame" title="Live-Vorschau" sandbox="allow-scripts allow-same-origin allow-modals allow-forms"></iframe>
+    </section>
+  </main>
+
+  <footer class="statusbar">
+    <span id="statusMsg">Bereit.</span>
+    <span class="status-right" id="cursorPos">Zeile 1, Spalte 1</span>
+  </footer>
+</div>
+
+<!-- ===== SEITENPANEL: STYLES ===== -->
+<aside class="side-panel" id="panelStyles">
+  <div class="side-panel-head">
+    <h2>Styles bearbeiten</h2>
+    <button class="btn-icon" id="closeStyles">&times;</button>
+  </div>
+  <div class="side-panel-body">
+    <div class="swatch-row" id="colorSwatches">
+      <p class="hint">Im Dokument gefundene Farben – Klick zum Ändern.</p>
+    </div>
+    <div class="style-editor-head">
+      <span>&lt;style&gt;-Inhalt</span>
+      <button class="btn-ghost small" id="btnApplyStyles">Anwenden</button>
+    </div>
+    <div class="editor-host" id="styleEditorHost"></div>
+  </div>
+</aside>
+
+<!-- ===== MODAL: MARKDOWN ===== -->
+<div class="modal-overlay" id="modalMarkdown">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Markdown einfügen</h2>
+      <button class="btn-icon" data-close-modal>&times;</button>
+    </div>
+    <div class="modal-body two-col">
+      <div class="modal-col">
+        <label>Markdown</label>
+        <textarea id="markdownInput" placeholder="# Überschrift&#10;&#10;Ein **fetter** Text mit *Betonung* und einer [Verlinkung](https://example.com).&#10;&#10;- Punkt eins&#10;- Punkt zwei"></textarea>
+      </div>
+      <div class="modal-col">
+        <label>Vorschau (HTML)</label>
+        <div class="md-preview" id="markdownPreview"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close-modal>Abbrechen</button>
+      <button class="btn btn-gold" id="btnInsertMarkdown">An Cursor einfügen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: SCRIPT-BUTTON ===== -->
+<div class="modal-overlay" id="modalScriptBtn">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Script-Button einfügen</h2>
+      <button class="btn-icon" data-close-modal>&times;</button>
+    </div>
+    <div class="modal-body">
+      <label>Beschriftung</label>
+      <input type="text" id="scriptBtnLabel" placeholder="z. B. Aktualisieren">
+      <label>Button-Stil</label>
+      <select id="scriptBtnStyle">
+        <option value="gold">Gold (Akzent)</option>
+        <option value="ghost">Ghost (dezent)</option>
+        <option value="plain">Ohne Klasse</option>
+      </select>
+      <label>JavaScript-Code (wird beim Klick ausgeführt)</label>
+      <textarea id="scriptBtnCode" class="code-textarea" placeholder="alert('Hallo!');"></textarea>
+      <p class="hint">Es wird ein &lt;button&gt; mit onclick-Handler sowie bei Bedarf ein passender &lt;style&gt;-Block an der Cursorposition eingefügt.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close-modal>Abbrechen</button>
+      <button class="btn btn-gold" id="btnInsertScriptBtn">An Cursor einfügen</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
