@@ -123,6 +123,24 @@ h1 {
   const previewFrame = document.getElementById('previewFrame');
   const previewWrap = document.getElementById('previewWrap');
   const deviceSwitch = document.getElementById('deviceSwitch');
+  const btnInspector = document.getElementById('btnInspector');
+  const inspectorPanel = document.getElementById('inspectorPanel');
+  const inspectorTarget = document.getElementById('inspectorTarget');
+  const inspectorDeselect = document.getElementById('inspectorDeselect');
+  const inspColor = document.getElementById('inspColor');
+  const inspColorReset = document.getElementById('inspColorReset');
+  const inspBg = document.getElementById('inspBg');
+  const inspBgReset = document.getElementById('inspBgReset');
+  const inspFontSize = document.getElementById('inspFontSize');
+  const inspFontUnit = document.getElementById('inspFontUnit');
+  const inspBold = document.getElementById('inspBold');
+  const inspItalic = document.getElementById('inspItalic');
+  const inspPadding = document.getElementById('inspPadding');
+  const inspPaddingUnit = document.getElementById('inspPaddingUnit');
+  const inspMargin = document.getElementById('inspMargin');
+  const inspMarginUnit = document.getElementById('inspMarginUnit');
+  const inspRadius = document.getElementById('inspRadius');
+  const inspRadiusUnit = document.getElementById('inspRadiusUnit');
   const statusMsg = document.getElementById('statusMsg');
   const cursorPosEl = document.getElementById('cursorPos');
 
@@ -475,6 +493,242 @@ h1 {
     previewWrap.classList.remove('device-desktop', 'device-tablet', 'device-mobile');
     previewWrap.classList.add('device-' + btn.dataset.device);
   });
+
+  /* ===================== STYLE-INSPEKTOR (VORSCHAU) ===================== */
+  let inspectorActive = false;
+  let selectedEl = null;
+  let selectedPath = null;
+  let commitTimer = null;
+
+  previewFrame.addEventListener('load', () => { if (inspectorActive) setupInspector(); });
+
+  function getPath(el) {
+    if (!el || el.nodeType !== 1) return '';
+    const parts = [];
+    let node = el;
+    while (node && node.nodeType === 1 && node.tagName.toLowerCase() !== 'html') {
+      const tag = node.tagName.toLowerCase();
+      const parent = node.parentElement;
+      if (!parent) break;
+      const sameTag = Array.from(parent.children).filter(c => c.tagName === node.tagName);
+      const idx = sameTag.indexOf(node) + 1;
+      parts.unshift(`${tag}:nth-of-type(${idx})`);
+      node = parent;
+    }
+    parts.unshift('html');
+    return parts.join(' > ');
+  }
+
+  function rgbToHex(rgb) {
+    if (!rgb) return '#000000';
+    const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (!m) return '#000000';
+    return '#' + [1, 2, 3].map(i => (+m[i]).toString(16).padStart(2, '0')).join('');
+  }
+
+  function labelFor(el) {
+    let cls = (el.className && typeof el.className === 'string')
+      ? el.className.split(/\s+/).filter(c => c && c !== 'hw-hover-outline' && c !== 'hw-selected-outline')
+      : [];
+    let s = el.tagName.toLowerCase();
+    if (el.id) s += '#' + el.id;
+    if (cls.length) s += '.' + cls.join('.');
+    return s;
+  }
+
+  function fillSpacing(inputEl, unitEl, inlineVal, computedVal) {
+    const m = (inlineVal || '').match(/^([\d.]+)(px|rem|em|%)$/);
+    inputEl.value = m ? m[1] : '';
+    unitEl.value = m ? m[2] : 'px';
+    inputEl.placeholder = computedVal ? Math.round(parseFloat(computedVal)) + 'px' : '0';
+  }
+
+  function populatePanel(el) {
+    inspectorTarget.textContent = labelFor(el);
+    const win = el.ownerDocument.defaultView;
+    const computed = win.getComputedStyle(el);
+
+    inspColor.value = rgbToHex(computed.color);
+    const bg = computed.backgroundColor;
+    inspBg.value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(bg);
+
+    const fsMatch = (el.style.fontSize || '').match(/^([\d.]+)(px|rem|em|%)$/);
+    inspFontSize.value = fsMatch ? fsMatch[1] : '';
+    inspFontUnit.value = fsMatch ? fsMatch[2] : 'px';
+    inspFontSize.placeholder = Math.round(parseFloat(computed.fontSize)) + 'px';
+
+    const isBold = el.style.fontWeight === 'bold' || parseInt(computed.fontWeight, 10) >= 700;
+    inspBold.classList.toggle('active', isBold);
+    const isItalic = (el.style.fontStyle || computed.fontStyle) === 'italic';
+    inspItalic.classList.toggle('active', isItalic);
+
+    const align = el.style.textAlign || computed.textAlign;
+    document.querySelectorAll('.insp-toggle[data-align]').forEach((b) => {
+      b.classList.toggle('active', b.dataset.align === align);
+    });
+
+    fillSpacing(inspPadding, inspPaddingUnit, el.style.padding, computed.paddingTop);
+    fillSpacing(inspMargin, inspMarginUnit, el.style.margin, computed.marginTop);
+    fillSpacing(inspRadius, inspRadiusUnit, el.style.borderRadius, computed.borderTopLeftRadius);
+  }
+
+  function openInspectorPanel() { inspectorPanel.classList.add('open'); }
+  function closeInspectorPanel() { inspectorPanel.classList.remove('open'); }
+
+  function deselectElement() {
+    if (selectedEl) selectedEl.classList.remove('hw-selected-outline');
+    selectedEl = null;
+    selectedPath = null;
+    closeInspectorPanel();
+  }
+
+  function selectElement(el) {
+    if (selectedEl) selectedEl.classList.remove('hw-selected-outline');
+    selectedEl = el;
+    selectedPath = getPath(el);
+    el.classList.remove('hw-hover-outline');
+    el.classList.add('hw-selected-outline');
+    populatePanel(el);
+    openInspectorPanel();
+  }
+
+  function applyProp(prop, value) {
+    if (!selectedEl) return;
+    if (value === '') selectedEl.style.removeProperty(prop);
+    else selectedEl.style.setProperty(prop, value);
+    clearTimeout(commitTimer);
+    commitTimer = setTimeout(commitToSource, 450);
+  }
+
+  function commitToSource() {
+    const doc = previewFrame.contentDocument;
+    if (!doc || !doc.documentElement) return;
+    const styleTag = doc.getElementById('hw-inspector-style');
+    if (styleTag) styleTag.remove();
+    doc.querySelectorAll('.hw-hover-outline, .hw-selected-outline').forEach((el) => {
+      el.classList.remove('hw-hover-outline', 'hw-selected-outline');
+    });
+    const html = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+    editor.setValue(html);
+  }
+
+  function onIframeMouseOver(e) {
+    if (e.target === selectedEl || e.target.nodeType !== 1) return;
+    e.target.classList.add('hw-hover-outline');
+  }
+  function onIframeMouseOut(e) {
+    if (e.target.nodeType !== 1) return;
+    e.target.classList.remove('hw-hover-outline');
+  }
+  function onIframeClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const el = e.target;
+    if (!el || el.nodeType !== 1 || el.tagName.toLowerCase() === 'html') return;
+    selectElement(el);
+  }
+
+  function setupInspector() {
+    const doc = previewFrame.contentDocument;
+    if (!doc || !doc.body) return;
+
+    if (!doc.getElementById('hw-inspector-style')) {
+      const styleTag = doc.createElement('style');
+      styleTag.id = 'hw-inspector-style';
+      styleTag.textContent = '.hw-hover-outline{outline:2px dashed rgba(201,162,39,.7) !important;outline-offset:-2px;} .hw-selected-outline{outline:2px solid #c9a227 !important;outline-offset:-2px;} html,body,*{cursor:crosshair !important;}';
+      doc.head.appendChild(styleTag);
+    }
+
+    if (!doc.__hwInspectorBound) {
+      doc.addEventListener('mouseover', onIframeMouseOver, true);
+      doc.addEventListener('mouseout', onIframeMouseOut, true);
+      doc.addEventListener('click', onIframeClick, true);
+      doc.addEventListener('submit', (e) => e.preventDefault(), true);
+      doc.__hwInspectorBound = true;
+    }
+
+    if (selectedPath) {
+      const el = doc.querySelector(selectedPath);
+      if (el) {
+        selectedEl = el;
+        el.classList.add('hw-selected-outline');
+        populatePanel(el);
+      } else {
+        selectedEl = null;
+        selectedPath = null;
+        closeInspectorPanel();
+      }
+    }
+  }
+
+  function teardownInspector() {
+    const doc = previewFrame.contentDocument;
+    if (doc) {
+      const styleTag = doc.getElementById('hw-inspector-style');
+      if (styleTag) styleTag.remove();
+      doc.querySelectorAll('.hw-hover-outline, .hw-selected-outline').forEach((el) => {
+        el.classList.remove('hw-hover-outline', 'hw-selected-outline');
+      });
+    }
+    deselectElement();
+  }
+
+  btnInspector.addEventListener('click', () => {
+    inspectorActive = !inspectorActive;
+    btnInspector.classList.toggle('active', inspectorActive);
+    previewWrap.classList.toggle('inspector-active', inspectorActive);
+    if (inspectorActive) setupInspector();
+    else teardownInspector();
+  });
+
+  inspectorDeselect.addEventListener('click', deselectElement);
+
+  inspColor.addEventListener('input', () => applyProp('color', inspColor.value));
+  inspColorReset.addEventListener('click', () => {
+    applyProp('color', '');
+    if (selectedEl) inspColor.value = rgbToHex(getComputedStyle(selectedEl).color);
+  });
+  inspBg.addEventListener('input', () => applyProp('background-color', inspBg.value));
+  inspBgReset.addEventListener('click', () => {
+    applyProp('background-color', '');
+    if (selectedEl) inspBg.value = rgbToHex(getComputedStyle(selectedEl).backgroundColor);
+  });
+
+  function commitFontSize() {
+    if (inspFontSize.value === '') applyProp('font-size', '');
+    else applyProp('font-size', inspFontSize.value + inspFontUnit.value);
+  }
+  inspFontSize.addEventListener('input', commitFontSize);
+  inspFontUnit.addEventListener('change', commitFontSize);
+
+  inspBold.addEventListener('click', () => {
+    const active = inspBold.classList.toggle('active');
+    applyProp('font-weight', active ? 'bold' : 'normal');
+  });
+  inspItalic.addEventListener('click', () => {
+    const active = inspItalic.classList.toggle('active');
+    applyProp('font-style', active ? 'italic' : 'normal');
+  });
+
+  document.querySelectorAll('.insp-toggle[data-align]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.insp-toggle[data-align]').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyProp('text-align', btn.dataset.align);
+    });
+  });
+
+  function wireSpacing(inputEl, unitEl, prop) {
+    const commit = () => {
+      if (inputEl.value === '') applyProp(prop, '');
+      else applyProp(prop, inputEl.value + unitEl.value);
+    };
+    inputEl.addEventListener('input', commit);
+    unitEl.addEventListener('change', commit);
+  }
+  wireSpacing(inspPadding, inspPaddingUnit, 'padding');
+  wireSpacing(inspMargin, inspMarginUnit, 'margin');
+  wireSpacing(inspRadius, inspRadiusUnit, 'border-radius');
 
   /* ===================== SCHRIFT & ZOOM ===================== */
   function positionPopover() {
