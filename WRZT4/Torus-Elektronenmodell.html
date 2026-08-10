@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Torus-Elektronenmodell</title>
+
+  <!-- MathJax Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ],
+        processEscapes: true
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'has_am'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+  
+<style>
+body {
+  font-family: sans-serif;
+  margin: 40px;
+  color: #222222;
+  background: #fdfdfd;
+}
+h1 {
+  color: #c9a227;
+}
+</style>
+</head>
+<body>
+<h1>Torus-Elektronenmodell</h1>
+
+ <h2>Das Williamson-van der Mark-Modell (1997)</h2>
+<p>Das 1997 von John G. Williamson und Martin B. van der Mark unter dem Titel <em>„Is the electron a photon with toroidal topology?“</em> veröffentlichte Modell gehört zu den detailliertesten semi-klassischen Ansätzen, die das Elektron nicht als punktförmiges Objekt, sondern als lokalisiertes, geometrisch gebundenes Quantenfeld beschreiben.</p>
+<hr>
+<h3>1. Die Grundidee: Das gefangene Photon</h3>
+<p>Ausgangspunkt der Theorie ist das Phänomen der Paarerzeugung und Annihilation: Bei der Vernichtung von Elektron und Positron entstehen zwei Photonen. Williamson und van der Mark drehten diesen Prozess gedanklich um und postulierten, dass ein Elektron strukturell aus einem einzelnen, zirkular polarisierten Photon besteht, das in einer geschlossenen, toroidalen Bahn mit dem Umfang seiner eigenen Compton-Wellenlänge ($\lambda_C = \frac{h}{m_e c}$) gefangen ist.</p>
+<h3>2. Geometrie der $720^\circ$-Doppelschleife</h3>
+<p>Damit das elektromagnetische Feld an den Rändern der Struktur stetig bleibt, kann die Welle nicht auf einem einfachen Kreis laufen:</p>
+<ul>
+<li><strong>Topologie:</strong> Die Energieströmung verläuft in Form einer gewundenen Doppelschleife (Möbius-Topologie) zweimal um den Hauptradius des Torus, bevor sie sich wieder schließt.</li>
+<li><strong>Mathematische Entsprechung:</strong> Diese $720^\circ$- bzw. $4\pi$-Periodizität entspricht exakt der mathematischen Eigenschaft der Spinor-Gruppe $SU(2)$ (der zweifachen Überlagerung der Drehgruppe $SO(3)$). Ein Fermion mit Spin $\frac{1}{2}$ kehrt erst nach zwei vollen Umdrehungen ($720^\circ$) in seinen ursprünglichen Quantenzustand zurück. Im Williamson-van der Mark-Modell ergibt sich dieses Verhalten rein geometrisch aus dem Pfad der Welle.</li>
+</ul>
+<hr>
+<h3>3. Entstehung der Teilchreneigenschaften aus der Feldgeometrie</h3>
+<p>Das Modell leitet die Messgrößen des Elektrons direkt aus den dynamischen Feldkomponenten der kreisenden Welle ab:</p>
+<ul>
+<li><strong>Masse ($m_e$):</strong> Die mit $c$ zirkulierende Welle trägt die Feldenergie $E = h\nu$. Durch die räumliche Bindung im Torus ruht der Gesamtschwerpunkt des Systems, wodurch die Energie gemäß $E = m_e c^2$ als Trägheit bzw. Ruhemasse in Erscheinung tritt.</li>
+<li><strong>Spin ($S = \frac{\hbar}{2}$):</strong> Der Drehimpuls des transversalen Photons verknüpft sich mit dem Bahndrehimpuls der Schlingenbewegung. Die $4\pi$-Doppelschleife halbiert die effektive Symmetrie und erzeugt den Halbzahligkeits-Spin.</li>
+<li><strong>Elektrische Ladung ($e$):</strong> Während die Welle den Torus durchläuft, dreht sich der Vektor des elektrischen Feldes $\vec{E}$ stetig mit. In der zeitlichen und räumlichen Mittelung zeigt das elektrische Feld im Außenraum radial nach außen bzw. innen. Die Elementarladung entsteht somit als topologische Windungszahl der Feldkonfiguration.</li>
+<li><strong>Magnetisches Moment ($g = 2$):</strong> Der rotierende Energie- und Ladungsfluss auf dem Radius $R = \frac{\lambda_C}{4\pi}$ erzeugt ein poloidales Magnetfeld, das exakt dem Bohrschen Magneton $\mu_B$ mit dem Landé-Faktor $g = 2$ entspricht.</li>
+</ul>
+<hr>
+<h3>4. Erklärung der punktförmigen Wechselwirkung</h3>
+<p>Ein Hauptargument gegen ausgedehnte Teilchenmodelle ist deren punktförmiges Verhalten in Hochenergie-Streuungen ($r &lt; 10^{-18}\text{ m}$). Williamson und van der Mark zeigten mathematisch, wie dieser Widerspruch aufgelöst wird:</p>
+<ul>
+<li>Bei Kollisionen mit extrem hohen Impulsen verkürzt sich die de-Broglie-Wellenlänge des eintreffenden Testteilchens dramatisch.</li>
+<li>Das Testteilchen sieht nicht die gesamte kohärente Compton-Hüllkurve des Torus, sondern tritt nur mit einem winzigen, hochfrequenten Ausschnitt des Phasenfeldes in Wechselwirkung. Relativistische Längenkontraktion lässt die Wechselwirkung im Stoßmoment punktförmig erscheinen.</li>
+</ul>
+<h3>5. Moderne Reformulierungen</h3>
+<p>Die ursprüngliche Arbeit von 1997 nutzte Stück-für-Stück-Anwendungen der Maxwellschen Vektorgleichungen. In neueren Arbeiten wird das Modell meist in der <strong>Quaternionen-Algebra</strong> oder der <strong>Spacetime Algebra (STA)</strong> formuliert:</p>
+<ul>
+<li>Hierbei wird das Maxwell-Feld zu einem einzigen Quaternionen-Rotor $\Psi$ zusammengefasst.</li>
+<li>Die Dirac-Gleichung $D\Psi = 0$ beschreibt dann direkt die spannungs- und impulsfreie Ausbreitung der Welle entlang des toroidalen Geodätenpfades.</li>
+<li>Die Schrödinger-Zitterbewegung entpuppt sich dabei als die physikalische Rotor-Zirkulation des inneren Phasenfeldes.</li>
+</ul>
+
+
+  
+</body>
+</html>
