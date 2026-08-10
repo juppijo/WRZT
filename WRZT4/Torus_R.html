@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotierender Poynting-Fluss auf einer Torusoberfläche</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-e: #38bdf8;
+            --accent-b: #f43f5e;
+            --accent-s: #fbbf24;
+            --accent-primary: #6366f1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        #canvas-container {
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+
+        #sidebar {
+            width: 360px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid var(--panel-border);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .section {
+            padding: 16px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .label-val {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .value-badge {
+            font-family: monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 5px;
+            border-radius: 5px;
+            background: #334155;
+            outline: none;
+            accent-color: var(--accent-primary);
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            background: #0f172a;
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .toggle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .toggle-btn {
+            background: #0f172a;
+            border: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            padding: 8px 4px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toggle-btn.active.e-btn { border-color: var(--accent-e); color: var(--accent-e); background: rgba(56, 189, 248, 0.1); }
+        .toggle-btn.active.b-btn { border-color: var(--accent-b); color: var(--accent-b); background: rgba(244, 63, 94, 0.1); }
+        .toggle-btn.active.s-btn { border-color: var(--accent-s); color: var(--accent-s); background: rgba(251, 191, 36, 0.1); }
+
+        .formula-box {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid var(--panel-border);
+            font-family: serif;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        #hud {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--panel-border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .hud-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar { width: 100%; height: 45vh; }
+            #canvas-container { height: 55vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="header">
+            <h1><i class="fa-solid fa-rotate"></i> Rotierender Poynting-Fluss</h1>
+            <p>Kontinuierliche Energiebewegung S = E × B</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Formel</div>
+            <div class="formula-box">
+                <span style="color:var(--accent-s); font-weight:bold;">S</span> = 
+                1/μ₀ (<span style="color:var(--accent-e); font-weight:bold;">E</span> × 
+                <span style="color:var(--accent-b); font-weight:bold;">B</span>)
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Fluss-Modus</div>
+            <select id="preset-select">
+                <option value="helical" selected>Helikaler Spin (Toroidal + Poloidal)</option>
+                <option value="toroidal">Pure Toroidale Rotation (Hauptkreis)</option>
+                <option value="poloidal">Pure Poloidale Rotation (Umlauf Röhre)</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Sichtbare Vektoren</div>
+            <div class="toggle-grid">
+                <div class="toggle-btn active e-btn" id="toggle-e"><i class="fa-solid fa-bolt"></i><span>E-Feld</span></div>
+                <div class="toggle-btn active b-btn" id="toggle-b"><i class="fa-solid fa-magnet"></i><span>B-Feld</span></div>
+                <div class="toggle-btn active s-btn" id="toggle-s"><i class="fa-solid fa-arrow-trend-up"></i><span>S-Vektor</span></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Geometrie & Parameter</div>
+            <div class="control-group">
+                <div class="label-val"><span>Großer Radius (R)</span><span class="value-badge" id="val-R">3.0</span></div>
+                <input type="range" id="param-R" min="1.5" max="5.0" step="0.1" value="3.0">
+            </div>
+            <div class="control-group">
+                <div class="label-val"><span>Kleiner Radius (r)</span><span class="value-badge" id="val-r">1.0</span></div>
+                <input type="range" id="param-r" min="0.3" max="1.8" step="0.05" value="1.0">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Fluss-Dynamik</div>
+            <div class="control-group">
+                <div class="label-val"><span>Rotationsgeschwindigkeit</span><span class="value-badge" id="val-speed">1.5</span></div>
+                <input type="range" id="param-speed" min="0.1" max="4.0" step="0.1" value="1.5">
+            </div>
+            <div class="control-group">
+                <div class="label-val"><span>Partikelanzahl</span><span class="value-badge" id="val-particles">600</span></div>
+                <input type="range" id="param-particles" min="100" max="1200" step="50" value="600">
+            </div>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <div id="hud">
+            <div class="hud-item"><div class="dot" style="background: var(--accent-e);"></div><span><strong>E</strong>: Elektrische Feldstärke</span></div>
+            <div class="hud-item"><div class="dot" style="background: var(--accent-b);"></div><span><strong>B</strong>: Magnetische Flussdichte</span></div>
+            <div class="hud-item"><div class="dot" style="background: var(--accent-s);"></div><span><strong>S</strong>: Poynting-Vektor (Rotierender Fluss)</span></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            R: 3.0,
+            r: 1.0,
+            density: 14,
+            particleCount: 600,
+            speed: 1.5,
+            preset: 'helical',
+            showE: true,
+            showB: true,
+            showS: true
+        };
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0f172a);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(6, 4, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 15, 10);
+        scene.add(dirLight);
+
+        let torusMesh, wireframeMesh;
+        const vectorGroup = new THREE.Group();
+        scene.add(vectorGroup);
+
+        let particleGeo, particleSystem;
+        let particleCoords = [];
+
+        function createTorusMesh() {
+            if (torusMesh) scene.remove(torusMesh);
+            if (wireframeMesh) scene.remove(wireframeMesh);
+
+            const geom = new THREE.TorusGeometry(state.R, state.r, 48, 96);
+            const mat = new THREE.MeshPhongMaterial({
+                color: 0x1e293b,
+                transparent: true,
+                opacity: 0.5,
+                shininess: 90,
+                side: THREE.DoubleSide
+            });
+            torusMesh = new THREE.Mesh(geom, mat);
+            scene.add(torusMesh);
+
+            const wireMat = new THREE.MeshBasicMaterial({ color: 0x475569, wireframe: true, transparent: true, opacity: 0.12 });
+            wireframeMesh = new THREE.Mesh(geom, wireMat);
+            scene.add(wireframeMesh);
+        }
+
+        function getTorusSurfacePoint(u, v, R = state.R, r = state.r) {
+            const x = (R + r * Math.cos(u)) * Math.cos(v);
+            const y = (R + r * Math.cos(u)) * Math.sin(v);
+            const z = r * Math.sin(u);
+            return new THREE.Vector3(x, y, z);
+        }
+
+        function getTorusFrame(u, v) {
+            const cosU = Math.cos(u), sinU = Math.sin(u);
+            const cosV = Math.cos(v), sinV = Math.sin(v);
+
+            const e_u = new THREE.Vector3(-sinU * cosV, -sinU * sinV, cosU).normalize();
+            const e_v = new THREE.Vector3(-sinV, cosV, 0).normalize();
+            const n = new THREE.Vector3().crossVectors(e_u, e_v).normalize();
+
+            return { e_u, e_v, n };
+        }
+
+        function computeFields(u, v) {
+            const { e_u, e_v, n } = getTorusFrame(u, v);
+            let E = new THREE.Vector3();
+            let B = new THREE.Vector3();
+
+            switch(state.preset) {
+                case 'helical':
+                    // E-Feld steht normal, B-Feld kombiniert poloidal + toroidal -> Poynting-Vektor rotiert helikal
+                    E.copy(n).multiplyScalar(0.9);
+                    B.copy(e_u).multiplyScalar(0.6).addScaledVector(e_v, 0.8);
+                    break;
+                case 'toroidal':
+                    // E poloidal, B normal -> S rotiert rein toroidal um die Hauptachse
+                    E.copy(e_u).multiplyScalar(0.9);
+                    B.copy(n).multiplyScalar(0.9);
+                    break;
+                case 'poloidal':
+                    // E normal, B toroidal -> S rotiert rein poloidal um die Röhre
+                    E.copy(n).multiplyScalar(0.9);
+                    B.copy(e_v).multiplyScalar(0.9);
+                    break;
+            }
+
+            const S = new THREE.Vector3().crossVectors(E, B);
+            return { E, B, S };
+        }
+
+        function updateVectors() {
+            while(vectorGroup.children.length > 0) {
+                const obj = vectorGroup.children.pop();
+                if(obj.geometry) obj.geometry.dispose();
+            }
+
+            const uSteps = state.density;
+            const vSteps = Math.round(state.density * (state.R / state.r) * 0.7);
+            const arrowScale = 0.55;
+
+            for (let i = 0; i < uSteps; i++) {
+                const u = (i / uSteps) * Math.PI * 2;
+                for (let j = 0; j < vSteps; j++) {
+                    const v = (j / vSteps) * Math.PI * 2;
+
+                    const pos = getTorusSurfacePoint(u, v);
+                    const { E, B, S } = computeFields(u, v);
+
+                    if (state.showE && E.lengthSq() > 0.01) {
+                        const len = E.length() * arrowScale;
+                        vectorGroup.add(new THREE.ArrowHelper(E.clone().normalize(), pos, len, 0x38bdf8, len*0.25, len*0.15));
+                    }
+                    if (state.showB && B.lengthSq() > 0.01) {
+                        const len = B.length() * arrowScale;
+                        vectorGroup.add(new THREE.ArrowHelper(B.clone().normalize(), pos, len, 0xf43f5e, len*0.25, len*0.15));
+                    }
+                    if (state.showS && S.lengthSq() > 0.01) {
+                        const len = S.length() * arrowScale;
+                        vectorGroup.add(new THREE.ArrowHelper(S.clone().normalize(), pos, len, 0xfbbf24, len*0.3, len*0.2));
+                    }
+                }
+            }
+        }
+
+        function initParticles() {
+            if (particleSystem) scene.remove(particleSystem);
+
+            const count = state.particleCount;
+            particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            particleCoords = [];
+
+            for (let i = 0; i < count; i++) {
+                const u = Math.random() * Math.PI * 2;
+                const v = Math.random() * Math.PI * 2;
+                particleCoords.push({ u, v });
+
+                const pos = getTorusSurfacePoint(u, v);
+                positions[i * 3] = pos.x;
+                positions[i * 3 + 1] = pos.y;
+                positions[i * 3 + 2] = pos.z;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const pMat = new THREE.PointsMaterial({
+                color: 0xfbbf24,
+                size: 0.09,
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending
+            });
+
+            particleSystem = new THREE.Points(particleGeo, pMat);
+            scene.add(particleSystem);
+        }
+
+        function updateParticles(dt) {
+            if (!particleSystem || state.particleCount === 0) return;
+
+            const positions = particleGeo.attributes.position.array;
+            const speedFactor = state.speed * 1.2;
+
+            for (let i = 0; i < state.particleCount; i++) {
+                let p = particleCoords[i];
+
+                const { S } = computeFields(p.u, p.v);
+                const { e_u, e_v } = getTorusFrame(p.u, p.v);
+
+                // Exakte Winkelgeschwindigkeiten berechnen:
+                // du/dt = S . e_u / r (poloidale Rotation)
+                // dv/dt = S . e_v / (R + r * cos(u)) (toroidale Rotation)
+                const R_eff = state.R + state.r * Math.cos(p.u);
+                const du = (S.dot(e_u) / state.r) * speedFactor * dt;
+                const dv = (S.dot(e_v) / Math.max(0.1, R_eff)) * speedFactor * dt;
+
+                p.u = (p.u + du + Math.PI * 2) % (Math.PI * 2);
+                p.v = (p.v + dv + Math.PI * 2) % (Math.PI * 2);
+
+                const newPos = getTorusSurfacePoint(p.u, p.v);
+                positions[i * 3] = newPos.x;
+                positions[i * 3 + 1] = newPos.y;
+                positions[i * 3 + 2] = newPos.z;
+            }
+
+            particleGeo.attributes.position.needsUpdate = true;
+        }
+
+        function setupUI() {
+            const bindSlider = (id, param, cb) => {
+                const slider = document.getElementById(`param-${id}`);
+                const badge = document.getElementById(`val-${id}`);
+                slider.addEventListener('input', (e) => {
+                    state[param] = parseFloat(e.target.value);
+                    badge.textContent = state[param].toFixed(slider.step.includes('.') ? 1 : 0);
+                    cb();
+                });
+            };
+
+            bindSlider('R', 'R', () => { createTorusMesh(); initParticles(); updateVectors(); });
+            bindSlider('r', 'r', () => { createTorusMesh(); initParticles(); updateVectors(); });
+            bindSlider('speed', 'speed', () => {});
+            bindSlider('particles', 'particleCount', () => { initParticles(); });
+
+            document.getElementById('preset-select').addEventListener('change', (e) => {
+                state.preset = e.target.value;
+                updateVectors();
+            });
+
+            const bindToggle = (id, key) => {
+                const btn = document.getElementById(id);
+                btn.addEventListener('click', () => {
+                    state[key] = !state[key];
+                    btn.classList.toggle('active', state[key]);
+                    updateVectors();
+                });
+            };
+
+            bindToggle('toggle-e', 'showE');
+            bindToggle('toggle-b', 'showB');
+            bindToggle('toggle-s', 'showS');
+
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        createTorusMesh();
+        initParticles();
+        updateVectors();
+        setupUI();
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = clock.getDelta();
+            controls.update();
+            updateParticles(dt);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
