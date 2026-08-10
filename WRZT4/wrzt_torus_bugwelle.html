@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Rotierende Feldlinien mit Pfeilen</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #080c14;
+            color: #e0e6ed;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        .ui-panel {
+            position: absolute; top: 20px; left: 20px; z-index: 10;
+            background: rgba(13, 20, 36, 0.88);
+            border: 1px solid rgba(0, 210, 255, 0.35);
+            border-radius: 12px; padding: 18px; width: 330px;
+            backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+        h1 { font-size: 1.05rem; color: #00d2ff; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { font-size: 0.78rem; color: #8a9ba8; margin-bottom: 14px; font-weight: 400; }
+        .control-group { margin-bottom: 12px; }
+        .control-group label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; color: #c2d1d9; }
+        .control-group input[type="range"] { width: 100%; height: 4px; background: #1a2638; border-radius: 2px; outline: none; accent-color: #00d2ff; }
+        .toggle-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem; }
+        .toggle-switch { position: relative; display: inline-block; width: 38px; height: 18px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1a2638; transition: .3s; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: #8a9ba8; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00d2ff; }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #080c14; }
+        .telemetry-panel {
+            position: absolute; bottom: 20px; right: 20px; z-index: 10;
+            background: rgba(13, 20, 36, 0.88); border: 1px solid rgba(0, 210, 255, 0.35);
+            border-radius: 12px; padding: 14px; width: 300px;
+            backdrop-filter: blur(10px); font-family: monospace; font-size: 0.78rem;
+        }
+        .telemetry-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .telemetry-value { color: #00d2ff; font-weight: bold; }
+        .phase-indicator { display: inline-block; padding: 1px 5px; border-radius: 4px; font-weight: bold; }
+        .phase-plus { background: rgba(0, 255, 136, 0.2); color: #00ff88; border: 1px solid #00ff88; }
+        .phase-minus { background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="ui-panel">
+        <h1>WRZT Torus-Elektron</h1>
+        <h2>Feldlinien-Rotation & Richtungspfeile</h2>
+
+        <div class="control-group">
+            <label>Hauptradius R<sub>e</sub>: <span id="re-val">2.0</span></label>
+            <input type="range" id="slider-re" min="1.0" max="3.5" step="0.1" value="2.0">
+        </div>
+
+        <div class="control-group">
+            <label>Schlauchradius r<sub>c</sub>: <span id="rc-val">0.6</span></label>
+            <input type="range" id="slider-rc" min="0.2" max="1.0" step="0.05" value="0.6">
+        </div>
+
+        <div class="control-group">
+            <label>Umlaufgeschwindigkeit c: <span id="speed-val">1.0</span></label>
+            <input type="range" id="slider-speed" min="0.1" max="2.5" step="0.1" value="1.0">
+        </div>
+
+        <div class="toggle-group">
+            <span>B-Feld Rotation (Poloidal)</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-bfield" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-group">
+            <span>E-Feld Rotation (Toroidal)</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-efield" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-group">
+            <span>Richtungspfeile (Vektoren)</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-arrows" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-group">
+            <span>Bugwelle (Phasen-Kegel)</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-bow" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-group">
+            <span>Torus-Netzwerk</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-mesh" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="telemetry-panel">
+        <div class="telemetry-row">
+            <span>Umlaufwinkel:</span>
+            <span class="telemetry-value" id="tele-angle">0°</span>
+        </div>
+        <div class="telemetry-row">
+            <span>Phase Ψ:</span>
+            <span id="tele-phase" class="phase-indicator phase-plus">+1.0</span>
+        </div>
+        <div class="telemetry-row">
+            <span>B-Feld Vektor:</span>
+            <span class="telemetry-value" style="color:#0088ff;">rotierend (poloidal)</span>
+        </div>
+        <div class="telemetry-row">
+            <span>E-Feld Vektor:</span>
+            <span class="telemetry-value" style="color:#ff3366;">zirkulär (toroidal)</span>
+        </div>
+        <div class="telemetry-row">
+            <span>Pinch-Kompression:</span>
+            <span class="telemetry-value" style="color:#00ff88;">Aktiv (F<sub>m</sub> = F<sub>e</sub>)</span>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x080c14, 0.035);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 4.5, 7.5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Lights
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+        const p1 = new THREE.PointLight(0x00d2ff, 2, 40); p1.position.set(0, 6, 6); scene.add(p1);
+        const p2 = new THREE.PointLight(0xff00aa, 1.2, 40); p2.position.set(0, -6, -6); scene.add(p2);
+
+        // State Variables
+        let R_e = 2.0, r_c = 0.6, speed = 1.0, theta = 0, poloidalAngle = 0;
+        let torusMesh, bowWaveMesh, wavePulse, pulseGlow;
+        let bFieldLoops = [], bFieldArrows = [], eFieldGroup, eFieldArrows = [];
+        const numBLoops = 12;
+
+        // Torus Mesh
+        function buildTorus() {
+            if (torusMesh) scene.remove(torusMesh);
+            const geo = new THREE.TorusGeometry(R_e, r_c, 24, 80);
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0x00d2ff, wireframe: true, transparent: true, opacity: 0.12
+            });
+            torusMesh = new THREE.Mesh(geo, mat);
+            torusMesh.rotation.x = Math.PI / 2;
+            scene.add(torusMesh);
+        }
+
+        // Bugwelle (Bow Wave Shock Cone)
+        function buildBowWave() {
+            if (bowWaveMesh) scene.remove(bowWaveMesh);
+            const geo = new THREE.ConeGeometry(r_c * 1.8, r_c * 2.5, 16, 1, true);
+            const mat = new THREE.MeshBasicMaterial({
+                color: 0x00ffcc, wireframe: true, transparent: true, opacity: 0.45
+            });
+            bowWaveMesh = new THREE.Mesh(geo, mat);
+            scene.add(bowWaveMesh);
+        }
+
+        // Poloidale B-Feldringe mit Pfeilen aufbauen
+        function buildBField() {
+            // Alte Elemente entfernen
+            bFieldLoops.forEach(l => scene.remove(l));
+            bFieldArrows.forEach(a => scene.remove(a));
+            bFieldLoops = [];
+            bFieldArrows = [];
+
+            const arrowGeo = new THREE.ConeGeometry(0.08, 0.22, 12);
+            const arrowMat = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+
+            for (let i = 0; i < numBLoops; i++) {
+                const ringAngle = (i / numBLoops) * Math.PI * 2;
+                
+                // Ring-Linie
+                const ringGeo = new THREE.BufferGeometry();
+                const points = [];
+                for (let j = 0; j <= 40; j++) {
+                    points.push(new THREE.Vector3());
+                }
+                ringGeo.setFromPoints(points);
+                const ringMat = new THREE.LineBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 0.6 });
+                const line = new THREE.Line(ringGeo, ringMat);
+                line.userData = { ringAngle: ringAngle };
+                scene.add(line);
+                bFieldLoops.push(line);
+
+                // Pfeile pro B-Feldring (4 Pfeile pro Ring)
+                for (let k = 0; k < 4; k++) {
+                    const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+                    arrow.userData = { ringAngle: ringAngle, offsetFrac: k / 4 };
+                    scene.add(arrow);
+                    bFieldArrows.push(arrow);
+                }
+            }
+        }
+
+        // B-Feld Punkte und Pfeilpositionen in Animation aktualisieren
+        function updateBField(pAngle) {
+            const arrowVis = document.getElementById('toggle-arrows').checked;
+
+            bFieldLoops.forEach((line) => {
+                const angle = line.userData.ringAngle;
+                const positions = line.geometry.attributes.position.array;
+                
+                for (let j = 0; j <= 40; j++) {
+                    const phi = (j / 40) * Math.PI * 2 + pAngle;
+                    const rx = (R_e + (r_c * 1.25) * Math.cos(phi)) * Math.cos(angle);
+                    const rz = (R_e + (r_c * 1.25) * Math.cos(phi)) * Math.sin(angle);
+                    const ry = (r_c * 1.25) * Math.sin(phi);
+
+                    positions[j * 3] = rx;
+                    positions[j * 3 + 1] = ry;
+                    positions[j * 3 + 2] = rz;
+                }
+                line.geometry.attributes.position.needsUpdate = true;
+            });
+
+            bFieldArrows.forEach((arrow) => {
+                arrow.visible = document.getElementById('toggle-bfield').checked && arrowVis;
+                if (!arrow.visible) return;
+
+                const angle = arrow.userData.ringAngle;
+                const phi = arrow.userData.offsetFrac * Math.PI * 2 + pAngle;
+
+                // Position
+                const rx = (R_e + (r_c * 1.25) * Math.cos(phi)) * Math.cos(angle);
+                const rz = (R_e + (r_c * 1.25) * Math.cos(phi)) * Math.sin(angle);
+                const ry = (r_c * 1.25) * Math.sin(phi);
+                arrow.position.set(rx, ry, rz);
+
+                // Tangentialer Richtungsvektor für den Pfeil
+                const dt = 0.01;
+                const phi2 = phi + dt;
+                const nx = (R_e + (r_c * 1.25) * Math.cos(phi2)) * Math.cos(angle);
+                const nz = (R_e + (r_c * 1.25) * Math.cos(phi2)) * Math.sin(angle);
+                const ny = (r_c * 1.25) * Math.sin(phi2);
+
+                const dir = new THREE.Vector3(nx - rx, ny - ry, nz - rz).normalize();
+                arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+            });
+        }
+
+        // Toroidales E-Feld mit Pfeilen aufbauen
+        function buildEField() {
+            if (eFieldGroup) scene.remove(eFieldGroup);
+            eFieldArrows.forEach(a => scene.remove(a));
+            eFieldArrows = [];
+
+            eFieldGroup = new THREE.Group();
+            
+            // 3 Toroidale Hauptringe (Innen, Mitte, Außen)
+            const offsets = [0, r_c * 0.7, -r_c * 0.7];
+            offsets.forEach((off) => {
+                const ringGeo = new THREE.BufferGeometry();
+                const points = [];
+                for (let i = 0; i <= 64; i++) {
+                    const phi = (i / 64) * Math.PI * 2;
+                    points.push(new THREE.Vector3((R_e + off) * Math.cos(phi), 0, (R_e + off) * Math.sin(phi)));
+                }
+                ringGeo.setFromPoints(points);
+                const ringMat = new THREE.LineDashedMaterial({ color: 0xff3366, dashSize: 0.2, gapSize: 0.1 });
+                const line = new THREE.Line(ringGeo, ringMat);
+                line.computeLineDistances();
+                eFieldGroup.add(line);
+            });
+            scene.add(eFieldGroup);
+
+            // Pfeile entlang des Hauptrings
+            const arrowGeo = new THREE.ConeGeometry(0.08, 0.24, 12);
+            const arrowMat = new THREE.MeshBasicMaterial({ color: 0xff3366 });
+            const numEArrows = 8;
+
+            for (let i = 0; i < numEArrows; i++) {
+                const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+                arrow.userData = { angleOffset: (i / numEArrows) * Math.PI * 2 };
+                scene.add(arrow);
+                eFieldArrows.push(arrow);
+            }
+        }
+
+        function updateEField(toroidalAngle) {
+            eFieldGroup.rotation.y = toroidalAngle;
+
+            const arrowVis = document.getElementById('toggle-arrows').checked && document.getElementById('toggle-efield').checked;
+
+            eFieldArrows.forEach((arrow) => {
+                arrow.visible = arrowVis;
+                if (!arrow.visible) return;
+
+                const angle = arrow.userData.angleOffset + toroidalAngle;
+                const x = R_e * Math.cos(angle);
+                const z = R_e * Math.sin(angle);
+                arrow.position.set(x, 0, z);
+
+                // Tangentialer Vektor entlang des Hauptkreises
+                const dir = new THREE.Vector3(-Math.sin(angle), 0, Math.cos(angle)).normalize();
+                arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+            });
+        }
+
+        // Circulating Pulse
+        function buildPulse() {
+            if (wavePulse) scene.remove(wavePulse);
+            wavePulse = new THREE.Mesh(
+                new THREE.SphereGeometry(0.12, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0x00ff88 })
+            );
+            pulseGlow = new THREE.Mesh(
+                new THREE.SphereGeometry(0.28, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0x00ff88, transparent: true, opacity: 0.35 })
+            );
+            wavePulse.add(pulseGlow);
+            scene.add(wavePulse);
+        }
+
+        function initScene() {
+            buildTorus();
+            buildBowWave();
+            buildBField();
+            buildEField();
+            buildPulse();
+        }
+
+        initScene();
+
+        // UI Listener
+        document.getElementById('slider-re').addEventListener('input', (e) => {
+            R_e = parseFloat(e.target.value);
+            document.getElementById('re-val').innerText = R_e.toFixed(1);
+            initScene();
+        });
+
+        document.getElementById('slider-rc').addEventListener('input', (e) => {
+            r_c = parseFloat(e.target.value);
+            document.getElementById('rc-val').innerText = r_c.toFixed(2);
+            initScene();
+        });
+
+        document.getElementById('slider-speed').addEventListener('input', (e) => {
+            speed = parseFloat(e.target.value);
+            document.getElementById('speed-val').innerText = speed.toFixed(1);
+        });
+
+        document.getElementById('toggle-bow').addEventListener('change', (e) => bowWaveMesh.visible = e.target.checked);
+        document.getElementById('toggle-bfield').addEventListener('change', (e) => {
+            const vis = e.target.checked;
+            bFieldLoops.forEach(l => l.visible = vis);
+        });
+        document.getElementById('toggle-efield').addEventListener('change', (e) => eFieldGroup.visible = e.target.checked);
+        document.getElementById('toggle-mesh').addEventListener('change', (e) => torusMesh.visible = e.target.checked);
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Umlauffrequenz des Pulses
+            theta += 0.015 * speed;
+            if (theta >= Math.PI * 4) theta -= Math.PI * 4;
+
+            // Poloidale B-Feld Rotation (Schlauchumrundung)
+            poloidalAngle += 0.03 * speed;
+            if (poloidalAngle >= Math.PI * 2) poloidalAngle -= Math.PI * 2;
+
+            // Toroidale E-Feld Rotation (Hauptkreisumrundung)
+            const toroidalAngle = theta;
+
+            // Feldlinien & Vektoren aktualisieren
+            updateBField(poloidalAngle);
+            updateEField(toroidalAngle);
+
+            // Position des Wellenknotens (4-Pi Knotenbahn)
+            const x = (R_e + r_c * Math.cos(theta / 2)) * Math.cos(theta);
+            const z = (R_e + r_c * Math.cos(theta / 2)) * Math.sin(theta);
+            const y = r_c * Math.sin(theta / 2);
+
+            wavePulse.position.set(x, y, z);
+
+            // Ausrichtung der Bugwelle (Tangente an Bahn)
+            const dt = 0.01;
+            const nx = (R_e + r_c * Math.cos((theta + dt) / 2)) * Math.cos(theta + dt);
+            const nz = (R_e + r_c * Math.cos((theta + dt) / 2)) * Math.sin(theta + dt);
+            const ny = r_c * Math.sin((theta + dt) / 2);
+
+            const dir = new THREE.Vector3(nx - x, ny - y, nz - z).normalize();
+            bowWaveMesh.position.set(x - dir.x * 0.2, y - dir.y * 0.2, z - dir.z * 0.2);
+            bowWaveMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+
+            // Telemetry Update
+            const totalDeg = Math.floor((theta / (Math.PI * 4)) * 720);
+            document.getElementById('tele-angle').innerText = totalDeg + "°";
+
+            const telePhase = document.getElementById('tele-phase');
+            if (theta < Math.PI * 2) {
+                telePhase.innerText = "-1.0 (Invertiert)";
+                telePhase.className = "phase-indicator phase-minus";
+                wavePulse.material.color.setHex(0xff0055);
+                pulseGlow.material.color.setHex(0xff0055);
+            } else {
+                telePhase.innerText = "+1.0 (Ursprung)";
+                telePhase.className = "phase-indicator phase-plus";
+                wavePulse.material.color.setHex(0x00ff88);
+                pulseGlow.material.color.setHex(0x00ff88);
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
