@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torus-Wirbel Simulation (Elektronen-Modell)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #58a6ff;
+            text-align: center;
+        }
+        p.subtitle {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .canvas-container {
+            position: relative;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        canvas {
+            display: block;
+            cursor: move;
+        }
+        .controls {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-size: 0.85rem;
+            color: #8b949e;
+            display: flex;
+            justify-content: space-between;
+        }
+        span.val {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        input[type=range] {
+            width: 100%;
+            accent-color: #1f6feb;
+        }
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .toggle-group input {
+            cursor: pointer;
+        }
+        .readout {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .readout-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .readout-val {
+            color: #7ee787;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Toroidales Wirbel- & Bugwellen-Modell</h1>
+    <p class="subtitle">Simulation einer zirkulierenden Phasenwelle und ihrer Raumverdichtung</p>
+
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="simCanvas" width="650" height="550"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Ringradius $R_e$ (Hauptkreis): <span id="rVal" class="val">150</span></label>
+                <input type="range" id="radiusInput" min="50" max="220" value="150">
+            </div>
+
+            <div class="control-group">
+                <label>Umlaufgeschwindigkeit $c$: <span id="speedVal" class="val">1.0</span></label>
+                <input type="range" id="speedInput" min="0.1" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <label>Bugwellen-Intensität: <span id="waveVal" class="val">0.8</span></label>
+                <input type="range" id="waveInput" min="0.1" max="2.0" step="0.1" value="0.8">
+            </div>
+
+            <div class="control-group">
+                <label>Partikel-Dichte: <span id="partVal" class="val">400</span></label>
+                <input type="range" id="partInput" min="100" max="1000" step="50" value="400">
+            </div>
+
+            <hr style="border-color: #30363d;">
+
+            <div class="toggle-group">
+                <label for="showTorus">Torus-Hülle anzeigen</label>
+                <input type="checkbox" id="showTorus" checked>
+            </div>
+
+            <div class="toggle-group">
+                <label for="showWaves">Bugwellen-Fronten anzeigen</label>
+                <input type="checkbox" id="showWaves" checked>
+            </div>
+
+            <div class="readout">
+                <div class="readout-row">
+                    <span>Zentrifugaldruck ($P_z$):</span>
+                    <span id="pzVal" class="readout-val">100 %</span>
+                </div>
+                <div class="readout-row">
+                    <span>Feld-Verdichtung ($\Delta\rho$):</span>
+                    <span id="drhoVal" class="readout-val">1.00</span>
+                </div>
+                <div class="readout-row">
+                    <span>Gleichgewicht ($F_{\text{in}} / F_{\text{out}}$):</span>
+                    <span id="balVal" class="readout-val" style="color: #7ee787;">1.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Steuerungselemente
+        const radiusInput = document.getElementById('radiusInput');
+        const speedInput = document.getElementById('speedInput');
+        const waveInput = document.getElementById('waveInput');
+        const partInput = document.getElementById('partInput');
+        const showTorusCheck = document.getElementById('showTorus');
+        const showWavesCheck = document.getElementById('showWaves');
+
+        // Parameter
+        let R = parseFloat(radiusInput.value);
+        let r_tube = R * 0.35; // Schlauchradius
+        let speed = parseFloat(speedInput.value);
+        let waveIntensity = parseFloat(waveInput.value);
+        let numParticles = parseInt(partInput.value);
+
+        let angle = 0;
+        let particles = [];
+        let waveFronts = [];
+
+        // Ansichts-Rotation (3D-Effekt)
+        let rotX = 0.5;
+        let rotY = 0.3;
+        let isDragging = false;
+        let lastMouseX = 0, lastMouseY = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - lastMouseX;
+            const dy = e.clientY - lastMouseY;
+            rotY += dx * 0.008;
+            rotX += dy * 0.008;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        // Partikel-Initialisierung für den Torus
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    u: Math.random() * Math.PI * 2, // Hauptkreis-Winkel
+                    v: Math.random() * Math.PI * 2, // Schlauch-Winkel
+                    speedOffset: 0.8 + Math.random() * 0.4
+                });
+            }
+        }
+        initParticles();
+
+        // Event-Listener
+        radiusInput.addEventListener('input', (e) => {
+            R = parseFloat(e.target.value);
+            r_tube = R * 0.35;
+            document.getElementById('rVal').innerText = R;
+        });
+        speedInput.addEventListener('input', (e) => {
+            speed = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = speed.toFixed(1);
+        });
+        waveInput.addEventListener('input', (e) => {
+            waveIntensity = parseFloat(e.target.value);
+            document.getElementById('waveVal').innerText = waveIntensity.toFixed(1);
+        });
+        partInput.addEventListener('input', (e) => {
+            numParticles = parseInt(e.target.value);
+            document.getElementById('partVal').innerText = numParticles;
+            initParticles();
+        });
+
+        // 3D-Projektion
+        function project(x, y, z) {
+            // Y-Rotation
+            let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
+            let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
+            let y1 = y;
+
+            // X-Rotation
+            let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+            let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+            const scale = 350 / (350 + z2);
+            return {
+                x: canvas.width / 2 + x1 * scale,
+                y: canvas.height / 2 + y2 * scale,
+                scale: scale,
+                z: z2
+            };
+        }
+
+        // Hauptschleife
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            angle += 0.03 * speed;
+
+            // Bugwellen erzeugen
+            if (showWavesCheck.checked && Math.random() < 0.4) {
+                waveFronts.push({
+                    u: angle,
+                    radius: 5,
+                    maxRadius: r_tube * 1.8,
+                    alpha: 1.0
+                });
+            }
+
+            // 1. Hintergrund-Gitter / Dichtefeld zeichnen
+            ctx.strokeStyle = 'rgba(30, 45, 65, 0.3)';
+            ctx.lineWidth = 1;
+            const gridSize = 300;
+            const step = 40;
+            for (let x = -gridSize; x <= gridSize; x += step) {
+                let p1 = project(x, 80, -gridSize);
+                let p2 = project(x, 80, gridSize);
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+            }
+
+            // 2. Torus-Drahtgitter (optional)
+            if (showTorusCheck.checked) {
+                ctx.strokeStyle = 'rgba(88, 166, 255, 0.08)';
+                ctx.lineWidth = 1;
+                const uSteps = 24;
+                const vSteps = 12;
+
+                for (let i = 0; i < uSteps; i++) {
+                    let u = (i / uSteps) * Math.PI * 2;
+                    ctx.beginPath();
+                    for (let j = 0; j <= vSteps; j++) {
+                        let v = (j / vSteps) * Math.PI * 2;
+                        let x = (R + r_tube * Math.cos(v)) * Math.cos(u);
+                        let y = r_tube * Math.sin(v);
+                        let z = (R + r_tube * Math.cos(v)) * Math.sin(u);
+                        let p = project(x, y, z);
+                        if (j === 0) ctx.moveTo(p.x, p.y);
+                        else ctx.lineTo(p.x, p.y);
+                    }
+                    ctx.stroke();
+                }
+            }
+
+            // 3. Bugwellen-Fronten aktualisieren und zeichnen
+            for (let i = waveFronts.length - 1; i >= 0; i--) {
+                let wf = waveFronts[i];
+                wf.radius += 1.5 * speed;
+                wf.alpha -= 0.02;
+
+                if (wf.alpha <= 0) {
+                    waveFronts.splice(i, 1);
+                    continue;
+                }
+
+                let centerPos = {
+                    x: R * Math.cos(wf.u),
+                    y: 0,
+                    z: R * Math.sin(wf.u)
+                };
+
+                let p = project(centerPos.x, centerPos.y, centerPos.z);
+                ctx.strokeStyle = `rgba(0, 210, 255, ${wf.alpha * waveIntensity})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, wf.radius * p.scale, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // 4. Haupt-Phasenwelle (Der zirkulierende "Impuls")
+            let waveX = R * Math.cos(angle);
+            let waveZ = R * Math.sin(angle);
+            let waveP = project(waveX, 0, waveZ);
+
+            let gradient = ctx.createRadialGradient(waveP.x, waveP.y, 0, waveP.x, waveP.y, 45 * waveP.scale);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.3, 'rgba(0, 180, 255, 0.8)');
+            gradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(waveP.x, waveP.y, 45 * waveP.scale, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 5. Partikel im Torus bewegen (Dichte-Strömung)
+            for (let p of particles) {
+                p.u += 0.02 * speed * p.speedOffset;
+                p.v += 0.05 * speed;
+
+                let x = (R + r_tube * Math.cos(p.v)) * Math.cos(p.u);
+                let y = r_tube * Math.sin(p.v);
+                let z = (R + r_tube * Math.cos(p.v)) * Math.sin(p.u);
+
+                let proj = project(x, y, z);
+
+                // Helligkeit basierend auf Nähe zur Wellenfront
+                let distToWave = Math.abs(p.u - (angle % (Math.PI * 2)));
+                let brightness = 0.3 + (1 - Math.min(distToWave, 1)) * 0.7;
+
+                ctx.fillStyle = `rgba(126, 231, 135, ${brightness})`;
+                ctx.beginPath();
+                ctx.arc(proj.x, proj.y, 1.8 * proj.scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Messwerte aktualisieren
+            document.getElementById('pzVal').innerText = Math.round((speed * speed / (R / 150)) * 100) + ' %';
+            document.getElementById('drhoVal').innerText = (waveIntensity * (R / 100)).toFixed(2);
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
