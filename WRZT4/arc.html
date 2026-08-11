@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geometrie-Animation mit 5 Nachkommastellen</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- MathJax Configuration -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ],
+        processEscapes: true
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'has_am'
+      }
+    };
+  </script>
+  <!-- MathJax für LaTeX-Formeldarstellung -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body { background-color: #0f172a; color: #f8fafc; }
+    #geoCanvas { cursor: grab; }
+    #geoCanvas:active { cursor: grabbing; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+  <div class="max-w-3xl w-full bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700">
+    <h1 class="text-2xl font-bold mb-4 text-center text-cyan-400">Interaktive Geometrie-Animation (Präzise)</h1>
+
+    <!-- Erklärung & Formel -->
+    <div class="mb-6 text-sm text-slate-300 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+      <p class="mb-2">Zusammenhang bei bekanntem $b$ und $\alpha$ (Gleichschenkliges Dreieck mit $\overline{EB} = \overline{E'B} = r$):</p>
+      <div class="text-center text-lg my-2 text-cyan-300">
+        $$a = \frac{b \cdot 2 \cdot \sin\left(\frac{\alpha}{2}\right)}{\sqrt{2} \cdot \alpha}$$
+      </div>
+      <p class="text-xs text-slate-400 text-center mt-2">💡 <i>Tipp: Mit dem Mausrad zoomen (Schrift & Punkte bleiben konstant), mit gedrückter Maustaste verschieben (Pan). Alle Werte 5-stellig genau.</i></p>
+    </div>
+
+    <!-- Regler / Controls -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Regler für Bogenlänge b -->
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+        <label for="bSlider" class="block text-sm font-medium mb-2 text-slate-300">
+          Bogenlänge ($b$): <span id="bValue" class="font-bold text-cyan-400">3.00000</span>
+        </label>
+        <input type="range" id="bSlider" min="0.5" max="4.0" step="0.001" value="1.0" class="w-full accent-cyan-400 cursor-pointer">
+      </div>
+
+      <!-- Regler für Winkel alpha -->
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+        <label for="alphaSlider" class="block text-sm font-medium mb-2 text-slate-300">
+          Winkel ($\alpha$ in rad): <span id="alphaValue" class="font-bold text-cyan-400">1.00000</span> rad
+        </label>
+        <input type="range" id="alphaSlider" min="0.5" max="1.5" step="0.001" value="1.0" class="w-full accent-cyan-400 cursor-pointer">
+      </div>
+    </div>
+
+    <!-- Live-Ergebnis & Reset -->
+    <div class="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6 bg-cyan-950/40 border border-cyan-800/50 p-4 rounded-xl">
+      <div class="text-center sm:text-left">
+        <span class="text-slate-400 text-sm">Berechneter Radius ($a$):</span>
+        <div id="resultA" class="text-2xl font-extrabold text-cyan-400 mt-1">--</div>
+      </div>
+      <button id="resetViewBtn" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-sm rounded-lg transition shadow">
+        Ansicht zentrieren
+      </button>
+    </div>
+
+    <!-- Grafische SVG-Vorschau -->
+    <div class="flex justify-center bg-slate-900 rounded-xl p-2 border border-slate-700 overflow-hidden relative">
+      <svg id="geoCanvas" width="400" height="350" viewBox="0 0 400 350" class="max-w-full select-none">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="1" />
+          </pattern>
+        </defs>
+        <!-- Hintergrund -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- SVG-Inhalt -->
+        <g id="svgContent"></g>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const bSlider = document.getElementById('bSlider');
+    const alphaSlider = document.getElementById('alphaSlider');
+    const bValue = document.getElementById('bValue');
+    const alphaValue = document.getElementById('alphaValue');
+    const resultA = document.getElementById('resultA');
+    const svgContent = document.getElementById('svgContent');
+    const svgCanvas = document.getElementById('geoCanvas');
+    const resetViewBtn = document.getElementById('resetViewBtn');
+
+    let panX = 60;
+    let panY = 60;
+    let zoomLevel = 1.0;
+    let isDragging = false;
+    let startX, startY;
+
+    svgCanvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateGeometry();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    svgCanvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = 1.15;
+      if (e.deltaY < 0) {
+        zoomLevel *= factor;
+      } else {
+        zoomLevel /= factor;
+      }
+      zoomLevel = Math.max(0.2, Math.min(10.0, zoomLevel));
+      updateGeometry();
+    }, {
+      passive: false
+    });
+
+    resetViewBtn.addEventListener('click', () => {
+      panX = 60;
+      panY = 60;
+      zoomLevel = 1.0;
+      updateGeometry();
+    });
+
+    function updateGeometry() {
+      const b = parseFloat(bSlider.value);
+      const alpha = parseFloat(alphaSlider.value);
+
+      bValue.textContent = b.toFixed(5);
+      alphaValue.textContent = alpha.toFixed(5);
+
+      const a = (b * 2 * Math.sin(alpha / 2)) / (Math.sqrt(2) * alpha);
+      resultA.textContent = a.toFixed(5) + " LE";
+
+      drawSVG(a, alpha, b);
+    }
+
+    function drawSVG(a, alpha, b) {
+      const baseScale = 250;
+      const scale = baseScale * zoomLevel;
+
+      const startX = panX;
+      const startY = panY;
+
+      const aPx = a * scale;
+
+      const Ax = startX;
+      const Ay = startY;
+
+      const EpX = Ax;
+      const EpY = Ay + aPx;
+
+      const Ex = Ax + aPx;
+      const Ey = Ay;
+
+      const chord = Math.sqrt(2) * aPx;
+      const rPx = chord / (2 * Math.sin(alpha / 2));
+
+      const mx = (EpX + Ex) / 2;
+      const my = (EpY + Ey) / 2;
+
+      const h = Math.sqrt(Math.max(0, rPx * rPx - (chord / 2) * (chord / 2)));
+      const nx = 1 / Math.sqrt(2);
+      const ny = 1 / Math.sqrt(2);
+
+      const Bx = mx + h * nx;
+      const By = my + h * ny;
+
+      let html = '';
+
+      html += `<polygon points="${Ax},${Ay} ${EpX},${EpY} ${Ex},${Ey}" fill="#0e7490" fill-opacity="0.2" stroke="#06b6d4" stroke-width="2"/>`;
+      html += `<polygon points="${Ex},${Ey} ${Bx},${By} ${EpX},${EpY}" fill="#0284c7" fill-opacity="0.1" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4"/>`;
+      html += `<path d="M ${EpX} ${EpY} A ${rPx} ${rPx} 0 0 1 ${Ex} ${Ey}" fill="none" stroke="#22d3ee" stroke-width="3"/>`;
+
+      const points = [{
+          x: Ax,
+          y: Ay,
+          label: 'A (90°)'
+        },
+        {
+          x: EpX,
+          y: EpY,
+          label: "E'"
+        },
+        {
+          x: Ex,
+          y: Ey,
+          label: 'E'
+        },
+        {
+          x: Bx,
+          y: By,
+          label: 'B (α)'
+        }
+      ];
+
+      points.forEach(p => {
+        html += `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#f43f5e"/>`;
+        html += `<text x="${p.x + 8}" y="${p.y + 4}" fill="#f8fafc" font-size="12" font-weight="bold">${p.label}</text>`;
+      });
+
+      html += `<text x="${Ax - 55}" y="${Ay + aPx/2}" fill="#94a3b8" font-size="11">a = ${a.toFixed(5)}</text>`;
+      html += `<text x="${Ax + aPx/2}" y="${Ay - 10}" fill="#94a3b8" font-size="11">a = ${a.toFixed(5)}</text>`;
+      html += `<text x="${mx + 10}" y="${my + 5}" fill="#22d3ee" font-size="12" font-weight="bold">b = ${b.toFixed(5)}</text>`;
+      html += `<text x="${(Ex+Bx)/2 + 10}" y="${(Ey+By)/2}" fill="#38bdf8" font-size="10">r = ${(rPx/scale).toFixed(5)}</text>`;
+      html += `<text x="${(EpX+Bx)/2 - 65}" y="${(EpY+By)/2 + 15}" fill="#38bdf8" font-size="10">r = ${(rPx/scale).toFixed(5)}</text>`;
+
+      svgContent.innerHTML = html;
+    }
+
+    bSlider.addEventListener('input', updateGeometry);
+    alphaSlider.addEventListener('input', updateGeometry);
+
+    updateGeometry();
+  </script>
+</body>
+</html>
