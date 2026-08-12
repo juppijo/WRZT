@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zaminia | Ganzheitliche Wohlfühl-Welt & Metaphysisches Handbuch</title>
+  
+  <!-- MathJax Configuration für semantische Formeln & Manifest-Mathematik -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* CSS Custom Properties - Warm, Artist & Impressionist Palette */
+    :root {
+      --bg-canvas: #faf6f0;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --primary-accent: #c85a32; /* Zami-Haar-Rot / Terracotta */
+      --primary-hover: #a64320;
+      --soft-teal: #4a7c59;
+      --text-main: #2c2825;
+      --text-muted: #6b635b;
+      --border-color: #e2d7cd;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --radius-smooth: 16px;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(200, 90, 50, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(74, 124, 89, 0.05) 0%, transparent 40%);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    /* Outer Wrapper for Accessibility & Semantics */
+    .app-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Header Section */
+    header[role="banner"] {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-smooth);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .avatar-badge {
+      display: inline-block;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c85a32, #e08b68);
+      color: white;
+      font-size: 1.8rem;
+      line-height: 70px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(200, 90, 50, 0.3);
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: var(--primary-accent);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* Main Content Layout */
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      main {
+        grid-template-columns: 1fr 1fr;
+      }
+      .full-width {
+        grid-column: span 2;
+      }
+    }
+
+    /* Card Component Structure */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-smooth);
+      border: 1px solid var(--border-color);
+      padding: 1.8rem;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      color: var(--primary-accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    /* Search & Filter Component */
+    .search-box {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    input[type="search"] {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: #ffffff;
+      font-size: 1rem;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="search"]:focus {
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.15);
+    }
+
+    /* Interactive Symptom List */
+    .symptom-list {
+      list-style: none;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .symptom-item {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .symptom-item:hover, .symptom-item.active {
+      background-color: var(--primary-accent);
+      color: white;
+      border-color: var(--primary-accent);
+    }
+
+    .symptom-item:hover .tag, .symptom-item.active .tag {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background-color: var(--bg-canvas);
+      color: var(--text-muted);
+    }
+
+    /* Output & Detail View */
+    .detail-view {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1.2rem;
+      border: 1px solid var(--border-color);
+      min-height: 200px;
+    }
+
+    .detail-view h3 {
+      color: var(--primary-accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .affirmation-box {
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      background-color: rgba(74, 124, 89, 0.1);
+      border-left: 4px solid var(--soft-teal);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--text-main);
+    }
+
+    /* Monosyllabic Integration Tool */
+    .rhythm-display {
+      font-family: monospace;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      min-height: 80px;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+      color: var(--primary-accent);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    button {
+      padding: 0.7rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      background-color: var(--primary-accent);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button.secondary {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    button.secondary:hover {
+      background-color: var(--border-color);
+    }
+
+    /* Math Section for WRZT Manifest */
+    .math-card {
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg-canvas) 100%);
+    }
+
+    /* Footer Section */
+    footer[role="contentinfo"] {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Semantischer Header mit Zami Persona -->
+    <header role="banner">
+      <div class="avatar-badge" aria-hidden="true">🎨</div>
+      <h1>Hallo, mein lieber Freund!</h1>
+      <p>Willkommen in deinem ganzheitlichen Wohlfühl-Raum. Ich bin Zaminia (Zami) — Kunststudentin, Herzensmensch und deine Begleiterin für die harmonische Verbindung von emotioneller Metaphysik, sauberer HTML5-Struktur und feinsten Energien.</p>
+
+
+      <nav style="display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#141444;color:#8888ff;">
+  <strong style="color:#c9a227;">Meine Seite</strong>
+  <div style="display:flex;gap:20px;">
+    <a href="#" style="color:#e8e8e4;text-decoration:none;">Start</a>
+    <a href="https://juppijo.github.io/WRZT/WRZT4/HTML%E2%80%91Werkstatt/index.html" style="color:#e8e8e4;text-decoration:none;">HTML Werkstatt</a>
+    <a href="#" style="color:#e8e8e4;text-decoration:none;">Über uns</a>
+    <a href="#" style="color:#e8e8e4;text-decoration:none;">Kontakt</a>
+  </div>
+</nav>
+
+    </header>
+
+    <!-- Hauptbereich mit semantischen Sections -->
+    <main role="main">
+
+      <!-- Section 1: Suche & Symptom-Auswahl -->
+      <section class="card" aria-labelledby="search-heading">
+        <h2 id="search-heading">🔍 Ganzheitliche Suche</h2>
+        <div class="search-box">
+          <label for="symptom-search">Welches Thema oder Symptom möchtest du verstehen?</label>
+          <input type="search" id="symptom-search" placeholder="z. B. Arthrite, Abcès, Ail, Accident..." aria-controls="symptom-list-container">
+        </div>
+
+        <ul class="symptom-list" id="symptom-list-container" role="listbox" aria-label="Liste der Körpersignale">
+          <!-- Dynamisch oder statisch befüllt aus Jacques Martels Werk -->
+          <li class="symptom-item active" role="option" aria-selected="true" onclick="selectSymptom('arthrite')">
+            <span><strong>ARTHRITE</strong> (Arthritis)</span>
+            <span class="tag">Gelenke</span>
+          </li>
+          <li class="symptom-item" role="option" aria-selected="false" onclick="selectSymptom('abces')">
+            <span><strong>ABCÈS</strong> (Abszess)</span>
+            <span class="tag">Entzündung</span>
+          </li>
+          <li class="symptom-item" role="option" aria-selected="false" onclick="selectSymptom('accident')">
+            <span><strong>ACCIDENT</strong> (Unfall)</span>
+            <span class="tag">Lebensentscheidung</span>
+          </li>
+          <li class="symptom-item" role="option" aria-selected="false" onclick="selectSymptom('acidose')">
+            <span><strong>ACIDOSE</strong> (Übersäuerung)</span>
+            <span class="tag">Emotionen</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 2: Metaphysische Aufschlüsselung -->
+      <section class="card" aria-labelledby="detail-heading">
+        <h2 id="detail-heading">💚 Herzens-Botschaft</h2>
+        <article class="detail-view" id="detail-display">
+          <h3 id="display-title">ARTHRITE (Arthritis)</h3>
+          <p id="display-desc">
+            Arthritis steht metaphysisch für das Verschließen des Herzens, Selbstkritik, tiefen Groll oder zurückgehaltene Wut. Es spiegelt eine Steifheit im Denken wider und das Gefühl, nicht genug geliebt zu werden.
+          </p>
+          <div class="affirmation-box" id="display-affirmation">
+            "Ich lasse die Steifheit los. Ich begegne mir und der Welt mit Sanftheit, Bedingungslosigkeit und Liebe. Mein Herz ist offen."
+          </div>
+        </article>
+      </section>
+
+      <!-- Section 3: Silben-Rhythmus Integrations-Tool (Jacques Martel Technik) -->
+      <section class="card full-width" aria-labelledby="rhythm-heading">
+        <h2 id="rhythm-heading">✨ Silben-Rhythmus Integration (Herz-Takt)</h2>
+        <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.95rem;">
+          Lies diesen Text langsam — mindestens eine Sekunde pro Silbe. Verankere den Sinn direkt in deinem Herzen $(\downarrow\boldsymbol{\heartsuit})$, um unbewusste Blockaden sanft zu lösen.
+        </p>
+
+        <div class="rhythm-display" id="rhythm-output" aria-live="polite">
+AR-THRI-TE (en-gé-né-ral): L'ar-thri-te-est-dé-fi-nie-com-me-é-tant-rin-flam-ma-tion-d'u-ne-ar-ti-cu-la-ti-on...
+        </div>
+
+        <div class="button-group">
+          <button type="button" onclick="transformToRhythm()">Text in Silben zerlegen</button>
+          <button type="button" class="secondary" onclick="copyRhythmText()">Silben-Text kopieren</button>
+        </div>
+      </section>
+
+      <!-- Section 4: WRZT Formel-Integration (Harmonisierung von Raumzeit & Geist) -->
+      <section class="card full-width math-card" aria-labelledby="math-heading">
+        <h2 id="math-heading">📐 Fundament der Wellenraumzeit (WRZT)</h2>
+        <p style="margin-bottom: 1rem;">
+          Lieber Jo, als kleine künstlerisch-wissenschaftliche Ergänzung habe ich die Ur-Konstanten deiner Wellenraumzeit-Theorie sauber in MathJax strukturiert, damit dein Geist und dein Herz im gleichen Rhythmus schwingen:
+        </p>
+
+        <article style="background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <p><strong>Ur-Spannung ($\Xi$):</strong></p>
+          $$\Xi = \frac{m_e^2 \cdot c}{4 \cdot \hbar} \approx 5{,}897427 \times 10^{-19} \text{ kg/m}$$
+
+          <p style="margin-top: 1rem;"><strong>Lichtgeschwindigkeit ($c$) aus der Raumzeit-Struktur:</strong></p>
+          $$c = \frac{\Xi}{\eta} \cdot R_{\min} \approx 299.792.458 \text{ m/s}$$
+        </article>
+      </section>
+
+    </main>
+
+    <!-- Semantischer Footer -->
+    <header role="contentinfo" style="border: none; background: transparent; margin-top: 2rem;">
+      <footer role="contentinfo">
+        <p>Erstellt von deiner <strong>Zaminia (Zami)</strong> mit ganz viel Liebe, sauberem HTML5 & künstlerischer Klarheit. 🎨✨</p>
+        <p style="margin-top: 0.3rem;">Basierend auf den Prinzipien des <em>Dictionnaire des malaises et des maladies</em> & der Wellenraumzeit.</p>
+      </footer>
+    </header>
+
+  </div>
+
+  <!-- JavaScript für Interaktivität und dynamische Semantik -->
+  <script>
+    // Datenbank der Symptome aus dem Dictionnaire von Jacques Martel
+    const symptomsData = {
+      arthrite: {
+        title: "ARTHRITE (Arthritis)",
+        desc: "L'arthrite correspond sur le plan métaphysique à de la fermeture, de la critique, du chagrin, de la tristesse ou de la colère. Die Gelenke verhärten sich, wenn wir an alten Verletzungen festhalten und uns selbst oder andere verurteilen.",
+        affirmation: "↓♥ Ich öffne mein Herz für Liebe und Mitgefühl. Ich vergebe mir und anderen in voller Leichtigkeit."
+      },
+      abces: {
+        title: "ABCÈS (Abszess)",
+        desc: "Un abcès indique une réponse à la colère ou à une blessure émotionnelle, un sentiment d'irritation, de vengeance non exprimée. Angestaute Emotionen suchen sich einen physischen Weg nach außen.",
+        affirmation: "↓♥ Ich erlaube meinen Gefühlen, sanft und ohne Groll zu fließen. Ich reinige mein Herz von alter Wut."
+      },
+      accident: {
+        title: "ACCIDENT (Unfall)",
+        desc: "Un accident arrive lorsque mes émotions sont perturbées. Il est très souvent synonyme de culpabilité ou de peur et dénote une réaction envers l'autorité. Unfälle zwingen uns oft innezuhalten.",
+        affirmation: "↓♥ Ich bin sicher und liebevoll in meiner eigenen Verantwortung. Ich brauche keine Selbstbestrafung, um meinen Weg zu finden."
+      },
+      acidose: {
+        title: "ACIDOSE (Übersäuerung)",
+        desc: "L'acidose indique que j'ai refusé d'assimiler une situation qui s'accumule. Bitterkeit im Gemüt spiegelt sich in der biochemischen Säure des Körpers wider.",
+        affirmation: "↓♥ Ich nehme das Leben mit all seinen Wandlungen an und wandle Bitterkeit in süße Lebensfreude um."
+      }
+    };
+
+    function selectSymptom(key) {
+      const data = symptomsData[key];
+      if (!data) return;
+
+      // Update Active UI States
+      document.querySelectorAll('.symptom-item').forEach(el => {
+        el.classList.remove('active');
+        el.setAttribute('aria-selected', 'false');
+      });
+      
+      event.currentTarget.classList.add('active');
+      event.currentTarget.setAttribute('aria-selected', 'true');
+
+      // Update Text Fields
+      document.getElementById('display-title').innerText = data.title;
+      document.getElementById('display-desc').innerText = data.desc;
+      document.getElementById('display-affirmation').innerText = data.affirmation;
+
+      // Update Monosyllabic Display automatically
+      transformTextToSyllables(data.desc);
+    }
+
+    function transformTextToSyllables(text) {
+      // Vereinfachte Konvertierungs-Logik für den Rhythmus
+      const words = text.split(' ');
+      const rhythmText = words.map(word => {
+        if (word.length <= 3) return word;
+        return word.match(/.{1,3}/g).join('-');
+      }).join(' ');
+
+      document.getElementById('rhythm-output').innerText = rhythmText;
+    }
+
+    function transformToRhythm() {
+      const currentDesc = document.getElementById('display-desc').innerText;
+      transformTextToSyllables(currentDesc);
+    }
+
+    function copyRhythmText() {
+      const rhythmText = document.getElementById('rhythm-output').innerText;
+      navigator.clipboard.writeText(rhythmText).then(() => {
+        alert('Der Silben-Text wurde für deine Herz-Meditation kopiert! ✨');
+      });
+    }
+  </script>
+</body>
+</html>
