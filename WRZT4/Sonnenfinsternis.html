@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Sonnenfinsternis 12. August 2026 - Standort & Uhrzeit</title>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+    .card {
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      text-align: center;
+      max-width: 680px;
+      width: 100%;
+    }
+    .grid-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+      text-align: left;
+    }
+    label {
+      font-size: 0.85em;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    canvas {
+      background-color: #050b14;
+      border-radius: 12px;
+      margin: 12px 0;
+      border: 1px solid #334155;
+    }
+    .time-display {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #38bdf8;
+      margin: 4px 0;
+      font-family: monospace;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #2563eb; }
+    .info { font-size: 0.85em; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Mondpassage über die Sonne (12. August 2026)</h2>
+  
+  <div class="grid-inputs">
+    <div>
+      <label for="presetSelect">Schnellauswahl Ort:</label>
+      <select id="presetSelect">
+        <option value="custom">-- Manuell / Eigene Eingabe --</option>
+        <option value="50.78,6.08" selected>Aachen (Deutschland)</option>
+        <option value="50.85,4.35">Brüssel (Belgien)</option>
+        <option value="49.61,6.13">Luxemburg (Luxemburg)</option>
+        <option value="52.37,4.89">Amsterdam (Niederlande)</option>
+        <option value="48.85,2.35">Paris (Frankreich)</option>
+        <option value="40.41,-3.70">Madrid (Spanien)</option>
+        <option value="42.50,-3.70">Totalitätszone Spanien (42.50° N)</option>
+        <option value="39.57,2.65">Palma de Mallorca (Spanien)</option>
+        <option value="64.14,-21.94">Reykjavík (Island)</option>
+      </select>
+    </div>
+    <div>
+      <label>Koordinaten (Breite / Länge):</label>
+      <div style="display:flex; gap:6px;">
+        <input type="number" id="latInput" value="50.78" step="0.01" title="Breitengrad (°N)">
+        <input type="number" id="lonInput" value="6.08" step="0.01" title="Längengrad (°E)">
+      </div>
+    </div>
+  </div>
+
+  <div id="timeClock" class="time-display">Uhrzeit: --:--:-- CEST</div>
+
+  <canvas id="eclipseCanvas" width="500" height="420"></canvas>
+  
+  <div class="controls">
+    <button id="playBtn">Play</button>
+    <input type="range" id="timeSlider" min="-1.5" max="1.5" step="0.003" value="0" style="width: 220px;">
+    <label><input type="checkbox" id="showLine" checked> Bahnlinie</label>
+  </div>
+  <div id="statusText" class="info" style="margin-top:8px;">Phase: Eintritt (Rechts oben)</div>
+</div>
+
+<script>
+  const canvas = document.getElementById('eclipseCanvas');
+  const ctx = canvas.getContext('2d');
+  const slider = document.getElementById('timeSlider');
+  const playBtn = document.getElementById('playBtn');
+  const showLineCheck = document.getElementById('showLine');
+  const statusText = document.getElementById('statusText');
+  const timeClock = document.getElementById('timeClock');
+  
+  const presetSelect = document.getElementById('presetSelect');
+  const latInput = document.getElementById('latInput');
+  const lonInput = document.getElementById('lonInput');
+
+  const centerX = 250;
+  const centerY = 210;
+  const rSun = 85;
+  const rMoon = 87;
+
+  // Flugrichtung von Rechts-Oben nach Links-Unten (135 Grad)
+  const angleRad = 135 * (Math.PI / 180); 
+  const pathLength = 250;
+
+  let isPlaying = false;
+
+  function getEclipseParams() {
+    const lat = parseFloat(latInput.value) || 50.78;
+    const lon = parseFloat(lonInput.value) || 6.08;
+
+    // Zeitberechnung
+    const baseSeconds = 20 * 3600 + 5 * 60; 
+    const totalitySec = baseSeconds + (lon * 50) - ((lat - 40) * 20);
+
+    // Parallaxe: Für Standorte nördlich von Spanien (lat > 42.5) zieht der Mond unterhalb der Sonne vorbei
+    let minOffset = 0;
+    if (lat > 42.5) {
+      minOffset = Math.min((lat - 42.5) * 4.2, 50); 
+    } else if (lat < 39) {
+      minOffset = -Math.min((39 - lat) * 4.2, 40);
+    }
+
+    return { totalitySec, minOffset };
+  }
+
+  function formatTime(secondsTotal) {
+    const h = Math.floor(secondsTotal / 3600);
+    const m = Math.floor((secondsTotal % 3600) / 60);
+    const s = Math.floor(secondsTotal % 60);
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} CEST`;
+  }
+
+  function draw() {
+    const t = parseFloat(slider.value);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const { totalitySec, minOffset } = getEclipseParams();
+
+    // Basis-Bahn
+    const baseX = centerX + Math.cos(angleRad) * (t * pathLength);
+    const baseY = centerY + Math.sin(angleRad) * (t * pathLength);
+    
+    // Korrigierter Versatzwinkel: Verschiebt den Mond nach unten/rechts für Standorte im Norden
+    const perpAngle = angleRad - Math.PI / 2;
+    const mx = baseX + Math.cos(perpAngle) * minOffset;
+    const my = baseY + Math.sin(perpAngle) * minOffset;
+
+    // Zeit
+    const currentSec = totalitySec + (t * 3300);
+    timeClock.innerText = "Uhrzeit: " + formatTime(currentSec);
+
+    const dist = Math.hypot(mx - centerX, my - centerY);
+    const isTotal = dist < (rMoon - rSun + 2) && Math.abs(minOffset) < 5;
+
+    // 1. Hintergrund bei Totalität
+    if (isTotal) {
+      ctx.fillStyle = "#030712";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // 2. Trajektorie
+    if (showLineCheck.checked) {
+      ctx.beginPath();
+      ctx.setLineDash([5, 5]);
+      ctx.moveTo(centerX - Math.cos(angleRad) * pathLength * 1.1, centerY - Math.sin(angleRad) * pathLength * 1.1);
+      ctx.lineTo(centerX + Math.cos(angleRad) * pathLength * 1.1, centerY + Math.sin(angleRad) * pathLength * 1.1);
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "11px sans-serif";
+      ctx.fillText("Eintritt (Rechts Oben)", 330, 45);
+      ctx.fillText("Austritt (Links Unten)", 40, 385);
+    }
+
+    // 3. Korona bei Totalität
+    if (isTotal) {
+      const grad = ctx.createRadialGradient(centerX, centerY, rSun, centerX, centerY, rSun * 2.3);
+      grad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+      grad.addColorStop(0.3, "rgba(186, 230, 253, 0.5)");
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, rSun * 2.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 4. Sonne
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, rSun, 0, Math.PI * 2);
+    ctx.fillStyle = "#fbbf24";
+    ctx.shadowColor = "#f59e0b";
+    ctx.shadowBlur = isTotal ? 0 : 20;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // 5. Mond
+    ctx.beginPath();
+    ctx.arc(mx, my, rMoon, 0, Math.PI * 2);
+    ctx.fillStyle = "#0f172a";
+    ctx.fill();
+
+    // Zentren-Punkte
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#b45309";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(mx, my, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#ef4444";
+    ctx.fill();
+
+    // Abdeckungsgrad
+    const overlap = Math.max(0, (rSun + rMoon - dist) / (2 * rSun));
+    const coveragePct = Math.min(100, Math.round(overlap * 100));
+
+    if (isTotal) {
+      statusText.innerText = "Phase: Totale Finsternis (100% Abdeckung)";
+      statusText.style.color = "#38bdf8";
+    } else if (dist < rSun + rMoon) {
+      statusText.innerText = `Phase: Partielle Finsternis (ca. ${coveragePct}% Abdeckung)`;
+      statusText.style.color = "#f59e0b";
+    } else {
+      statusText.innerText = t < 0 ? "Phase: Vor dem Eintritt" : "Phase: Nach dem Austritt";
+      statusText.style.color = "#94a3b8";
+    }
+  }
+
+  function loop() {
+    if (isPlaying) {
+      let val = parseFloat(slider.value) + 0.0025;
+      if (val > 1.5) val = -1.5;
+      slider.value = val;
+      draw();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  presetSelect.addEventListener('change', (e) => {
+    const [lat, lon] = e.target.value.split(',');
+    latInput.value = lat;
+    lonInput.value = lon;
+    draw();
+  });
+
+  const updateInputs = () => draw();
+  latInput.addEventListener('input', updateInputs);
+  latInput.addEventListener('change', updateInputs);
+  lonInput.addEventListener('input', updateInputs);
+  lonInput.addEventListener('change', updateInputs);
+  slider.addEventListener('input', draw);
+
+  playBtn.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    playBtn.innerText = isPlaying ? "Pause" : "Play";
+  });
+
+  showLineCheck.addEventListener('change', draw);
+
+  draw();
+  loop();
+</script>
+
+</body>
+</html>

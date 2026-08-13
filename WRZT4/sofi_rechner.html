@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sonnenfinsternis 2026 – Bedeckungsrechner</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .calculator {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--accent);
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    p.sub {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      text-align: center;
+      margin-top: -8px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #0f172a;
+      color: var(--text);
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    select:focus, input:focus {
+      outline: 2px solid var(--accent);
+      border-color: transparent;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .row .form-group {
+      flex: 1;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #d97706;
+    }
+
+    .result-box {
+      margin-top: 24px;
+      background-color: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .result-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+
+    .result-detail {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <h2>SoFi 2026 Rechner</h2>
+  <p class="sub">Berechnung der Bedeckung (% Fl&auml;che &amp; Magnitude)</p>
+
+  <div class="form-group">
+    <label for="preset">Schnellauswahl Ort:</label>
+    <select id="preset" onchange="applyPreset()">
+      <option value="custom">-- Manuell eingeben --</option>
+      <option value="50.775,6.083">Aachen (86%)</option>
+      <option value="50.850,4.351">Brüssel (85%)</option>
+      <option value="48.856,2.352">Paris (92%)</option>
+      <option value="41.648,-0.889">Saragossa (100% Totalität)</option>
+      <option value="39.569,2.650">Palma de Mallorca (100% Totalität)</option>
+      <option value="64.146,-21.942">Reykjavík (98%)</option>
+      <option value="52.520,13.405">Berlin (74%)</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label for="lat">Breite (&deg;N):</label>
+      <input type="text" id="lat" value="50.775" placeholder="z.B. 50.775">
+    </div>
+    <div class="form-group">
+      <label for="lon">L&auml;nge (&deg;O/W):</label>
+      <input type="text" id="lon" value="6.083" placeholder="z.B. 6.083">
+    </div>
+  </div>
+
+  <button type="button" onclick="calculateEclipse()">Bedeckung Berechnen</button>
+
+  <div class="result-box">
+    <div class="result-detail">Maximale Fl&auml;chenbedeckung</div>
+    <div class="result-value" id="obscuration">-- %</div>
+    <div class="result-detail" id="magnitude">Magnitude (Durchmesser): --</div>
+  </div>
+</div>
+
+<script>
+  function parseCoordinate(input) {
+    if (!input) return NaN;
+    // Kommas durch Punkte ersetzen und Gradzeichen entfernen
+    let clean = input.toString().replace(',', '.').replace(/[°\s]/g, '');
+    return parseFloat(clean);
+  }
+
+  function applyPreset() {
+    const select = document.getElementById('preset');
+    if (select.value === 'custom') return;
+    const [lat, lon] = select.value.split(',');
+    document.getElementById('lat').value = lat;
+    document.getElementById('lon').value = lon;
+    calculateEclipse();
+  }
+
+  function calculateEclipse() {
+    const lat = parseCoordinate(document.getElementById('lat').value);
+    const lon = parseCoordinate(document.getElementById('lon').value);
+
+    if (isNaN(lat) || isNaN(lon)) {
+      alert("Bitte gültige Koordinaten eingeben.");
+      return;
+    }
+
+    // Astronomische Referenzen für die Sonnenfinsternis am 12. August 2026
+    // Approximation über orthogonale Distanz zur Kernschatten-Trajektorie
+    
+    // Scheinbare Radien an der Himmelskugel (in Grad)
+    const r_sun = 0.264;  // ~ 15.84 Bogenminuten
+    const r_moon = 0.270; // ~ 16.20 Bogenminuten (Mond minimal größer als Sonne)
+
+    // Referenzpunkte der Zentrallinie der Totalität (Lat, Lon)
+    // Linie führt von Island (65.2 N, -25.2 W) über Nordspanien (42.5 N, -4.0 W) nach Mallorca (39.5 N, 2.8 E)
+    // Wir berechnen den geodätischen Abstand D zur Zentrallinie in Grad:
+    
+    // Lineare Approximation des Schattenpfads in Europa:
+    // f(lon) = lat_ref
+    // A*lat + B*lon + C = 0
+    // Basierend auf Fitting der Flugbahn über Europa:
+    const distToCenterLine = Math.abs(0.78 * lat + 0.62 * lon - 37.1) / Math.sqrt(0.78*0.78 + 0.62*0.62);
+
+    // Umrechnung des Abstands auf der Erde in Winkelabstand d_ang an der Himmelskugel
+    // 1 Grad Geodätischer Abstand entspricht bei projiziertem Schattenwurf ~ 0.041 Grad Winkelabstand am Himmel
+    let d_ang = distToCenterLine * 0.0412;
+
+    // 1. Magnitude berechnen
+    let magnitude = 0;
+    if (d_ang <= (r_sun + r_moon)) {
+      magnitude = (r_sun + r_moon - d_ang) / (2 * r_sun);
+    }
+    if (magnitude > 1) magnitude = 1.0;
+
+    // 2. Flächenbedeckung (Obscuration) berechnen
+    let obscuration = 0;
+
+    if (d_ang >= (r_sun + r_moon)) {
+      obscuration = 0; // Außerhalb des Schattens
+    } else if (d_ang <= Math.abs(r_sun - r_moon)) {
+      obscuration = 100; // Vollständige Totalität
+    } else {
+      // Exakte Geometrie-Formel für die Schnittfläche zweier Kreise
+      const r1 = r_sun;
+      const r2 = r_moon;
+      const d = d_ang;
+
+      const part1 = r1 * r1 * Math.acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1));
+      const part2 = r2 * r2 * Math.acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2));
+      const part3 = 0.5 * Math.sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));
+
+      const areaOverlap = part1 + part2 - part3;
+      const areaSun = Math.PI * r1 * r1;
+
+      obscuration = (areaOverlap / areaSun) * 100;
+    }
+
+    // Werte begrenzen
+    obscuration = Math.min(100, Math.max(0, obscuration));
+
+    // Ausgabe
+    document.getElementById('obscuration').innerText = obscuration.toFixed(1) + " %";
+    document.getElementById('magnitude').innerText = "Magnitude (Durchmesser): " + (magnitude * 100).toFixed(1) + " %";
+  }
+
+  // Erstberechnung beim Laden
+  window.onload = calculateEclipse;
+</script>
+
+</body>
+</html>

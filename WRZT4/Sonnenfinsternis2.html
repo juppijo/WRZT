@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Sonnenfinsternis 2026 - Simulator (Neuentwurf)</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --accent: #38bdf8;
+      --accent-green: #10b981;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #283548;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+    
+    .container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 680px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    
+    h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      text-align: center;
+      color: var(--accent);
+    }
+    
+    .control-panel {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    
+    label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    
+    input[type="text"], select {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    
+    input[type="text"]:focus, select:focus {
+      border-color: var(--accent);
+    }
+    
+    .btn {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      height: 38px;
+    }
+    
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+    
+    .btn-green {
+      background: var(--accent-green);
+      color: white;
+    }
+    
+    canvas {
+      display: block;
+      background: #030712;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin: 0 auto 16px auto;
+    }
+    
+    .playback-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+    }
+    
+    .status-badge {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      min-height: 1.2rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Sonnenfinsternis 12. August 2026</h2>
+
+    <div class="control-panel">
+      <div class="form-group">
+        <label for="preset">Schnellauswahl Ort:</label>
+        <select id="preset">
+          <option value="custom">-- Manuell / Eigene Eingabe --</option>
+          <option value="50.78,6.08">Aachen (50.78° N, 6.08° O)</option>
+          <option value="50.85,4.35">Brüssel (50.85° N, 4.35° O)</option>
+          <option value="49.61,6.13">Luxemburg (49.61° N, 6.13° O)</option>
+          <option value="52.37,4.89">Amsterdam (52.37° N, 4.89° O)</option>
+          <option value="48.85,2.35">Paris (48.85° N, 2.35° O)</option>
+          <option value="42.50,-3.70">Totalitätszone Spanien (42.50° N)</option>
+          <option value="40.41,-3.70" selected>Mallorca (39.57° N, 2.65° W)</option>
+          <option value="40.41,-3.70">Madrid (40.41° N, 3.70° W)</option>
+          <option value="64.14,-21.94">Reykjavík (64.14° N, 21.94° W)</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label for="lat">Breite (°N):</label>
+          <input type="text" id="lat" value="50.42">
+        </div>
+        <div>
+          <label for="lon">Länge (°O):</label>
+          <input type="text" id="lon" value="6.00">
+        </div>
+        <button type="button" id="startBtn" class="btn btn-green">Start / Übernehmen</button>
+      </div>
+    </div>
+
+    <canvas id="canvas" width="520" height="440"></canvas>
+
+    <div class="playback-bar">
+      <button type="button" id="playBtn" class="btn">Play</button>
+      <input type="range" id="slider" min="-1.5" max="1.5" step="0.005" value="0" style="width:220px;">
+      <label><input type="checkbox" id="togglePath" checked> Bahn anzeigen</label>
+    </div>
+
+    <div id="status" class="status-badge">Koordiniere Ansicht...</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const presetSelect = document.getElementById('preset');
+    const latInput = document.getElementById('lat');
+    const lonInput = document.getElementById('lon');
+    const startBtn = document.getElementById('startBtn');
+    const playBtn = document.getElementById('playBtn');
+    const slider = document.getElementById('slider');
+    const togglePath = document.getElementById('togglePath');
+    const statusEl = document.getElementById('status');
+
+    // Geometrie-Parameter
+    const cx = 260;
+    const cy = 220;
+    const rSun = 85;
+    const rMoon = 87;
+    const pathAngle = 135 * (Math.PI / 180); // Passage-Winkel
+
+    let currentLat = 50.42;
+    let currentLon = 6.00;
+    let isAnimating = false;
+
+    function parseInput(val) {
+      if (!val) return NaN;
+      const clean = String(val).replace(/[°\s]/g, '').replace(',', '.');
+      return parseFloat(clean);
+    }
+
+    function getOffsetPixels(lat) {
+      // 42.5 N ist das Zentrum der Totalität
+      const diff = lat - 42.5;
+      // Skalierungsfaktor: 8 Pixel Versatz pro Grad Breite
+      const offset = diff * 3.1;
+      // Eingrenzen, damit die Flugbahn immer sichtbar im Canvas bleibt
+      return Math.max(-110, Math.min(110, offset));
+    }
+
+    function calculateCoverage(offset) {
+      const dist = Math.abs(offset);
+      if (dist <= Math.abs(rMoon - rSun)) return 100;
+      const maxDist = rSun + rMoon;
+      if (dist >= maxDist) return 0;
+      const overlapRatio = (maxDist - dist) / (2 * rSun);
+      return Math.min(99, Math.round(overlapRatio * 100));
+    }
+
+    function updateCoordinates() {
+      const latVal = parseInput(latInput.value);
+      const lonVal = parseInput(lonInput.value);
+
+      if (!isNaN(latVal) && !isNaN(lonVal)) {
+        currentLat = latVal;
+        currentLon = lonVal;
+        slider.value = 0; // Auf Höhepunkt der Finsternis springen
+
+        statusEl.innerText = `Aktiviert: ${currentLat.toFixed(2)}° N, ${currentLon.toFixed(2)}° O`;
+        statusEl.style.color = '#10b981';
+        render();
+      } else {
+        statusEl.innerText = "Fehler: Bitte gültige Zahlen eingeben!";
+        statusEl.style.color = '#ef4444';
+      }
+    }
+
+    function render() {
+      const t = parseFloat(slider.value);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const offsetPx = getOffsetPixels(currentLat);
+      const perpAngle = pathAngle - (Math.PI / 2);
+
+      // Versatz rechtwinklig zur Flugbahn
+      const offsetX = Math.cos(perpAngle) * offsetPx;
+      const offsetY = Math.sin(perpAngle) * offsetPx;
+
+      // Aktuelle Mondposition auf der Bahn
+      const travelDist = t * 220;
+      const mx = cx + offsetX + Math.cos(pathAngle) * travelDist;
+      const my = cy + offsetY + Math.sin(pathAngle) * travelDist;
+
+      // Bahnlinie zeichnen
+      if (togglePath.checked) {
+        const lineLen = 260;
+        const x1 = (cx + offsetX) - Math.cos(pathAngle) * lineLen;
+        const y1 = (cy + offsetY) - Math.sin(pathAngle) * lineLen;
+        const x2 = (cx + offsetX) + Math.cos(pathAngle) * lineLen;
+        const y2 = (cy + offsetY) + Math.sin(pathAngle) * lineLen;
+
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Sonne
+      ctx.beginPath();
+      ctx.arc(cx, cy, rSun, 0, Math.PI * 2);
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 85;
+      ctx.fill();
+
+      // Mond
+      ctx.beginPath();
+      ctx.shadowBlur = 1;
+      ctx.arc(mx, my, rMoon, 0, Math.PI * 2);
+      ctx.fillStyle = '#0b0f19';
+      ctx.fill();
+
+      // Sonnenzentrum-Markierung
+      ctx.beginPath();
+      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#d97706';
+      ctx.fill();
+
+      // HUD-Anzeige (Oben Links im Canvas)
+      const coverage = calculateCoverage(offsetPx);
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.fillRect(12, 12, 210, 65);
+      ctx.strokeStyle = "#283548";
+      ctx.strokeRect(12, 12, 210, 65);
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "12px monospace";
+      ctx.fillText(`Breite : ${currentLat.toFixed(2)}° N`, 22, 32);
+      ctx.fillText(`Länge  : ${currentLon.toFixed(2)}° O`, 22, 48);
+      ctx.fillText(`Bedeckung: max. ${coverage}%`, 22, 64);
+    }
+
+    // Event Listener
+    startBtn.addEventListener('click', () => {
+      presetSelect.value = "custom";
+      const parts = e.target.value.split(',');
+      latInput.value = parts[0];
+      lonInput.value = parts[1];
+
+      updateCoordinates();
+    });
+
+    [latInput, lonInput].forEach(elem => {
+      elem.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          presetSelect.value = "custom";
+          const parts = e.target.value.split(',');
+          latInput.value = parts[0];
+          lonInput.value = parts[1];
+          updateCoordinates();
+        }
+      });
+    });
+
+    presetSelect.addEventListener('change', (e) => {
+      if (e.target.value !== 'custom') {
+        const parts = e.target.value.split(',');
+        latInput.value = parts[0];
+        lonInput.value = parts[1];
+        updateCoordinates();
+      }
+    });
+
+    slider.addEventListener('input', render);
+    togglePath.addEventListener('change', render);
+
+    playBtn.addEventListener('click', () => {
+      isAnimating = !isAnimating;
+      playBtn.innerText = isAnimating ? "Pause" : "Play";
+    });
+
+    function animLoop() {
+      if (isAnimating) {
+        let val = parseFloat(slider.value) + 0.003;
+        if (val > 1.5) val = -1.5;
+        slider.value = val;
+        render();
+      }
+      requestAnimationFrame(animLoop);
+    }
+
+    // Initialer Start
+    updateCoordinates();
+    animLoop();
+  </script>
+
+</body>
+</html>
