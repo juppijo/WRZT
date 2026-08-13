@@ -265,23 +265,12 @@
 
     <div class="checkbox-row" style="margin-top:8px;">
       <input type="checkbox" id="mirrorToggle">
-      <label for="mirrorToggle">Rechts/Links spiegeln (falls Bahnrichtung falsch herum wirkt)</label>
+      <label for="mirrorToggle">Rechts/Links spiegeln</label>
     </div>
 
-    <div class="timeline-panel" id="timelinePanel">
-      <div class="timeline-header">
-        <span>Ereignis-Zeitleiste (UTC) — zeigt direkt, wie sich die Länge auswirkt</span>
-        <span id="timelineTimeLabel">— UTC</span>
-      </div>
-      <div class="timeline-track" id="timelineTrack">
-        <div class="timeline-refmark" title="Referenz: Totalitätszone Spanien"></div>
-        <div class="timeline-marker" id="timelineMarker"></div>
-      </div>
-      <div class="timeline-scale">
-        <span>17:00 (West/Island)</span>
-        <span>18:30 (Ref. Spanien)</span>
-        <span>19:00 (Ost)</span>
-      </div>
+    <div class="checkbox-row" style="margin-top:8px;">
+      <input type="checkbox" id="mirrorYToggle" checked>
+      <label for="mirrorYToggle">Oben/Unten spiegeln</label>
     </div>
 
     <div class="playback-row">
@@ -348,15 +337,17 @@
   // Physikalisch-geometrische Konstanten
   // ---------------------------------------------------------------
   const CENTRAL_LAT   = 42.5;     // Zentrallinie der Totalität (Nordspanien)
-  const REF_LON        = -3.5;    // Referenzlänge (Totalitätszone Nordspanien, nahe Burgos)
-  const BASE_UTC_MIN   = 18 * 60 + 30; // Maximum an REF_LON: 18:30 UTC
-                                        // (reale Daten: Totalität Spanien 18:27–18:34 UTC,
-                                        //  größte Verfinsterung global 17:46 UTC, Quelle: NASA/Nat.Geo./ESA)
-  // Reale Zeitrate der Schattenwanderung entlang der Länge, kalibriert aus zwei bekannten
-  // Messpunkten: Reykjavík (-21.94°, Totalität ~17:45 UTC) und Nordspanien (-3.5°, ~18:30 UTC)
-  // => (18:30 - 17:45) / (-3.5 - (-21.94)) ≈ 2.44 min pro Längengrad
-  const MIN_PER_DEGREE_LON = 2.44;
-  const MAX_DELTA_DEG  = 12;      // Breitendifferenz, ab der Bedeckung = 0%
+  // Kalibrierungs-Ankerpunkt: reale Daten der Sternwarte Aachen für den 12.8.2026
+  // (Aachen 50.78°N/6.08°O: Maximum 20:13 MESZ = 18:13 UTC, Bedeckung 88.7–88.8%)
+  const REF_LON        = 6.08;    // Referenzlänge = Aachen
+  const BASE_UTC_MIN   = 18 * 60 + 13; // Maximum an REF_LON: 18:13 UTC (20:13 MESZ)
+  // Näherungsweise Zeitrate der Verfinsterungs-Wanderung entlang der Länge (Ost = später).
+  // Reale lokale Umstände hängen von Breite UND Länge komplex ab; dies ist eine lineare
+  // Vereinfachung, siehe Fußnote.
+  const MIN_PER_DEGREE_LON = 2.0;
+  // Pixel-pro-Grad-Skalierung: kalibriert, damit bei Δ Breite = 8.28° (Aachen) exakt
+  // eine Bedeckung von 88.7% herauskommt (Kreis-Kreis-Überlappungsformel, siehe unten).
+  const PX_PER_DEGREE = 2.0098;
   const SPEED_PX_PER_MIN = 6;     // Bewegung des Mondes entlang der Bahn (px/min)
   const PATH_ANGLE_DEG = 135;     // Neigungswinkel der Passage-Linie (Darstellung)
   const TOTALITY_THRESHOLD = 99.5; // ab hier gilt "Totalität" (Aurora/Korona-Effekt)
@@ -376,9 +367,7 @@
   // dargestellt werden kann (unabhängig von der tatsächlichen Gradzahl).
   const MAX_VISUAL_OFFSET = Math.min(H, W) / 2 - Math.max(SUN_R, MOON_R) - 25;
 
-  // Skalierungsfaktor: Grad -> Pixel, so kalibriert, dass bei MAX_DELTA_DEG
-  // der Versatz genau der Summe der Radien entspricht (Bedeckung = 0%).
-  const PX_PER_DEGREE = (SUN_R + MOON_R) / MAX_DELTA_DEG;
+  // Skalierungsfaktor: Grad -> Pixel (siehe Kalibrierung oben, PX_PER_DEGREE)
 
   const thetaRad = PATH_ANGLE_DEG * Math.PI / 180;
   const alongDir = { x: Math.cos(thetaRad), y: Math.sin(thetaRad) };
@@ -503,17 +492,24 @@
     }
     ctx.restore();
 
+    // Laufrichtungs-Vektoren: horizontal/vertikal spiegelbar über die Schalter,
+    // damit Bahnlinie und Mond garantiert konsistent dieselbe Ausrichtung zeigen.
+    const mirrorX = mirrorToggle.checked ? -1 : 1;
+    const mirrorY = mirrorYToggle.checked ? -1 : 1;
+    const aDir = { x: alongDir.x * mirrorX, y: alongDir.y * mirrorY };
+    const pDir = { x: perpDir.x * mirrorX, y: perpDir.y * mirrorY };
+
     // Bahnlinie
     if (document.getElementById('pathToggle').checked){
       ctx.save();
       ctx.strokeStyle = 'rgba(90,169,230,0.5)';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([7, 7]);
-      const off = { x: CENTER.x + perpDir.x * state.d_px_visual, y: CENTER.y + perpDir.y * state.d_px_visual };
+      const off = { x: CENTER.x + pDir.x * state.d_px_visual, y: CENTER.y + pDir.y * state.d_px_visual };
       const len = 1000;
       ctx.beginPath();
-      ctx.moveTo(off.x - alongDir.x*len, off.y - alongDir.y*len);
-      ctx.lineTo(off.x + alongDir.x*len, off.y + alongDir.y*len);
+      ctx.moveTo(off.x - aDir.x*len, off.y - aDir.y*len);
+      ctx.lineTo(off.x + aDir.x*len, off.y + aDir.y*len);
       ctx.stroke();
       ctx.restore();
     }
@@ -542,13 +538,10 @@
     ctx.restore();
 
     // Mondposition entlang Bahn
-    // Vorzeichen invertiert: der Mond läuft real von West nach Ost über die Sonne
-    // (aus Beobachtersicht meist rechts -> links); die Bahnlinie/der Winkel bleiben gleich,
-    // nur die Laufrichtung wurde korrigiert.
     const a = -state.t * SPEED_PX_PER_MIN;
     const moonPos = {
-      x: CENTER.x + alongDir.x * a + perpDir.x * state.d_px_visual,
-      y: CENTER.y + alongDir.y * a + perpDir.y * state.d_px_visual
+      x: CENTER.x + aDir.x * a + pDir.x * state.d_px_visual,
+      y: CENTER.y + aDir.y * a + pDir.y * state.d_px_visual
     };
 
     // aktueller Abstand & Bedeckung (physikalisch, unclamped)
@@ -704,6 +697,8 @@
   const timeLabel = document.getElementById('timeLabel');
   const clockLabel = document.getElementById('clockLabel');
   const pathToggle = document.getElementById('pathToggle');
+  const mirrorToggle = document.getElementById('mirrorToggle');
+  const mirrorYToggle = document.getElementById('mirrorYToggle');
 
   LOCATIONS.forEach((loc, idx) => {
     const opt = document.createElement('option');
@@ -794,6 +789,8 @@
   });
 
   pathToggle.addEventListener('change', draw);
+  mirrorToggle.addEventListener('change', draw);
+  mirrorYToggle.addEventListener('change', draw);
 
   function updateTimeLabels(){
     timeLabel.textContent = "t = " + state.t.toFixed(0) + " min";
