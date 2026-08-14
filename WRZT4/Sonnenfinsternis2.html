@@ -128,15 +128,15 @@
     }
   </style>
 </head>
-<body>
+<body class="">
 
   <div class="container">
-    <h2>Sonnenfinsternis 12. August 2026</h2>
+    <h2 class="">Sonnenfinsternis 12. August 2026</h2>
 
     <div class="control-panel">
       <div class="form-group">
-        <label for="preset">Schnellauswahl Ort:</label>
-        <select id="preset">
+        <label for="preset" class="">Schnellauswahl Ort:</label>
+        <select id="preset" class="">
           <option value="custom">-- Manuell / Eigene Eingabe --</option>
           <option value="50.78,6.08">Aachen (50.78° N, 6.08° O)</option>
           <option value="50.85,4.35">Brüssel (50.85° N, 4.35° O)</option>
@@ -144,7 +144,7 @@
           <option value="52.37,4.89">Amsterdam (52.37° N, 4.89° O)</option>
           <option value="48.85,2.35">Paris (48.85° N, 2.35° O)</option>
           <option value="42.50,-3.70">Totalitätszone Spanien (42.50° N)</option>
-          <option value="40.41,-3.70" selected>Mallorca (39.57° N, 2.65° W)</option>
+          <option value="40.41,-3.70" selected="">Mallorca (39.57° N, 2.65° W)</option>
           <option value="40.41,-3.70">Madrid (40.41° N, 3.70° W)</option>
           <option value="64.14,-21.94">Reykjavík (64.14° N, 21.94° W)</option>
         </select>
@@ -155,23 +155,23 @@
           <label for="lat">Breite (°N):</label>
           <input type="text" id="lat" value="50.42">
         </div>
-        <div>
-          <label for="lon">Länge (°O):</label>
-          <input type="text" id="lon" value="6.00">
+        <div class="">
+          <label for="lon" class="">Länge (°O):</label>
+          <input type="text" id="lon" value="6.00" class="">
         </div>
         <button type="button" id="startBtn" class="btn btn-green">Start / Übernehmen</button>
       </div>
     </div>
 
-    <canvas id="canvas" width="520" height="440"></canvas>
+    <canvas id="canvas" width="520" height="440" class="" style="background-color: rgb(29, 57, 135);"></canvas>
 
     <div class="playback-bar">
       <button type="button" id="playBtn" class="btn">Play</button>
       <input type="range" id="slider" min="-1.5" max="1.5" step="0.005" value="0" style="width:220px;">
-      <label><input type="checkbox" id="togglePath" checked> Bahn anzeigen</label>
+      <label><input type="checkbox" id="togglePath" checked=""> Bahn anzeigen</label>
     </div>
 
-    <div id="status" class="status-badge">Koordiniere Ansicht...</div>
+    <div id="status" class="status-badge" style="color: rgb(16, 185, 129);">Aktiviert: 50.42° N, 6.00° O</div>
   </div>
 
   <script>
@@ -256,6 +256,9 @@
       const mx = cx + offsetX + Math.cos(pathAngle) * travelDist;
       const my = cy + offsetY + Math.sin(pathAngle) * travelDist;
 
+      const distT = Math.hypot(mx - offsetX, my - offsetY);
+      const isTotal = distT < (rMoon - rSun + 2) && Math.abs(minOffset) < 5;
+
       // Bahnlinie zeichnen
       if (togglePath.checked) {
         const lineLen = 260;
@@ -272,6 +275,23 @@
         ctx.lineWidth = 1.5;
         ctx.stroke();
         ctx.setLineDash([]);
+      }
+
+      // 1. Hintergrund bei Totalität
+      if (isTotal) {
+        ctx.fillStyle = "#030712";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      // 3. Korona bei Totalität
+      if (isTotal) {
+        const grad = ctx.createRadialGradient(centerX, centerY, rSun, centerX, centerY, rSun * 2.3);
+        grad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+        grad.addColorStop(0.3, "rgba(186, 230, 253, 0.5)");
+        grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, rSun * 2.3, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       // Sonne
@@ -362,6 +382,7 @@
     updateCoordinates();
     animLoop();
   </script>
+
 
 </body>
 </html>

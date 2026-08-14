@@ -3,837 +3,878 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sonnenfinsternis 12. August 2026 — Interaktive Simulation</title>
+<title>Sonnenfinsternis-Simulator · 12. August 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg-deep:#0a0e17;
-    --bg-panel:#111827;
-    --bg-panel-2:#161f30;
-    --border:#243044;
-    --text:#e6ecf5;
-    --text-dim:#8b98b0;
-    --gold:#c9a227;
-    --gold-bright:#f0c94a;
-    --accent:#5aa9e6;
-    --accent-2:#3d7ab5;
-    --danger:#e0645a;
-    --radius:14px;
-  }
+:root{
+  --bg:#0a0908; --bg2:#131110; --panel:#17140f; --panel2:#1d1912;
+  --gold:#c9a227; --gold-dim:#8a6f1f; --text:#ece6d6; --text-dim:#9a9282;
+  --accent2:#7a8fa6; --line:#332c1c; --danger:#b5462f; --good:#5a8f5a;
+  --shadow-sky-day:#3f7bb0; --shadow-sky-tot:#04060f;
+}
+body[data-theme="himmelblau"]{
+  --bg:#070c14; --bg2:#0d1622; --panel:#0f1c2b; --panel2:#132335;
+  --gold:#5ec2e8; --gold-dim:#2f7ea3; --text:#e5f2fb; --text-dim:#84a2b8;
+  --accent2:#c9a227; --line:#1c3348;
+}
+body[data-theme="aurora"]{
+  --bg:#050b0a; --bg2:#0a1512; --panel:#0d1a16; --panel2:#11221c;
+  --gold:#4fd8a0; --gold-dim:#2e9d75; --text:#e2f5ec; --text-dim:#82b3a2;
+  --accent2:#9b6fd9; --line:#173026;
+}
+body[data-theme="korona"]{
+  --bg:#0b0710; --bg2:#130c1c; --panel:#170f22; --panel2:#1c1329;
+  --gold:#d98fd6; --gold-dim:#9a5a97; --text:#f1e6f5; --text-dim:#a58fae;
+  --accent2:#e0b23d; --line:#2a1c38;
+}
 
-  *{ box-sizing:border-box; }
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Barlow',sans-serif;
+  overflow:hidden;
+  transition:background .4s ease;
+}
+h1,h2,h3,.display{font-family:'Bebas Neue',sans-serif; letter-spacing:.03em;}
+.mono{font-family:'JetBrains Mono',monospace;}
 
-  body{
-    margin:0;
-    min-height:100vh;
-    background:
-      radial-gradient(circle at 15% 10%, #16213a 0%, transparent 45%),
-      radial-gradient(circle at 85% 90%, #14203a 0%, transparent 45%),
-      var(--bg-deep);
-    color:var(--text);
-    font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:24px 16px 60px;
-  }
+#app{position:relative; width:100vw; height:100vh; height:100dvh;}
 
-  header{
-    text-align:center;
-    margin-bottom:22px;
-    max-width:900px;
-  }
+/* ---------- SKY CANVAS ---------- */
+#sky{position:absolute; inset:0; width:100%; height:100%; display:block;}
 
-  header h1{
-    font-size:1.7rem;
-    margin:0 0 6px;
-    letter-spacing:0.3px;
-    background:linear-gradient(90deg, var(--gold-bright), var(--accent));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-  }
+/* ---------- TOP BAR ---------- */
+#topbar{
+  position:absolute; top:0; left:0; right:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px;
+  z-index:30;
+  pointer-events:none;
+}
+#topbar > *{pointer-events:auto;}
+#brand{
+  display:flex; flex-direction:column; line-height:1;
+  text-shadow:0 2px 12px rgba(0,0,0,.8);
+}
+#brand .display{font-size:26px; color:var(--gold); letter-spacing:.06em;}
+#brand .sub{font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-top:2px;}
 
-  header p{
-    margin:0;
-    color:var(--text-dim);
-    font-size:0.92rem;
-    line-height:1.5;
-  }
+#topbtns{display:flex; gap:8px;}
+.iconbtn{
+  background:rgba(15,13,9,.72);
+  border:1px solid var(--line);
+  color:var(--text);
+  width:42px; height:42px;
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  backdrop-filter:blur(6px);
+  transition:border-color .2s, transform .15s;
+}
+.iconbtn:hover{border-color:var(--gold); transform:translateY(-1px);}
+.iconbtn svg{width:20px; height:20px; stroke:var(--text); fill:none;}
+.iconbtn:hover svg{stroke:var(--gold);}
 
-  .app{
-    width:100%;
-    max-width:960px;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-  }
+/* ---------- CONTROL PANEL ---------- */
+#panel{
+  position:absolute; top:74px; left:16px;
+  width:300px; max-width:calc(100vw - 32px);
+  background:rgba(15,13,9,.82);
+  border:1px solid var(--line);
+  border-radius:12px;
+  backdrop-filter:blur(10px);
+  z-index:25;
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;
+  transition:transform .3s ease, opacity .3s ease;
+}
+#panel.collapsed{transform:translateX(-340px); opacity:0; pointer-events:none;}
+#panel::-webkit-scrollbar{width:6px;}
+#panel::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
 
-  .panel{
-    background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:18px 20px;
-    box-shadow:0 8px 28px rgba(0,0,0,0.35);
-  }
+.panel-sec{padding:14px 16px; border-bottom:1px solid var(--line);}
+.panel-sec:last-child{border-bottom:none;}
+.panel-sec h2{font-size:14px; color:var(--gold); letter-spacing:.08em; margin-bottom:10px;}
 
-  .controls-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
-    gap:14px;
-    align-items:end;
-  }
+.coordrow{display:flex; gap:8px; margin-bottom:8px;}
+.field{flex:1; display:flex; flex-direction:column; gap:4px;}
+.field label{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em;}
+.field input{
+  background:var(--panel2); border:1px solid var(--line); color:var(--text);
+  border-radius:6px; padding:7px 8px; font-family:'JetBrains Mono',monospace; font-size:13px;
+  width:100%;
+}
+.field input:focus{outline:none; border-color:var(--gold);}
 
-  .field{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-  }
+.btnrow{display:flex; gap:8px; margin-top:4px;}
+button.act{
+  background:var(--gold); color:#100e09; border:none; border-radius:6px;
+  padding:9px 10px; font-family:'Barlow',sans-serif; font-weight:600; font-size:13px;
+  cursor:pointer; flex:1; transition:filter .15s, transform .15s;
+}
+button.act:hover{filter:brightness(1.1); transform:translateY(-1px);}
+button.act.ghost{
+  background:transparent; color:var(--text); border:1px solid var(--line);
+}
+button.act.ghost:hover{border-color:var(--gold); color:var(--gold);}
 
-  .field label{
-    font-size:0.75rem;
-    text-transform:uppercase;
-    letter-spacing:0.6px;
-    color:var(--text-dim);
-  }
+.presetrow{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+.preset{
+  font-size:11px; padding:5px 9px; border-radius:20px;
+  border:1px solid var(--line); background:transparent; color:var(--text-dim);
+  cursor:pointer; font-family:'Barlow',sans-serif;
+}
+.preset:hover{border-color:var(--gold); color:var(--gold);}
 
-  select, input[type="text"]{
-    background:#0d1420;
-    border:1px solid var(--border);
-    color:var(--text);
-    padding:9px 10px;
-    border-radius:8px;
-    font-size:0.95rem;
-    outline:none;
-    transition:border-color .15s;
-  }
-  select:focus, input[type="text"]:focus{
-    border-color:var(--accent);
-  }
+/* time control */
+#timeReadout{font-family:'JetBrains Mono',monospace; font-size:19px; color:var(--gold); text-align:center; margin-bottom:6px;}
+#timeReadout .local{display:block; font-size:11px; color:var(--text-dim); margin-top:2px;}
+input[type=range]{
+  width:100%; -webkit-appearance:none; height:4px; border-radius:2px;
+  background:var(--line); outline:none; margin:8px 0;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+  background:var(--gold); cursor:pointer; border:2px solid #100e09;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px; height:14px; border-radius:50%; background:var(--gold); border:2px solid #100e09; cursor:pointer;
+}
+.playrow{display:flex; align-items:center; gap:8px; margin-top:6px;}
+.playrow button{
+  background:var(--panel2); border:1px solid var(--line); color:var(--text);
+  width:36px; height:36px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.playrow button:hover{border-color:var(--gold); color:var(--gold);}
+.speedgroup{display:flex; gap:4px; margin-left:auto;}
+.speedgroup button{width:auto; padding:0 8px; font-size:11px; font-family:'JetBrains Mono',monospace;}
+.speedgroup button.on{color:var(--gold); border-color:var(--gold);}
 
-  button{
-    cursor:pointer;
-    border:none;
-    border-radius:8px;
-    padding:10px 16px;
-    font-size:0.9rem;
-    font-weight:600;
-    letter-spacing:0.3px;
-    transition:transform .1s, filter .15s;
-  }
-  button:active{ transform:translateY(1px); }
+/* stats */
+.statgrid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.stat{background:var(--panel2); border-radius:8px; padding:8px 10px;}
+.stat .k{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em;}
+.stat .v{font-family:'JetBrains Mono',monospace; font-size:16px; color:var(--text); margin-top:2px;}
+.stat .v.hi{color:var(--gold);}
+#typeBadge{
+  display:inline-block; margin-top:8px; padding:5px 12px; border-radius:20px;
+  font-size:12px; font-weight:600; letter-spacing:.04em; text-align:center; width:100%;
+}
+.badge-none{background:rgba(255,255,255,.06); color:var(--text-dim);}
+.badge-partial{background:rgba(201,162,39,.18); color:var(--gold);}
+.badge-total{background:rgba(181,70,47,.25); color:#ff8f6e;}
+.badge-annular{background:rgba(122,143,166,.25); color:var(--accent2);}
+.badge-below{background:rgba(120,0,0,.15); color:#c96b5a;}
 
-  .btn-primary{
-    background:linear-gradient(135deg, var(--gold-bright), var(--gold));
-    color:#1a1406;
-  }
-  .btn-primary:hover{ filter:brightness(1.08); }
+.contacts{margin-top:10px; font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--text-dim); line-height:1.9;}
+.contacts b{color:var(--text);}
 
-  .btn-secondary{
-    background:#1b2434;
-    color:var(--text);
-    border:1px solid var(--border);
-  }
-  .btn-secondary:hover{ border-color:var(--accent); }
+.infotext{font-size:12px; color:var(--text-dim); line-height:1.6;}
+.infotext b{color:var(--gold-dim);}
 
-  .checkbox-row{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:0.85rem;
-    color:var(--text-dim);
-  }
-  .checkbox-row input{ accent-color:var(--accent); width:16px; height:16px; }
+/* facts pill bottom */
+#factbar{
+  position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+  display:flex; gap:18px; background:rgba(15,13,9,.72); border:1px solid var(--line);
+  border-radius:30px; padding:9px 22px; backdrop-filter:blur(8px); z-index:20;
+  font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-dim);
+  max-width:calc(100vw - 32px); overflow-x:auto; white-space:nowrap;
+}
+#factbar b{color:var(--gold);}
 
-  .playback-row{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    margin-top:16px;
-    flex-wrap:wrap;
-  }
+#togglePanelBtn{
+  position:absolute; top:74px; left:16px; z-index:26;
+  display:none;
+}
 
-  .playback-row .slider-wrap{
-    flex:1;
-    min-width:220px;
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-  }
-
-  input[type="range"]{
-    -webkit-appearance:none;
-    width:100%;
-    height:6px;
-    border-radius:4px;
-    background:linear-gradient(90deg, var(--accent-2), var(--gold));
-    outline:none;
-  }
-  input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    background:var(--gold-bright);
-    border:2px solid #241d08;
-    cursor:pointer;
-  }
-  input[type="range"]::-moz-range-thumb{
-    width:16px; height:16px; border-radius:50%;
-    background:var(--gold-bright);
-    border:2px solid #241d08;
-    cursor:pointer;
-  }
-
-  .slider-label{
-    display:flex;
-    justify-content:space-between;
-    font-size:0.78rem;
-    color:var(--text-dim);
-  }
-
-  .canvas-wrap{
-    display:flex;
-    justify-content:center;
-    background:radial-gradient(circle at 50% 40%, #0e1420 0%, #060a12 75%);
-    border-radius:var(--radius);
-    border:1px solid var(--border);
-    padding:10px;
-  }
-
-  canvas{
-    width:100%;
-    max-width:820px;
-    height:auto;
-    display:block;
-    border-radius:10px;
-  }
-
-  .legend{
-    display:flex;
-    gap:18px;
-    flex-wrap:wrap;
-    font-size:0.8rem;
-    color:var(--text-dim);
-    margin-top:4px;
-  }
-  .legend span{ display:inline-flex; align-items:center; gap:6px; }
-  .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; }
-
-  footer{
-    margin-top:22px;
-    color:var(--text-dim);
-    font-size:0.75rem;
-    text-align:center;
-    max-width:700px;
-  }
+@media (max-width: 720px){
+  #panel{width:calc(100vw - 32px); top:70px;}
+  #brand .display{font-size:21px;}
+  #factbar{display:none;}
+  .statgrid{grid-template-columns:1fr 1fr;}
+}
 </style>
 </head>
-<body>
+<body data-theme="dark">
+<div id="app">
+  <canvas id="sky"></canvas>
 
-<header>
-  <h1>Sonnenfinsternis · 12. August 2026</h1>
-  <p>Interaktive Simulation der Bedeckung für verschiedene Beobachtungsorte in Europa.
-  Die Zentrallinie der Totalität liegt bei 42.5° N — Abweichungen in der geografischen Breite
-  verschieben den Mond senkrecht zur Bahn, die Länge verschiebt den Zeitpunkt des Maximums.</p>
-</header>
-
-<div class="app">
-
-  <div class="panel">
-    <div class="controls-grid">
-      <div class="field">
-        <label for="locationSelect">Ort (Schnellauswahl)</label>
-        <select id="locationSelect"></select>
-      </div>
-      <div class="field">
-        <label for="latInput">Breite (°N)</label>
-        <input type="text" id="latInput" value="50,78">
-      </div>
-      <div class="field">
-        <label for="lonInput">Länge (°O)</label>
-        <input type="text" id="lonInput" value="6,08">
-      </div>
-      <div class="field">
-        <button type="button" class="btn-primary" id="applyBtn">Übernehmen / Start</button>
-      </div>
+  <div id="topbar">
+    <div id="brand">
+      <div class="display">Sonnenfinsternis-Simulator</div>
+      <div class="sub">12. AUGUST 2026 · TOTALE SONNENFINSTERNIS · SAROS 126</div>
     </div>
-
-    <div class="checkbox-row" style="margin-top:14px;">
-      <input type="checkbox" id="pathToggle" checked>
-      <label for="pathToggle">Gestrichelte Bahnlinie anzeigen</label>
+    <div id="topbtns">
+      <button class="iconbtn" id="panelBtn" title="Bedienfeld">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <button class="iconbtn" id="styleBtn" title="Stil wechseln">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" stroke="none"/><path d="M12 2a10 10 0 1 0 10 10c0-1-1-2-2-2h-2.5a2 2 0 0 1-2-2v-.5a2 2 0 0 1 2-2H19a2 2 0 0 0 1.7-3A10 10 0 0 0 12 2Z"/><circle cx="7.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="9" cy="8.5" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="iconbtn" id="fullscreenBtn" title="Vollbild">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
     </div>
+  </div>
 
-    <div class="checkbox-row" style="margin-top:8px;">
-      <input type="checkbox" id="mirrorToggle">
-      <label for="mirrorToggle">Rechts/Links spiegeln</label>
-    </div>
-
-    <div class="checkbox-row" style="margin-top:8px;">
-      <input type="checkbox" id="mirrorYToggle" checked>
-      <label for="mirrorYToggle">Oben/Unten spiegeln</label>
-    </div>
-
-    <div class="playback-row">
-      <button type="button" class="btn-secondary" id="playBtn">▶ Play</button>
-      <div class="slider-wrap">
-        <input type="range" id="timeSlider" min="-60" max="60" step="1" value="0">
-        <div class="slider-label">
-          <span id="timeLabel">t = 0 min</span>
-          <span id="clockLabel">— UTC</span>
+  <div id="panel">
+    <div class="panel-sec">
+      <h2>Standort</h2>
+      <div class="coordrow">
+        <div class="field">
+          <label>Breitengrad (°N)</label>
+          <input type="number" id="lat" step="0.0001" value="64.1466">
+        </div>
+        <div class="field">
+          <label>Längengrad (°E)</label>
+          <input type="number" id="lon" step="0.0001" value="-21.9426">
         </div>
       </div>
-      <button type="button" class="btn-secondary" id="resetBtn">⟲ Reset (t=0)</button>
+      <div class="btnrow">
+        <button class="act" id="calcBtn">Berechnen</button>
+        <button class="act ghost" id="geoBtn">📍 Mein Standort</button>
+      </div>
+      <div class="presetrow">
+        <button class="preset" data-lat="65.6835" data-lon="-18.0878">Akureyri</button>
+        <button class="preset" data-lat="64.1466" data-lon="-21.9426">Reykjavík</button>
+        <button class="preset" data-lat="76.5" data-lon="-25.0">Ostgrönland</button>
+        <button class="preset" data-lat="42.8782" data-lon="-8.5448">Santiago de C.</button>
+        <button class="preset" data-lat="40.4168" data-lon="-3.7038">Madrid</button>
+        <button class="preset" data-lat="52.52" data-lon="13.405">Berlin</button>
+        <button class="preset" data-lat="48.2082" data-lon="16.3738">Wien</button>
+        <button class="preset" data-lat="40.7128" data-lon="-74.006">New York</button>
+      </div>
+    </div>
+
+    <div class="panel-sec">
+      <h2>Zeitpunkt (UTC, 12.08.2026)</h2>
+      <div id="timeReadout">--:--:-- <span class="local" id="localTime">Ortszeit: --</span></div>
+      <input type="range" id="timeSlider" min="0" max="1" step="0.0001" value="0.5">
+      <div class="playrow">
+        <button id="playBtn" title="Abspielen">▶</button>
+        <button id="resetBtn" title="Zum Maximum springen">⤓</button>
+        <div class="speedgroup">
+          <button class="speedbtn" data-s="1">1×</button>
+          <button class="speedbtn on" data-s="4">4×</button>
+          <button class="speedbtn" data-s="12">12×</button>
+          <button class="speedbtn" data-s="40">40×</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-sec">
+      <h2>Lokale Verhältnisse</h2>
+      <div id="typeBadge" class="badge-none">Keine Berechnung</div>
+      <div class="statgrid">
+        <div class="stat"><div class="k">Bedeckungsgrad</div><div class="v hi" id="statMag">–</div></div>
+        <div class="stat"><div class="k">Flächenanteil</div><div class="v" id="statArea">–</div></div>
+        <div class="stat"><div class="k">Sonnenhöhe</div><div class="v" id="statAlt">–</div></div>
+        <div class="stat"><div class="k">Sonnenazimut</div><div class="v" id="statAz">–</div></div>
+      </div>
+      <div class="contacts" id="contacts">
+        Kontaktzeiten werden nach der Berechnung angezeigt.
+      </div>
+    </div>
+
+    <div class="panel-sec">
+      <h2>Über dieses Ereignis</h2>
+      <p class="infotext">
+        Die totale Sonnenfinsternis vom <b>12. August 2026</b> zieht über Grönland, Island und Nordspanien.
+        Größte Finsternis um <b>17:45:54 UTC</b> bei 65,2° N / 25,2° W, Magnitude <b>1,0386</b>, maximale Totalitätsdauer <b>2 min 18 s</b>, Kernschattenbreite bis zu <b>294 km</b>.
+        Die Zentrallinien-Positionen in dieser Simulation stammen aus echten NASA/Espenak-Bahndaten; die Verdeckung an deinem Standort wird geometrisch daraus abgeleitet — eine Annäherung, keine Sekunden-genaue Ephemeride.
+      </p>
     </div>
   </div>
 
-  <div class="panel">
-    <div class="canvas-wrap">
-      <canvas id="eclipseCanvas" width="820" height="500"></canvas>
-    </div>
-    <div class="legend">
-      <span><span class="dot" style="background:#f0c94a;"></span> Sonne</span>
-      <span><span class="dot" style="background:#1a2330; border:1px solid #465066;"></span> Mond</span>
-      <span><span class="dot" style="background:transparent; border:1px dashed #5aa9e6;"></span> Bahnlinie (135°)</span>
-      <span><span class="dot" style="background:linear-gradient(135deg,#7cffb2,#b983ff);"></span> Aurora/Korona (nur bei Totalität)</span>
-    </div>
+  <div id="factbar">
+    <span><b>Gamma</b> 0,8977</span>
+    <span><b>Magnitude</b> 1,0386</span>
+    <span><b>Pfadbreite</b> ≤ 294 km</span>
+    <span><b>Dauer</b> ≤ 2m18s</span>
+    <span><b>Saros</b> 126 (48/72)</span>
   </div>
-
 </div>
-
-<footer>
-  Vereinfachtes physikalisches Modell zu Demonstrationszwecken: Bedeckungsgrad basiert auf
-  Kreis-Kreis-Überlappung von Sonnen- und Mondscheibe, deren senkrechter Versatz proportional
-  zur Differenz der geografischen Breite zur Totalitätszentrallinie (42.5° N) berechnet wird.
-  Die Zeitverschiebung durch die Länge ist anhand realer Eckdaten kalibriert (Totalität
-  Nordspanien ca. 18:27–18:34 UTC, Reykjavík ca. 17:45 UTC, größte Verfinsterung global ca.
-  17:46 UTC — Quellen: NASA, National Geographic, ESA, timeanddate), bleibt aber eine lineare
-  Näherung, keine exakte Ephemeride. Die Aurora-/Korona-Animation erscheint ausschließlich bei
-  einer Bedeckung ≥ 99.5 % (echte Totalität). Hinweis: Da der reale Schattenpfad 2026 über den
-  Nordpol verläuft (Russland → Grönland → Island → Spanien), weicht das hier verwendete,
-  vereinfachte Breitenband-Modell bei sehr hohen Breiten (z. B. Island) von der tatsächlichen
-  Geometrie ab.
-</footer>
 
 <script>
 (function(){
-  "use strict";
+"use strict";
 
-  // ---------------------------------------------------------------
-  // Orte (Schnellauswahl)
-  // ---------------------------------------------------------------
-  const LOCATIONS = [
-    { name: "Aachen",                      lat: 50.78, lon: 6.08 },
-    { name: "Brüssel",                     lat: 50.85, lon: 4.35 },
-    { name: "Luxemburg",                   lat: 49.61, lon: 6.13 },
-    { name: "Amsterdam",                   lat: 52.37, lon: 4.90 },
-    { name: "Paris",                       lat: 48.85, lon: 2.35 },
-    { name: "Totalitätszone Spanien (42.5°N)", lat: 42.5, lon: -3.50 },
-    { name: "Madrid",                      lat: 40.42, lon: -3.70 },
-    { name: "Reykjavík",                   lat: 64.15, lon: -21.94 },
-    { name: "Manuell",                     lat: null,  lon: null }
-  ];
+/* ============ THEME ============ */
+const themes = ["dark","himmelblau","aurora","korona"];
+const themeNames = {dark:"Dunkel-Gold", himmelblau:"Himmelblau", aurora:"Aurora", korona:"Korona"};
+let themeIdx = 0;
+document.getElementById("styleBtn").addEventListener("click", ()=>{
+  themeIdx = (themeIdx+1)%themes.length;
+  document.body.setAttribute("data-theme", themes[themeIdx]);
+});
 
-  // ---------------------------------------------------------------
-  // Physikalisch-geometrische Konstanten
-  // ---------------------------------------------------------------
-  const CENTRAL_LAT   = 42.5;     // Zentrallinie der Totalität (Nordspanien)
-  // Kalibrierungs-Ankerpunkt: reale Daten der Sternwarte Aachen für den 12.8.2026
-  // (Aachen 50.78°N/6.08°O: Maximum 20:13 MESZ = 18:13 UTC, Bedeckung 88.7–88.8%)
-  const REF_LON        = 6.08;    // Referenzlänge = Aachen
-  const BASE_UTC_MIN   = 18 * 60 + 13; // Maximum an REF_LON: 18:13 UTC (20:13 MESZ)
-  // Näherungsweise Zeitrate der Verfinsterungs-Wanderung entlang der Länge (Ost = später).
-  // Reale lokale Umstände hängen von Breite UND Länge komplex ab; dies ist eine lineare
-  // Vereinfachung, siehe Fußnote.
-  const MIN_PER_DEGREE_LON = 2.0;
-  // Pixel-pro-Grad-Skalierung: kalibriert, damit bei Δ Breite = 8.28° (Aachen) exakt
-  // eine Bedeckung von 88.7% herauskommt (Kreis-Kreis-Überlappungsformel, siehe unten).
-  const PX_PER_DEGREE = 2.0098;
-  const SPEED_PX_PER_MIN = 6;     // Bewegung des Mondes entlang der Bahn (px/min)
-  const PATH_ANGLE_DEG = 135;     // Neigungswinkel der Passage-Linie (Darstellung)
-  const TOTALITY_THRESHOLD = 99.5; // ab hier gilt "Totalität" (Aurora/Korona-Effekt)
+document.getElementById("panelBtn").addEventListener("click", ()=>{
+  document.getElementById("panel").classList.toggle("collapsed");
+});
 
-  const SUN_R  = 70;
-  const MOON_R = 73; // leicht größer als die Sonne -> ermöglicht Totalität bei d=0
+document.getElementById("fullscreenBtn").addEventListener("click", ()=>{
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen();
+  }
+});
 
-  // ---------------------------------------------------------------
-  // Canvas Setup
-  // ---------------------------------------------------------------
-  const canvas = document.getElementById('eclipseCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const CENTER = { x: W / 2, y: H / 2 };
+/* ============ ASTRONOMY CORE ============ */
+const toRad = d => d*Math.PI/180;
+const toDeg = r => r*180/Math.PI;
+function norm360(d){ d = d%360; if(d<0) d+=360; return d; }
 
-  // Maximaler visueller Versatz, der garantiert noch vollständig auf dem Canvas
-  // dargestellt werden kann (unabhängig von der tatsächlichen Gradzahl).
-  const MAX_VISUAL_OFFSET = Math.min(H, W) / 2 - Math.max(SUN_R, MOON_R) - 25;
+function julianDay(dateUTC){ return dateUTC.getTime()/86400000 + 2440587.5; }
 
-  // Skalierungsfaktor: Grad -> Pixel (siehe Kalibrierung oben, PX_PER_DEGREE)
+// Meeus low-precision apparent solar position -> RA, Dec (rad), distance (AU)
+function sunPosition(jd){
+  const T = (jd-2451545.0)/36525;
+  const L0 = norm360(280.46646 + 36000.76983*T + 0.0003032*T*T);
+  const M  = norm360(357.52911 + 35999.05029*T - 0.0001537*T*T);
+  const e  = 0.016708634 - 0.000042037*T - 0.0000001267*T*T;
+  const Mr = toRad(M);
+  const C = (1.914602-0.004817*T-0.000014*T*T)*Math.sin(Mr)
+          + (0.019993-0.000101*T)*Math.sin(2*Mr)
+          + 0.000289*Math.sin(3*Mr);
+  const trueLong = L0 + C;
+  const trueAnom = M + C;
+  const R = (1.000001018*(1-e*e))/(1+e*Math.cos(toRad(trueAnom)));
+  const omega = 125.04 - 1934.136*T;
+  const lambda = trueLong - 0.00569 - 0.00478*Math.sin(toRad(omega));
+  const eps0 = 23+26/60+21.448/3600 - (46.8150*T+0.00059*T*T-0.001813*T*T*T)/3600;
+  const eps = eps0 + 0.00256*Math.cos(toRad(omega));
+  const lambdaR = toRad(lambda), epsR = toRad(eps);
+  const ra = Math.atan2(Math.cos(epsR)*Math.sin(lambdaR), Math.cos(lambdaR));
+  const dec = Math.asin(Math.sin(epsR)*Math.sin(lambdaR));
+  return {ra: (ra<0? ra+2*Math.PI:ra), dec, distAU:R};
+}
 
-  const thetaRad = PATH_ANGLE_DEG * Math.PI / 180;
-  const alongDir = { x: Math.cos(thetaRad), y: Math.sin(thetaRad) };
-  const perpDir  = { x: -alongDir.y, y: alongDir.x };
+function gmstDeg(jd){
+  const T=(jd-2451545.0)/36525;
+  let g = 280.46061837 + 360.98564736629*(jd-2451545.0) + 0.000387933*T*T - (T*T*T)/38710000;
+  return norm360(g);
+}
 
-  // ---------------------------------------------------------------
-  // Toleranter Zahlen-Parser
-  // ---------------------------------------------------------------
-  function parseTolerantFloat(str, hemisphere){
-    if (typeof str !== 'string') return NaN;
-    let s = str.trim();
+function altAz(ra, dec, latDeg, lonDeg, jd){
+  const gst = gmstDeg(jd);
+  const lst = norm360(gst + lonDeg);
+  const ha = toRad(lst) - ra;
+  const latR = toRad(latDeg);
+  const alt = Math.asin(Math.sin(dec)*Math.sin(latR) + Math.cos(dec)*Math.cos(latR)*Math.cos(ha));
+  const azY = Math.sin(ha);
+  const azX = Math.cos(ha)*Math.sin(latR) - Math.tan(dec)*Math.cos(latR);
+  let az = toDeg(Math.atan2(azY, azX)) + 180;
+  az = norm360(az);
+  return {alt: toDeg(alt), az: az};
+}
 
-    // Alternative Minuszeichen (Unicode-Minus, En-/Em-Dash) auf ASCII '-' normalisieren
-    s = s.replace(/[\u2212\u2013\u2014]/g, '-');
+function haversineKm(lat1,lon1,lat2,lon2){
+  const R=6371.0;
+  const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+function bearingDeg(lat1,lon1,lat2,lon2){
+  const y = Math.sin(toRad(lon2-lon1))*Math.cos(toRad(lat2));
+  const x = Math.cos(toRad(lat1))*Math.sin(toRad(lat2)) - Math.sin(toRad(lat1))*Math.cos(toRad(lat2))*Math.cos(toRad(lon2-lon1));
+  return norm360(toDeg(Math.atan2(y,x)));
+}
 
-    // Himmelsrichtung erkennen (z.B. "21,94 W", "3,5 O", "50,78 N", "8,2 S")
-    // -> überschreibt das Vorzeichen, damit z.B. "West"-Angaben korrekt negativ werden.
-    let hemiSign = null;
-    if (hemisphere === 'lon'){
-      if (/\bw(est)?\b/i.test(s)) hemiSign = -1;
-      else if (/\b[oe](st)?\b/i.test(s)) hemiSign = 1;
-    } else if (hemisphere === 'lat'){
-      if (/\bs(üd|ued|outh)?\b/i.test(s)) hemiSign = -1;
-      else if (/\bn(ord|orth)?\b/i.test(s)) hemiSign = 1;
-    }
+/* ============ REAL NASA/ESPENAK CENTRAL PATH DATA ============
+   Total Solar Eclipse 2026 Aug 12 — central line every 2 min (UT),
+   [minutesUTC, lat, lon(E+), pathWidthKm, centralDurationSec, diamRatio]
+   Source: Fred Espenak / NASA GSFC eclipse path tables (VSOP87/ELP2000-85). */
+const PATH = [
+ [17*60+10, 86.8350, -1.6383, 275, 120.4, 1.036],
+ [17*60+12, 85.4033, -15.1817, 275, 122.8, 1.036],
+ [17*60+14, 83.9317, -21.1867, 276, 124.9, 1.037],
+ [17*60+16, 82.4950, -24.2717, 276, 126.8, 1.037],
+ [17*60+18, 81.1100, -25.9917, 277, 128.5, 1.037],
+ [17*60+20, 79.7733, -26.9817, 278, 130.0, 1.037],
+ [17*60+22, 78.4833, -27.5400, 278, 131.4, 1.038],
+ [17*60+24, 77.2333, -27.8250, 279, 132.6, 1.038],
+ [17*60+26, 76.0183, -27.9283, 280, 133.7, 1.038],
+ [17*60+28, 74.8367, -27.9050, 281, 134.6, 1.038],
+ [17*60+30, 73.6833, -27.7883, 282, 135.4, 1.038],
+ [17*60+32, 72.5567, -27.6033, 283, 136.2, 1.038],
+ [17*60+34, 71.4500, -27.3617, 285, 136.8, 1.038],
+ [17*60+36, 70.3650, -27.0783, 286, 137.3, 1.039],
+ [17*60+38, 69.2983, -26.7600, 288, 137.7, 1.039],
+ [17*60+40, 68.2467, -26.4100, 289, 137.9, 1.039],
+ [17*60+42, 67.2100, -26.0317, 291, 138.1, 1.039],
+ [17*60+44, 66.1850, -25.6300, 292, 138.2, 1.039],
+ [17*60+46, 65.1717, -25.2050, 294, 138.2, 1.039],
+ [17*60+48, 64.1683, -24.7567, 296, 138.1, 1.039],
+ [17*60+50, 63.1717, -24.2867, 298, 137.9, 1.039],
+ [17*60+52, 62.1833, -23.7933, 300, 137.6, 1.039],
+ [17*60+54, 61.2000, -23.2767, 302, 137.1, 1.038],
+ [17*60+56, 60.2217, -22.7367, 304, 136.6, 1.038],
+ [17*60+58, 59.2450, -22.1700, 305, 136.0, 1.038],
+ [18*60+0,  58.2717, -21.5733, 307, 135.3, 1.038],
+ [18*60+2,  57.2967, -20.9467, 309, 134.5, 1.038],
+ [18*60+4,  56.3217, -20.2867, 311, 133.5, 1.038],
+ [18*60+6,  55.3433, -19.5883, 313, 132.5, 1.038],
+ [18*60+8,  54.3617, -18.8467, 315, 131.3, 1.038],
+ [18*60+10, 53.3717, -18.0567, 316, 130.0, 1.037],
+ [18*60+12, 52.3717, -17.2117, 318, 128.6, 1.037],
+ [18*60+14, 51.3600, -16.3033, 319, 127.0, 1.037],
+ [18*60+16, 50.3333, -15.3167, 319, 125.2, 1.037],
+ [18*60+18, 49.2850, -14.2383, 319, 123.3, 1.036],
+ [18*60+20, 48.2117, -13.0483, 319, 121.2, 1.036],
+ [18*60+22, 47.1017, -11.7150, 318, 118.8, 1.035],
+ [18*60+24, 45.9433, -10.1900, 315, 116.1, 1.035],
+ [18*60+26, 44.7133, -8.3983, 311, 113.0, 1.034],
+ [18*60+28, 43.3717, -6.1883, 304, 109.3, 1.034],
+ [18*60+30, 41.8167, -3.1850, 294, 104.6, 1.033],
+ [18*60+32, 39.4083, 2.9500, 270, 95.8, 1.031],
+];
+const PATH_T0 = PATH[0][0], PATH_T1 = PATH[PATH.length-1][0];
 
-    s = s.replace(/°/g, '');
-    s = s.replace(/[A-Za-zÀ-ÖØ-öø-ÿ]/g, ''); // Buchstaben (Himmelsrichtungen etc.) entfernen
-    s = s.replace(/\s+/g, '');
+function centralPoint(tMin){
+  // returns {lat, lon, width, dur, ratio, exists}
+  let i0=-1;
+  if(tMin <= PATH_T0){
+    i0 = 0;
+  } else if(tMin >= PATH_T1){
+    i0 = PATH.length-2;
+  } else {
+    for(let i=0;i<PATH.length-1;i++){ if(tMin>=PATH[i][0] && tMin<=PATH[i+1][0]){ i0=i; break; } }
+  }
+  const a = PATH[i0], b = PATH[i0+1];
+  const f = (tMin - a[0])/(b[0]-a[0]);
+  const lat = a[1] + (b[1]-a[1])*f;
+  const lon = a[2] + (b[2]-a[2])*f;
+  let width = a[3] + (b[3]-a[3])*f;
+  const dur  = a[4] + (b[4]-a[4])*f;
+  const ratio= a[5] + (b[5]-a[5])*f;
+  // taper width to 0 just outside the real table range (umbra touches down / lifts off)
+  let exists = true;
+  if(tMin < PATH_T0){
+    const dt = PATH_T0-tMin;
+    width = Math.max(0, width - dt*8);
+    if(dt>6) exists=false;
+  } else if(tMin > PATH_T1){
+    const dt = tMin-PATH_T1;
+    width = Math.max(0, width - dt*20);
+    if(dt>3) exists=false;
+  }
+  return {lat,lon,width,dur,ratio,exists};
+}
 
-    // Falls Komma als Dezimaltrennzeichen genutzt wird und kein Punkt vorhanden ist:
-    if (s.indexOf(',') !== -1 && s.indexOf('.') === -1) {
-      s = s.replace(',', '.');
+// Eclipse geometry: given separation & radii (arcsec) -> magnitude, area fraction, type
+function overlapAreaFraction(d, r1, r2){
+  if(d >= r1+r2) return 0;
+  if(d <= Math.abs(r1-r2)){
+    const rmin = Math.min(r1,r2);
+    return Math.min(1, (rmin*rmin)/(r1*r1));
+  }
+  const r1_2=r1*r1, r2_2=r2*r2, d2=d*d;
+  let ca1 = (d2+r1_2-r2_2)/(2*d*r1); ca1=Math.max(-1,Math.min(1,ca1));
+  let ca2 = (d2+r2_2-r1_2)/(2*d*r2); ca2=Math.max(-1,Math.min(1,ca2));
+  const alpha = Math.acos(ca1), beta = Math.acos(ca2);
+  const area = r1_2*(alpha - Math.sin(2*alpha)/2) + r2_2*(beta - Math.sin(2*beta)/2);
+  return Math.min(1, Math.max(0, area/(Math.PI*r1_2)));
+}
+function eclipseType(d, r1, r2){
+  if(d >= r1+r2) return "none";
+  if(d <= Math.abs(r1-r2)) return (r2>=r1) ? "total" : "annular";
+  return "partial";
+}
+
+// Main: compute local circumstance at (lat,lon) & time (minutes UTC on 2026-08-12)
+function computeLocal(lat, lon, tMin){
+  const cp = centralPoint(tMin);
+  const dateUTC = new Date(Date.UTC(2026,7,12, 0,0,0, 0));
+  dateUTC.setUTCMinutes(tMin);
+  const jd = julianDay(dateUTC);
+  const sun = sunPosition(jd);
+  const sunAA = altAz(sun.ra, sun.dec, lat, lon, jd);
+
+  // solar semidiameter from real distance (arcsec)
+  const r1 = 959.63/sun.distAU;
+  const ratio = cp.exists ? cp.ratio : 1.036;
+  const r2 = ratio*r1;
+
+  let sep;
+  if(cp.width>0){
+    const halfW = cp.width/2;
+    const dKm = haversineKm(lat,lon,cp.lat,cp.lon);
+    const x = dKm/halfW;
+    if(x<=1){
+      sep = x*(r2-r1);
     } else {
-      // Mehrere Kommas als Tausendertrennzeichen entfernen, letztes Komma als Dezimalpunkt
-      s = s.replace(/,(?=.*,)/g, '');
-      s = s.replace(',', '.');
+      const penumbraOuterFactor = 1 + (2800/halfW); // outer partial-limit multiplier
+      const f = Math.min(1, (x-1)/(penumbraOuterFactor-1));
+      sep = (r2-r1) + f*(2*r1);
     }
-    s = s.replace(/[^0-9.\-+]/g, '');
-    let val = parseFloat(s);
-    if (isNaN(val)) return NaN;
+  } else {
+    // no umbra nearby (far in time from totality window): estimate via distance to nearest path endpoint
+    const nearest = tMin<PATH_T0 ? PATH[0] : PATH[PATH.length-1];
+    const dKm = haversineKm(lat,lon,nearest[1],nearest[2]);
+    const f = Math.min(1, Math.max(0, (dKm-150)/3000));
+    sep = (r2-r1) + f*(2*r1);
+  }
+  sep = Math.max(0, sep);
 
-    if (hemiSign !== null){
-      val = Math.abs(val) * hemiSign;
+  const area = overlapAreaFraction(sep, r1, r2);
+  const magnitude = Math.max(0, Math.min( (r1+r2-sep)/(2*r1), (Math.min(r1,r2)*2)/(2*r1) ));
+  const type = eclipseType(sep, r1, r2);
+  const visible = sunAA.alt > -0.3; // simple horizon check (no refraction subtlety)
+
+  // bearing of shadow track for animation angle
+  const cpEarlier = centralPoint(tMin-1), cpLater = centralPoint(tMin+1);
+  let brg = 135;
+  if(cpEarlier.width>0 || cpLater.width>0){
+    brg = bearingDeg(cpEarlier.lat, cpEarlier.lon, cpLater.lat, cpLater.lon);
+  }
+
+  return {sunAlt:sunAA.alt, sunAz:sunAA.az, r1, r2, sep, area, magnitude, type, visible, brg, dur:cp.dur, exists:cp.width>0};
+}
+
+// scan for contact times (C1..C4) at given lat/lon across the whole day window
+function findContacts(lat, lon){
+  const samples = [];
+  for(let t=15*60; t<=20*60; t+=0.5){
+    const c = computeLocal(lat, lon, t);
+    samples.push({t, sep:c.sep, r1:c.r1, r2:c.r2});
+  }
+  const events = {c1:null,c2:null,c3:null,c4:null,max:null,maxMag:-1};
+  for(let i=0;i<samples.length;i++){
+    if(samples[i].sep < events.maxMag*-1){} // noop
+  }
+  // find minimal separation (max eclipse)
+  let minSep=Infinity, minIdx=0;
+  samples.forEach((s,i)=>{ if(s.sep<minSep){minSep=s.sep; minIdx=i;} });
+  events.max = samples[minIdx].t;
+
+  function crossing(thresholdFn, fromIdx, dir){
+    for(let i=fromIdx; dir>0? i<samples.length-1 : i>0; i+=dir){
+      const a=samples[i], b=samples[i+dir];
+      const va = thresholdFn(a), vb = thresholdFn(b);
+      if(va*vb<=0 && va!==vb){
+        const f = Math.abs(va)/(Math.abs(va)+Math.abs(vb));
+        return a.t + (b.t-a.t)*f*dir/Math.abs(dir)*(dir>0?1:-1)*0 + (dir>0? a.t+(b.t-a.t)*Math.abs(va)/(Math.abs(va)+Math.abs(vb)) : a.t-(a.t-b.t)*Math.abs(va)/(Math.abs(va)+Math.abs(vb)));
+      }
     }
-    return val;
+    return null;
   }
-
-  // ---------------------------------------------------------------
-  // Kreis-Kreis-Überlappungsfläche (für Bedeckungsgrad)
-  // ---------------------------------------------------------------
-  function circleOverlapArea(r1, r2, d){
-    if (d >= r1 + r2) return 0;
-    if (d <= Math.abs(r1 - r2)) return Math.PI * Math.min(r1, r2) * Math.min(r1, r2);
-    const r1sq = r1 * r1, r2sq = r2 * r2;
-    const alpha = Math.acos((d*d + r1sq - r2sq) / (2 * d * r1));
-    const beta  = Math.acos((d*d + r2sq - r1sq) / (2 * d * r2));
-    const area = r1sq * (alpha - Math.sin(2*alpha) / 2) + r2sq * (beta - Math.sin(2*beta) / 2);
-    return area;
+  // C1 / C4: sep - (r1+r2) crosses zero
+  events.c1 = crossing(s=> s.sep-(s.r1+s.r2), minIdx, -1);
+  events.c4 = crossing(s=> s.sep-(s.r1+s.r2), minIdx, 1);
+  // C2 / C3: sep - |r1-r2| crosses zero (only if total/annular occurs)
+  if(minSep <= Math.abs(samples[minIdx].r1-samples[minIdx].r2)+0.5){
+    events.c2 = crossing(s=> s.sep-Math.abs(s.r1-s.r2), minIdx, -1);
+    events.c3 = crossing(s=> s.sep-Math.abs(s.r1-s.r2), minIdx, 1);
   }
+  return events;
+}
 
-  function coveragePercent(d){
-    const overlap = circleOverlapArea(SUN_R, MOON_R, d);
-    const sunArea = Math.PI * SUN_R * SUN_R;
-    const pct = (overlap / sunArea) * 100;
-    return Math.max(0, Math.min(100, pct));
+function fmtTimeUTC(tMin){
+  tMin = ((tMin%1440)+1440)%1440;
+  const h = Math.floor(tMin/60), m = Math.floor(tMin%60), s = Math.round((tMin%1) * 60);
+  return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+function localTimeString(tMin, lon){
+  const offsetH = lon/15;
+  let lt = tMin + offsetH*60;
+  lt = ((lt%1440)+1440)%1440;
+  const h = Math.floor(lt/60), m = Math.floor(lt%60);
+  const sign = offsetH>=0?"+":"";
+  return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+" (UTC"+sign+offsetH.toFixed(1)+")";
+}
+
+/* ============ UI / STATE ============ */
+const latInput = document.getElementById("lat");
+const lonInput = document.getElementById("lon");
+const timeSlider = document.getElementById("timeSlider");
+const timeReadout = document.getElementById("timeReadout");
+const localTimeEl = document.getElementById("localTime");
+const statMag = document.getElementById("statMag");
+const statArea = document.getElementById("statArea");
+const statAlt = document.getElementById("statAlt");
+const statAz = document.getElementById("statAz");
+const typeBadge = document.getElementById("typeBadge");
+const contactsEl = document.getElementById("contacts");
+
+const SLIDER_T0 = 15*60, SLIDER_T1 = 20*60; // 15:00 - 20:00 UTC window
+
+let state = { lat:64.1466, lon:-21.9426, tMin: 17*60+46, playing:false, speed:4, contacts:null };
+
+function sliderToT(v){ return SLIDER_T0 + v*(SLIDER_T1-SLIDER_T0); }
+function tToSlider(t){ return (t-SLIDER_T0)/(SLIDER_T1-SLIDER_T0); }
+
+function recomputeContacts(){
+  state.contacts = findContacts(state.lat, state.lon);
+}
+
+function refreshUI(){
+  const c = computeLocal(state.lat, state.lon, state.tMin);
+  timeReadout.innerHTML = fmtTimeUTC(state.tMin)+" UTC<span class='local' id='localTime'>Ortszeit ca. "+localTimeString(state.tMin,state.lon)+"</span>";
+  statMag.textContent = (c.magnitude*100).toFixed(1)+" %";
+  statArea.textContent = (c.area*100).toFixed(1)+" %";
+  statAlt.textContent = c.sunAlt.toFixed(1)+"°";
+  statAz.textContent = c.sunAz.toFixed(0)+"°";
+
+  let badgeClass="badge-none", label="Keine Finsternis sichtbar";
+  if(!c.visible){
+    badgeClass="badge-below"; label="Sonne unter dem Horizont";
+  } else if(c.type==="total"){ badgeClass="badge-total"; label="TOTALE FINSTERNIS"; }
+  else if(c.type==="annular"){ badgeClass="badge-annular"; label="Ringförmig (theoretisch)"; }
+  else if(c.type==="partial"){ badgeClass="badge-partial"; label="Partielle Finsternis"; }
+  typeBadge.className = badgeClass;
+  typeBadge.textContent = label;
+
+  if(state.contacts){
+    const ct = state.contacts;
+    let html = "";
+    html += "<b>Größte Verdeckung:</b> "+ (ct.max!==null? fmtTimeUTC(ct.max)+" UTC":"–") +"<br>";
+    if(ct.c1!==null) html += "<b>Beginn (C1):</b> "+fmtTimeUTC(ct.c1)+" UTC<br>";
+    if(ct.c2!==null) html += "<b>Beginn Totalität (C2):</b> "+fmtTimeUTC(ct.c2)+" UTC<br>";
+    if(ct.c3!==null) html += "<b>Ende Totalität (C3):</b> "+fmtTimeUTC(ct.c3)+" UTC<br>";
+    if(ct.c4!==null) html += "<b>Ende (C4):</b> "+fmtTimeUTC(ct.c4)+" UTC<br>";
+    if(ct.c2===null) html += "<span style='color:var(--text-dim)'>Keine Totalität an diesem Standort.</span>";
+    contactsEl.innerHTML = html;
   }
+  return c;
+}
 
-  // ---------------------------------------------------------------
-  // Anwendungszustand
-  // ---------------------------------------------------------------
-  const state = {
-    lat: 50.78,
-    lon: 6.08,
-    locationName: "Aachen",
-    t: 0,          // Minuten relativ zum Maximum
-    playing: false,
-    deltaLatUsed: 0,
-    d_px_raw: 0,
-    d_px_visual: 0,
-    maxCoveragePct: 0
-  };
+document.getElementById("calcBtn").addEventListener("click", ()=>{
+  const lat = parseFloat(latInput.value), lon = parseFloat(lonInput.value);
+  if(isNaN(lat)||isNaN(lon)) return;
+  state.lat = lat; state.lon = lon;
+  recomputeContacts();
+  refreshUI();
+});
 
-  function recomputeGeometry(){
-    const deltaLat = state.lat - CENTRAL_LAT;
-    state.deltaLatUsed = deltaLat;
-    const dRaw = Math.abs(deltaLat) * PX_PER_DEGREE;
-    state.d_px_raw = dRaw;
-    state.d_px_visual = Math.sign(deltaLat) * Math.min(dRaw, MAX_VISUAL_OFFSET);
-    state.maxCoveragePct = coveragePercent(dRaw);
+document.getElementById("geoBtn").addEventListener("click", ()=>{
+  if(!navigator.geolocation){ alert("Geolokalisierung wird von diesem Browser nicht unterstützt."); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    latInput.value = pos.coords.latitude.toFixed(4);
+    lonInput.value = pos.coords.longitude.toFixed(4);
+    state.lat = pos.coords.latitude; state.lon = pos.coords.longitude;
+    recomputeContacts();
+    refreshUI();
+  }, err=>{ alert("Standort konnte nicht ermittelt werden."); });
+});
+
+document.querySelectorAll(".preset").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    latInput.value = btn.dataset.lat;
+    lonInput.value = btn.dataset.lon;
+    state.lat = parseFloat(btn.dataset.lat);
+    state.lon = parseFloat(btn.dataset.lon);
+    recomputeContacts();
+    refreshUI();
+  });
+});
+
+timeSlider.addEventListener("input", ()=>{
+  state.tMin = sliderToT(parseFloat(timeSlider.value));
+  refreshUI();
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(state.contacts && state.contacts.max!==null){
+    state.tMin = state.contacts.max;
+    timeSlider.value = tToSlider(state.tMin);
+    refreshUI();
   }
+});
 
-  function utcMinutesToString(mins){
-    let m = ((Math.round(mins) % 1440) + 1440) % 1440;
-    const hh = Math.floor(m / 60).toString().padStart(2, '0');
-    const mm = (m % 60).toString().padStart(2, '0');
-    return hh + ":" + mm + " UTC";
+const playBtn = document.getElementById("playBtn");
+playBtn.addEventListener("click", ()=>{
+  state.playing = !state.playing;
+  playBtn.textContent = state.playing ? "❚❚" : "▶";
+});
+document.querySelectorAll(".speedbtn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".speedbtn").forEach(b=>b.classList.remove("on"));
+    btn.classList.add("on");
+    state.speed = parseFloat(btn.dataset.s);
+  });
+});
+
+/* ============ CANVAS RENDER ============ */
+const canvas = document.getElementById("sky");
+const ctx = canvas.getContext("2d");
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio||1);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W*DPR; canvas.height = H*DPR;
+  canvas.style.width=W+"px"; canvas.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener("resize", resize);
+resize();
+
+const stars = Array.from({length:220}, ()=>({
+  x:Math.random(), y:Math.random()*0.75, r:Math.random()*1.4+0.3, tw:Math.random()*Math.PI*2
+}));
+
+function skyColorForAlt(alt, darkness){
+  // darkness in [0,1], 0=no eclipse dimming, 1=totality black
+  let top,bottom;
+  if(alt > 15){ top=[20,55,110]; bottom=[95,165,215]; }
+  else if(alt > 0){ const f=alt/15; top=[10,15,40].map((v,i)=>v+(20-v)*f).map((v,i)=>v); top=[lerp(10,20,f),lerp(15,55,f),lerp(45,110,f)]; bottom=[lerp(255,235,f? (1-f):1),lerp(140,165,f),lerp(90,120,f)]; bottom=[lerp(255,140,1-f),lerp(120,165,1-f),lerp(70,150,1-f)]; }
+  else if(alt > -6){ const f=(alt+6)/6; top=[lerp(5,10,f),lerp(6,15,f),lerp(20,45,f)]; bottom=[lerp(60,220,f),lerp(30,110,f),lerp(50,80,f)]; }
+  else { top=[3,4,10]; bottom=[6,7,16]; }
+  // apply eclipse darkening
+  top = top.map(v=>lerp(v, v*0.05, darkness));
+  bottom = bottom.map(v=>lerp(v, v*0.08, darkness));
+  return {top, bottom};
+}
+function lerp(a,b,f){ return a+(b-a)*f; }
+function rgb(c){ return "rgb("+Math.round(c[0])+","+Math.round(c[1])+","+Math.round(c[2])+")"; }
+
+let animStart = performance.now();
+function draw(now){
+  const c = computeLocal(state.lat, state.lon, state.tMin);
+  const darkness = c.visible ? Math.pow(c.area, 1.6) * (c.type==="total"? 1: 0.9) : 1;
+
+  // sky gradient
+  const {top,bottom} = skyColorForAlt(c.sunAlt, darkness);
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, rgb(top));
+  g.addColorStop(1, rgb(bottom));
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  // horizon line + ground silhouette
+  const horizonY = H*0.82;
+  ctx.fillStyle = darkness>0.5 ? "rgba(4,4,8,0.9)" : "rgba(8,10,10,0.55)";
+  ctx.beginPath();
+  ctx.moveTo(0,H);
+  ctx.lineTo(0,horizonY);
+  for(let x=0;x<=W;x+=40){
+    ctx.lineTo(x, horizonY - Math.sin(x*0.004+2)*6 - Math.sin(x*0.011)*3);
   }
+  ctx.lineTo(W,H);
+  ctx.closePath();
+  ctx.fill();
 
-  function currentUtcMinutes(){
-    const lonOffset = (state.lon - REF_LON) * MIN_PER_DEGREE_LON;
-    return BASE_UTC_MIN + lonOffset + state.t;
-  }
-
-  // ---------------------------------------------------------------
-  // Rendering
-  // ---------------------------------------------------------------
-  function draw(){
-    ctx.clearRect(0, 0, W, H);
-
-    // Sternenhintergrund
+  // stars (visible when dark enough)
+  const starOpacity = Math.max(0, (darkness-0.55))*2.2;
+  if(starOpacity>0.02){
     ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    for (let i = 0; i < 60; i++){
-      const sx = (i * 137.5) % W;
-      const sy = (i * 91.3) % H;
-      const r = (i % 3 === 0) ? 1.4 : 0.8;
-      ctx.globalAlpha = 0.15 + (i % 5) * 0.08;
+    stars.forEach(s=>{
+      const tw = 0.6+0.4*Math.sin(now*0.002+s.tw);
+      ctx.globalAlpha = Math.min(1,starOpacity)*tw;
+      ctx.fillStyle="#fff";
       ctx.beginPath();
-      ctx.arc(sx, sy, r, 0, Math.PI*2);
+      ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
       ctx.fill();
-    }
+    });
     ctx.restore();
+  }
 
-    // Laufrichtungs-Vektoren: horizontal/vertikal spiegelbar über die Schalter,
-    // damit Bahnlinie und Mond garantiert konsistent dieselbe Ausrichtung zeigen.
-    const mirrorX = mirrorToggle.checked ? -1 : 1;
-    const mirrorY = mirrorYToggle.checked ? -1 : 1;
-    const aDir = { x: alongDir.x * mirrorX, y: alongDir.y * mirrorY };
-    const pDir = { x: perpDir.x * mirrorX, y: perpDir.y * mirrorY };
+  // position of sun in sky (stylized): x by azimuth relative to south-ish sweep, y by altitude
+  const azNorm = ((c.sunAz - 90 + 540)%360)/360; // spread across width
+  const sx = W*(0.12 + 0.76*(((c.sunAz)%360)/360<0.5 ? ((c.sunAz%360)/360)*1.0 : ((c.sunAz%360)/360)));
+  // simpler: map azimuth 90(E)-270(W) across screen, clamp
+  let azClamped = Math.max(60, Math.min(300, c.sunAz));
+  const sxFinal = W*((azClamped-60)/240);
+  const altClamped = Math.max(-10, Math.min(75, c.sunAlt));
+  const syFinal = horizonY - (altClamped/75)*(horizonY-H*0.10);
 
-    // Bahnlinie
-    if (document.getElementById('pathToggle').checked){
+  const baseR = Math.min(W,H)*0.075;
+  const r1px = baseR;
+  const r2px = baseR * (c.r2/c.r1);
+
+  const visibleOnScreen = c.sunAlt > -8;
+  if(visibleOnScreen){
+    // corona / glow during high obscuration
+    if(darkness>0.4){
+      const glowR = r1px*(2.2+darkness*1.6);
+      const grad = ctx.createRadialGradient(sxFinal,syFinal, r1px*0.9, sxFinal,syFinal, glowR);
+      grad.addColorStop(0, "rgba(255,244,214,"+(0.55*darkness)+")");
+      grad.addColorStop(0.4, "rgba(255,230,180,"+(0.22*darkness)+")");
+      grad.addColorStop(1, "rgba(255,230,180,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(sxFinal,syFinal,glowR,0,Math.PI*2); ctx.fill();
+    }
+
+    // sun rays (subtle) when not totally dark
+    if(darkness<0.9){
       ctx.save();
-      ctx.strokeStyle = 'rgba(90,169,230,0.5)';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([7, 7]);
-      const off = { x: CENTER.x + pDir.x * state.d_px_visual, y: CENTER.y + pDir.y * state.d_px_visual };
-      const len = 1000;
-      ctx.beginPath();
-      ctx.moveTo(off.x - aDir.x*len, off.y - aDir.y*len);
-      ctx.lineTo(off.x + aDir.x*len, off.y + aDir.y*len);
-      ctx.stroke();
+      ctx.globalAlpha = 0.5*(1-darkness);
+      ctx.strokeStyle = "#ffdf9e";
+      ctx.lineWidth = 2;
+      for(let i=0;i<16;i++){
+        const a = (i/16)*Math.PI*2 + now*0.00005;
+        ctx.beginPath();
+        ctx.moveTo(sxFinal+Math.cos(a)*r1px*1.05, syFinal+Math.sin(a)*r1px*1.05);
+        ctx.lineTo(sxFinal+Math.cos(a)*r1px*1.55, syFinal+Math.sin(a)*r1px*1.55);
+        ctx.stroke();
+      }
       ctx.restore();
     }
 
-    // Sonne
-    const sunGrad = ctx.createRadialGradient(CENTER.x, CENTER.y, 5, CENTER.x, CENTER.y, SUN_R*1.9);
-    sunGrad.addColorStop(0, 'rgba(255,240,180,1)');
-    sunGrad.addColorStop(0.35, 'rgba(255,201,74,0.9)');
-    sunGrad.addColorStop(1, 'rgba(255,150,40,0)');
-    ctx.save();
+    // sun disk
+    const sunGrad = ctx.createRadialGradient(sxFinal,syFinal,0, sxFinal,syFinal,r1px);
+    sunGrad.addColorStop(0,"#fff8e2");
+    sunGrad.addColorStop(0.7,"#ffe19a");
+    sunGrad.addColorStop(1,"#ffb24d");
     ctx.fillStyle = sunGrad;
-    ctx.beginPath();
-    ctx.arc(CENTER.x, CENTER.y, SUN_R*1.9, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
+    ctx.beginPath(); ctx.arc(sxFinal,syFinal,r1px,0,Math.PI*2); ctx.fill();
+
+    // moon offset direction from bearing
+    const angleRad = toRad(c.brg + 90); // rotate so track reads naturally on screen
+    const sepFrac = c.sep / c.r1; // in units of solar radii
+    const offsetPx = sepFrac * r1px;
+    const mx = sxFinal + Math.cos(angleRad)*offsetPx;
+    const my = syFinal + Math.sin(angleRad)*offsetPx;
 
     ctx.save();
-    const coreGrad = ctx.createRadialGradient(CENTER.x - SUN_R*0.2, CENTER.y - SUN_R*0.2, 2, CENTER.x, CENTER.y, SUN_R);
-    coreGrad.addColorStop(0, '#fff6d8');
-    coreGrad.addColorStop(0.5, '#f0c94a');
-    coreGrad.addColorStop(1, '#e08a1e');
-    ctx.fillStyle = coreGrad;
-    ctx.beginPath();
-    ctx.arc(CENTER.x, CENTER.y, SUN_R, 0, Math.PI*2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(sxFinal,syFinal,r1px,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle = darkness>0.97 ? "#050505" : "#0c0b10";
+    ctx.beginPath(); ctx.arc(mx,my,r2px,0,Math.PI*2); ctx.fill();
     ctx.restore();
+    // moon limb subtle highlight
+    ctx.strokeStyle="rgba(120,110,140,0.35)";
+    ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(mx,my,r2px,0,Math.PI*2); ctx.stroke();
 
-    // Mondposition entlang Bahn
-    const a = -state.t * SPEED_PX_PER_MIN;
-    const moonPos = {
-      x: CENTER.x + aDir.x * a + pDir.x * state.d_px_visual,
-      y: CENTER.y + aDir.y * a + pDir.y * state.d_px_visual
-    };
-
-    // aktueller Abstand & Bedeckung (physikalisch, unclamped)
-    const dCurrent = Math.sqrt(a*a + state.d_px_raw*state.d_px_raw);
-    const covCurrent = coveragePercent(dCurrent);
-
-    // Mond
-    ctx.save();
-    const moonGrad = ctx.createRadialGradient(
-      moonPos.x - MOON_R*0.3, moonPos.y - MOON_R*0.3, 2,
-      moonPos.x, moonPos.y, MOON_R
-    );
-    moonGrad.addColorStop(0, '#2a3548');
-    moonGrad.addColorStop(1, '#0a0e17');
-    ctx.fillStyle = moonGrad;
-    ctx.beginPath();
-    ctx.arc(moonPos.x, moonPos.y, MOON_R, 0, Math.PI*2);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(90,169,230,0.35)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.restore();
-
-    // Korona-Andeutung bei hoher Bedeckung (sanfter Ring, wächst bis zur Totalität)
-    if (covCurrent > 90){
-      ctx.save();
-      ctx.globalAlpha = (covCurrent - 90) / 10 * 0.8;
-      ctx.strokeStyle = '#fff6d8';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(CENTER.x, CENTER.y, SUN_R + 4, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.restore();
+    // diamond ring / corona ring at edges of totality
+    if(c.type==="total" && darkness>0.9){
+      ctx.strokeStyle="rgba(255,255,255,0.9)";
+      ctx.lineWidth = Math.max(1, r1px*0.02);
+      ctx.beginPath(); ctx.arc(sxFinal,syFinal, r1px*1.01, 0, Math.PI*2); ctx.stroke();
     }
-
-    // Aurora / Korona-Simulation NUR während echter Totalität
-    const isTotality = covCurrent >= TOTALITY_THRESHOLD;
-    if (isTotality){
-      drawAuroraCorona(animPhase);
-    }
-
-    // HUD
-    drawHUD(covCurrent, dCurrent, isTotality);
+  } else {
+    ctx.fillStyle="rgba(255,255,255,0.75)";
+    ctx.font = "16px Barlow";
+    ctx.textAlign="center";
+    ctx.fillText("Sonne unter dem Horizont", W/2, H*0.5);
   }
 
-  // ---------------------------------------------------------------
-  // Aurora / Korona-Effekt (nur sichtbar bei Totalität)
-  // ---------------------------------------------------------------
-  function drawAuroraCorona(phase){
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-
-    // Feine strahlenförmige Sonnenkorona
-    const rays = 48;
-    for (let i = 0; i < rays; i++){
-      const ang = (i / rays) * Math.PI * 2 + phase * 0.04;
-      const flicker = 0.5 + 0.5 * Math.sin(phase * 0.9 + i * 1.37);
-      const len = SUN_R * 1.25 + flicker * SUN_R * 0.75 + Math.sin(phase * 0.5 + i) * 8;
-      const x1 = CENTER.x + Math.cos(ang) * SUN_R * 1.02;
-      const y1 = CENTER.y + Math.sin(ang) * SUN_R * 1.02;
-      const x2 = CENTER.x + Math.cos(ang) * len;
-      const y2 = CENTER.y + Math.sin(ang) * len;
-      ctx.strokeStyle = 'rgba(255,255,240,' + (0.12 + 0.22 * flicker).toFixed(3) + ')';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
-
-    // Schimmernde Aurora-Ringe (grün / violett / cyan) um die Korona
-    const auroraColors = ['124,255,178', '185,131,255', '111,227,255'];
-    auroraColors.forEach((rgb, k) => {
-      const rr = SUN_R * 1.55 + k * 20 + Math.sin(phase * 0.35 + k * 2.1) * 7;
-      const alpha = 0.10 + 0.09 * (0.5 + 0.5 * Math.sin(phase * 0.55 + k * 1.9));
-      ctx.strokeStyle = 'rgba(' + rgb + ',' + alpha.toFixed(3) + ')';
-      ctx.lineWidth = 7;
-      ctx.beginPath();
-      ctx.arc(CENTER.x, CENTER.y, rr, 0, Math.PI * 2);
-      ctx.stroke();
-    });
-
-    ctx.restore();
+  // small label near sun with %
+  if(visibleOnScreen){
+    ctx.fillStyle="rgba(255,255,255,0.85)";
+    ctx.font="600 13px 'JetBrains Mono', monospace";
+    ctx.textAlign="center";
+    ctx.fillText((c.area*100).toFixed(0)+"% bedeckt", sxFinal, syFinal + r1px + 26);
   }
 
-  function drawHUD(covCurrent, dCurrent, isTotality){
-    ctx.save();
-    ctx.textBaseline = 'top';
-    const pad = 14;
-    const lines = [
-      { label: "Ort:", value: state.locationName },
-      { label: "Koordinaten:", value: state.lat.toFixed(2) + "° N, " + state.lon.toFixed(2) + "° O" },
-      { label: "Δ Breite zur Zentrallinie:", value: (state.deltaLatUsed >= 0 ? "+" : "") + state.deltaLatUsed.toFixed(2) + "°" },
-      { label: "Versatz d (Pixel):", value: state.d_px_raw.toFixed(1) + " px" },
-      { label: "Max. Bedeckung (t=0):", value: state.maxCoveragePct.toFixed(1) + " %" },
-      { label: "Aktuelle Bedeckung:", value: covCurrent.toFixed(1) + " %" },
-      { label: "Zeitpunkt:", value: utcMinutesToString(currentUtcMinutes()) + "  (t = " + state.t.toFixed(0) + " min)" },
-      { label: "Status:", value: isTotality ? "✨ TOTALITÄT" : "Partiell / kein Kontakt" }
-    ];
+  requestAnimationFrame(draw);
 
-    ctx.font = '600 13px "Segoe UI", sans-serif';
-    let boxW = 0;
-    lines.forEach(l => {
-      const w = ctx.measureText(l.label + " " + l.value).width;
-      if (w > boxW) boxW = w;
-    });
-    boxW += pad * 2;
-    const lineH = 20;
-    const boxH = lines.length * lineH + pad * 2 - 4;
-
-    ctx.fillStyle = 'rgba(8,12,20,0.72)';
-    roundRect(ctx, 12, 12, boxW, boxH, 10);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(90,169,230,0.35)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, 12, 12, boxW, boxH, 10);
-    ctx.stroke();
-
-    let y = 12 + pad - 4;
-    lines.forEach(l => {
-      ctx.fillStyle = '#8b98b0';
-      ctx.font = '600 11px "Segoe UI", sans-serif';
-      ctx.fillText(l.label, 12 + pad, y);
-      ctx.fillStyle = '#f0c94a';
-      ctx.font = '600 13px "Segoe UI", sans-serif';
-      ctx.fillText(l.value, 12 + pad + ctx.measureText(l.label).width + 6, y - 1);
-      y += lineH;
-    });
-
-    ctx.restore();
+  if(state.playing){
+    state.tMin += (state.speed/60) * (16.7/1000) * 6; // approx minutes advanced per frame
+    if(state.tMin>SLIDER_T1){ state.tMin=SLIDER_T0; }
+    timeSlider.value = tToSlider(state.tMin);
+    refreshUI();
   }
+}
+requestAnimationFrame(draw);
 
-  function roundRect(ctx, x, y, w, h, r){
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  }
-
-  // ---------------------------------------------------------------
-  // UI Wiring
-  // ---------------------------------------------------------------
-  const locSelect = document.getElementById('locationSelect');
-  const latInput = document.getElementById('latInput');
-  const lonInput = document.getElementById('lonInput');
-  const applyBtn = document.getElementById('applyBtn');
-  const playBtn = document.getElementById('playBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const timeSlider = document.getElementById('timeSlider');
-  const timeLabel = document.getElementById('timeLabel');
-  const clockLabel = document.getElementById('clockLabel');
-  const pathToggle = document.getElementById('pathToggle');
-  const mirrorToggle = document.getElementById('mirrorToggle');
-  const mirrorYToggle = document.getElementById('mirrorYToggle');
-
-  LOCATIONS.forEach((loc, idx) => {
-    const opt = document.createElement('option');
-    opt.value = idx;
-    opt.textContent = loc.name;
-    locSelect.appendChild(opt);
-  });
-  locSelect.value = "0"; // Aachen als Default
-
-  function fmtInputValue(v){
-    return v.toFixed(2).replace('.', ',');
-  }
-
-  locSelect.addEventListener('change', () => {
-    const idx = parseInt(locSelect.value, 10);
-    const loc = LOCATIONS[idx];
-    if (loc.lat === null){
-      // Manuell -> Felder bleiben editierbar, keine automatische Anwendung
-      latInput.focus();
-      return;
-    }
-    latInput.value = fmtInputValue(loc.lat);
-    lonInput.value = fmtInputValue(loc.lon);
-    state.locationName = loc.name;
-    applyParams();
-  });
-
-  function applyParams(){
-    const latVal = parseTolerantFloat(latInput.value, 'lat');
-    const lonVal = parseTolerantFloat(lonInput.value, 'lon');
-
-    if (isNaN(latVal) || isNaN(lonVal)){
-      alert("Bitte gültige Zahlenwerte für Breite und Länge eingeben.");
-      return;
-    }
-
-    state.lat = Math.max(-90, Math.min(90, latVal));
-    state.lon = Math.max(-180, Math.min(180, lonVal));
-
-    const idx = parseInt(locSelect.value, 10);
-    const loc = LOCATIONS[idx];
-    if (loc && loc.lat !== null && Math.abs(loc.lat - state.lat) < 0.001 && Math.abs(loc.lon - state.lon) < 0.001){
-      state.locationName = loc.name;
-    } else {
-      state.locationName = "Manuell (" + state.lat.toFixed(2) + "°N, " + state.lon.toFixed(2) + "°O)";
-      locSelect.value = String(LOCATIONS.length - 1);
-    }
-
-    recomputeGeometry();
-
-    state.t = 0;
-    timeSlider.value = 0;
-    updateTimeLabels();
-    draw();
-  }
-
-  applyBtn.addEventListener('click', applyParams);
-
-  // Enter-Taste in den Koordinatenfeldern löst "Übernehmen / Start" aus
-  [latInput, lonInput].forEach(inp => {
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter'){
-        e.preventDefault();
-        applyParams();
-      }
-    });
-  });
-
-  // Live-Validierung: roter Rahmen bei aktuell nicht interpretierbarer Eingabe
-  function validateField(input, hemisphere){
-    const val = parseTolerantFloat(input.value, hemisphere);
-    input.style.borderColor = isNaN(val) ? 'var(--danger)' : '';
-  }
-  latInput.addEventListener('input', () => validateField(latInput, 'lat'));
-  lonInput.addEventListener('input', () => validateField(lonInput, 'lon'));
-
-  resetBtn.addEventListener('click', () => {
-    state.t = 0;
-    timeSlider.value = 0;
-    updateTimeLabels();
-    draw();
-  });
-
-  timeSlider.addEventListener('input', () => {
-    state.t = parseFloat(timeSlider.value);
-    updateTimeLabels();
-    draw();
-  });
-
-  pathToggle.addEventListener('change', draw);
-  mirrorToggle.addEventListener('change', draw);
-  mirrorYToggle.addEventListener('change', draw);
-
-  function updateTimeLabels(){
-    timeLabel.textContent = "t = " + state.t.toFixed(0) + " min";
-    clockLabel.textContent = utcMinutesToString(currentUtcMinutes());
-  }
-
-  // ---------------------------------------------------------------
-  // Playback (Play/Pause) — durchgehender Render-Loop
-  // ---------------------------------------------------------------
-  let lastFrameTime = null;
-  let animPhase = 0; // Sekunden-basierte Phase für Aurora-Schimmer, läuft immer weiter
-  const MIN_PER_SEC = 12; // Animationsgeschwindigkeit der Zeitachse
-
-  function tick(ts){
-    if (lastFrameTime === null) lastFrameTime = ts;
-    const dt = (ts - lastFrameTime) / 1000;
-    lastFrameTime = ts;
-    animPhase = ts / 1000;
-
-    if (state.playing){
-      state.t += dt * MIN_PER_SEC;
-      if (state.t > 60){
-        state.t = -60;
-      }
-      timeSlider.value = Math.round(state.t);
-      updateTimeLabels();
-    }
-
-    draw();
-    requestAnimationFrame(tick);
-  }
-
-  playBtn.addEventListener('click', () => {
-    state.playing = !state.playing;
-    playBtn.textContent = state.playing ? "⏸ Pause" : "▶ Play";
-  });
-
-  // ---------------------------------------------------------------
-  // Initialisierung
-  // ---------------------------------------------------------------
-  recomputeGeometry();
-  updateTimeLabels();
-  requestAnimationFrame(tick);
+/* init */
+recomputeContacts();
+timeSlider.value = tToSlider(state.tMin);
+refreshUI();
 
 })();
 </script>
