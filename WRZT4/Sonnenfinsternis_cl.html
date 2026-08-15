@@ -240,12 +240,12 @@ input[type=range]::-moz-range-thumb{
       <div class="presetrow">
         <button class="preset" data-lat="65.6835" data-lon="-18.0878">Akureyri</button>
         <button class="preset" data-lat="64.1466" data-lon="-21.9426">Reykjavík</button>
-        <button class="preset" data-lat="76.5" data-lon="-25.0">Ostgrönland</button>
+        <button class="preset" data-lat="39.57" data-lon="2.73">Mallorca</button>
         <button class="preset" data-lat="42.8782" data-lon="-8.5448">Santiago de C.</button>
         <button class="preset" data-lat="40.4168" data-lon="-3.7038">Madrid</button>
         <button class="preset" data-lat="52.52" data-lon="13.405">Berlin</button>
         <button class="preset" data-lat="48.2082" data-lon="16.3738">Wien</button>
-        <button class="preset" data-lat="40.7128" data-lon="-74.006">New York</button>
+        <button class="preset" data-lat="50.6828" data-lon="6.006">Aachen</button>
       </div>
     </div>
 
@@ -772,16 +772,11 @@ function draw(now){
     ctx.restore();
   }
 
-  // position of sun in sky (stylized): x by azimuth relative to south-ish sweep, y by altitude
-  const azNorm = ((c.sunAz - 90 + 540)%360)/360; // spread across width
-  const sx = W*(0.12 + 0.76*(((c.sunAz)%360)/360<0.5 ? ((c.sunAz%360)/360)*1.0 : ((c.sunAz%360)/360)));
-  // simpler: map azimuth 90(E)-270(W) across screen, clamp
-  let azClamped = Math.max(60, Math.min(300, c.sunAz));
-  const sxFinal = W*((azClamped-60)/240);
-  const altClamped = Math.max(-10, Math.min(75, c.sunAlt));
-  const syFinal = horizonY - (altClamped/75)*(horizonY-H*0.10);
+  // Sonne bleibt fest im Bildschirmzentrum verankert; Mond & Himmel bewegen sich relativ zu ihr
+  const sxFinal = W*0.5;
+  const syFinal = H*0.46;
 
-  const baseR = Math.min(W,H)*0.075;
+  const baseR = Math.min(W,H)*0.16;
   const r1px = baseR;
   const r2px = baseR * (c.r2/c.r1);
 
