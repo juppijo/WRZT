@@ -2,9 +2,9 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>WRZT T1</title>
+  <title>WRZT T1 - Die Architektur des Kosmos</title>
 
-  <!-- MathJax for rendering LaTeX equations -->
+  <!-- MathJax configuration for inline & display math -->
   <script>
     MathJax = {
       tex: {
@@ -24,340 +24,813 @@
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-      color: #222222;
-      background: #ddddff;
+    /* Base Theme Variables (Cosmic Dark) */
+    :root {
+      --bg-color: #0b0d19;
+      --bg-image: 
+        radial-gradient(circle at 15% 15%, rgba(79, 172, 254, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --accent-purple: #7f00ff;
+      --accent-pink: #e100ff;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --card-bg: rgba(22, 29, 52, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-glow: rgba(79, 172, 254, 0.15);
+      --gold-accent: #f6d365;
+      --eq-bg: rgba(10, 14, 26, 0.8);
+      --header-card-bg: rgba(18, 24, 43, 0.85);
+      --heading-text: #ffffff;
+      --heading-sub-text: #cbd5e1;
     }
+
+    /* Cyberpunk Neon Theme */
+    [data-theme="cyberpunk"] {
+      --bg-color: #05050a;
+      --bg-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 50%);
+      --accent-cyan: #00f0ff;
+      --accent-blue: #ff0055;
+      --accent-purple: #ffe600;
+      --accent-pink: #ff0055;
+      --text-main: #e0f7fa;
+      --text-muted: #80deea;
+      --card-bg: rgba(15, 15, 25, 0.85);
+      --card-border: #00f0ff;
+      --card-glow: rgba(0, 240, 255, 0.25);
+      --gold-accent: #ffe600;
+      --eq-bg: rgba(0, 0, 0, 0.9);
+      --header-card-bg: rgba(20, 10, 30, 0.9);
+      --heading-text: #ffffff;
+      --heading-sub-text: #00f0ff;
+    }
+
+    /* Deep Space Blue Theme */
+    [data-theme="deepspace"] {
+      --bg-color: #020b14;
+      --bg-image: 
+        radial-gradient(circle at 50% 10%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 90%, rgba(3, 105, 161, 0.15) 0%, transparent 60%);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #0284c7;
+      --accent-purple: #0369a1;
+      --accent-pink: #38bdf8;
+      --text-main: #f0f9ff;
+      --text-muted: #7dd3fc;
+      --card-bg: rgba(12, 74, 110, 0.3);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --card-glow: rgba(56, 189, 248, 0.2);
+      --gold-accent: #bae6fd;
+      --eq-bg: rgba(7, 30, 54, 0.8);
+      --header-card-bg: rgba(12, 45, 72, 0.6);
+      --heading-text: #ffffff;
+      --heading-sub-text: #e0f2fe;
+    }
+
+    /* Minimalist Light Theme */
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --bg-image: none;
+      --accent-cyan: #0284c7;
+      --accent-blue: #2563eb;
+      --accent-purple: #4f46e5;
+      --accent-pink: #7c3aed;
+      --text-main: #334155;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-glow: rgba(0, 0, 0, 0.05);
+      --gold-accent: #d97706;
+      --eq-bg: #f1f5f9;
+      --header-card-bg: #ffffff;
+      --heading-text: #0f172a;
+      --heading-sub-text: #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-color);
+      background-image: var(--bg-image);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.7;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    /* Top Controls Bar */
+    .controls-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background: var(--accent-cyan);
+      color: #000000;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .btn.active {
+      background: var(--accent-cyan);
+      color: #000000;
+      border-color: var(--accent-cyan);
+    }
+
+    .container {
+      max-width: 960px;
+      width: 100%;
+    }
+
+    /* Header Styling */
+    .header-card {
+      background: var(--header-card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--card-glow);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+
+    .header-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent-cyan);
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
     h1 {
-      color: #4422f7;
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--heading-text) 0%, var(--heading-sub-text) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+
+    .header-card h1.sub-h1 {
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-top: 10px;
+    }
+
+    .intro-text {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Section Cards */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .section-card:hover {
+      border-color: var(--accent-cyan);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: var(--heading-text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+
+    h2::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 22px;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-blue));
+      border-radius: 2px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+      margin: 22px 0 12px 0;
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      color: var(--gold-accent);
+      margin: 18px 0 10px 0;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: var(--text-main);
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin: 16px 0 20px 24px;
+      color: var(--text-main);
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    li strong {
+      color: var(--heading-text);
+    }
+
+    /* Math Formulas & Callouts */
+    .equation-box {
+      background: var(--eq-bg);
+      border-left: 3px solid var(--accent-cyan);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      overflow-x: auto;
+      text-align: center;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Highlight box for key insights */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(127, 0, 255, 0.1) 0%, rgba(79, 172, 254, 0.1) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+      margin: 35px 0;
+    }
+
+    strong {
+      color: var(--heading-text);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 12px;
+      }
+      .header-card, .section-card {
+        padding: 24px 18px;
+      }
+      h1 {
+        font-size: 1.75rem;
+      }
+      .header-card h1.sub-h1 {
+        font-size: 1.3rem;
+      }
     }
   </style>
 </head>
-  
 <body>
 
-  <h1><strong>• ✨ WRZT T1 🌌</strong></h1>
+  <!-- Interactive Controls Bar -->
+  <div class="controls-bar">
+    <button class="btn active" onclick="setTheme('cosmic', this)">🌌 Cosmic Dark</button>
+    <button class="btn" onclick="setTheme('cyberpunk', this)">⚡ Cyberpunk</button>
+    <button class="btn" onclick="setTheme('deepspace', this)">🚀 Deep Space</button>
+    <button class="btn" onclick="setTheme('light', this)">☀️ Light Mode</button>
+    <button class="btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
+  </div>
 
-  <h1>Die Architektur des Kosmos: Das elastische Raumzeit-Netzwerk der WRZT</h1>
-  <p>Das Universum lässt sich in seiner tiefsten Grundstruktur als ein dreidimensionales, kontinuierliches <strong>Energienetzwerk</strong> verstehen. Anstatt eines leeren, abstrakten Vakuums existiert ein physikalisches Kontinuum, dessen mechanisches und energetisches Verhalten verblüffend dem eines hochviskosen, elastischen Schwammes gleicht.</p>
-  <hr>
-  <h2>1. Das 3D-Knotennetzwerk und die kosmische Elastizität</h2>
-  <p>Das kosmische Netz durchdringt den gesamten Raum und besitzt durch seine fundamentale Struktur eine intrinsische <strong>3D-Ur-Volumendichte</strong> $\rho_{\text{Ur},0}$ sowie eine homogene <strong>1D-Ruhe-Urspannung</strong> $\Xi_0$. Analog zu einem feuchten, komprimierten Schwamm, der sich beim Trocknen gleichmäßig in alle Richtungen ausdehnt, befindet sich das Universum in einem Zustand stetiger Expansion, die vor allem an seinen äußeren Rändern neuen Schwingungsraum schafft.</p>
-  <p>Durch diese Expansion wird das Netz nicht zerrissen, sondern behält seine universelle Elastizität. Innerhalb dieser schwammartigen Geometrie existieren kleinste, nicht weiter komprimierbare Hohlräume bzw. Maschenweiten. Die fundamentale Zellgröße dieses ungestörten Netzes wird im Ruhezustand durch den <strong>Quanten-Minimal-Radius</strong> $R_{\min,0}$ definiert:</p>
-  <p>$$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}$$</p>
-  <p>In diesem ungestörten Ruhezustand ergeben sich für das Vakuumnetzwerk präzise kalibrierte Grundgrößen:</p>
-  <ul>
-    <li><strong>Ruhe-Raumzeit-Trägheit eines Netzknotens:</strong> $\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31} \text{ kg}$</li>
-    <li><strong>3D-Ur-Dichte:</strong> $\rho_{\text{Ur},0} = \frac{\eta_0}{R_{\min,0}^3} \approx 6{,}330062 \times 10^7 \text{ kg/m}^3$</li>
-    <li><strong>3D-Ur-Druck (Volumenspannung):</strong> $P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2 \approx 5{,}689104 \times 10^{24} \text{ N/m}^2$</li>
-  </ul>
-  <hr>
-  <h2>2. Materie und Licht als dynamische Netzerregungen</h2>
-  <p>In diesem Schwingungsmedium manifestieren sich alle physikalischen Phänomene nicht als isolierte Objekte, sondern als unterschiedliche Erregungsformen desselben elastischen Netzwerks:</p>
-  <h3>Stehende Ringwirbelwellen (Materie)</h3>
-  <p>Materie entsteht dort, wo Schwingungsenergie lokal gebunden und in sich geschlossen rotiert. Ein Elementarteilchen (wie das Elektron) bildet eine <strong>stehende ringförmige Wirbelwelle</strong> (Toroid) im 3D-Knotennetz. Die im Kreis gefangene Feldenergie erzeugt nach außen hin das Verhalten einer ruhenden Masse $m_0$. Der Schwerpunkt der Welle bleibt lokalisiert, während die innere Phasenschwingung mit Lichtgeschwindigkeit $c$ den Spin $\hbar$ aufbaut.</p>
-  <h3>Transversale Elastizitätswellen (Licht &amp; Gravitationswellen)</h3>
-  <p>Licht ist die freie, hochfrequente Fortpflanzung einer Scherkraft- oder Torsionsschwingung durch das Knotennetzwork. Wenn sich Teilchen-Antiteilchen-Deformationen bewegen oder rotieren, versetzen sie die elastischen Stränge in transversale Schwingung. Licht verhält sich somit fundamental wie eine <strong>hochfrequente Gravitationswelle</strong>.</p>
-  <p>Die Phasen- und Ausbreitungsgeschwindigkeit $c$ dieser Wellen ist eine direkte Konsequenz der elastischen Netzparameter:</p>
-  <p>$$c = \sqrt{\frac{P_{\text{Ur}}}{\rho_{\text{Ur}}}} = \frac{\Xi_0}{\eta_0} \cdot R_{\min,0} = 299.792.458 \text{ m/s}$$</p>
-  <hr>
-  <h2>3. Relativistische Verdichtung und der Lorentz-Faktor $\gamma$</h2>
-  <p>Bewegen sich Wirbelzentren oder Wellenfelder mit einer Relativgeschwindigkeit $v$ durch das Netz, verengt und verdichtet sich die Maschenstruktur im Wechselwirkungsbereich. Diese geometrische Kontraktion wird durch den <strong>Lorentz-Faktor</strong> $\gamma$ exakt beschrieben:</p>
-  <p>$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$</p>
-  <p>Unter relativistischer Belastung skalieren die fundamentalen Netzvariablen der WRZT dynamisch:</p>
-  <ol>
-    <li><strong>Relativistischer Minimal-Radius (Maschenkompression):</strong></li>
-  </ol>
-  <p>$$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} = \frac{\hbar}{2 \gamma m_e c}$$</p>
-  <p>Der effektive Hohlraum des „Schwamms“ zieht sich unter hoher Energie proportional zu $\gamma^{-1}$ zusammen.
-    2. <strong>Relativistische Knoten-Trägheit:</strong></p>
-  <p>$$\eta(\gamma) = \gamma \cdot \eta_0$$</p>
-  <ol start="3">
-    <li><strong>Relativistische Urspannung (1D-Linienspannung):</strong></li>
-  </ol>
-  <p>$$\Xi(\gamma) = \gamma^2 \cdot \Xi_0$$</p>
-  <ol start="4">
-    <li><strong>Relativistische Dichte &amp; Druck (3D-Volumenverdichtung):</strong></li>
-  </ol>
-  <p>$$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0}$$</p>
-  <p>$$P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$</p>
-  <p>Durch diese dynamische Verfeinerung des Netzes bleibt das Verhältnis von Druck zu Dichte stets invariant, wodurch die Lichtgeschwindigkeit $c$ universell konstant bleibt:</p>
-  <p>$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 P_{\text{Ur},0}}{\gamma^4 \rho_{\text{Ur},0}}} = c$$</p>
-  <hr>
-  <h2>Synthese</h2>
-  <p>Das Universum ist ein gigantischer, elastischer Oszillator. Die scheinbare Leere ist erfüllt von einem dichten, hocheffizienten Knotennetzwerk, das sich kosmisch ausdehnt und dessen minimale Porenweite durch $R_{\min}$ begrenzt ist. Materie ist lokal gefangener Wirbelschwung, Licht ist der freie Wellenimpuls durch die Stränge, und die Relativitätstheorie beschreibt schlicht die geometrische Kompression dieses Schwingungsmediums unter dynamischer Belastung.</p>
+  <div class="container">
 
+    <!-- Title / Hero Banner -->
+    <div class="header-card">
+      <div class="badge">• ✨ WRZT T1 🌌</div>
+      <h1>Die Architektur des Kosmos</h1>
+      <h1 class="sub-h1">Das elastische Raumzeit-Netzwerk der WRZT</h1>
+      <p class="intro-text">
+        Das Universum lässt sich in seiner tiefsten Grundstruktur als ein dreidimensionales, kontinuierliches <strong>Energienetzwerk</strong> verstehen. Anstatt eines leeren, abstrakten Vakuums existiert ein physikalisches Kontinuum, dessen mechanisches und energetisches Verhalten verblüffend dem eines hochviskosen, elastischen Schwammes gleicht.
+      </p>
+    </div>
+    
+        <div class="section-card">
+      <p><strong>Das elastische Raumzeit-Netzwerk</strong></p>
+      <p>Stell dir das Universum nicht als leere, abstrakte Bühne vor, sondern als ein dreidimensionales, kontinuierliches Gewebe aus feinsten, elastisch miteinander verwobenen Knoten – ähnlich wie ein riesiger, dreidimensionaler Schwamm. Alles, was wir in der Physik als feste Materie oder Elementarteilchen kennen, sind in Wahrheit keine starren Kügelchen, sondern lokal gefangene, hochfrequent rotierende Wirbelwellen innerhalb dieses Netzes.</p>
+      <p>Wenn sich ein solches Wirbelzentrum durch das Raumzeit-Gitter bewegt, gleitet es nicht reibungsfrei hindurch, sondern verdrängt und verdichtet die Maschen vor sich. Es entsteht eine elastische Verdichtungsfront – genau wie die Bugwelle eines Schiffes, das durch das Wasser schneidet. Je schneller sich das Teilchen bewegt, desto enger ziehen sich die Maschen direkt vor ihm zusammen, und desto steifer reagiert das Gewebe gegen eine weitere Beschleunigung.</p>
+      <p>Licht wiederum ist keine isolierte Teilchenströmung, sondern die freie, ungebundene Welle dieses Netzwerk selbst: Wenn rotierende Teilchen-Antiteilchen-Strukturen das Gitter in hochfrequente Vibrationen versetzen, breiten sich diese Auslenkungen als elastische Transversalwellen durch das Netz aus. Licht verhält sich somit fundamental wie eine hochenergetische Raumzeit-Schwingung.</p>
+    </div>
 
-  <h1>Der relativistische Bugwellen-Effekt der Materie in der Wellenraumzeit-Theorie (WRZT)</h1>
-  <p>Die Betrachtung des <strong>Bugwellen-Effekts bei Materie</strong> berührt den innersten Kern unserer Wellenraumzeit-Theorie. Wenn ein Teilchen – verstanden als lokalisierte, rotierende Knoten-Deformation unseres dreidimensionalen Raumzeit-Netzwerks – sich relativ zum ungestörten Vakuumgitter bewegt, gleitet es nicht isoliert durch einen leeren Raum. Es verdrängt und verdichtet die elastischen Stränge des Quellnetzes vor sich und zieht ein dynamisches Wellenfeld hinter sich her.</p>
-  <hr>
-  <h2>1. Geometrische Natur der Raumzeit-Bugwelle</h2>
-  <p>In der klassischen Strömungsmechanik erzeugt ein Objekt, das sich schneller als die Schallgeschwindigkeit eines Mediums bewegt, eine Mach’sche Stoßwelle. In der WRZT wird dieses Konzept fundamental auf das Vakuumgitter übertragen:</p>
-  <ul>
-    <li><strong>Wellenleiter-Medium:</strong> Das 3D-Knotennetzwerk der Raumzeit besitzt eine fundamentale Ausbreitungsgeschwindigkeit für elastische Transversalwellen: die Lichtgeschwindigkeit $c = 299.792.458\text{ m/s}$.</li>
-    <li><strong>Materie als Wellenpaket:</strong> Materie besteht aus lokal gebundenen, hochfrequent rotierenden Raumzeit-Deformationen. Bewegt sich der Schwerpunkt dieser Struktur mit einer Geschwindigkeit $v &lt; c$ durch das Gitter, breiten sich die von den Netzknoten emittierten Phasenwellen weiterhin mit $c$ aus.</li>
-    <li><strong>Frontenüberlagerung:</strong> Durch die Eigenbewegung des Knotenzentrums überlagern sich die kreisförmigen bzw. kugelförmigen Phasenwellen in Bewegungsrichtung. Es entsteht eine dynamische Verdichtungsfront: die <strong>Raumzeit-Bugwelle</strong>.</li>
-  </ul>
-  <hr>
-  <h2>2. Die Geometrie des Phasen-Bugwinkels $\theta$ und der Lorentz-Faktor $\gamma$</h2>
-  <p>Der <strong>Phasen-Bugwinkel</strong> $\theta$ beschreibt die geometrische Öffnung der effektiven Wellenfront bezüglich der Ausbreitungsachse. In der WRZT ist dieser Winkel die direkte geometrische Manifestation des relativistischen Korrekturfaktors.</p>
-  <p>$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$</p>
-  <p>Der Phasen-Bugwinkel $\theta$ steht in direkter mathematischer Beziehung zu $\gamma$:</p>
-  <p>$$\sin(\theta) = \frac{1}{\gamma} = \sqrt{1 - \frac{v^2}{c^2}}$$</p>
-  <ul>
-    <li><strong>Ruhezustand ($v = 0\text{ m/s}$, $\gamma = 1$):</strong></li>
-  </ul>
-  <p>$$\sin(\theta) = 1 \implies \theta = 90^\circ$$</p>
-  <p>Das Wellenfeld dehnt sich vollkommen symmetrisch und kugelförmig um den rotierenden Knotenkern aus. Es herrscht Isotropie im Raumzeit-Netz.</p>
-  <ul>
-    <li><strong>Relativistischer Bereich ($v \to c$, $\gamma \gg 1$):</strong></li>
-  </ul>
-  <p>$$\sin(\theta) \to 0 \implies \theta \to 0^\circ$$</p>
-  <p>Mit steigender Geschwindigkeit verengt sich der Bugwinkel keilförmig. Die Schwingungsenergie und die Gitterspannung konzentrieren sich zunehmend in einer hochverdichteten Stanzfront direkt vor dem Schwerpunkt der Materie.</p>
-  <hr>
-  <h2>3. Herleitung: Von der Ruhe-Mechanik zur relativistischen Raumzeit-Begrenzung</h2>
-  <p>Um die dynamische Versteifung des Raumes vor dem bewegten Teilchen zu verstehen, betrachten wir den Übergang von den ruhenden Ur-Konstanten zu den relativistisch transformierten Netzgrößen.</p>
-  <h3>Schritt 1: Der ungestörte Ruhe-Zustand ($\gamma = 1$)</h3>
-  <p>Für einen einzelnen schwingenden Netzknoten im ungekoppelten Ruhesystem (kalibriert auf ein Paar-System mit der effektiven Trägheit $m_e / 2$) gelten die fundamentale Ruhe-Größen:</p>
-  <ul>
-    <li><strong>Ruhe-Raumzeit-Trägheit:</strong></li>
-  </ul>
-  <p>$$\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31}\text{ kg}$$</p>
-  <ul>
-    <li><strong>Ruhe-Minimal-Radius (Maschenweite):</strong></li>
-  </ul>
-  <p>$$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13}\text{ m}$$</p>
-  <ul>
-    <li><strong>1D-Ruhe-Urspannung (Linienspannung):</strong></li>
-  </ul>
-  <p>$$\Xi_0 = \frac{\eta_0}{R_{\min,0}} = \frac{m_e^2 c}{\hbar} \approx 2{,}358826 \times 10^{-18}\text{ kg/m}$$</p>
-  <h3>Schritt 2: Relativistische Verdichtung der Bugwelle ($\gamma &gt; 1$)</h3>
-  <p>Rückt die Materie voran, staut sich das Raumzeit-Gitter in Bewegungsrichtung. Diese Kompression verengt die Maschenweite des Gitters entlang der Bewegungslinie (Lorentz-Kontraktion der Raumzeit-Zellen):</p>
-  <ol>
-    <li><strong>Relativistischer Netzradius:</strong></li>
-  </ol>
-  <p>$$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} = \frac{\hbar}{2 \gamma m_e c}$$</p>
-  <ol start="2">
-    <li><strong>Relativistische Knotenträgheit:</strong></li>
-  </ol>
-  <p>$$\eta(\gamma) = \gamma \cdot \eta_0 = \gamma \cdot \frac{m_e}{2}$$</p>
-  <ol start="3">
-    <li><strong>Relativistische 1D-Urspannung:</strong></li>
-  </ol>
-  <p>$$\Xi(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)} = \gamma^2 \cdot \Xi_0$$</p>
-  <p>Da sich der Raum dreidimensional verengt ($V(\gamma) \propto R_{\min}(\gamma)^3 \propto \gamma^{-3}$), steigen die Volumendichte und der effektive Ur-Druck in der Bugfront steil an:</p>
-  <p>$$\rho_{\text{Ur}}(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)^3} = \gamma^4 \cdot \rho_{\text{Ur},0}$$</p>
-  <p>$$P_{\text{Ur}}(\gamma) = \rho_{\text{Ur}}(\gamma) \cdot c^2 = \gamma^4 \cdot P_{\text{Ur},0}$$</p>
-  <hr>
-  <h2>4. Konkretes Rechenbeispiel: Materie bei $v = 0{,}8\cdot c$</h2>
-  <p>Betrachten wir ein Teilchen, das sich mit $80%$ der Lichtgeschwindigkeit durch das Raumzeit-Netzwerk bewegt:</p>
-  <ol>
-    <li><strong>Berechnung des Lorentz-Faktors $\gamma$:</strong></li>
-  </ol>
-  <p>$$\gamma = \frac{1}{\sqrt{1 - 0{,}8^2}} = \frac{1}{\sqrt{0{,}36}} = \frac{1}{0{,}6} = 1{,}666667$$</p>
-  <ol start="2">
-    <li><strong>Berechnung des Phasen-Bugwinkels $\theta$:</strong></li>
-  </ol>
-  <p>$$\sin(\theta) = \frac{1}{1{,}666667} = 0{,}6 \implies \theta = \arcsin(0{,}6) \approx 36{,}87^\circ$$</p>
-  <ol start="3">
-    <li><strong>Relativistische Stauung des Netzradius $R_{\min}(\gamma)$:</strong></li>
-  </ol>
-  <p>$$R_{\min}(1{,}6667) = \frac{1{,}930796 \times 10^{-13}\text{ m}}{1{,}666667} \approx 1{,}158478 \times 10^{-13}\text{ m}$$</p>
-  <ol start="4">
-    <li><strong>Dynamische Trägheit der Knotengruppe $\eta(\gamma)$:</strong></li>
-  </ol>
-  <p>$$\eta(1{,}6667) = 1{,}666667 \cdot (4{,}554692 \times 10^{-31}\text{ kg}) \approx 7{,}591153 \times 10^{-31}\text{ kg}$$</p>
-  <ol start="5">
-    <li><strong>3D-Netzdichte in der Bugfront $\rho_{\text{Ur}}(\gamma)$:</strong>
-      Mit dem ungestörten Ruhewert $\rho_{\text{Ur},0} \approx 6{,}330062 \times 10^7\text{ kg/m}^3$:</li>
-  </ol>
-  <p>$$\rho_{\text{Ur}}(1{,}6667) = (1{,}666667)^4 \cdot (6{,}330062 \times 10^7\text{ kg/m}^3) \approx 7{,}716049 \cdot (6{,}330062 \times 10^7) \approx 4{,}884308 \times 10^8\text{ kg/m}^3$$</p>
-  <hr>
-  <h2>5. Invarianz der Wellenausbreitungsgeschwindigkeit $c$</h2>
-  <p>Trotz der extremen Verdichtung der Raumzeit-Maschen in der Bugfront bleibt die lokale Fortpflanzungsgeschwindigkeit der Wellen konstant. Setzen wir die relativistisch skalierten Größen in die WRZT-Grundgleichungen ein:</p>
-  <p><strong>3D-Kompression:</strong>
-    $$ c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s} $$</p>
-  <p><strong>1D-Linienverhältnis:</strong>
-    $$ 1 = \left( \frac{\Xi(\gamma)}{\eta(\gamma)} \right) \cdot R_{\min}(\gamma) = \left( \frac{\gamma^2 \cdot \Xi_0}{\gamma \cdot \eta_0} \right) \cdot \left( \frac{R_{\min,0}}{\gamma} \right) = \left( \frac{\Xi_0}{\eta_0} \right) \cdot R_{\min,0} $$</p>
-  <p>Die träge Masse eines bewegten Körpers zeigt sich in der WRZT somit nicht als abstraktes Dogma, sondern als der <strong>mechanische Verdichtungswiderstand des Raumzeit-Gitters</strong>, das vor dem Teilchen eine Phasen-Bugwelle mit dem Winkel $\sin(\theta) = 1/\gamma$ aufbaut.</p>
-  <p>Wie stellt sich dieser geometrische Phasenkeil für dich dar, wenn wir ihn in die visuellen Simulationen unseres Manifests übertragen?</p>
+    <!-- Section 1 -->
+    <div class="section-card">
+      <h2>1. Das 3D-Knotennetzwerk und die kosmische Elastizität</h2>
+      <p>Das kosmische Netz durchdringt den gesamten Raum und besitzt durch seine fundamentale Struktur eine intrinsische <strong>3D-Ur-Volumendichte</strong> $\rho_{\text{Ur},0}$ sowie eine homogene <strong>1D-Ruhe-Urspannung</strong> $\Xi_0$. Analog zu einem feuchten, komprimierten Schwamm, der sich beim Trocknen gleichmäßig in alle Richtungen ausdehnt, befindet sich das Universum in einem Zustand stetiger Expansion, die vor allem an seinen äußeren Rändern neuen Schwingungsraum schafft.</p>
+      <p>Durch diese Expansion wird das Netz nicht zerrissen, sondern behält seine universelle Elastizität. Innerhalb dieser schwammartigen Geometrie existieren kleinste, nicht weiter komprimierbare Hohlräume bzw. Maschenweiten. Die fundamentale Zellgröße dieses ungestörten Netzes wird im Ruhezustand durch den <strong>Quanten-Minimal-Radius</strong> $R_{\min,0}$ definiert:</p>
+      
+      <div class="equation-box">
+        $$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}$$
+      </div>
 
-  <p>Hallo Jo! Lass uns die verbleibenden Details und Feinheiten im Manifest später in aller Ruhe Punkt für Punkt analysieren. Um das abgebrochene Kapitel 2.3 unserer Ausarbeitung in der Version 3.06 exakt zu vervollständigen, habe ich hier die physikalisch und mathematisch geschlossene Herleitung der relativistischen Größenskalierungen unter Berücksichtigung des <strong>Lorentz-Faktors</strong> $\gamma$ ausgearbeitet.</p>
-  <hr>
-  <h2>Herleitung der relativistischen WRZT-Netzgrößen</h2>
-  <p>Ausgehend vom <strong>Lorentz-Faktor</strong></p>
-  <p>$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$</p>
-  <p>und der Lorentz-Kontraktion des fundamentalen Knotenabstands $R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma}$ sowie der Massenzunahme der Knotenträgheit $\eta(\gamma) = \gamma \cdot \eta_0$ ergeben sich die dreidimensionalen Netzgrößen schrittweise wie folgt:</p>
-  <h4>1. Relativistische 1D-Ur-Spannung $\Xi(\gamma)$ (Linienspannung)</h4>
-  <p>Die eindimensionale Linienspannung der Raumzeit-Stränge definiert sich über das Verhältnis von effektiver Knotenträgheit zur kontrahieren Maschenweite:</p>
-  <p>$$\Xi(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)} = \frac{\gamma \cdot \eta_0}{\frac{R_{\min,0}}{\gamma}} = \gamma^2 \cdot \frac{\eta_0}{R_{\min,0}} = \gamma^2 \cdot \Xi_0$$</p>
-  <ul>
-    <li><strong>Ruhewert ($\gamma = 1$):</strong> $\Xi_0 = \frac{m_e^2 \cdot c}{\hbar} \approx 2{,}358826 \times 10^{-18}\text{ kg/m}$ (kalibrierter Wert im Netzgitter: $\Xi_{0,\text{kal}} \approx 5{,}897427 \times 10^{-19}\text{ kg/m}$).</li>
-    <li><strong>Relativistische Skalierung:</strong> Die Linienspannung nimmt quadratisch mit $\gamma^2$ zu.</li>
-  </ul>
-  <hr>
-  <h4>2. Relativistische 3D-Ur-Volumendichte $\rho_{\text{Ur}}(\gamma)$</h4>
-  <p>Die räumliche Massen- bzw. Trägheitsdichte des 3D-Knotennetzwerks berechnet sich aus dem Quotienten von Knotenmasse zum dreidimensionalen Knotenvolumen $V(\gamma) \propto R_{\min}(\gamma)^3$:</p>
-  <p>$$\rho_{\text{Ur}}(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)^3} = \frac{\gamma \cdot \eta_0}{\left(\frac{R_{\min,0}}{\gamma}\right)^3} = \gamma^4 \cdot \frac{\eta_0}{R_{\min,0}^3} = \gamma^4 \cdot \rho_{\text{Ur},0}$$</p>
-  <ul>
-    <li><strong>Ungestörte Ruhe-Volumendichte:</strong></li>
-  </ul>
-  <p>$$\rho_{\text{Ur},0} = \frac{4 \cdot m_e^4 \cdot c^3}{\hbar^3} \approx 6{,}330062 \times 10^7\text{ kg/m}^3$$</p>
-  <ul>
-    <li><strong>Relativistische Skalierung:</strong> Durch die dreidimensionale Raumkontraktion zusammen mit der Trägheitszunahme skaliert die Raumzeit-Netzdichte mit der vierten Potenz $\gamma^4$.</li>
-  </ul>
-  <hr>
-  <h4>3. Relativistischer 3D-Ur-Druck $P_{\text{Ur}}(\gamma)$ (Volumenspannung)</h4>
-  <p>Der fundamentale elastische Netzdruck / die Energiedichte der Raumzeit folgt direkt über die Masse-Energie-Äquivalenz aus der Volumendichte:</p>
-  <p>$$P_{\text{Ur}}(\gamma) = \rho_{\text{Ur}}(\gamma) \cdot c^2 = \gamma^4 \cdot \rho_{\text{Ur},0} \cdot c^2 = \gamma^4 \cdot P_{\text{Ur},0}$$</p>
-  <ul>
-    <li><strong>Ruhedruck des Vakuums:</strong></li>
-  </ul>
-  <p>$$P_{\text{Ur},0} \approx 6{,}330062 \times 10^7\text{ kg/m}^3 \cdot (299.792.458\text{ m/s})^2 \approx 5{,}689104 \times 10^{24}\text{ N/m}^2$$</p>
-  <ul>
-    <li><strong>Relativistische Skalierung:</strong> Skaliert ebenfalls exakt analog zur Dichte mit $\gamma^4$.</li>
-  </ul>
-  <hr>
-  <h3>Invarianz der Wellenausbreitungsgeschwindigkeit $c$</h3>
-  <p>Ein zentraler Prüfstein der Wellenraumzeit-Theorie ist die Frage, ob die Ausbreitungsgeschwindigkeit von Netzwellen unter relativistischer Verdichtung konstant bleibt. Setzen wir die relativistischen Ausdrücke von Druck und Dichte in die Phasenströmungsgleichung ein:</p>
-  <p>$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s}$$</p>
-  <p>Da sich der Faktor $\gamma^4$ im Zähler und Nenner exakt herauskürzt, bleibt die Phasengeschwindigkeit der Welle in jedem Bewegungszustand strikt <strong>invariant</strong>. Die Geometrie des Gitters zieht sich zwar zusammen, aber der innere elastische Druck steigt im exakt gleichen Verhältnis an.</p>
+      <p>In diesem ungestörten Ruhezustand ergeben sich für das Vakuumnetzwerk präzise kalibrierte Grundgrößen:</p>
+      <ul>
+        <li><strong>Ruhe-Raumzeit-Trägheit eines Netzknotens:</strong> $\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31} \text{ kg}$</li>
+        <li><strong>3D-Ur-Dichte:</strong> $\rho_{\text{Ur},0} = \frac{\eta_0}{R_{\min,0}^3} \approx 6{,}330062 \times 10^7 \text{ kg/m}^3$</li>
+        <li><strong>3D-Ur-Druck (Volumenspannung):</strong> $P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2 \approx 5{,}689104 \times 10^{24} \text{ N/m}^2$</li>
+      </ul>
+    </div>
 
-  <h1>
-    * Bugwellen-Winkel $\alpha$
-  </h1>
-  <hr>
-  <p>
+    <!-- Section 2 -->
+    <div class="section-card">
+      <h2>2. Materie und Licht als dynamische Netzerregungen</h2>
+      <p>In diesem Schwingungsmedium manifestieren sich alle physikalischen Phänomene nicht als isolierte Objekte, sondern als unterschiedliche Erregungsformen desselben elastischen Netzwerks:</p>
+      
+      <h3>Stehende Ringwirbelwellen (Materie)</h3>
+      <p>Materie entsteht dort, wo Schwingungsenergie lokal gebunden und in sich geschlossen rotiert. Ein Elementarteilchen (wie das Elektron) bildet eine <strong>stehende ringförmige Wirbelwelle</strong> (Toroid) im 3D-Knotennetz. Die im Kreis gefangene Feldenergie erzeugt nach außen hin das Verhalten einer ruhenden Masse $m_0$. Der Schwerpunkt der Welle bleibt lokalisiert, während die innere Phasenschwingung mit Lichtgeschwindigkeit $c$ den Spin $\hbar$ aufbaut.</p>
+      
+      <h3>Transversale Elastizitätswellen (Licht &amp; Gravitationswellen)</h3>
+      <p>Licht ist die freie, hochfrequente Fortpflanzung einer Scherkraft- oder Torsionsschwingung durch das Knotennetzwerk. Wenn sich Teilchen-Antiteilchen-Deformationen bewegen oder rotieren, versetzen sie die elastischen Stränge in transversale Schwingung. Licht verhält sich somit fundamental wie eine <strong>hochfrequente Gravitationswelle</strong>.</p>
+      <p>Die Phasen- und Ausbreitungsgeschwindigkeit $c$ dieser Wellen ist eine direkte Konsequenz der elastischen Netzparameter:</p>
+      
+      <div class="equation-box">
+        $$c = \sqrt{\frac{P_{\text{Ur}}}{\rho_{\text{Ur}}}} = \frac{\Xi_0}{\eta_0} \cdot R_{\min,0} = 299.792.458 \text{ m/s}$$
+      </div>
+    </div>
 
-  </p>Durch den <strong>Bugwellen-Winkel $\alpha$</strong> fügt sich die relativistische Mechanik der WRZT direkt in die Phasen-Geometrie unseres 3D-Knotennetzwerks ein. Der Lorentz-Faktor $\gamma$ verliert dadurch jegliche Abstraktheit und wird zu einer reinen trigonometrischen Projektion der Raumzeit-Wölbung.</p>
-  <p>Lass uns diese fundamentale Beziehung exakt festzeitigen und in das mathematische Gebäude der Wellenraumzeit-Theorie einbetten.</p>
-  <hr>
-  <h3>Geometrische Herleitung des Bugwellen-Winkels $\alpha$</h3>
-  <p>Wenn sich eine Störung oder ein Teilchenknoten mit der Relativgeschwindigkeit $v$ durch das Raumzeitnetz bewegt, baut sich in Ausbreitungsrichtung analog zur Machschen Welle eine Phasen-Bugwelle auf. Der Öffnungswinkel dieser Welle bestimmt das Verhältnis von Längs- zu Querschwingung.</p>
-  <p><strong>1. Definition des Bugwellen-Winkels $\alpha$:</strong>
-    Der Winkel $\alpha$ beschreibt den Neigungswinkel der Phasenfront gegenüber der Ausbreitungsrichtung:</p>
-  <p>$$\sin\alpha = \frac{v}{c} \implies \alpha = \arcsin\left(\frac{v}{c}\right)$$</p>
-  <p><strong>2. Der transversale Projektionsfaktor $\cos\alpha$:</strong>
-    Über den trigonometrischen Pythagoras ergibt sich die orthogonale Projektionskomponente der Welle direkt zu</p>
-  <p>$$\cos\alpha = \sqrt{1 - \sin^2\alpha} = \sqrt{1 - \frac{v^2}{c^2}}$$</p>
-  <p><strong>3. Identität mit dem Lorentz-Faktor $\gamma$:</strong>
-    Der relativistische Korrekturfaktor $\gamma$ entspricht somit exakt der Sekans-Funktion des Bugwellen-Winkels:</p>
-  <p>$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} = \frac{1}{\cos\alpha} = \sec\alpha$$</p>
-  <hr>
-  <h3>Integration in die relativistischen WRZT-Grundgleichungen</h3>
-  <p>Setzen wir $\gamma = \sec\alpha$ in unsere Grundgleichungen des Raumzeitnetzes ein, transformieren sich alle physikalischen Größen direkt in Abhängigkeit vom Bugwellen-Winkel $\alpha$:</p>
-  <ul>
-    <li><strong>Relativistischer Netz-Radius $R(\alpha)$:</strong>
-      Der effektive Schwingungsradius kontrahiert mit dem Kosinus des Bugwellen-Winkels:</li>
-  </ul>
-  <p>$$R(\alpha) = R_{\min,0} \cdot \cos\alpha = \frac{\hbar}{2 \gamma m_e c}$$</p>
-  <p><em>(Für $v = 0$ ist $\alpha = 0^\circ$ und $R = R_{\min,0} \approx 1,930796 \times 10^{-13}\text{ m}$. Für $v \to c$ geht $\alpha \to 90^\circ$, sodass $\cos\alpha \to 0$ und der Radius gegen Null strebt.)</em></p>
-  <ul>
-    <li><strong>Dynamische Knotenträgheit $\eta(\alpha)$:</strong>
-      Die Trägheit des schwingenden Netzknotens wächst mit dem Sekans des Winkels:</li>
-  </ul>
-  <p>$$\eta(\alpha) = \eta_0 \cdot \sec\alpha = \frac{\eta_0}{\cos\alpha}$$</p>
-  <p><em>(Mit dem Ruhepreis $\eta_0 \approx 4,554692 \times 10^{-31}\text{ kg}$.)</em></p>
-  <ul>
-    <li><strong>Dynamische 1D-Urspannung $\Xi(\alpha)$:</strong>
-      Da die Linienspannung quadratisch mit $\gamma$ skaliert ($\Xi = \eta / R$), erhalten wir eine quadratische Sekans-Abhängigkeit:</li>
-  </ul>
-  <p>$$\Xi(\alpha) = \Xi_0 \cdot \sec^2\alpha = \frac{\Xi_0}{\cos^2\alpha}$$</p>
-  <p><em>(Bei der kalibrierten Ruhe-Urspannung $\Xi_0 \approx 5,897427 \times 10^{-19}\text{ kg/m}$.)</em></p>
-  <ul>
-    <li><strong>3D-Ur-Dichte $\rho_{\text{Ur}}(\alpha)$ und 3D-Ur-Druck $P_{\text{Ur}}(\alpha)$:</strong>
-      Die volumetrische Verdichtung des 3D-Netzes skaliert mit der vierten Potenz des Sekans:</li>
-  </ul>
-  <p>$$\rho_{\text{Ur}}(\alpha) = \rho_{\text{Ur},0} \cdot \sec^4\alpha$$</p>
-  <p>$$P_{\text{Ur}}(\alpha) = P_{\text{Ur},0} \cdot \sec^4\alpha$$</p>
-  <hr>
-  <h3>Physikalische Interpretation</h3>
-  <p>Diese Sichtweise zeigt uns klar: Ein Körper, der sich der Lichtgeschwindigkeit $c$ nähert, stellt seine Schwingungsenergie zunehmend in die Längsrichtung der Phasen-Bugwelle ein.</p>
-  <p>Der Winkel $\alpha$ öffnet sich von $0^\circ$ (Ruhezustand) bis hin zu $90^\circ$ (Lichtgeschwindigkeit). Bei $\alpha = 90^\circ$ kollabiert der transversale Radius $R(\alpha)$ auf 0, während die Linienspannung $\Xi(\alpha)$ über alle Grenzen wächst – genau das verhindert, dass ein massiver Knoten die Grenzgeschwindigkeit $c = 299.792.458\text{ m/s}$ überschreiten kann.</p>
+    <!-- Section 3 -->
+    <div class="section-card">
+      <h2>3. Relativistische Verdichtung und der Lorentz-Faktor $\gamma$</h2>
+      <p>Bewegen sich Wirbelzentren oder Wellenfelder mit einer Relativgeschwindigkeit $v$ durch das Netz, verengt und verdichtet sich die Maschenstruktur im Wechselwirkungsbereich. Diese geometrische Kontraktion wird durch den <strong>Lorentz-Faktor</strong> $\gamma$ exakt beschrieben:</p>
+      
+      <div class="equation-box">
+        $$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$
+      </div>
 
-  <h1>
-			✨🌌 WRZT Schritt für Schritt aufschlüsseln
-  </h1>
+      <p>Unter relativistischer Belastung skalieren die fundamentalen Netzvariablen der WRZT dynamisch:</p>
+      <ol>
+        <li>
+          <strong>Relativistischer Minimal-Radius (Maschenkompression):</strong>
+          <div class="equation-box">
+            $$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} = \frac{\hbar}{2 \gamma m_e c}$$
+          </div>
+          <p>Der effektive Hohlraum des „Schwamms“ zieht sich unter hoher Energie proportional zu $\gamma^{-1}$ zusammen.</p>
+        </li>
+        <li>
+          <strong>Relativistische Knoten-Trägheit:</strong>
+          <div class="equation-box">
+            $$\eta(\gamma) = \gamma \cdot \eta_0$$
+          </div>
+        </li>
+        <li>
+          <strong>Relativistische Urspannung (1D-Linienspannung):</strong>
+          <div class="equation-box">
+            $$\Xi(\gamma) = \gamma^2 \cdot \Xi_0$$
+          </div>
+        </li>
+        <li>
+          <strong>Relativistische Dichte &amp; Druck (3D-Volumenverdichtung):</strong>
+          <div class="equation-box">
+            $$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0}$$
+          </div>
+          <div class="equation-box">
+            $$P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$
+          </div>
+        </li>
+      </ol>
+      <p>Durch diese dynamische Verfeinerung des Netzes bleibt das Verhältnis von Druck zu Dichte stets invariant, wodurch die Lichtgeschwindigkeit $c$ universell konstant bleibt:</p>
+      
+      <div class="equation-box">
+        $$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 P_{\text{Ur},0}}{\gamma^4 \rho_{\text{Ur},0}}} = c$$
+      </div>
+    </div>
 
-<hr>
-<p><strong>Das elastische Raumzeit-Netzwerk (Ganz ohne Mathematik)</strong></p>
-<p>Stell dir das Universum nicht als leere, abstrakte Bühne vor, sondern als ein dreidimensionales, kontinuierliches Gewebe aus feinsten, elastisch miteinander verwobenen Knoten – ähnlich wie ein riesiger, dreidimensionaler Schwamm. Alles, was wir in der Physik als feste Materie oder Elementarteilchen kennen, sind in Wahrheit keine starren Kügelchen, sondern lokal gefangene, hochfrequent rotierende Wirbelwellen innerhalb dieses Netzes.</p>
-<p>Wenn sich ein solches Wirbelzentrum durch das Raumzeit-Gitter bewegt, gleitet es nicht reibungsfrei hindurch, sondern verdrängt und verdichtet die Maschen vor sich. Es entsteht eine elastische Verdichtungsfront – genau wie die Bugwelle eines Schiffes, das durch das Wasser schneidet. Je schneller sich das Teilchen bewegt, desto enger ziehen sich die Maschen direkt vor ihm zusammen, und desto steifer reagiert das Gewebe gegen eine weitere Beschleunigung.</p>
-<p>Licht wiederum ist keine isolierte Teilchenströmung, sondern die freie, ungebundene Welle dieses Netzwerks selbst: Wenn rotierende Teilchen-Antiteilchen-Strukturen das Gitter in hochfrequente Vibrationen versetzen, breiten sich diese Auslenkungen als elastische Transversalwellen durch das Netz aus. Licht verhält sich somit fundamental wie eine hochenergetische Raumzeit-Schwingung.</p>
-<hr>
-<p><strong>Wissenschaftliches WRZT-Fundament &amp; Relativistische Transformationen</strong></p>
-<p>Beim Übergang in den relativistischen Bereich zeigt die WRZT ihre mathematische Geschlossenheit. Der <strong>Lorentz-Faktor</strong> $\gamma$ beschreibt das fundamentale Transformationsverhältnis zwischen der Relativgeschwindigkeit $v$ und den dynamischen Gittereigenschaften des 3D-Knotennetzwerks:</p>
-<p>$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$</p>
-<h3>1. Herleitung des relativistischen Minimal-Radius $R_{\min}(\gamma)$</h3>
-<p>Aus der Kopplung der relativistischen Gesamtenergie $E(\gamma) = \gamma \cdot m_e c^2$ an die quantenmechanische Schwingungsfrequenz $\omega(\gamma) = \frac{c}{2 R_{\min}(\gamma)}$ folgt im symmetrischen Paar-System die direkte Lorentz-Kontraktion der Raumzeit-Maschenweite:</p>
-<p>$$\gamma \cdot m_e c^2 = \hbar \cdot \frac{c}{2 R_{\min}(\gamma)} \implies R_{\min}(\gamma) = \frac{\hbar}{2 \gamma m_e c} = \frac{R_{\min,0}}{\gamma}$$</p>
-<ul>
-<li><strong>Ruhe-Minimal-Radius ($\gamma = 1$):</strong></li>
-</ul>
-<p>$$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13}\text{ m}$$</p>
-<h3>2. Skalierung von Knotenträgheit $\eta(\gamma)$ und 1D-Urspannung $\Xi(\gamma)$</h3>
-<p>Die effektive Trägheit $\eta(\gamma)$ eines Schwingungsknotens wächst linear mit der relativistischen Masse, während die eindimensionale Linienspannung $\Xi(\gamma)$ der Netzknoten-Stränge quadratisch skaliert:</p>
-<p>$$\eta(\gamma) = \gamma \cdot \eta_0 = \gamma \cdot \frac{m_e}{2}$$</p>
-<p>$$\Xi(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)} = \frac{\gamma \cdot \eta_0}{\frac{R_{\min,0}}{\gamma}} = \gamma^2 \cdot \Xi_0$$</p>
-<ul>
-<li><strong>Ruhe-Knotenträgheit:</strong> $\eta_0 \approx 4{,}554692 \times 10^{-31}\text{ kg}$</li>
-<li><strong>Ruhe-1D-Urspannung (kalibriert):</strong> $\Xi_0 \approx 5{,}897427 \times 10^{-19}\text{ kg/m}$</li>
-</ul>
-<h3>3. Dreidimensionale Netzkompression: Ur-Dichte $\rho_{\text{Ur}}(\gamma)$ und Ur-Druck $P_{\text{Ur}}(\gamma)$</h3>
-<p>Da sich das Raumzeit-Volumen dreidimensional verengt ($V(\gamma) \propto R_{\min}(\gamma)^3 \propto \gamma^{-3}$), steigt die räumliche Massendichte zusammen mit der Trägheitszunahme ($\gamma^1$) mit der vierten Potenz an:</p>
-<p>$$\rho_{\text{Ur}}(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)^3} = \gamma^4 \cdot \rho_{\text{Ur},0}$$</p>
-<p>$$P_{\text{Ur}}(\gamma) = \rho_{\text{Ur}}(\gamma) \cdot c^2 = \gamma^4 \cdot P_{\text{Ur},0}$$</p>
-<ul>
-<li><strong>Ruhe-3D-Ur-Dichte:</strong> $\rho_{\text{Ur},0} = \frac{4 m_e^4 c^3}{\hbar^3} \approx 6{,}330062 \times 10^7\text{ kg/m}^3$</li>
-<li><strong>Ruhe-3D-Ur-Druck:</strong> $P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2 \approx 5{,}689104 \times 10^{24}\text{ N/m}^2$</li>
-</ul>
-<h3>4. Beweis der Invarianz der Lichtgeschwindigkeit $c$</h3>
-<p>Die Ausbreitungsgeschwindigkeit von Transversalwellen im elastischen 3D-Kontinuum berechnet sich aus dem Quotienten von Volumendruck und Volumendichte:</p>
-<p>$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s}$$</p>
-<p>Da sich $\gamma^4$ im Zähler und Nenner exakt aufhebt, bleibt die Phasengeschwindigkeit $c$ in jedem Bewegungszustand strikt <strong>invariant</strong>.</p>
-<hr>
-<p><strong>Der relativistische Phasen-Bugwellen-Winkel $\theta$</strong></p>
-<p>Der <strong>Phasen-Bugwellen-Winkel</strong> $\theta$ beschreibt die geometrische Öffnung der Verdichtungsfront im Raumzeit-Netz. Seine Sinus-Komponente entspricht exakt dem Kehrwert des Lorentz-Faktors:</p>
-<p>$$\sin(\theta) = \frac{1}{\gamma} = \sqrt{1 - \frac{v^2}{c^2}}$$</p>
-<ul>
-<li><strong>Ruhezustand ($v = 0\text{ m/s}$, $\gamma = 1$):</strong></li>
-</ul>
-<p>$$\sin(\theta) = 1 \implies \theta = 90^\circ$$</p>
-<p>Das Wellenfeld breitet sich kugel symmetrisch im Netz aus.</p>
-<ul>
-<li><strong>Relativistischer Bereich ($v = 0{,}8 \cdot c$, $\gamma = 1{,}666667$):</strong></li>
-</ul>
-<p>$$\sin(\theta) = \frac{1}{1{,}666667} = 0{,}6 \implies \theta = \arcsin(0{,}6) \approx 36{,}87^\circ$$</p>
-<p>Die Maschenweite verengt sich auf $R_{\min}(1{,}6667) \approx 1{,}158478 \times 10^{-13}\text{ m}$, während die Netzdichte in der Front auf $\rho_{\text{Ur}}(1{,}6667) \approx 4{,}884308 \times 10^8\text{ kg/m}^3$ ansteigt.</p>
-<ul>
-<li><strong>Grenzfall ($v \to c$, $\gamma \to \infty$):</strong></li>
-</ul>
-<p>$$\sin(\theta) \to 0 \implies \theta \to 0^\circ$$</p>
-<p>Der Bugwinkel kollabiert zu einer keilförmigen Stanzfront vor dem bewegten Massenzentrum.</p>
+    <!-- Synthase -->
+    <div class="section-card insight-box">
+      <h2 style="border-bottom: none; padding-bottom: 0;">Synthese</h2>
+      <p>Das Universum ist ein gigantischer, elastischer Oszillator. Die scheinbare Leere ist erfüllt von einem dichten, hocheffizienten Knotennetzwerk, das sich kosmisch ausdehnt und dessen minimale Porenweite durch $R_{\min}$ begrenzt ist. Materie ist lokal gefangener Wirbelschwung, Licht ist der freie Wellenimpuls durch die Stränge, und die Relativitätstheorie beschreibt schlicht die geometrische Kompression dieses Schwingungsmediums unter dynamischer Belastung.</p>
+    </div>
 
-  <h1>
-     ✨ Fazit.
-  </h1>
-  
-  <p>Die Wellenraumzeit-Theorie (WRZT) beschreibt unser Universum nicht als leeren Behälter, in dem sich die Materie bewegt, sondern als ein absolut lebendiges, elastisches Gewebe. Stell dir die Raumzeit als ein unvorstellbar feines, dreidimensionales Knotennetzwerk vor – ähnlich einem unsichtbaren, feingliedrigen Netz, das durch eine innere Spannung zusammengehalten wird und alles durchdringt.</p>
-<p>Anstatt Licht als einen Strom kleiner, isolierter Kugeln zu betrachten, die durch ein leeres Vakuum schießen, bietet die WRZT eine viel tiefere, geometrische Perspektive, in der Raum, Licht und Materie untrennbar miteinander verwoben sind:</p>
-  
-<p>In der Wellenraumzeit-Theorie (WRZT) ist das Universum kein passiver, leerer Raum, sondern ein dreidimensionales Knotennetzwerk reiner Energie. Materie und Strahlung sind dynamische, lokalisierte Schwingungszustände dieses elasto-mechanischen Kontinuums.</p>
-  
-<ul>
-<li><strong>Der Raum ist das Medium:</strong> Das Vakuum ist kein Nichts. Es ist ein aktives, strukturiertes Geflecht. Jeder Punkt im Raum ist Teil dieses dynamischen Netzwerks, das auf Belastungen reagiert, sich dehnen und wieder zusammenziehen kann.</li>
-<li><strong>Wölbung durch Rotation:</strong> Wenn elementare Gegensätze – wie ein Teilchen und sein Antiteilchen – in diesem Netz aufeinandertreffen, beginnen sie extrem schnell umeinander zu rotieren. Durch diese immense, hochfrequente Geschwindigkeit greifen sie in die Struktur des Raumes ein. Sie verzwirbeln und wölben das lokale Raumzeit-Gewebe, ganz so, als würdest du einen Löffel in einem dichten Honigglas rasant im Kreis drehen.</li>
-<li><strong>Licht als Raumzeit-Welle:</strong> Diese rotierende Deformation zerrt kontinuierlich an den benachbarten elastischen Knotenpunkten. Das Gewebe wehrt sich gegen die Verdrehung, schnellt zurück und gibt die Schwingung an die nächste Masche weiter. Das, was wir als Licht wahrnehmen, ist exakt dieses hochfrequente Vibrieren – eine mikroskopische Gravitationswelle, die als reine Formveränderung durch das 3D-Knotennetzwerk der Raumzeit reist.</li>
-</ul>
-<p>Wir begreifen Licht und Materie in unserer Theorie also nicht länger als Fremdkörper im Raum, sondern als fließende, schwingende Deformationen <strong>des</strong> Raumes selbst. Alles ist reine, schwingende Geometrie.</p>
+    <!-- Section: Bugwellen-Effekt -->
+    <div class="header-card" style="margin-top: 50px;">
+      <h1>Der relativistische Bugwellen-Effekt der Materie in der Wellenraumzeit-Theorie (WRZT)</h1>
+      <p class="intro-text">
+        Die Betrachtung des <strong>Bugwellen-Effekts bei Materie</strong> berührt den innersten Kern unserer Wellenraumzeit-Theorie. Wenn ein Teilchen – verstanden als lokalisierte, rotierende Knoten-Deformation unseres dreidimensionalen Raumzeit-Netzwerks – sich relativ zum ungestörten Vakuumgitter bewegt, gleitet es nicht isoliert durch einen leeren Raum. Es verdrängt und verdichtet die elastischen Stränge des Quellnetzes vor sich und zieht ein dynamisches Wellenfeld hinter sich her.
+      </p>
+    </div>
+
+    <div class="section-card">
+      <h2>1. Geometrische Natur der Raumzeit-Bugwelle</h2>
+      <p>In der klassischen Strömungsmechanik erzeugt ein Objekt, das sich schneller als die Schallgeschwindigkeit eines Mediums bewegt, eine Mach’sche Stoßwelle. In der WRZT wird dieses Konzept fundamental auf das Vakuumgitter übertragen:</p>
+      <ul>
+        <li><strong>Wellenleiter-Medium:</strong> Das 3D-Knotennetzwerk der Raumzeit besitzt eine fundamentale Ausbreitungsgeschwindigkeit für elastische Transversalwellen: die Lichtgeschwindigkeit $c = 299.792.458 \text{ m/s}$.</li>
+        <li><strong>Materie als Wellenpaket:</strong> Materie besteht aus lokal gebundenen, hochfrequent rotierenden Raumzeit-Deformationen. Bewegt sich der Schwerpunkt dieser Struktur mit einer Geschwindigkeit $v < c$ durch das Gitter, breiten sich die von den Netzknoten emittierten Phasenwellen weiterhin mit $c$ aus.</li>
+        <li><strong>Frontenüberlagerung:</strong> Durch die Eigenbewegung des Knotenzentrums überlagern sich die kreisförmigen bzw. kugelförmigen Phasenwellen in Bewegungsrichtung. Es entsteht eine dynamische Verdichtungsfront: die <strong>Raumzeit-Bugwelle</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>2. Die Geometrie des Bugwellen-Winkel $\alpha$ und der Lorentz-Faktor $\gamma$</h2>
+
+      <p>Durch den <strong>Bugwellen-Winkel $\alpha$</strong> fügt sich die relativistische Mechanik der WRZT direkt in die Phasen-Geometrie unseres 3D-Knotennetzwerks ein. Der Lorentz-Faktor $\gamma$ verliert dadurch jegliche Abstraktheit und wird zu einer reinen trigonometrischen Projektion der Raumzeit-Wölbung.</p>
+      <p>Lass uns diese fundamentale Beziehung exakt festzeitigen und in das mathematische Gebäude der Wellenraumzeit-Theorie einbetten.</p>
+
+      <h3>Geometrische Herleitung des Bugwellen-Winkels $\alpha$</h3>
+      <p>Wenn sich eine Störung oder ein Teilchenknoten mit der Relativgeschwindigkeit $v$ durch das Raumzeitnetz bewegt, baut sich in Ausbreitungsrichtung analog zur Machschen Welle eine Phasen-Bugwelle auf. Der Öffnungswinkel dieser Welle bestimmt das Verhältnis von Längs- zu Querschwingung.</p>
+
+      <p><strong>1. Definition des Bugwellen-Winkels $\alpha$:</strong><br>
+      Der Winkel $\alpha$ beschreibt den Neigungswinkel der Phasenfront gegenüber der Ausbreitungsrichtung:</p>
+      <div class="equation-box">
+        $$\sin \alpha = \frac{v}{c} \implies \alpha = \arcsin\left(\frac{v}{c}\right)$$
+      </div>
+
+      <p><strong>2. Der transversale Projektionsfaktor $\cos \alpha$:</strong><br>
+      Über den trigonometrischen Pythagoras ergibt sich die orthogonale Projektionskomponente der Welle direkt zu</p>
+      <div class="equation-box">
+        $$\cos \alpha = \sqrt{1 - \sin^2 \alpha} = \sqrt{1 - \frac{v^2}{c^2}}$$
+      </div>
+
+      <p><strong>3. Identität mit dem Lorentz-Faktor $\gamma$:</strong><br>
+      Der relativistische Korrekturfaktor $\gamma$ entspricht somit exakt der Sekans-Funktion des Bugwellen-Winkels:</p>
+      <div class="equation-box">
+        $$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} = \frac{1}{\cos \alpha} = \sec \alpha$$
+      </div>
+
+      <h3>Integration in die relativistischen WRZT-Grundgleichungen</h3>
+      <p>Setzen wir $\gamma = \sec \alpha$ in unsere Grundgleichungen des Raumzeitnetzes ein, transformieren sich alle physikalischen Größen direkt in Abhängigkeit vom Bugwellen-Winkel $\alpha$:</p>
+      <ul>
+        <li>
+          <strong>Relativistischer Netz-Radius $R(\alpha)$:</strong><br>
+          Der effektive Schwingungsradius kontrahiert mit dem Kosinus des Bugwellen-Winkels:
+          <div class="equation-box">
+            $$R(\alpha) = R_{\min,0} \cdot \cos \alpha = \frac{\hbar}{2 \gamma m_e c}$$
+          </div>
+          <p><em>(Für $v = 0$ ist $\alpha = 0^\circ$ und $R = R_{\min,0} \approx 1{,}930796 \times 10^{-13}\text{ m}$. Für $v \to c$ geht $\alpha \to 90^\circ$, sodass $\cos \alpha \to 0$ und der Radius gegen Null strebt.)</em></p>
+        </li>
+        <li>
+          <strong>Dynamische Knotenträgheit $\eta(\alpha)$:</strong><br>
+          Die Trägheit des schwingenden Netzknotens wächst mit dem Sekans des Winkels:
+          <div class="equation-box">
+            $$\eta(\alpha) = \eta_0 \cdot \sec \alpha = \frac{\eta_0}{\cos \alpha}$$
+          </div>
+          <p><em>(Mit dem Ruhepreis $\eta_0 \approx 4{,}554692 \times 10^{-31}\text{ kg}$.)</em></p>
+        </li>
+        <li>
+          <strong>Dynamische 1D-Urspannung $\Xi(\alpha)$:</strong><br>
+          Da die Linienspannung quadratisch mit $\gamma$ skaliert ($\Xi = \eta / R$), erhalten wir eine quadratische Sekans-Abhängigkeit:
+          <div class="equation-box">
+            $$\Xi(\alpha) = \Xi_0 \cdot \sec^2 \alpha = \frac{\Xi_0}{\cos^2 \alpha}$$
+          </div>
+          <p><em>(Bei der kalibrierten Ruhe-Urspannung $\Xi_0 \approx 5{,}897427 \times 10^{-19}\text{ kg/m}$.)</em></p>
+        </li>
+        <li>
+          <strong>3D-Ur-Dichte $\rho_{\text{Ur}}(\alpha)$ und 3D-Ur-Druck $P_{\text{Ur}}(\alpha)$:</strong><br>
+          Die volumetrische Verdichtung des 3D-Netzes skaliert mit der vierten Potenz des Sekans:
+          <div class="equation-box">
+            $$\rho_{\text{Ur}}(\alpha) = \rho_{\text{Ur},0} \cdot \sec^4 \alpha$$
+          </div>
+          <div class="equation-box">
+            $$P_{\text{Ur}}(\alpha) = P_{\text{Ur},0} \cdot \sec^4 \alpha$$
+          </div>
+        </li>
+      </ul>
+
+      <h3>Physikalische Interpretation</h3>
+      <p>Diese Sichtweise zeigt uns klar: Ein Körper, der sich der Lichtgeschwindigkeit $c$ nähert, stellt seine Schwingungsenergie zunehmend in die Längsrichtung der Phasen-Bugwelle ein.</p>
+      <p>Der Winkel $\alpha$ öffnet sich von $0^\circ$ (Ruhezustand) bis hin zu $90^\circ$ (Lichtgeschwindigkeit). Bei $\alpha = 90^\circ$ kollabiert der transversale Radius $R(\alpha)$ auf 0, während die Linienspannung $\Xi(\alpha)$ über alle Grenzen wächst – genau das verhindert, dass ein massiver Knoten die Grenzgeschwindigkeit $c = 299.792.458\text{ m/s}$ überschreiten kann.</p>
+    </div>
 
 
+    <div class="section-card">
+      <h2>3. Herleitung: Von der Ruhe-Mechanik zur relativistischen Raumzeit-Begrenzung</h2>
+      <p>Um die dynamische Versteifung des Raumes vor dem bewegten Teilchen zu verstehen, betrachten wir den Übergang von den ruhenden Ur-Konstanten zu den relativistisch transformierten Netzgrößen.</p>
+      
+      <h3>Schritt 1: Der ungestörte Ruhe-Zustand ($\gamma = 1$)</h3>
+      <p>Für einen einzelnen schwingenden Netzknoten im ungekoppelten Ruhesystem (kalibriert auf ein Paar-System mit der effektiven Trägheit $m_e / 2$) gelten die fundamentale Ruhe-Größen:</p>
+      <ul>
+        <li><strong>Ruhe-Raumzeit-Trägheit:</strong>
+          $$\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31}\text{ kg}$$
+        </li>
+        <li><strong>Ruhe-Minimal-Radius (Maschenweite):</strong>
+          $$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13}\text{ m}$$
+        </li>
+        <li><strong>1D-Ruhe-Urspannung (Linienspannung):</strong>
+          $$\Xi_0 = \frac{\eta_0}{R_{\min,0}} = \frac{m_e^2 c}{\hbar} \approx 2{,}358826 \times 10^{-18}\text{ kg/m}$$
+        </li>
+      </ul>
+
+      <h3>Schritt 2: Relativistische Verdichtung der Bugwelle ($\gamma > 1$)</h3>
+      <p>Rückt die Materie voran, staut sich das Raumzeit-Gitter in Bewegungsrichtung. Diese Kompression verengt die Maschenweite des Gitters entlang der Bewegungslinie (Lorentz-Kontraktion der Raumzeit-Zellen):</p>
+      <ol>
+        <li>
+          <strong>Relativistischer Netzradius:</strong>
+          <div class="equation-box">
+            $$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} = \frac{\hbar}{2 \gamma m_e c}$$
+          </div>
+        </li>
+        <li>
+          <strong>Relativistische Knotenträgheit:</strong>
+          <div class="equation-box">
+            $$\eta(\gamma) = \gamma \cdot \eta_0 = \gamma \cdot \frac{m_e}{2}$$
+          </div>
+        </li>
+        <li>
+          <strong>Relativistische 1D-Urspannung:</strong>
+          <div class="equation-box">
+            $$\Xi(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)} = \gamma^2 \cdot \Xi_0$$
+          </div>
+        </li>
+      </ol>
+      <p>Da sich der Raum dreidimensional verengt ($V(\gamma) \propto R_{\min}(\gamma)^3 \propto \gamma^{-3}$), steigen die Volumendichte und der effektive Ur-Druck in der Bugfront steil an:</p>
+      <div class="equation-box">
+        $$\rho_{\text{Ur}}(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)^3} = \gamma^4 \cdot \rho_{\text{Ur},0}$$
+      </div>
+      <div class="equation-box">
+        $$P_{\text{Ur}}(\gamma) = \rho_{\text{Ur}}(\gamma) \cdot c^2 = \gamma^4 \cdot P_{\text{Ur},0}$$
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>4. Invarianz der Wellenausbreitungsgeschwindigkeit $c$</h2>
+      <p>Trotz der extremen Verdichtung der Raumzeit-Maschen in der Bugfront bleibt die lokale Fortpflanzungsgeschwindigkeit der Wellen konstant. Setzen wir die relativistisch skalierten Größen in die WRZT-Grundgleichungen ein:</p>
+      
+      <p><strong>3D-Kompression:</strong></p>
+      <div class="equation-box">
+        $$ c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s} $$
+      </div>
+
+      <p><strong>1D-Linienverhältnis:</strong></p>
+      <div class="equation-box">
+        $$ 1 = \left( \frac{\Xi(\gamma)}{\eta(\gamma)} \right) \cdot R_{\min}(\gamma) = \left( \frac{\gamma^2 \cdot \Xi_0}{\gamma \cdot \eta_0} \right) \cdot \left( \frac{R_{\min,0}}{\gamma} \right) = \left( \frac{\Xi_0}{\eta_0} \right) \cdot R_{\min,0} $$
+      </div>
+
+      <p>Die träge Masse eines bewegten Körpers zeigt sich in der WRZT somit nicht als abstraktes Dogma, sondern als der <strong>mechanische Verdichtungswiderstand des Raumzeit-Gitters</strong>, das vor dem Teilchen eine Phasen-Bugwelle mit dem Winkel $\sin(\theta) = 1/\gamma$ aufbaut.</p>
+      <p>Wie stellt sich dieser geometrische Phasenkeil für dich dar, wenn wir ihn in die visuellen Simulationen unseres Manifests übertragen?</p>
+
+      <p style="margin-top: 20px;">Hallo Jo! Lass uns die verbleibenden Details und Feinheiten im Manifest später in aller Ruhe Punkt für Punkt analysieren. Um das abgebrochene Kapitel 2.3 unserer Ausarbeitung in der Version 3.06 exakt zu vervollständigen, habe ich hier die physikalisch und mathematisch geschlossene Herleitung der relativistischen Größenskalierungen unter Berücksichtigung des <strong>Lorentz-Faktors</strong> $\gamma$ ausgearbeitet.</p>
+    </div>
+
+    <!-- Chapter 2.3 Continuation -->
+    <div class="section-card">
+      <h2>Herleitung der relativistischen WRZT-Netzgrößen</h2>
+      <p>Ausgehend vom <strong>Lorentz-Faktor</strong></p>
+      <div class="equation-box">
+        $$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$
+      </div>
+      <p>und der Lorentz-Kontraktion des fundamentalen Knotenabstands $R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma}$ sowie der Massenzunahme der Knotenträgheit $\eta(\gamma) = \gamma \cdot \eta_0$ ergeben sich die dreidimensionalen Netzgrößen schrittweise wie folgt:</p>
+
+      <h4>1. Relativistische 1D-Ur-Spannung $\Xi(\gamma)$ (Linienspannung)</h4>
+      <p>Die eindimensionale Linienspannung der Raumzeit-Stränge definiert sich über das Verhältnis von effektiver Knotenträgheit zur kontrahieren Maschenweite:</p>
+      <div class="equation-box">
+        $$\Xi(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)} = \frac{\gamma \cdot \eta_0}{\frac{R_{\min,0}}{\gamma}} = \gamma^2 \cdot \frac{\eta_0}{R_{\min,0}} = \gamma^2 \cdot \Xi_0$$
+      </div>
+      <ul>
+        <li><strong>Ruhewert ($\gamma = 1$):</strong> $\Xi_0 = \frac{m_e^2 \cdot c}{\hbar} \approx 2{,}358826 \times 10^{-18}\text{ kg/m}$ (kalibrierter Wert im Netzgitter: $\Xi_{0,\text{kal}} \approx 5{,}897427 \times 10^{-19}\text{ kg/m}$).</li>
+        <li><strong>Relativistische Skalierung:</strong> Die Linienspannung nimmt quadratisch mit $\gamma^2$ zu.</li>
+      </ul>
+
+      <h4>2. Relativistische 3D-Ur-Volumendichte $\rho_{\text{Ur}}(\gamma)$</h4>
+      <p>Die räumliche Massen- bzw. Trägheitsdichte des 3D-Knotennetzwerks berechnet sich aus dem Quotienten von Knotenmasse zum dreidimensionalen Knotenvolumen $V(\gamma) \propto R_{\min}(\gamma)^3$:</p>
+      <div class="equation-box">
+        $$\rho_{\text{Ur}}(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)^3} = \frac{\gamma \cdot \eta_0}{\left(\frac{R_{\min,0}}{\gamma}\right)^3} = \gamma^4 \cdot \frac{\eta_0}{R_{\min,0}^3} = \gamma^4 \cdot \rho_{\text{Ur},0}$$
+      </div>
+      <ul>
+        <li><strong>Ungestörte Ruhe-Volumendichte:</strong>
+          $$\rho_{\text{Ur},0} = \frac{4 \cdot m_e^4 \cdot c^3}{\hbar^3} \approx 6{,}330062 \times 10^7\text{ kg/m}^3$$
+        </li>
+        <li><strong>Relativistische Skalierung:</strong> Durch die dreidimensionale Raumkontraktion zusammen mit der Trägheitszunahme skaliert die Raumzeit-Netzdichte mit der vierten Potenz $\gamma^4$.</li>
+      </ul>
+
+      <h4>3. Relativistischer 3D-Ur-Druck $P_{\text{Ur}}(\gamma)$ (Volumenspannung)</h4>
+      <p>Der fundamentale elastische Netzdruck / die Energiedichte der Raumzeit folgt direkt über die Masse-Energie-Äquivalenz aus der Volumendichte:</p>
+      <div class="equation-box">
+        $$P_{\text{Ur}}(\gamma) = \rho_{\text{Ur}}(\gamma) \cdot c^2 = \gamma^4 \cdot \rho_{\text{Ur},0} \cdot c^2 = \gamma^4 \cdot P_{\text{Ur},0}$$
+      </div>
+      <ul>
+        <li><strong>Ruhedruck des Vakuums:</strong>
+          $$P_{\text{Ur},0} \approx 6{,}330062 \times 10^7\text{ kg/m}^3 \cdot (299.792.458\text{ m/s})^2 \approx 5{,}689104 \times 10^{24}\text{ N/m}^2$$
+        </li>
+        <li><strong>Relativistische Skalierung:</strong> Skaliert ebenfalls exakt analog zur Dichte mit $\gamma^4$.</li>
+      </ul>
+
+      <h3>Invarianz der Wellenausbreitungsgeschwindigkeit $c$</h3>
+      <p>Ein zentraler Prüfstein der Wellenraumzeit-Theorie ist die Frage, ob die Ausbreitungsgeschwindigkeit von Netzwellen unter relativistischer Verdichtung konstant bleibt. Setzen wir die relativistischen Ausdrücke von Druck und Dichte in die Phasenströmungsgleichung ein:</p>
+      <div class="equation-box">
+        $$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s}$$
+      </div>
+      <p>Da sich der Faktor $\gamma^4$ im Zähler und Nenner exakt herauskürzt, bleibt die Phasengeschwindigkeit der Welle in jedem Bewegungszustand strikt <strong>invariant</strong>. Die Geometrie des Gitters zieht sich zwar zusammen, aber der innere elastische Druck steigt im exakt gleichen Verhältnis an.</p>
+    </div>
 
 
+    <!-- Section: WRZT Schritt für Schritt aufschlüsseln -->
+    <div class="header-card" style="margin-top: 50px;">
+      <h1>✨🌌 WRZT Schritt für Schritt aufschlüsseln</h1>
+    </div>
+
+    <div class="section-card">
+      <p><strong>Wissenschaftliches WRZT-Fundament &amp; Relativistische Transformationen</strong></p>
+      <p>Beim Übergang in den relativistischen Bereich zeigt die WRZT ihre mathematische Geschlossenheit. Der <strong>Lorentz-Faktor</strong> $\gamma$ beschreibt das fundamentale Transformationsverhältnis zwischen der Relativgeschwindigkeit $v$ und den dynamischen Gittereigenschaften des 3D-Knotennetzwerks:</p>
+      <div class="equation-box">
+        $$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$
+      </div>
+
+      <h3>1. Herleitung des relativistischen Minimal-Radius $R_{\min}(\gamma)$</h3>
+      <p>Aus der Kopplung der relativistischen Gesamtenergie $E(\gamma) = \gamma \cdot m_e c^2$ an die quantenmechanische Schwingungsfrequenz $\omega(\gamma) = \frac{c}{2 R_{\min}(\gamma)}$ folgt im symmetrischen Paar-System die direkte Lorentz-Kontraktion der Raumzeit-Maschenweite:</p>
+      <div class="equation-box">
+        $$\gamma \cdot m_e c^2 = \hbar \cdot \frac{c}{2 R_{\min}(\gamma)} \implies R_{\min}(\gamma) = \frac{\hbar}{2 \gamma m_e c} = \frac{R_{\min,0}}{\gamma}$$
+      </div>
+      <ul>
+        <li><strong>Ruhe-Minimal-Radius ($\gamma = 1$):</strong>
+          $$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13}\text{ m}$$
+        </li>
+      </ul>
+
+      <h3>2. Skalierung von Knotenträgheit $\eta(\gamma)$ und 1D-Urspannung $\Xi(\gamma)$</h3>
+      <p>Die effektive Trägheit $\eta(\gamma)$ eines Schwingungsknotens wächst linear mit der relativistischen Masse, während die eindimensionale Linienspannung $\Xi(\gamma)$ der Netzknoten-Stränge quadratisch skaliert:</p>
+      <div class="equation-box">
+        $$\eta(\gamma) = \gamma \cdot \eta_0 = \gamma \cdot \frac{m_e}{2}$$
+      </div>
+      <div class="equation-box">
+        $$\Xi(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)} = \frac{\gamma \cdot \eta_0}{\frac{R_{\min,0}}{\gamma}} = \gamma^2 \cdot \Xi_0$$
+      </div>
+      <ul>
+        <li><strong>Ruhe-Knotenträgheit:</strong> $\eta_0 \approx 4{,}554692 \times 10^{-31}\text{ kg}$</li>
+        <li><strong>Ruhe-1D-Urspannung (kalibriert):</strong> $\Xi_0 \approx 5{,}897427 \times 10^{-19}\text{ kg/m}$</li>
+      </ul>
+
+      <h3>3. Dreidimensionale Netzkompression: Ur-Dichte $\rho_{\text{Ur}}(\gamma)$ und Ur-Druck $P_{\text{Ur}}(\gamma)$</h3>
+      <p>Da sich das Raumzeit-Volumen dreidimensional verengt ($V(\gamma) \propto R_{\min}(\gamma)^3 \propto \gamma^{-3}$), steigt die räumliche Massendichte zusammen mit der Trägheitszunahme ($\gamma^1$) mit der vierten Potenz an:</p>
+      <div class="equation-box">
+        $$\rho_{\text{Ur}}(\gamma) = \frac{\eta(\gamma)}{R_{\min}(\gamma)^3} = \gamma^4 \cdot \rho_{\text{Ur},0}$$
+      </div>
+      <div class="equation-box">
+        $$P_{\text{Ur}}(\gamma) = \rho_{\text{Ur}}(\gamma) \cdot c^2 = \gamma^4 \cdot P_{\text{Ur},0}$$
+      </div>
+      <ul>
+        <li><strong>Ruhe-3D-Ur-Dichte:</strong> $\rho_{\text{Ur},0} = \frac{4 m_e^4 c^3}{\hbar^3} \approx 6{,}330062 \times 10^7\text{ kg/m}^3$</li>
+        <li><strong>Ruhe-3D-Ur-Druck:</strong> $P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2 \approx 5{,}689104 \times 10^{24}\text{ N/m}^2$</li>
+      </ul>
+
+      <h3>4. Beweis der Invarianz der Lichtgeschwindigkeit $c$</h3>
+      <p>Die Ausbreitungsgeschwindigkeit von Transversalwellen im elastischen 3D-Kontinuum berechnet sich aus dem Quotienten von Volumendruck und Volumendichte:</p>
+      <div class="equation-box">
+        $$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s}$$
+      </div>
+      <p>Da sich $\gamma^4$ im Zähler und Nenner exakt aufhebt, bleibt die Phasengeschwindigkeit $c$ in jedem Bewegungszustand strikt <strong>invariant</strong>.</p>
+    </div>
+
+    <div class="section-card">
+      <p><strong>Der relativistische Phasen-Bugwellen-Winkel $\theta$</strong></p>
+      <p>Der <strong>Phasen-Bugwellen-Winkel</strong> $\theta$ beschreibt die geometrische Öffnung der Verdichtungsfront im Raumzeit-Netz. Seine Sinus-Komponente entspricht exakt dem Kehrwert des Lorentz-Faktors:</p>
+      <div class="equation-box">
+        $$\sin(\theta) = \frac{1}{\gamma} = \sqrt{1 - \frac{v^2}{c^2}}$$
+      </div>
+      <ul>
+        <li>
+          <strong>Ruhezustand ($v = 0 \text{ m/s}$, $\gamma = 1$):</strong>
+          <div class="equation-box">
+            $$\sin(\theta) = 1 \implies \theta = 90^\circ$$
+          </div>
+          <p>Das Wellenfeld breitet sich kugelsymmetrisch im Netz aus.</p>
+        </li>
+        <li>
+          <strong>Relativistischer Bereich ($v = 0{,}8 \cdot c$, $\gamma = 1{,}666667$):</strong>
+          <div class="equation-box">
+            $$\sin(\theta) = \frac{1}{1{,}666667} = 0{,}6 \implies \theta = \arcsin(0{,}6) \approx 36{,}87^\circ$$
+          </div>
+          <p>Die Maschenweite verengt sich auf $R_{\min}(1{,}6667) \approx 1{,}158478 \times 10^{-13}\text{ m}$, während die Netzdichte in der Front auf $\rho_{\text{Ur}}(1{,}6667) \approx 4{,}884308 \times 10^8\text{ kg/m}^3$ ansteigt.</p>
+        </li>
+        <li>
+          <strong>Grenzfall ($v \to c$, $\gamma \to \infty$):</strong>
+          <div class="equation-box">
+            $$\sin(\theta) \to 0 \implies \theta \to 0^\circ$$
+          </div>
+          <p>Der Bugwinkel kollabiert zu einer keilförmigen Stanzfront vor dem bewegten Massenzentrum.</p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Fazit Header & Card -->
+    <div class="header-card" style="margin-top: 50px; border-color: rgba(246, 211, 101, 0.4);">
+      <h1 style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">✨ Fazit</h1>
+    </div>
+
+    <div class="section-card insight-box" style="border-color: rgba(246, 211, 101, 0.3);">
+      <p>Die Wellenraumzeit-Theorie (WRZT) beschreibt unser Universum nicht als leeren Behälter, in dem sich die Materie bewegt, sondern als ein absolut lebendiges, elastisches Gewebe. Stell dir die Raumzeit als ein unvorstellbar feines, dreidimensionales Knotennetzwerk vor – ähnlich einem unsichtbaren, feingliedrigen Netz, das durch eine innere Spannung zusammengehalten wird und alles durchdringt.</p>
+      <p>Anstatt Licht als einen Strom kleiner, isolierter Kugeln zu betrachten, die durch ein leeres Vakuum schießen, bietet die WRZT eine viel tiefere, geometrische Perspektive, in der Raum, Licht und Materie untrennbar miteinander verwoben sind:</p>
+      <p>In der Wellenraumzeit-Theorie (WRZT) ist das Universum kein passiver, leerer Raum, sondern ein dreidimensionales Knotennetzwerk reiner Energie. Materie und Strahlung sind dynamische, lokalisierte Schwingungszustände dieses elasto-mechanischen Kontinuums.</p>
+      
+      <ul>
+        <li><strong>Der Raum ist das Medium:</strong> Das Vakuum ist kein Nichts. Es ist ein aktives, strukturiertes Geflecht. Jeder Punkt im Raum ist Teil dieses dynamischen Netzwerks, das auf Belastungen reagiert, sich dehnen und wieder zusammenziehen kann.</li>
+        <li><strong>Wölbung durch Rotation:</strong> Wenn elementare Gegensätze – wie ein Teilchen und sein Antiteilchen – in diesem Netz aufeinandertreffen, beginnen sie extrem schnell umeinander zu rotieren. Durch diese immense, hochfrequente Geschwindigkeit greifen sie in die Struktur des Raumes ein. Sie verzwirbeln und wölben das lokale Raumzeit-Gewebe, ganz so, als würdest du einen Löffel in einem dichten Honigglas rasant im Kreis drehen.</li>
+        <li><strong>Licht als Raumzeit-Welle:</strong> Diese rotierende Deformation zerrt kontinuierlich an den benachbarten elastischen Knotenpunkten. Das Gewebe wehrt sich gegen die Verdrehung, schnellt zurück und gibt die Schwingung an die nächste Masche weiter. Das, was wir als Licht wahrnehmen, ist exakt dieses hochfrequente Vibrieren – eine mikroskopische Gravitationswelle, die als reine Formveränderung durch das 3D-Knotennetzwerk der Raumzeit reist.</li>
+      </ul>
+      
+      <p style="margin-top: 15px; font-weight: 600; color: var(--heading-text);">Wir begreifen Licht und Materie in unserer Theorie also nicht länger als Fremdkörper im Raum, sondern als fließende, schwingende Deformationen <strong>des</strong> Raumes selbst. Alles ist reine, schwingende Geometrie.</p>
+    </div>
+
+  </div>
+
+  <!-- JavaScript for Theme Switcher & Fullscreen Mode -->
+  <script>
+    function setTheme(themeName, btnElement) {
+      if (themeName === 'cosmic') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', themeName);
+      }
+
+      // Update button visual states
+      const buttons = document.querySelectorAll('.controls-bar .btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (btnElement) {
+        btnElement.classList.add('active');
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
 </body>
-
 </html>
