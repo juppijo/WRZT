@@ -25,8 +25,13 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
+    /* Base Theme Variables (Cosmic Dark) */
     :root {
-      --bg-gradient: linear-gradient(135deg, #0b0d19 0%, #10152b 50%, #0d1120 100%);
+      --bg-color: #0b0d19;
+      --bg-image: 
+        radial-gradient(circle at 15% 15%, rgba(79, 172, 254, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
       --accent-cyan: #00f2fe;
       --accent-blue: #4facfe;
       --accent-purple: #7f00ff;
@@ -37,6 +42,74 @@
       --card-border: rgba(255, 255, 255, 0.1);
       --card-glow: rgba(79, 172, 254, 0.15);
       --gold-accent: #f6d365;
+      --eq-bg: rgba(10, 14, 26, 0.8);
+      --header-card-bg: rgba(18, 24, 43, 0.85);
+      --heading-text: #ffffff;
+      --heading-sub-text: #cbd5e1;
+    }
+
+    /* Cyberpunk Neon Theme */
+    [data-theme="cyberpunk"] {
+      --bg-color: #05050a;
+      --bg-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 50%);
+      --accent-cyan: #00f0ff;
+      --accent-blue: #ff0055;
+      --accent-purple: #ffe600;
+      --accent-pink: #ff0055;
+      --text-main: #e0f7fa;
+      --text-muted: #80deea;
+      --card-bg: rgba(15, 15, 25, 0.85);
+      --card-border: #00f0ff;
+      --card-glow: rgba(0, 240, 255, 0.25);
+      --gold-accent: #ffe600;
+      --eq-bg: rgba(0, 0, 0, 0.9);
+      --header-card-bg: rgba(20, 10, 30, 0.9);
+      --heading-text: #ffffff;
+      --heading-sub-text: #00f0ff;
+    }
+
+    /* Deep Space Blue Theme */
+    [data-theme="deepspace"] {
+      --bg-color: #020b14;
+      --bg-image: 
+        radial-gradient(circle at 50% 10%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 90%, rgba(3, 105, 161, 0.15) 0%, transparent 60%);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #0284c7;
+      --accent-purple: #0369a1;
+      --accent-pink: #38bdf8;
+      --text-main: #f0f9ff;
+      --text-muted: #7dd3fc;
+      --card-bg: rgba(12, 74, 110, 0.3);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --card-glow: rgba(56, 189, 248, 0.2);
+      --gold-accent: #bae6fd;
+      --eq-bg: rgba(7, 30, 54, 0.8);
+      --header-card-bg: rgba(12, 45, 72, 0.6);
+      --heading-text: #ffffff;
+      --heading-sub-text: #e0f2fe;
+    }
+
+    /* Minimalist Light Theme */
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --bg-image: none;
+      --accent-cyan: #0284c7;
+      --accent-blue: #2563eb;
+      --accent-purple: #4f46e5;
+      --accent-pink: #7c3aed;
+      --text-main: #334155;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-glow: rgba(0, 0, 0, 0.05);
+      --gold-accent: #d97706;
+      --eq-bg: #f1f5f9;
+      --header-card-bg: #ffffff;
+      --heading-text: #0f172a;
+      --heading-sub-text: #1e293b;
     }
 
     * {
@@ -47,17 +120,62 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #0b0d19;
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(79, 172, 254, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+      background: var(--bg-color);
+      background-image: var(--bg-image);
       background-attachment: fixed;
       color: var(--text-main);
       line-height: 1.7;
       padding: 40px 20px;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    /* Top Controls Bar */
+    .controls-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      margin-bottom: 25px;
+      flex-wrap: wrap;
       justify-content: center;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background: var(--accent-cyan);
+      color: #000000;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .btn.active {
+      background: var(--accent-cyan);
+      color: #000000;
+      border-color: var(--accent-cyan);
     }
 
     .container {
@@ -67,8 +185,8 @@
 
     /* Header Styling */
     .header-card {
-      background: rgba(18, 24, 43, 0.85);
-      border: 1px solid rgba(0, 242, 254, 0.3);
+      background: var(--header-card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 20px;
       padding: 40px;
       margin-bottom: 40px;
@@ -77,6 +195,7 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+      transition: background 0.4s ease, border-color 0.4s ease;
     }
 
     .header-card::before {
@@ -93,9 +212,9 @@
       font-size: 0.9rem;
       font-weight: 700;
       letter-spacing: 2px;
-      color: #00f2fe;
+      color: var(--accent-cyan);
       background: rgba(0, 242, 254, 0.1);
-      border: 1px solid rgba(0, 242, 254, 0.3);
+      border: 1px solid var(--card-border);
       border-radius: 30px;
       margin-bottom: 15px;
       text-transform: uppercase;
@@ -104,7 +223,7 @@
     h1 {
       font-size: 2.2rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      background: linear-gradient(135deg, var(--heading-text) 0%, var(--heading-sub-text) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 15px;
@@ -135,21 +254,21 @@
       margin-bottom: 30px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(8px);
-      transition: border-color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .section-card:hover {
-      border-color: rgba(79, 172, 254, 0.4);
+      border-color: var(--accent-cyan);
     }
 
     h2 {
       font-size: 1.5rem;
-      color: #ffffff;
+      color: var(--heading-text);
       margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid var(--card-border);
       padding-bottom: 12px;
     }
 
@@ -176,7 +295,7 @@
 
     p {
       margin-bottom: 16px;
-      color: #cbd5e1;
+      color: var(--text-main);
     }
 
     p:last-child {
@@ -186,7 +305,7 @@
     /* Lists */
     ul, ol {
       margin: 16px 0 20px 24px;
-      color: #cbd5e1;
+      color: var(--text-main);
     }
 
     li {
@@ -194,25 +313,25 @@
     }
 
     li strong {
-      color: #ffffff;
+      color: var(--heading-text);
     }
 
     /* Math Formulas & Callouts */
     .equation-box {
-      background: rgba(10, 14, 26, 0.8);
+      background: var(--eq-bg);
       border-left: 3px solid var(--accent-cyan);
       border-radius: 8px;
       padding: 16px 20px;
       margin: 20px 0;
       overflow-x: auto;
       text-align: center;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
     /* Highlight box for key insights */
     .insight-box {
-      background: linear-gradient(135deg, rgba(127, 0, 255, 0.15) 0%, rgba(79, 172, 254, 0.15) 100%);
-      border: 1px solid rgba(127, 0, 255, 0.3);
+      background: linear-gradient(135deg, rgba(127, 0, 255, 0.1) 0%, rgba(79, 172, 254, 0.1) 100%);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 20px;
       margin: 24px 0;
@@ -221,12 +340,12 @@
     hr {
       border: none;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      background: linear-gradient(90deg, transparent, var(--card-border), transparent);
       margin: 35px 0;
     }
 
     strong {
-      color: #ffffff;
+      color: var(--heading-text);
     }
 
     /* Responsive adjustments */
@@ -247,6 +366,15 @@
   </style>
 </head>
 <body>
+
+  <!-- Interactive Controls Bar -->
+  <div class="controls-bar">
+    <button class="btn active" onclick="setTheme('cosmic', this)">🌌 Cosmic Dark</button>
+    <button class="btn" onclick="setTheme('cyberpunk', this)">⚡ Cyberpunk</button>
+    <button class="btn" onclick="setTheme('deepspace', this)">🚀 Deep Space</button>
+    <button class="btn" onclick="setTheme('light', this)">☀️ Light Mode</button>
+    <button class="btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
+  </div>
 
   <div class="container">
 
@@ -342,7 +470,7 @@
       </div>
     </div>
 
-    <!-- Synthese -->
+    <!-- Synthase -->
     <div class="section-card insight-box">
       <h2 style="border-bottom: none; padding-bottom: 0;">Synthese</h2>
       <p>Das Universum ist ein gigantischer, elastischer Oszillator. Die scheinbare Leere ist erfüllt von einem dichten, hocheffizienten Knotennetzwerk, das sich kosmisch ausdehnt und dessen minimale Porenweite durch $R_{\min}$ begrenzt ist. Materie ist lokal gefangener Wirbelschwung, Licht ist der freie Wellenimpuls durch die Stränge, und die Relativitätstheorie beschreibt schlicht die geometrische Kompression dieses Schwingungsmediums unter dynamischer Belastung.</p>
@@ -738,10 +866,39 @@
         <li><strong>Licht als Raumzeit-Welle:</strong> Diese rotierende Deformation zerrt kontinuierlich an den benachbarten elastischen Knotenpunkten. Das Gewebe wehrt sich gegen die Verdrehung, schnellt zurück und gibt die Schwingung an die nächste Masche weiter. Das, was wir als Licht wahrnehmen, ist exakt dieses hochfrequente Vibrieren – eine mikroskopische Gravitationswelle, die als reine Formveränderung durch das 3D-Knotennetzwerk der Raumzeit reist.</li>
       </ul>
       
-      <p style="margin-top: 15px; font-weight: 600; color: #ffffff;">Wir begreifen Licht und Materie in unserer Theorie also nicht länger als Fremdkörper im Raum, sondern als fließende, schwingende Deformationen <strong>des</strong> Raumes selbst. Alles ist reine, schwingende Geometrie.</p>
+      <p style="margin-top: 15px; font-weight: 600; color: var(--heading-text);">Wir begreifen Licht und Materie in unserer Theorie also nicht länger als Fremdkörper im Raum, sondern als fließende, schwingende Deformationen <strong>des</strong> Raumes selbst. Alles ist reine, schwingende Geometrie.</p>
     </div>
 
   </div>
 
+  <!-- JavaScript for Theme Switcher & Fullscreen Mode -->
+  <script>
+    function setTheme(themeName, btnElement) {
+      if (themeName === 'cosmic') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', themeName);
+      }
+
+      // Update button visual states
+      const buttons = document.querySelectorAll('.controls-bar .btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (btnElement) {
+        btnElement.classList.add('active');
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
 </body>
 </html>
