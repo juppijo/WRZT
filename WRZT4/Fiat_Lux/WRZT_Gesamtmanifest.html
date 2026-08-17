@@ -347,6 +347,66 @@
       .fiat-lux-title { font-size: 2.2rem; }
       h1 { font-size: 1.6rem; }
     }
+    
+    .card-container {
+      width: 405px;
+      height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      position: relative;
+      background: #000;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      margin: 5 auto;
+    }
+    
+    .card-container:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Iframe verkleinern und skalieren für Vorschau-Effekt */
+    .preview-iframe {
+      width: 800px;
+      height: 600px;
+      border: none;
+      transform: scale(0.5);
+      transform-origin: 0 0;
+      pointer-events: none; /* Deaktiviert Interaktionen im Iframe, damit der Klick auf die Card greift */
+    }
+    
+    /* Unsichtbarer Link-Overlay über der gesamten Card */
+    .card-link {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      text-decoration: none;
+    }
+    
+    /* Optionales Overlay-Badge beim Drüberfahren */
+    .overlay-hint {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+      z-index: 5;
+    }
+    
+    .card-container:hover .overlay-hint {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -465,7 +525,8 @@
         <strong>Zentrale Aussage:</strong> Wenn ein Elektron-Positron-Paar mit nahezu Lichtgeschwindigkeit
         um seinen gemeinsamen Schwerpunkt rotiert, entstehen hochfrequente Raumzeit-Bugwellen, die wir
         makroskopisch als Licht wahrnehmen. Der sich aus dem Kräftegleichgewicht ergebende Grenzradius
-        entspricht exakt dem klassischen Elektronenradius $r_e \approx 2{,}8179 \times 10^{-15}\text{ m}$.
+        entspricht exakt der <strong> halben reduzierte Compton-Wellenlänge </strong> $R_{\min,0} = \frac{\bar{\lambda}_e}{2} = 1{.}9307963372\times10^{-13}\ {\rm m}$ oder dem <strong> klassischen Elektronenradius </strong> $r_e \approx 2{,}8179 \times 10^{-15}\text{ m}$ <strong> $\times \text{ } \alpha $ </strong>.
+        $$ \bar{\lambda}_e =\frac{\lambda _{C}}{2\pi }=\frac{h}{2\pi \cdot m\cdot c}=\frac{\hbar }{m\cdot c} = 3,8615926744 ⋅ 10^{-13}\text{ m}$$
       </div>
     </div>
 
@@ -610,9 +671,21 @@
         <p>oder etwas ausführlicher:</p>
         <p>„Licht ist eine quantisierte, hochfrequente Raumzeit-Schwingung mit sowohl wellenartigen als auch teilchenartigen Erscheinungseigenschaften.“</p>
 
-        <button style="background:#c9a227;color:#161200;border:none;border-radius:6px;padding:9px 16px;font-weight:600;cursor:pointer;">Mehr erfahren</button>
-      </div>
+        <div Style="display: flex;
+  				justify-content: center; /* Horizontale Zentrierung */
+  				align-items: center;     /* Vertikale Zentrierung */
+  				margin: 0;">
+          <div class="card-container">
+            <p>
+              • Simulation durch click in neuem Tab öffnen ↗
+            </p>
+            <a href="https://juppijo.github.io/WRZT/Undatron_3D.html" target="_blank" rel="noopener noreferrer" class="card-link" aria-label="Undatron 3D in neuem Tab öffnen"></a>
+            <iframe src="https://juppijo.github.io/WRZT/Undatron_3D.html" class="preview-iframe" title="Undatron 3D Vorschau"></iframe>
+            <!-- <div class="overlay-hint">In neuem Tab öffnen ↗</div> -->
+          </div>
 
+        </div>
+      </div>
 
     </div>
 
@@ -631,7 +704,7 @@
         Hohlräume bzw. Maschenweiten. Die fundamentale Zellgröße dieses ungestörten Netzes wird im
         Ruhezustand durch den <strong>Quanten-Minimal-Radius</strong> $R_{\min,0}$ definiert:
       </p>
-      <div class="equation-box">$$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}$$</div>
+      <div class="equation-box">$$R_{\min,0} = \frac{\bar{\lambda}_e}{2} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}$$</div>
       <hr>
       <div class="equation-box">
         <p>Wenn du die <strong>Feinstrukturkonstante $\alpha$ explizit in deine Formel einbauen</strong> möchtest, gibt es eine sehr schöne Beziehung: Die reduzierte Compton-Wellenlänge ist</p>
@@ -659,7 +732,7 @@
         <p>$$\boxed{R_{\min,0} = 1,930,796,3372\times10^{-13}\ {\rm m}}$$</p>
         <p><strong>Für deine Formelsammlung würde ich daher besonders diese Form aufnehmen:</strong></p>
         <h3>$$\boxed{
-          R_{\min,0}=\frac{\alpha a_0}{2}=\frac{r_e}{2\alpha}=\frac{\hbar}{2m_e c}=1{,}930,796,3372\times10^{-13}\ {\rm m}
+          R_{\min,0}=\frac{\bar{\lambda}_e}{2}=\frac{\alpha a_0}{2}=\frac{r_e}{2\alpha}=\frac{\hbar}{2m_e c}=1{,}930,796,3372\times10^{-13}\ {\rm m}
           }$$</h3>
         <p>Damit ist $\alpha$ nicht einfach zusätzlich eingesetzt, sondern zeigt die <strong>Verknüpfung zwischen Bohr-Radius, klassischem Elektronenradius und reduzierter Compton-Länge</strong>. </p>
         <p>Das könnte für deine WRZT besonders interessant sein, weil $\alpha$ damit als <strong>Skalierungsfaktor zwischen atomarer und relativistisch/quantum-mechanischer Längenskala</strong> erscheint.</p>
