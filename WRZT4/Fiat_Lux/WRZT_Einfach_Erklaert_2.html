@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Was ist Licht wirklich? — Einfach erklärt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-deep: #171334;
+    --bg-deep2: #2c2158;
+    --bg-deep3: #422a5c;
+    --gold: #ffd27a;
+    --gold-soft: #ffe9bf;
+    --coral: #ff9770;
+    --cream: #faf4e8;
+    --ink: #2c2440;
+    --muted: #c9c0e8;
+    --card: rgba(255, 244, 224, 0.06);
+    --card-border: rgba(255, 226, 170, 0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: radial-gradient(ellipse 120% 70% at 50% -10%, var(--bg-deep3), var(--bg-deep) 55%),
+                var(--bg-deep);
+    color: var(--cream);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- Ambient background stars ---------- */
+  .stars {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.7;
+  }
+  .stars span {
+    position: absolute; width: 2px; height: 2px; background: var(--gold-soft);
+    border-radius: 50%; opacity: 0.5; animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100% { opacity: 0.15; } 50% { opacity: 0.85; } }
+
+  main { position: relative; z-index: 1; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: 92vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 60px 24px 40px;
+  }
+
+  .orb-wrap { width: 200px; height: 200px; margin-bottom: 34px; position: relative; }
+  .orb-glow {
+    position: absolute; inset: -60px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,210,122,0.35) 0%, rgba(255,210,122,0) 70%);
+    animation: breathe 5s ease-in-out infinite;
+  }
+  .orb-core {
+    position: absolute; inset: 40px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff9ea 0%, var(--gold) 45%, var(--coral) 100%);
+    box-shadow: 0 0 60px 10px rgba(255,210,122,0.6), 0 0 120px 30px rgba(255,151,112,0.25);
+    animation: breathe 5s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+  .eyebrow {
+    font-family: 'Figtree', sans-serif; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    font-size: 0.78rem; color: var(--gold); margin-bottom: 18px; opacity: 0.9;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.15; max-width: 820px;
+    background: linear-gradient(135deg, var(--cream) 30%, var(--gold-soft) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero .lead {
+    margin-top: 22px; font-size: 1.15rem; color: var(--muted); max-width: 620px;
+  }
+  .scroll-hint { margin-top: 50px; color: var(--muted); font-size: 0.85rem; opacity: 0.7; }
+  .scroll-hint span { display: block; margin-top: 6px; animation: bob 2s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* ---------- Chapters ---------- */
+  .chapter {
+    max-width: 880px; margin: 0 auto; padding: 70px 24px;
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .chapter.visible { opacity: 1; transform: translateY(0); }
+
+  .chapter-inner {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 48px clamp(24px, 5vw, 56px);
+    backdrop-filter: blur(6px);
+  }
+
+  .chapter-label {
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--coral); margin-bottom: 14px;
+  }
+  .chapter h2 {
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--gold-soft); margin-bottom: 22px; line-height: 1.25;
+  }
+  .chapter p { color: var(--cream); font-size: 1.06rem; margin-bottom: 16px; }
+  .chapter p:last-child { margin-bottom: 0; }
+  .chapter p strong { color: var(--gold); font-weight: 600; }
+
+  .analogy {
+    margin-top: 26px;
+    display: flex; gap: 18px; align-items: flex-start;
+    background: rgba(0,0,0,0.15); border-left: 3px solid var(--gold);
+    border-radius: 0 16px 16px 0; padding: 18px 22px;
+  }
+  .analogy .icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+  .analogy p { margin: 0; font-style: italic; color: var(--gold-soft); font-size: 1rem; }
+
+  .illustration { display: flex; justify-content: center; margin: 6px 0 30px 0; }
+  .illustration svg { width: 100%; max-width: 420px; height: auto; }
+
+  /* ---------- Divider dot ---------- */
+  .divider { display: flex; justify-content: center; padding: 6px 0; }
+  .divider .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 16px 4px rgba(255,210,122,0.5);
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  /* ---------- Closing ---------- */
+  .closing {
+    text-align: center; max-width: 640px; margin: 40px auto 0;
+    padding: 70px 24px 110px;
+  }
+  .closing .quote {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 500;
+    font-size: clamp(1.3rem, 3vw, 1.7rem); color: var(--gold-soft); line-height: 1.5;
+  }
+  .closing .quote-author { margin-top: 16px; color: var(--muted); font-size: 0.9rem; }
+  .closing .signoff { margin-top: 46px; color: var(--muted); font-size: 0.88rem; }
+
+  @media (max-width: 600px) {
+    .chapter { padding: 40px 16px; }
+    .chapter-inner { padding: 32px 22px; border-radius: 22px; }
+    .analogy { flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<main>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="orb-wrap">
+      <div class="orb-glow"></div>
+      <div class="orb-core"></div>
+    </div>
+    <div class="eyebrow">Eine Reise in einfachen Bildern</div>
+    <h1>Was ist Licht wirklich?</h1>
+    <p class="lead">
+      Keine Formeln. Keine Zahlen. Nur eine einfache Geschichte darüber, wie Licht entstehen könnte —
+      erzählt mit den Dingen, die wir aus dem Alltag kennen.
+    </p>
+    <div class="scroll-hint">Scroll dich hinein<span>↓</span></div>
+  </section>
+
+  <!-- ================= KAPITEL 1: Das Universum als nasser Schwamm ================= -->
+  <section class="chapter">
+    <div class="chapter-inner">
+      <div class="chapter-label">Der Anfang</div>
+      <h2>Stell dir das Universum als einen riesigen, nassen Schwamm vor</h2>
+
+      <div class="illustration">
+        <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="poreGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffd27a" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#ff9770" stop-opacity="0.05"/>
+            </radialGradient>
+          </defs>
+          <g fill="url(#poreGrad)" stroke="#ffd27a" stroke-width="0.8" opacity="0.75">
+            <circle cx="60" cy="45" r="16"/>
+            <circle cx="130" cy="30" r="10"/>
+            <circle cx="120" cy="90" r="20"/>
+            <circle cx="200" cy="55" r="13"/>
+            <circle cx="260" cy="35" r="17"/>
+            <circle cx="330" cy="60" r="11"/>
+            <circle cx="70" cy="130" r="12"/>
+            <circle cx="150" cy="150" r="18"/>
+            <circle cx="230" cy="140" r="10"/>
+            <circle cx="300" cy="120" r="15"/>
+            <circle cx="360" cy="150" r="12"/>
+            <circle cx="20" cy="170" r="9"/>
+          </g>
+          <circle cx="200" cy="100" r="20" fill="none" stroke="#fff9ea" stroke-width="2" opacity="0.9"/>
+          <circle cx="200" cy="100" r="8" fill="#fff9ea"/>
+        </svg>
+      </div>
+
+      <p>
+        Nicht trocken und starr, sondern <strong>feucht, weich und voller winziger Poren</strong> — so als
+        wäre der ganze Raum um uns herum aus einem einzigen, durchtränkten Schwamm gewebt. Dieser Schwamm
+        ist unsichtbar, aber niemals leer: Jede noch so kleine Stelle in ihm ist mit unsichtbarer
+        Feuchtigkeit gefüllt und reagiert federnd auf alles, was sich in ihm bewegt.
+      </p>
+      <p>
+        Drückt man mit dem Finger in einen nassen Schwamm, entsteht eine kleine Vertiefung, und die
+        Feuchtigkeit weicht ringsum ein Stückchen zurück. Genau das passiert, wenn ein winziges Teilchen im
+        Raum sitzt: Es drückt eine kleine <strong>Vertiefung</strong> in den Raum-Schwamm. Sein Gegenstück,
+        das sogenannte Antiteilchen, tut das Gegenteil — es drückt eine kleine <strong>Wölbung</strong>
+        nach außen.
+      </p>
+
+      <div class="analogy">
+        <span class="icon">🧽</span>
+        <p>Wie ein nasser Küchenschwamm: Drückst du hinein, gibt er nach und bildet eine Mulde. Lässt du los, wölbt er sich wieder zurück — er ist immer in Bewegung, nie ganz starr.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="dot"></div></div>
+
+  <!-- ================= KAPITEL 2: Der Tanz ================= -->
+  <section class="chapter">
+    <div class="chapter-inner">
+      <div class="chapter-label">Die Begegnung</div>
+      <h2>Zwei Tänzer, die sich nicht loslassen können</h2>
+
+      <div class="illustration">
+        <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="200" cy="100" rx="90" ry="55" fill="none" stroke="#ffd27a" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.5"/>
+          <circle cx="130" cy="85" r="16" fill="#fff9ea"/>
+          <circle cx="270" cy="115" r="16" fill="#ff9770"/>
+          <path d="M130,60 A 60,60 0 0,1 250,95" fill="none" stroke="#fff9ea" stroke-width="2" opacity="0.8"/>
+          <path d="M270,140 A 60,60 0 0,1 150,105" fill="none" stroke="#ff9770" stroke-width="2" opacity="0.8"/>
+        </svg>
+      </div>
+
+      <p>
+        Wenn ein Teilchen (die Vertiefung) und sein Antiteilchen (die Wölbung) sich zu nahe kommen, ziehen sie
+        sich unwiderstehlich an — wie zwei Magnete. Doch statt einfach ineinander zu fallen, beginnen sie,
+        <strong>umeinander zu kreisen</strong>. Immer schneller, immer enger. Wie zwei Eiskunstläufer, die
+        sich an den Händen halten und sich so schnell drehen, dass man ihre einzelnen Gesichter kaum noch
+        erkennen kann.
+      </p>
+      <p>
+        Diese Drehung ist keine ruhige Angelegenheit. Sie geschieht so rasend schnell, dass sie das
+        elastische Raum-Schwamm um sie herum regelrecht <strong>durchschüttelt</strong>.
+      </p>
+
+      <div class="analogy">
+        <span class="icon">💃</span>
+        <p>Wie zwei Tänzer, die sich immer schneller drehen, bis der Boden unter ihnen zu zittern beginnt.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="dot"></div></div>
+
+  <!-- ================= KAPITEL 3: Licht als Welle ================= -->
+  <section class="chapter">
+    <div class="chapter-inner">
+      <div class="chapter-label">Der Moment des Lichts</div>
+      <h2>Licht ist das Zittern, das nach außen läuft</h2>
+
+      <div class="illustration">
+        <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="200" cy="100" r="8" fill="#fff9ea"/>
+          <circle cx="200" cy="100" r="30" fill="none" stroke="#ffd27a" stroke-width="1.5" opacity="0.7"/>
+          <circle cx="200" cy="100" r="55" fill="none" stroke="#ffd27a" stroke-width="1.3" opacity="0.5"/>
+          <circle cx="200" cy="100" r="80" fill="none" stroke="#ff9770" stroke-width="1.1" opacity="0.35"/>
+          <circle cx="200" cy="100" r="105" fill="none" stroke="#ff9770" stroke-width="1" opacity="0.2"/>
+        </svg>
+      </div>
+
+      <p>
+        Genau wie ein Kieselstein, der ins Wasser fällt und Ringe erzeugt, die sich immer weiter
+        ausbreiten, sendet das rasend schnelle Tanzpaar aus Teilchen und Antiteilchen sein Zittern als
+        <strong>Wellen durch den Raum-Schwamm</strong>. Diese Wellen sind das, was wir Licht nennen.
+      </p>
+      <p>
+        Tanzt das Paar langsamer, entstehen weichere, gemütlichere Wellen — das wäre so etwas wie warmes,
+        rotes Licht oder unsichtbare Wärmestrahlung. Tanzt es rasend schnell, entstehen enge, scharfe
+        Wellen — das würde eher grellem, energiereichem Licht wie ultraviolettem Licht oder
+        Röntgenstrahlen entsprechen.
+      </p>
+
+      <div class="analogy">
+        <span class="icon">🌊</span>
+        <p>Wie ein Stein im Teich: Ein sanfter Wurf macht große, ruhige Ringe. Ein harter Wurf macht enge, aufgeregte Ringe.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="dot"></div></div>
+
+  <!-- ================= KAPITEL 4: Doppelspalt & Verschränkung ================= -->
+  <section class="chapter">
+    <div class="chapter-inner">
+      <div class="chapter-label">Das Rätsel</div>
+      <h2>Warum sich Licht wie eine Welle <em>und</em> wie ein Ball verhält</h2>
+
+      <p>
+        Eines der größten Rätsel der Physik: Licht verhält sich manchmal wie eine ausgebreitete Welle —
+        und manchmal wie ein winziger Ball, der genau an einem Punkt einschlägt. Wie kann beides
+        gleichzeitig wahr sein?
+      </p>
+      <p>
+        Stell dir eine Welle vor, die sich ungestört über einen Teich ausbreitet — sie ist überall
+        gleichzeitig, breit und weich, sie kann sogar durch zwei Öffnungen in einer Wand gleichzeitig
+        hindurchlaufen und sich auf der anderen Seite mit sich selbst überlagern. Doch sobald diese Welle
+        auf etwas <strong>trifft</strong> — eine Wand, ein Blatt, unser Auge —, gibt sie ihre ganze Energie
+        an genau einer Stelle ab. In diesem Moment wirkt es, als wäre plötzlich ein kleiner Ball
+        eingeschlagen.
+      </p>
+      <p>
+        Die Welle war also die ganze Zeit über ausgebreitet — nur der <strong>Einschlag</strong> sieht aus
+        wie ein Teilchen.
+      </p>
+
+      <div class="analogy">
+        <span class="icon">🎯</span>
+        <p>Wie eine Wasserwelle, die sich weit über den See ausbreitet, aber beim Auftreffen auf das Ufer nur an einer einzigen Stelle Sand wegspült.</p>
+      </div>
+
+      <p style="margin-top: 30px;">
+        Und was, wenn zwei Tanzpartner, die einmal gemeinsam getanzt haben, sich später trennen und
+        weit voneinander entfernen? Weil sie ihren Tanz einst gemeinsam begonnen haben, bleiben sie auf
+        seltsame Weise <strong>miteinander verbunden</strong> — verändert sich der eine, „weiß" der andere
+        davon, ganz gleich wie weit sie auseinander sind. Das nennt die Physik Verschränkung.
+      </p>
+
+      <div class="analogy">
+        <span class="icon">👯</span>
+        <p>Wie Zwillinge, die schon als Kinder im Gleichschritt liefen — und noch Jahre später, an ganz verschiedenen Orten, wie von selbst dieselbe Bewegung machen.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="dot"></div></div>
+
+  <!-- ================= KAPITEL 5: Die Sonne ================= -->
+  <section class="chapter">
+    <div class="chapter-inner">
+      <div class="chapter-label">Ein Blick zur Sonne</div>
+      <h2>Warum die Sonne in allen Farben leuchtet</h2>
+
+      <div class="illustration">
+        <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="200" cy="100" r="46" fill="#ffd27a" opacity="0.9"/>
+          <circle cx="200" cy="100" r="46" fill="none" stroke="#fff9ea" stroke-width="2" opacity="0.5"/>
+          <g stroke="#ff9770" stroke-width="2" opacity="0.6">
+            <line x1="200" y1="30" x2="200" y2="14"/>
+            <line x1="200" y1="170" x2="200" y2="186"/>
+            <line x1="130" y1="100" x2="114" y2="100"/>
+            <line x1="270" y1="100" x2="286" y2="100"/>
+            <line x1="150" y1="50" x2="138" y2="38"/>
+            <line x1="250" y1="150" x2="262" y2="162"/>
+            <line x1="250" y1="50" x2="262" y2="38"/>
+            <line x1="150" y1="150" x2="138" y2="162"/>
+          </g>
+          <circle cx="175" cy="90" r="4" fill="#fff9ea"/>
+          <circle cx="220" cy="105" r="4" fill="#fff"/>
+          <circle cx="195" cy="115" r="3" fill="#fff9ea"/>
+        </svg>
+      </div>
+
+      <p>
+        Im Inneren der Sonne herrscht ein unvorstellbares Gedränge. Dort tanzen nicht nur ein, sondern
+        <strong>unzählige Paare</strong> gleichzeitig — manche langsam, manche rasend schnell, in jeder
+        erdenklichen Größe und Geschwindigkeit.
+      </p>
+      <p>
+        Jedes dieser winzigen Tanzpaare sendet seine eigenen Wellen aus. Zusammen ergeben all diese
+        unterschiedlichen Wellen genau das, was wir als Sonnenlicht kennen — ein Gemisch aus allen Farben,
+        von wärmender Infrarotstrahlung bis zu unsichtbarem UV-Licht.
+      </p>
+
+      <div class="analogy">
+        <span class="icon">✨</span>
+        <p>Wie ein riesiges Fest mit Millionen Tänzern gleichzeitig — jeder tanzt in seinem eigenen Tempo, und zusammen ergibt das ein einziges, gewaltiges Leuchten.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="dot"></div></div>
+
+  <!-- ================= KAPITEL 6: Offene Fragen ================= -->
+  <section class="chapter">
+    <div class="chapter-inner">
+      <div class="chapter-label">Ein offenes Ende</div>
+      <h2>Eine Geschichte, die noch nicht zu Ende erzählt ist</h2>
+
+      <p>
+        Diese Erklärung ist ein Bild, kein Beweis — ein Versuch, sich etwas so Unfassbares wie Licht mit
+        vertrauten Dingen vorstellbar zu machen: einen nassen Schwamm, Tänzer, Wasserwellen, Zwillinge. Die
+        eigentliche Wirklichkeit dahinter ist komplizierter, und vieles bleibt offen.
+      </p>
+      <p>
+        Was genau ist eigentlich <strong>Zeit</strong> in diesem Bild — vielleicht nur der Takt, den all
+        diese winzigen Tänze gemeinsam schlagen? Und was verbirgt sich hinter der geheimnisvollen
+        <strong>dunklen Materie</strong>, die wir im Universum spüren, aber nicht sehen können — ruhen dort
+        vielleicht Tanzpaare, die ihren Tanz längst beendet haben?
+      </p>
+      <p>
+        Fragen wie diese laden dazu ein, weiterzudenken — nicht, weil schon alle Antworten feststehen,
+        sondern weil das Staunen selbst schon ein guter Anfang ist.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= CLOSING ================= -->
+  <section class="closing">
+    <div class="orb-wrap" style="width:90px; height:90px; margin: 0 auto 30px;">
+      <div class="orb-glow" style="inset:-30px;"></div>
+      <div class="orb-core" style="inset:18px;"></div>
+    </div>
+    <p class="quote">„Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“</p>
+    <p class="quote-author">— Thich Nhat Hanh</p>
+    <p class="signoff">Wellenraumzeit-Theorie · Einfach erklärt</p>
+  </section>
+
+</main>
+
+<script>
+  // Sternenfeld erzeugen
+  const starsContainer = document.getElementById('stars');
+  const starCount = window.innerWidth < 600 ? 40 : 80;
+  for (let i = 0; i < starCount; i++) {
+    const s = document.createElement('span');
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 4) + 's';
+    starsContainer.appendChild(s);
+  }
+
+  // Scroll-Reveal für Kapitel
+  const chapters = document.querySelectorAll('.chapter');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    chapters.forEach(c => observer.observe(c));
+  } else {
+    chapters.forEach(c => c.classList.add('visible'));
+  }
+</script>
+
+</body>
+</html>
