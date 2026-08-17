@@ -1,1291 +1,1485 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WRZT — Das Gesamt-Manifest der Wellenraumzeit-Theorie</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT — Das Gesamt-Manifest der Wellenraumzeit-Theorie</title>
 
-<!-- MathJax -->
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']],
-      processEscapes: true
-    },
-    options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
-  };
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-<style>
-  /* ============ THEME 1: Cosmic Dark (Default) ============ */
-  :root {
-    --bg-color: #0b0d19;
-    --bg-image:
-      radial-gradient(circle at 15% 15%, rgba(79, 172, 254, 0.12) 0%, transparent 40%),
-      radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 40%),
-      radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
-    --accent-cyan: #00f2fe;
-    --accent-blue: #4facfe;
-    --accent-purple: #7f00ff;
-    --accent-pink: #e100ff;
-    --accent-orange: #ffb454;
-    --text-main: #e2e8f0;
-    --text-muted: #94a3b8;
-    --card-bg: rgba(22, 29, 52, 0.7);
-    --card-border: rgba(255, 255, 255, 0.1);
-    --card-glow: rgba(79, 172, 254, 0.15);
-    --gold-accent: #f6d365;
-    --eq-bg: rgba(10, 14, 26, 0.85);
-    --header-card-bg: rgba(18, 24, 43, 0.85);
-    --heading-text: #ffffff;
-    --heading-sub-text: #cbd5e1;
-    --quote-color: #f6d365;
-  }
-
-  /* ============ THEME 2: Cyberpunk Neon ============ */
-  [data-theme="cyberpunk"] {
-    --bg-color: #05050a;
-    --bg-image:
-      radial-gradient(circle at 20% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 50%);
-    --accent-cyan: #00f0ff;
-    --accent-blue: #ff0055;
-    --accent-purple: #ffe600;
-    --accent-pink: #ff0055;
-    --accent-orange: #ffe600;
-    --text-main: #e0f7fa;
-    --text-muted: #80deea;
-    --card-bg: rgba(15, 15, 25, 0.85);
-    --card-border: #00f0ff;
-    --card-glow: rgba(0, 240, 255, 0.25);
-    --gold-accent: #ffe600;
-    --eq-bg: rgba(0, 0, 0, 0.9);
-    --header-card-bg: rgba(20, 10, 30, 0.9);
-    --heading-text: #ffffff;
-    --heading-sub-text: #00f0ff;
-    --quote-color: #ffe600;
-  }
-
-  /* ============ THEME 3: Deep Space Blue ============ */
-  [data-theme="deepspace"] {
-    --bg-color: #020b14;
-    --bg-image:
-      radial-gradient(circle at 50% 10%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
-      radial-gradient(circle at 50% 90%, rgba(3, 105, 161, 0.15) 0%, transparent 60%);
-    --accent-cyan: #38bdf8;
-    --accent-blue: #0284c7;
-    --accent-purple: #0369a1;
-    --accent-pink: #38bdf8;
-    --accent-orange: #fbbf24;
-    --text-main: #f0f9ff;
-    --text-muted: #7dd3fc;
-    --card-bg: rgba(12, 74, 110, 0.3);
-    --card-border: rgba(56, 189, 248, 0.2);
-    --card-glow: rgba(56, 189, 248, 0.2);
-    --gold-accent: #bae6fd;
-    --eq-bg: rgba(7, 30, 54, 0.8);
-    --header-card-bg: rgba(12, 45, 72, 0.6);
-    --heading-text: #ffffff;
-    --heading-sub-text: #e0f2fe;
-    --quote-color: #bae6fd;
-  }
-
-  /* ============ THEME 4: Klassisch (Papier / Light) ============ */
-  [data-theme="light"] {
-    --bg-color: #f8fafc;
-    --bg-image: none;
-    --accent-cyan: #0284c7;
-    --accent-blue: #2563eb;
-    --accent-purple: #4f46e5;
-    --accent-pink: #7c3aed;
-    --accent-orange: #b45309;
-    --text-main: #334155;
-    --text-muted: #64748b;
-    --card-bg: #ffffff;
-    --card-border: #e2e8f0;
-    --card-glow: rgba(0, 0, 0, 0.05);
-    --gold-accent: #b45309;
-    --eq-bg: #f1f5f9;
-    --header-card-bg: #ffffff;
-    --heading-text: #0f172a;
-    --heading-sub-text: #1e293b;
-    --quote-color: #b45309;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg-color);
-    background-image: var(--bg-image);
-    background-attachment: fixed;
-    color: var(--text-main);
-    line-height: 1.75;
-    padding: 100px 20px 60px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: background 0.4s ease, color 0.4s ease;
-  }
-
-  /* ---- Fixed Toolbar ---- */
-  .toolbar {
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    padding: 14px 10px;
-    background: linear-gradient(to bottom, var(--bg-color) 60%, transparent);
-  }
-
-  .controls-bar {
-    display: flex;
-    gap: 8px;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    padding: 8px 14px;
-    border-radius: 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    backdrop-filter: blur(12px);
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 96vw;
-  }
-
-  .btn {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--card-border);
-    color: var(--text-main);
-    padding: 6px 13px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  .btn:hover { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
-  .btn.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
-
-  .container { max-width: 980px; width: 100%; }
-
-  /* ---- Header ---- */
-  .header-card {
-    background: var(--header-card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 46px 40px;
-    margin-bottom: 34px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--card-glow);
-    backdrop-filter: blur(10px);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .header-card::before {
-    content: "";
-    position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
-  }
-  .badge {
-    display: inline-block; padding: 6px 16px; font-size: 0.85rem; font-weight: 700;
-    letter-spacing: 2px; color: var(--accent-cyan); background: rgba(0,242,254,0.1);
-    border: 1px solid var(--card-border); border-radius: 30px; margin-bottom: 18px; text-transform: uppercase;
-  }
-  .fiat-lux-title {
-    font-size: 3rem; font-weight: 800; margin-bottom: 6px;
-    color: var(--gold-accent);
-    text-shadow: 0 0 15px var(--card-glow), 0 0 30px var(--card-glow);
-  }
-  h1 {
-    font-size: 2.1rem; font-weight: 800; line-height: 1.3; margin-bottom: 14px;
-    background: linear-gradient(135deg, var(--heading-text) 0%, var(--heading-sub-text) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .subtitle { font-size: 1.15rem; color: var(--accent-cyan); font-style: italic; margin-bottom: 18px; }
-  .intro-text { font-size: 1.05rem; color: var(--text-muted); max-width: 760px; margin: 0 auto; }
-  .author-info { margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; }
-
-  /* ---- Part divider ---- */
-  .part-divider {
-    text-align: center; margin: 60px 0 30px 0; position: relative;
-  }
-  .part-divider .part-eyebrow {
-    display: inline-block; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent-cyan); margin-bottom: 8px;
-  }
-  .part-divider h1 {
-    font-size: 2rem;
-  }
-  .part-divider .part-line {
-    height: 2px; width: 120px; margin: 18px auto 0 auto;
-    background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
-  }
-
-  /* ---- Section cards ---- */
-  .section-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 32px;
-    margin-bottom: 26px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    backdrop-filter: blur(8px);
-    transition: border-color 0.3s ease;
-    scroll-margin-top: 90px;
-  }
-  .section-card:hover { border-color: var(--accent-cyan); }
-
-  .section-card > h2 {
-    font-size: 1.45rem; color: var(--heading-text); margin-bottom: 18px;
-    display: flex; align-items: center; gap: 12px;
-    border-bottom: 1px solid var(--card-border); padding-bottom: 12px;
-    cursor: pointer; user-select: none;
-  }
-  h2 {
-    font-size: 1.45rem; color: var(--heading-text); margin-bottom: 18px;
-    display: flex; align-items: center; gap: 12px;
-    border-bottom: 1px solid var(--card-border); padding-bottom: 12px;
-  }
-  h2::before {
-    content: ""; display: inline-block; width: 4px; height: 22px; flex-shrink: 0;
-    background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-blue)); border-radius: 2px;
-  }
-  .section-card > h2::after {
-    content: "▾";
-    margin-left: auto;
-    color: var(--accent-cyan);
-    font-size: 1.1rem;
-    transition: transform 0.25s ease;
-    flex-shrink: 0;
-  }
-  .section-card.collapsed > h2::after { transform: rotate(-90deg); }
-  .section-card.collapsed > h2 { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-  .section-card > *:not(h2) {
-    overflow: hidden;
-    max-height: 20000px;
-    opacity: 1;
-    transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.35s ease;
-  }
-  .section-card.collapsed > *:not(h2) {
-    max-height: 0 !important;
-    opacity: 0;
-    margin: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  h3 { font-size: 1.15rem; color: var(--accent-cyan); margin: 22px 0 12px 0; }
-  h4 { font-size: 1.0rem; color: var(--gold-accent); margin: 16px 0 8px 0; }
-
-  p { margin-bottom: 15px; color: var(--text-main); text-align: justify; }
-  p:last-child { margin-bottom: 0; }
-
-  ul, ol { margin: 12px 0 18px 24px; color: var(--text-main); }
-  li { margin-bottom: 8px; }
-  li strong { color: var(--heading-text); }
-
-  .equation-box {
-    background: var(--eq-bg); border-left: 3px solid var(--accent-cyan); border-radius: 8px;
-    padding: 16px 20px; margin: 18px 0; overflow-x: auto; text-align: center;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-  }
-
-  .insight-box {
-    background: linear-gradient(135deg, rgba(127,0,255,0.1) 0%, rgba(79,172,254,0.1) 100%);
-    border: 1px solid var(--card-border); border-radius: 12px; padding: 18px 22px; margin: 20px 0;
-  }
-
-  .quote-box {
-    border-left: 4px solid var(--gold-accent); padding: 14px 20px; margin: 22px 0;
-    font-style: italic; color: var(--quote-color); background: rgba(255,255,255,0.02); border-radius: 0 10px 10px 0;
-  }
-  .quote-box .author { display:block; margin-top: 8px; font-style: normal; font-weight: 700; text-align: right; }
-
-  .note-box {
-    border: 1px solid var(--accent-orange); background: rgba(255,180,84,0.07);
-    border-radius: 10px; padding: 14px 20px; margin: 18px 0; font-size: 0.95rem;
-  }
-
-  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.92rem; }
-  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--card-border); }
-  th { color: var(--accent-cyan); font-weight: 700; }
-
-  .toc-box ol { columns: 1; }
-  .toc-box a { color: var(--text-main); text-decoration: none; }
-  .toc-box a:hover { color: var(--accent-cyan); }
-  .toc-part-label { color: var(--gold-accent); font-weight: 700; margin: 14px 0 6px 0; display: block; }
-
-  .svg-container { text-align: center; margin: 22px 0; padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--eq-bg); }
-  .svg-container svg { max-width: 100%; height: auto; }
-  .caption { font-size: 0.82rem; color: var(--text-muted); margin-top: 8px; }
-
-  hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--card-border), transparent); margin: 30px 0; }
-  strong { color: var(--heading-text); }
-
-  footer { text-align: center; padding: 40px 0 10px 0; color: var(--text-muted); font-size: 0.85rem; }
-
-  details > summary { cursor: pointer; color: var(--accent-cyan); font-weight: 700; }
-
-  :fullscreen { background: var(--bg-color); overflow-y: auto; }
-
-  @media (max-width: 768px) {
-    body { padding: 130px 12px 40px 12px; }
-    .header-card, .section-card { padding: 22px 18px; }
-    .fiat-lux-title { font-size: 2.2rem; }
-    h1 { font-size: 1.6rem; }
-  }
-</style>
+  <style>
+    /* ============ THEME 1: Cosmic Dark (Default) ============ */
+    :root {
+      --bg-color: #0b0d19;
+      --bg-image:
+        radial-gradient(circle at 15% 15%, rgba(79, 172, 254, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --accent-purple: #7f00ff;
+      --accent-pink: #e100ff;
+      --accent-orange: #ffb454;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --card-bg: rgba(22, 29, 52, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-glow: rgba(79, 172, 254, 0.15);
+      --gold-accent: #f6d365;
+      --eq-bg: rgba(10, 14, 26, 0.85);
+      --header-card-bg: rgba(18, 24, 43, 0.85);
+      --heading-text: #ffffff;
+      --heading-sub-text: #cbd5e1;
+      --quote-color: #f6d365;
+    }
+    
+    /* ============ THEME 2: Cyberpunk Neon ============ */
+    [data-theme="cyberpunk"] {
+      --bg-color: #05050a;
+      --bg-image:
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 50%);
+      --accent-cyan: #00f0ff;
+      --accent-blue: #ff0055;
+      --accent-purple: #ffe600;
+      --accent-pink: #ff0055;
+      --accent-orange: #ffe600;
+      --text-main: #e0f7fa;
+      --text-muted: #80deea;
+      --card-bg: rgba(15, 15, 25, 0.85);
+      --card-border: #00f0ff;
+      --card-glow: rgba(0, 240, 255, 0.25);
+      --gold-accent: #ffe600;
+      --eq-bg: rgba(0, 0, 0, 0.9);
+      --header-card-bg: rgba(20, 10, 30, 0.9);
+      --heading-text: #ffffff;
+      --heading-sub-text: #00f0ff;
+      --quote-color: #ffe600;
+    }
+    
+    /* ============ THEME 3: Deep Space Blue ============ */
+    [data-theme="deepspace"] {
+      --bg-color: #020b14;
+      --bg-image:
+        radial-gradient(circle at 50% 10%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 90%, rgba(3, 105, 161, 0.15) 0%, transparent 60%);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #0284c7;
+      --accent-purple: #0369a1;
+      --accent-pink: #38bdf8;
+      --accent-orange: #fbbf24;
+      --text-main: #f0f9ff;
+      --text-muted: #7dd3fc;
+      --card-bg: rgba(12, 74, 110, 0.3);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --card-glow: rgba(56, 189, 248, 0.2);
+      --gold-accent: #bae6fd;
+      --eq-bg: rgba(7, 30, 54, 0.8);
+      --header-card-bg: rgba(12, 45, 72, 0.6);
+      --heading-text: #ffffff;
+      --heading-sub-text: #e0f2fe;
+      --quote-color: #bae6fd;
+    }
+    
+    /* ============ THEME 4: Klassisch (Papier / Light) ============ */
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --bg-image: none;
+      --accent-cyan: #0284c7;
+      --accent-blue: #2563eb;
+      --accent-purple: #4f46e5;
+      --accent-pink: #7c3aed;
+      --accent-orange: #b45309;
+      --text-main: #334155;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-glow: rgba(0, 0, 0, 0.05);
+      --gold-accent: #b45309;
+      --eq-bg: #f1f5f9;
+      --header-card-bg: #ffffff;
+      --heading-text: #0f172a;
+      --heading-sub-text: #1e293b;
+      --quote-color: #b45309;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-color);
+      background-image: var(--bg-image);
+      background-attachment: fixed;
+      color: var(--text-main);
+      line-height: 1.75;
+      padding: 100px 20px 60px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    
+    /* ---- Fixed Toolbar ---- */
+    .toolbar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      padding: 14px 10px;
+      background: linear-gradient(to bottom, var(--bg-color) 60%, transparent);
+    }
+    
+    .controls-bar {
+      display: flex;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(12px);
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 96vw;
+    }
+    
+    .btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+    .btn.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
+    
+    .container { max-width: 980px; width: 100%; }
+    
+    /* ---- Header ---- */
+    .header-card {
+      background: var(--header-card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 46px 40px;
+      margin-bottom: 34px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--card-glow);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+    }
+    .badge {
+      display: inline-block; padding: 6px 16px; font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 2px; color: var(--accent-cyan); background: rgba(0,242,254,0.1);
+      border: 1px solid var(--card-border); border-radius: 30px; margin-bottom: 18px; text-transform: uppercase;
+    }
+    .fiat-lux-title {
+      font-size: 3rem; font-weight: 800; margin-bottom: 6px;
+      color: var(--gold-accent);
+      text-shadow: 0 0 15px var(--card-glow), 0 0 30px var(--card-glow);
+    }
+    h1 {
+      font-size: 2.1rem; font-weight: 800; line-height: 1.3; margin-bottom: 14px;
+      background: linear-gradient(135deg, var(--heading-text) 0%, var(--heading-sub-text) 100%);
+      -webkit-background-clip: text; -webkit-color: transparent;
+    }
+    .subtitle { font-size: 1.15rem; color: var(--accent-cyan); font-style: italic; margin-bottom: 18px; }
+    .intro-text { font-size: 1.05rem; color: var(--text-muted); max-width: 760px; margin: 0 auto; }
+    .author-info { margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; }
+    
+    /* ---- Part divider ---- */
+    .part-divider {
+      text-align: center; margin: 60px 0 30px 0; position: relative;
+    }
+    .part-divider .part-eyebrow {
+      display: inline-block; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent-cyan); margin-bottom: 8px;
+    }
+    .part-divider h1 {
+      font-size: 2rem;
+    }
+    .part-divider .part-line {
+      height: 2px; width: 120px; margin: 18px auto 0 auto;
+      background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+    }
+    
+    /* ---- Section cards ---- */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 26px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s ease;
+      scroll-margin-top: 90px;
+    }
+    .section-card:hover { border-color: var(--accent-cyan); }
+    
+    .section-card > h2 {
+      font-size: 1.45rem; color: var(--heading-text); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--card-border); padding-bottom: 12px;
+      cursor: pointer; user-select: none;
+    }
+    h2 {
+      font-size: 1.45rem; color: var(--heading-text); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--card-border); padding-bottom: 12px;
+    }
+    h2::before {
+      content: ""; display: inline-block; width: 4px; height: 22px; flex-shrink: 0;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-blue)); border-radius: 2px;
+    }
+    .section-card > h2::after {
+      content: "▾";
+      margin-left: auto;
+      color: var(--accent-cyan);
+      font-size: 1.1rem;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    .section-card.collapsed > h2::after { transform: rotate(-90deg); }
+    .section-card.collapsed > h2 { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+    .section-card > *:not(h2) {
+      overflow: hidden;
+      max-height: 20000px;
+      opacity: 1;
+      transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.35s ease;
+    }
+    .section-card.collapsed > *:not(h2) {
+      max-height: 0 !important;
+      opacity: 0;
+      margin: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    h3 { font-size: 1.15rem; color: var(--accent-cyan); margin: 22px 0 12px 0; }
+    h4 { font-size: 1.0rem; color: var(--gold-accent); margin: 16px 0 8px 0; }
+    
+    p { margin-bottom: 15px; color: var(--text-main); text-align: justify; }
+    p:last-child { margin-bottom: 0; }
+    
+    ul, ol { margin: 12px 0 18px 24px; color: var(--text-main); }
+    li { margin-bottom: 8px; }
+    li strong { color: var(--heading-text); }
+    
+    .equation-box {
+      background: var(--eq-bg); border-left: 3px solid var(--accent-cyan); border-radius: 8px;
+      padding: 16px 20px; margin: 18px 0; overflow-x: auto; text-align: center;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    }
+    
+    .insight-box {
+      background: linear-gradient(135deg, rgba(127,0,255,0.1) 0%, rgba(79,172,254,0.1) 100%);
+      border: 1px solid var(--card-border); border-radius: 12px; padding: 18px 22px; margin: 20px 0;
+    }
+    
+    .quote-box {
+      border-left: 4px solid var(--gold-accent); padding: 14px 20px; margin: 22px 0;
+      font-style: italic; color: var(--quote-color); background: rgba(255,255,255,0.02); border-radius: 0 10px 10px 0;
+    }
+    .quote-box .author { display:block; margin-top: 8px; font-style: normal; font-weight: 700; text-align: right; }
+    
+    .note-box {
+      border: 1px solid var(--accent-orange); background: rgba(255,180,84,0.07);
+      border-radius: 10px; padding: 14px 20px; margin: 18px 0; font-size: 0.95rem;
+    }
+    
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.92rem; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--card-border); }
+    th { color: var(--accent-cyan); font-weight: 700; }
+    
+    .toc-box ol { columns: 1; }
+    .toc-box a { color: var(--text-main); text-decoration: none; }
+    .toc-box a:hover { color: var(--accent-cyan); }
+    .toc-part-label { color: var(--gold-accent); font-weight: 700; margin: 14px 0 6px 0; display: block; }
+    
+    .svg-container { text-align: center; margin: 22px 0; padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--eq-bg); }
+    .svg-container svg { max-width: 100%; height: auto; }
+    .caption { font-size: 0.82rem; color: var(--text-muted); margin-top: 8px; }
+    
+    hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--card-border), transparent); margin: 30px 0; }
+    strong { color: var(--heading-text); }
+    
+    footer { text-align: center; padding: 40px 0 10px 0; color: var(--text-muted); font-size: 0.85rem; }
+    
+    details > summary { cursor: pointer; color: var(--accent-cyan); font-weight: 700; }
+    
+    :fullscreen { background: var(--bg-color); overflow-y: auto; }
+    
+    @media (max-width: 768px) {
+      body { padding: 130px 12px 40px 12px; }
+      .header-card, .section-card { padding: 22px 18px; }
+      .fiat-lux-title { font-size: 2.2rem; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ================= TOOLBAR ================= -->
-<div class="toolbar">
-  <div class="controls-bar">
-    <button class="btn active" onclick="setTheme('cosmic', this)">🌌 Cosmic Dark</button>
-    <button class="btn" onclick="setTheme('cyberpunk', this)">⚡ Cyberpunk</button>
-    <button class="btn" onclick="setTheme('deepspace', this)">🚀 Deep Space</button>
-    <button class="btn" onclick="setTheme('light', this)">☀️ Klassisch</button>
-    <button class="btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
-    <button class="btn" onclick="collapseAll(true)">▸ Alle zuklappen</button>
-    <button class="btn" onclick="collapseAll(false)">▾ Alle aufklappen</button>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- ================= TITELSEITE ================= -->
-  <div class="header-card">
-    <div class="badge">🌌 Wellenraumzeit-Theorie (WRZT) 🌀</div>
-    <div class="fiat-lux-title">💡 Fiat Lux</div>
-    <h1>Das Gesamt-Manifest der Wellenraumzeit-Theorie</h1>
-    <div class="subtitle">„Es werde Licht" — Von der Architektur des Kosmos zur Natur des Lichts</div>
-    <p class="intro-text">
-      Ein zusammenfassendes Werk aus Einleitung, anschaulichen Erklärungen, mathematischen Herleitungen
-      und offenen Überlegungen: Die WRZT beschreibt das Universum als ein elastisches, dreidimensionales
-      Raumzeit-Netzwerk, in dem Materie gefangener Wirbelschwung und Licht dessen freie, hochfrequente
-      Gravitationswelle ist.
-    </p>
-    <div class="author-info">Gesamtausgabe · Zusammengeführt aus allen Entwicklungsstufen · Autoren: Jo D. (@juppijo) &amp; Zaminia</div>
-  </div>
-
-  <!-- ================= INHALTSVERZEICHNIS ================= -->
-  <div class="section-card toc-box" id="toc">
-    <h2>📖 Inhaltsverzeichnis</h2>
-
-    <span class="toc-part-label">Teil I — Einleitung &amp; Philosophie</span>
-    <ol>
-      <li><a href="#i1">Vorwort: Was ist Licht?</a></li>
-    </ol>
-
-    <span class="toc-part-label">Teil II — Die Architektur des Kosmos (Grundlagen)</span>
-    <ol>
-      <li><a href="#ii1">Das elastische Raumzeit-Netzwerk</a></li>
-      <li><a href="#ii2">Das 3D-Knotennetzwerk und die kosmische Elastizität</a></li>
-      <li><a href="#ii3">Materie und Licht als dynamische Netzerregungen</a></li>
-      <li><a href="#ii4">Relativistische Verdichtung und der Lorentz-Faktor γ</a></li>
-    </ol>
-
-    <span class="toc-part-label">Teil III — Der relativistische Bugwellen-Effekt</span>
-    <ol>
-      <li><a href="#iii1">Geometrische Natur der Raumzeit-Bugwelle</a></li>
-      <li><a href="#iii2">Der Bugwellen-Winkel α und der Lorentz-Faktor γ</a></li>
-      <li><a href="#iii3">Von der Ruhe-Mechanik zur relativistischen Begrenzung</a></li>
-      <li><a href="#iii4">Invarianz der Wellenausbreitungsgeschwindigkeit c</a></li>
-    </ol>
-
-    <span class="toc-part-label">Teil IV — Fiat Lux: Licht als hochfrequente Gravitationswelle</span>
-    <ol>
-      <li><a href="#sec1">Einleitung: Was ist Licht?</a></li>
-      <li><a href="#sec2">Das Teilchen-Antiteilchen-Konzept</a></li>
-      <li><a href="#sec2b">Quantitativer Beweis und Herleitung</a></li>
-      <li><a href="#sec2c">Relativistische Verfeinerung: R<sub>min</sub> und Systemkonstanten</a></li>
-      <li><a href="#sec3">Eigenschaften des Lichts</a></li>
-      <li><a href="#sec4">Spin von Photonen</a></li>
-      <li><a href="#sec5">Weitere Eigenschaften des Lichts</a></li>
-      <li><a href="#sec6">Doppelspaltexperiment und Quantenverschränkung</a></li>
-      <li><a href="#sec7">Raumzeitkrümmung vs. Raumzeit-Wölbung</a></li>
-      <li><a href="#sec8">Energieabgabe und Annihilation</a></li>
-      <li><a href="#sec9">Das Licht der Sonne</a></li>
-      <li><a href="#sec10">Hochfrequente Gravitationswellen</a></li>
-      <li><a href="#sec11">Konsequenzen des Modells</a></li>
-      <li><a href="#sec12">Schlusswort</a></li>
-    </ol>
-
-    <span class="toc-part-label">Teil V — Der Undatron-Mechanismus</span>
-    <ol>
-      <li><a href="#v1">Der Tanz an der Lichtgeschwindigkeit</a></li>
-      <li><a href="#v2">Der Undatron-Kollaps</a></li>
-      <li><a href="#v3">Bugwellen-Geometrie und Wellenüberlagerung</a></li>
-    </ol>
-
-    <span class="toc-part-label">Teil VI — Einordnung, offene Fragen &amp; Ausblick</span>
-    <ol>
-      <li><a href="#vi1">Licht — beschrieben auf verschiedene Arten</a></li>
-      <li><a href="#vi2">Noch offene Fragen und Ausblick</a></li>
-    </ol>
-
-    <span class="toc-part-label">Teil VII — Anhang</span>
-    <ol>
-      <li><a href="#a1">Tabelle der Ur-Konstanten und Längenskalen</a></li>
-      <li><a href="#a2">Das elektromagnetische Spektrum</a></li>
-      <li><a href="#a3">Modellrechnungen: Umdrehungsfrequenz und Bahnradius</a></li>
-    </ol>
-  </div>
-
-  <!-- ================= KURZFASSUNG ================= -->
-  <div class="section-card">
-    <h2>⚡ Kurzfassung der WRZT</h2>
-    <p>
-      Die <strong>Wellenraumzeit-Theorie (WRZT)</strong> beschreibt das Universum nicht als leeres,
-      abstraktes Vakuum mit punktförmigen Teilchen, sondern als ein <strong>dreidimensionales, elastisches
-      Knotennetzwerk</strong>. Materie und Strahlung sind keine getrennten Phänomene, sondern lokalisierte,
-      rotierende Deformationswellen (Schwingungswirbel) innerhalb dieser Raumzeit-Struktur.
-    </p>
-    <p>
-      Licht ist in diesem Bild eine hochfrequente, transversale Raumzeit-Welle, die sich mit der
-      charakteristischen Ausbreitungsgeschwindigkeit des Netzes ($c$) bewegt. Ruhemasse entsteht erst dann,
-      wenn diese Welle auf einer geschlossenen Bahn gefangen wird (Quanten-Lokalisierung). Jedes Teilchen
-      entspricht dabei einer lokalen Raumzeitkrümmung (Vertiefung), jedes Antiteilchen einer komplementären
-      Raumzeit-Wölbung.
-    </p>
-    <div class="insight-box">
-      <strong>Zentrale Aussage:</strong> Wenn ein Elektron-Positron-Paar mit nahezu Lichtgeschwindigkeit
-      um seinen gemeinsamen Schwerpunkt rotiert, entstehen hochfrequente Raumzeit-Bugwellen, die wir
-      makroskopisch als Licht wahrnehmen. Der sich aus dem Kräftegleichgewicht ergebende Grenzradius
-      entspricht exakt dem klassischen Elektronenradius $r_e \approx 2{,}8179 \times 10^{-15}\text{ m}$.
+  <!-- ================= TOOLBAR ================= -->
+  <div class="toolbar">
+    <div class="controls-bar">
+      <button class="btn active" onclick="setTheme('cosmic', this)">🌌 Cosmic Dark</button>
+      <button class="btn" onclick="setTheme('cyberpunk', this)">⚡ Cyberpunk</button>
+      <button class="btn" onclick="setTheme('deepspace', this)">🚀 Deep Space</button>
+      <button class="btn" onclick="setTheme('light', this)">☀️ Klassisch</button>
+      <button class="btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
+      <button class="btn" onclick="collapseAll(true)">▸ Alle zuklappen</button>
+      <button class="btn" onclick="collapseAll(false)">▾ Alle aufklappen</button>
     </div>
   </div>
 
-  <!-- Illustration -->
-  <div class="svg-container">
-    <svg width="700" height="320" viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
-          <stop offset="30%" stop-color="#00f2fe" stop-opacity="0.8" />
-          <stop offset="70%" stop-color="#4facfe" stop-opacity="0.3" />
-          <stop offset="100%" stop-color="#0b0f19" stop-opacity="0" />
-        </radialGradient>
-        <radialGradient id="antiGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
-          <stop offset="30%" stop-color="#e100ff" stop-opacity="0.8" />
-          <stop offset="70%" stop-color="#7f00ff" stop-opacity="0.3" />
-          <stop offset="100%" stop-color="#0b0f19" stop-opacity="0" />
-        </radialGradient>
-      </defs>
-      <g stroke="#1e293b" stroke-width="1">
-        <path d="M 0,50 Q 350,180 700,50" fill="none" />
-        <path d="M 0,100 Q 350,200 700,100" fill="none" />
-        <path d="M 0,150 Q 350,220 700,150" fill="none" />
-        <path d="M 0,200 Q 350,240 700,200" fill="none" />
-        <path d="M 0,250 Q 350,260 700,250" fill="none" />
-      </g>
-      <g fill="none" stroke-width="1.5" opacity="0.6">
-        <circle cx="350" cy="160" r="40" stroke="#00f2fe" stroke-dasharray="4,4" />
-        <circle cx="350" cy="160" r="80" stroke="#00f2fe" opacity="0.8" />
-        <circle cx="350" cy="160" r="130" stroke="#4facfe" opacity="0.5" />
-        <circle cx="350" cy="160" r="190" stroke="#4facfe" opacity="0.3" />
-      </g>
-      <circle cx="320" cy="150" r="24" fill="url(#starGlow)" />
-      <circle cx="380" cy="170" r="24" fill="url(#antiGlow)" />
-      <circle cx="320" cy="150" r="6" fill="#00f2fe" />
-      <circle cx="380" cy="170" r="6" fill="#e100ff" />
-      <path d="M 320,120 A 35,35 0 0,1 385,140" fill="none" stroke="#00f2fe" stroke-width="2" />
-      <path d="M 380,200 A 35,35 0 0,1 315,180" fill="none" stroke="#e100ff" stroke-width="2" />
-      <text x="350" y="300" fill="#94a3b8" font-size="14" text-anchor="middle">Rotierendes Teilchen-Antiteilchen-Paar als Quelle hochfrequenter Raumzeitwellen</text>
-    </svg>
-    <div class="caption">Abbildung: Dynamische Raumzeitverzerrung durch die Rotation gekoppelter Ladungs-/Massezentren in der WRZT.</div>
-  </div>
+  <div class="container">
 
-
-  <!-- ======================================================= -->
-  <!-- TEIL I — EINLEITUNG & PHILOSOPHIE                         -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil1">
-    <span class="part-eyebrow">Teil I</span>
-    <h1>Einleitung &amp; Philosophie</h1>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card" id="i1">
-    <h2>Vorwort: Was ist Licht?</h2>
-    <p>
-      Licht ist seit Jahrhunderten eines der faszinierendsten Phänomene, die Wissenschaftler, Philosophen
-      und Denker untersucht haben. Von den ersten Überlegungen zur Natur des Lichts als Welle bis hin zur
-      Entdeckung seiner Dualität als Teilchen und Welle hat die Menschheit stetig versucht, seine wahre
-      Natur zu begreifen. In der klassischen Physik wird Licht als elektromagnetische Welle beschrieben,
-      die sich durch den Raum bewegt. Die Quantenmechanik ergänzt dies, indem sie Licht als eine Ansammlung
-      von Photonen beschreibt – Teilchen mit einer bestimmten Energie und einem Spin.
-    </p>
-    <p>
-      Doch was wäre, wenn Licht mehr als nur ein Zusammenspiel elektrischer und magnetischer Felder ist?
-      Was, wenn Licht selbst eine Form der Raumzeitdeformation darstellt – eine Gravitationswelle? Diese
-      Frage bildet den Ausgangspunkt der <strong>Wellenraumzeit-Theorie (WRZT)</strong>: eine Perspektive,
-      die nicht nur unser Verständnis von Licht verändern könnte, sondern auch tiefergehende Fragen über
-      die Verbindung von Gravitation und Quantenmechanik zu beantworten versucht.
-    </p>
-    <p>
-      Bevor wir zur Natur des Lichts selbst kommen, lohnt sich ein Blick auf die tiefere Bühne, auf der
-      sich dieses Licht abspielt: die Struktur der Raumzeit selbst. Teil II dieses Manifests entwirft
-      diese Bühne — ein elastisches, dreidimensionales Netzwerk, aus dem heraus sich in Teil III und IV
-      Materie, Bewegung und schließlich Licht als notwendige Konsequenzen ergeben.
-    </p>
-    <div class="quote-box">
-      „Man sollte eine Theorie nicht vorschnell verwerfen, nur weil sie Fehler zeigt – sie könnte den Weg
-      zu tieferem Verständnis ebnen.“
-    </div>
-    <p>
-      Dieser Gedanke ist der Leitfaden für die Erforschung neuer Konzepte, die bestehende Annahmen
-      herausfordern und unser Wissen erweitern sollen. Im Folgenden werden die Grundlagen dieser Theorie
-      dargelegt, ihre mathematischen Implikationen untersucht und die Verbindungen zu bekannten
-      physikalischen Phänomenen wie der Quantenverschränkung und der Doppelspalt-Interferenz erklärt.
-      Abschließend werden offene Fragen formuliert, die zu weiterem Nachdenken anregen sollen.
-    </p>
-    <div class="quote-box">
-      „Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“
-      <span class="author">— Thich Nhat Hanh</span>
-    </div>
-  </div>
-
-
-  <!-- ======================================================= -->
-  <!-- TEIL II — DIE ARCHITEKTUR DES KOSMOS                      -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil2">
-    <span class="part-eyebrow">Teil II</span>
-    <h1>Die Architektur des Kosmos</h1>
-    <div class="subtitle">Das elastische Raumzeit-Netzwerk der WRZT</div>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card" id="ii1">
-    <h2>Das elastische Raumzeit-Netzwerk</h2>
-    <p>
-      Stell dir das Universum nicht als leere, abstrakte Bühne vor, sondern als ein dreidimensionales,
-      kontinuierliches Gewebe aus feinsten, elastisch miteinander verwobenen Knoten – ähnlich wie ein
-      riesiger, dreidimensionaler Schwamm. Alles, was wir in der Physik als feste Materie oder
-      Elementarteilchen kennen, sind in Wahrheit keine starren Kügelchen, sondern lokal gefangene,
-      hochfrequent rotierende Wirbelwellen innerhalb dieses Netzes.
-    </p>
-    <p>
-      Wenn sich ein solches Wirbelzentrum durch das Raumzeit-Gitter bewegt, gleitet es nicht reibungsfrei
-      hindurch, sondern verdrängt und verdichtet die Maschen vor sich. Es entsteht eine elastische
-      Verdichtungsfront – genau wie die Bugwelle eines Schiffes, das durch das Wasser schneidet. Je
-      schneller sich das Teilchen bewegt, desto enger ziehen sich die Maschen direkt vor ihm zusammen,
-      und desto steifer reagiert das Gewebe gegen eine weitere Beschleunigung.
-    </p>
-    <p>
-      Licht wiederum ist keine isolierte Teilchenströmung, sondern die freie, ungebundene Welle dieses
-      Netzwerks selbst: Wenn rotierende Teilchen-Antiteilchen-Strukturen das Gitter in hochfrequente
-      Vibrationen versetzen, breiten sich diese Auslenkungen als elastische Transversalwellen durch das
-      Netz aus. Licht verhält sich somit fundamental wie eine hochenergetische Raumzeit-Schwingung.
-    </p>
-  </div>
-
-  <div class="section-card" id="ii2">
-    <h2>1. Das 3D-Knotennetzwerk und die kosmische Elastizität</h2>
-    <p>
-      Das kosmische Netz durchdringt den gesamten Raum und besitzt durch seine fundamentale Struktur eine
-      intrinsische <strong>3D-Ur-Volumendichte</strong> $\rho_{\text{Ur},0}$ sowie eine homogene
-      <strong>1D-Ruhe-Urspannung</strong> $\Xi_0$. Analog zu einem feuchten, komprimierten Schwamm, der
-      sich beim Trocknen gleichmäßig in alle Richtungen ausdehnt, befindet sich das Universum in einem
-      Zustand stetiger Expansion, die vor allem an seinen äußeren Rändern neuen Schwingungsraum schafft.
-    </p>
-    <p>
-      Durch diese Expansion wird das Netz nicht zerrissen, sondern behält seine universelle Elastizität.
-      Innerhalb dieser schwammartigen Geometrie existieren kleinste, nicht weiter komprimierbare
-      Hohlräume bzw. Maschenweiten. Die fundamentale Zellgröße dieses ungestörten Netzes wird im
-      Ruhezustand durch den <strong>Quanten-Minimal-Radius</strong> $R_{\min,0}$ definiert:
-    </p>
-    <div class="equation-box">$$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}$$</div>
-    <p>In diesem ungestörten Ruhezustand ergeben sich für das Vakuumnetzwerk präzise kalibrierte Grundgrößen:</p>
-    <ul>
-      <li><strong>Ruhe-Raumzeit-Trägheit eines Netzknotens:</strong> $\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31} \text{ kg}$</li>
-      <li><strong>3D-Ur-Dichte:</strong> $\rho_{\text{Ur},0} = \frac{\eta_0}{R_{\min,0}^3} \approx 6{,}330062 \times 10^7 \text{ kg/m}^3$</li>
-      <li><strong>3D-Ur-Druck (Volumenspannung):</strong> $P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2 \approx 5{,}689104 \times 10^{24} \text{ N/m}^2$</li>
-    </ul>
-  </div>
-
-  <div class="section-card" id="ii3">
-    <h2>2. Materie und Licht als dynamische Netzerregungen</h2>
-    <p>
-      In diesem Schwingungsmedium manifestieren sich alle physikalischen Phänomene nicht als isolierte
-      Objekte, sondern als unterschiedliche Erregungsformen desselben elastischen Netzwerks:
-    </p>
-    <h3>Stehende Ringwirbelwellen (Materie)</h3>
-    <p>
-      Materie entsteht dort, wo Schwingungsenergie lokal gebunden und in sich geschlossen rotiert. Ein
-      Elementarteilchen (wie das Elektron) bildet eine <strong>stehende ringförmige Wirbelwelle</strong>
-      (Toroid) im 3D-Knotennetz. Die im Kreis gefangene Feldenergie erzeugt nach außen hin das Verhalten
-      einer ruhenden Masse $m_0$. Der Schwerpunkt der Welle bleibt lokalisiert, während die innere
-      Phasenschwingung mit Lichtgeschwindigkeit $c$ den Spin $\hbar$ aufbaut.
-    </p>
-    <h3>Transversale Elastizitätswellen (Licht &amp; Gravitationswellen)</h3>
-    <p>
-      Licht ist die freie, hochfrequente Fortpflanzung einer Scherkraft- oder Torsionsschwingung durch
-      das Knotennetzwerk. Wenn sich Teilchen-Antiteilchen-Deformationen bewegen oder rotieren, versetzen
-      sie die elastischen Stränge in transversale Schwingung. Licht verhält sich somit fundamental wie
-      eine <strong>hochfrequente Gravitationswelle</strong>. Die Phasen- und Ausbreitungsgeschwindigkeit
-      $c$ dieser Wellen ist eine direkte Konsequenz der elastischen Netzparameter:
-    </p>
-    <div class="equation-box">$$c = \sqrt{\frac{P_{\text{Ur}}}{\rho_{\text{Ur}}}} = 299.792.458 \text{ m/s} ←✨→ \frac{\Xi_0}{\eta_0} \cdot R_{\min,0} =1$$</div>
-  </div>
-
-  <div class="section-card" id="ii4">
-    <h2>3. Relativistische Verdichtung und der Lorentz-Faktor γ</h2>
-    <p>
-      Bewegen sich Wirbelzentren oder Wellenfelder mit einer Relativgeschwindigkeit $v$ durch das Netz,
-      verengt und verdichtet sich die Maschenstruktur im Wechselwirkungsbereich. Diese geometrische
-      Kontraktion wird durch den <strong>Lorentz-Faktor</strong> $\gamma$ exakt beschrieben:
-    </p>
-    <div class="equation-box">$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$</div>
-    <p>Unter relativistischer Belastung skalieren die fundamentalen Netzvariablen der WRZT dynamisch:</p>
-    <ol>
-      <li><strong>Relativistischer Minimal-Radius (Maschenkompression):</strong>
-        <div class="equation-box">$$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} = \frac{\hbar}{2 \gamma m_e c}$$</div>
-        <p>Der effektive Hohlraum des „Schwamms“ zieht sich unter hoher Energie proportional zu $\gamma^{-1}$ zusammen.</p>
-      </li>
-      <li><strong>Relativistische Knoten-Trägheit:</strong>
-        <div class="equation-box">$$\eta(\gamma) = \gamma \cdot \eta_0$$</div>
-      </li>
-      <li><strong>Relativistische Urspannung (1D-Linienspannung):</strong>
-        <div class="equation-box">$$\Xi(\gamma) = \gamma^2 \cdot \Xi_0$$</div>
-      </li>
-      <li><strong>Relativistische Dichte &amp; Druck (3D-Volumenverdichtung):</strong>
-        <div class="equation-box">$$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0} \qquad P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$</div>
-      </li>
-    </ol>
-    <p>
-      Durch diese dynamische Verfeinerung des Netzes bleibt das Verhältnis von Druck zu Dichte stets
-      invariant, wodurch die Lichtgeschwindigkeit $c$ universell konstant bleibt:
-    </p>
-    <div class="equation-box">$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 P_{\text{Ur},0}}{\gamma^4 \rho_{\text{Ur},0}}} = c$$</div>
-    <div class="insight-box">
-      <strong>Synthese:</strong> Das Universum ist ein gigantischer, elastischer Oszillator. Die
-      scheinbare Leere ist erfüllt von einem dichten, hocheffizienten Knotennetzwerk, das sich kosmisch
-      ausdehnt und dessen minimale Porenweite durch $R_{\min}$ begrenzt ist. Materie ist lokal gefangener
-      Wirbelschwung, Licht ist der freie Wellenimpuls durch die Stränge, und die Relativitätstheorie
-      beschreibt schlicht die geometrische Kompression dieses Schwingungsmediums unter dynamischer Belastung.
-    </div>
-  </div>
-
-
-  <!-- ======================================================= -->
-  <!-- TEIL III — DER RELATIVISTISCHE BUGWELLEN-EFFEKT           -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil3">
-    <span class="part-eyebrow">Teil III</span>
-    <h1>Der relativistische Bugwellen-Effekt der Materie</h1>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card">
-    <h2>Vorbemerkung</h2>
-    <p>
-      Die Betrachtung des Bugwellen-Effekts bei Materie berührt den innersten Kern der Wellenraumzeit-Theorie.
-      Wenn ein Teilchen – verstanden als lokalisierte, rotierende Knoten-Deformation unseres
-      dreidimensionalen Raumzeit-Netzwerks – sich relativ zum ungestörten Vakuumgitter bewegt, gleitet es
-      nicht isoliert durch einen leeren Raum. Es verdrängt und verdichtet die elastischen Stränge des
-      Quellnetzes vor sich und zieht ein dynamisches Wellenfeld hinter sich her.
-    </p>
-  </div>
-
-  <div class="section-card" id="iii1">
-    <h2>1. Geometrische Natur der Raumzeit-Bugwelle</h2>
-    <p>
-      In der klassischen Strömungsmechanik erzeugt ein Objekt, das sich schneller als die
-      Schallgeschwindigkeit eines Mediums bewegt, eine Mach'sche Stoßwelle. In der WRZT wird dieses
-      Konzept fundamental auf das Vakuumgitter übertragen:
-    </p>
-    <ul>
-      <li><strong>Wellenleiter-Medium:</strong> Das 3D-Knotennetzwerk der Raumzeit besitzt eine fundamentale Ausbreitungsgeschwindigkeit für elastische Transversalwellen: die Lichtgeschwindigkeit $c = 299.792.458\text{ m/s}$.</li>
-      <li><strong>Materie als Wellenpaket:</strong> Materie besteht aus lokal gebundenen, hochfrequent rotierenden Raumzeit-Deformationen. Bewegt sich der Schwerpunkt dieser Struktur mit einer Geschwindigkeit $v < c$, überlagern sich die kugelförmigen Phasenwellen asymmetrisch.</li>
-      <li><strong>Frontenüberlagerung:</strong> Durch die Eigenbewegung des Knotenzentrums überlagern sich die kreisförmigen bzw. kugelförmigen Phasenwellen in Bewegungsrichtung. Es entsteht eine dynamische Verdichtungsfront: die <strong>Raumzeit-Bugwelle</strong>.</li>
-    </ul>
-  </div>
-
-  <div class="section-card" id="iii2">
-    <h2>2. Der Bugwellen-Winkel α und der Lorentz-Faktor γ</h2>
-    <p>
-      Durch den Bugwellen-Winkel $\alpha$ fügt sich die relativistische Mechanik der WRZT direkt in die
-      Phasen-Geometrie des 3D-Knotennetzwerks ein. Der Lorentz-Faktor $\gamma$ verliert dadurch jegliche
-      Abstraktheit und wird zu einer reinen trigonometrischen Projektion der Raumzeit-Wölbung.
-    </p>
-    <h3>Geometrische Herleitung</h3>
-    <p><strong>1. Definition des Bugwellen-Winkels $\alpha$:</strong> Der Winkel $\alpha$ beschreibt den Neigungswinkel der Phasenfront gegenüber der Ausbreitungsrichtung:</p>
-    <div class="equation-box">$$\sin \alpha = \frac{v}{c} \implies \alpha = \arcsin\left(\frac{v}{c}\right)$$</div>
-    <p><strong>2. Der transversale Projektionsfaktor $\cos \alpha$:</strong></p>
-    <div class="equation-box">$$\cos \alpha = \sqrt{1 - \sin^2 \alpha} = \sqrt{1 - \frac{v^2}{c^2}}$$</div>
-    <p><strong>3. Identität mit dem Lorentz-Faktor $\gamma$:</strong> Der relativistische Korrekturfaktor $\gamma$ entspricht exakt der Sekans-Funktion des Bugwellen-Winkels:</p>
-    <div class="equation-box">$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} = \frac{1}{\cos \alpha} = \sec \alpha$$</div>
-
-    <h3>Integration in die relativistischen WRZT-Grundgleichungen</h3>
-    <p>Setzt man $\gamma = \sec \alpha$ in die Grundgleichungen des Raumzeitnetzes ein, transformieren sich alle physikalischen Größen direkt in Abhängigkeit vom Bugwellen-Winkel $\alpha$:</p>
-    <ul>
-      <li><strong>Relativistischer Netz-Radius:</strong> $$R(\alpha) = R_{\min,0} \cdot \cos \alpha = \frac{\hbar}{2 \gamma m_e c}$$</li>
-      <li><strong>Dynamische Knotenträgheit:</strong> $$\eta(\alpha) = \eta_0 \cdot \sec \alpha = \frac{\eta_0}{\cos \alpha}$$</li>
-      <li><strong>Dynamische 1D-Urspannung:</strong> $$\Xi(\alpha) = \Xi_0 \cdot \sec^2 \alpha = \frac{\Xi_0}{\cos^2 \alpha}$$</li>
-      <li><strong>3D-Ur-Dichte &amp; Druck:</strong> $$\rho_{\text{Ur}}(\alpha) = \rho_{\text{Ur},0} \cdot \sec^4 \alpha \qquad P_{\text{Ur}}(\alpha) = P_{\text{Ur},0} \cdot \sec^4 \alpha$$</li>
-    </ul>
-    <div class="note-box">
-      <strong>Physikalische Interpretation:</strong> Ein Körper, der sich der Lichtgeschwindigkeit $c$
-      nähert, stellt seine Schwingungsenergie zunehmend in die Längsrichtung der Phasen-Bugwelle ein. Der
-      Winkel $\alpha$ öffnet sich von $0^\circ$ (Ruhezustand) bis hin zu $90^\circ$ (Lichtgeschwindigkeit).
-      Bei $\alpha = 90^\circ$ kollabiert der transversale Radius $R(\alpha)$ auf 0, während die
-      Linienspannung $\Xi(\alpha)$ über alle Grenzen wächst – genau das verhindert, dass ein massiver
-      Knoten die Grenzgeschwindigkeit $c$ überschreiten kann.
-    </div>
-  </div>
-
-  <div class="section-card" id="iii3">
-    <h2>3. Von der Ruhe-Mechanik zur relativistischen Raumzeit-Begrenzung</h2>
-    <p>Um die dynamische Versteifung des Raumes vor dem bewegten Teilchen zu verstehen, betrachten wir den Übergang von den ruhenden Ur-Konstanten zu den relativistisch transformierten Netzgrößen.</p>
-    <h3>Schritt 1: Der ungestörte Ruhe-Zustand (γ = 1)</h3>
-    <p>Für einen einzelnen schwingenden Netzknoten im ungekoppelten Ruhesystem (kalibriert auf ein Paar-System mit der effektiven Trägheit $m_e/2$) gelten die fundamentalen Ruhe-Größen:</p>
-    <div class="equation-box">
-      $$\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31}\text{ kg}$$
-      $$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13}\text{ m}$$
-      $$\Xi_0 = \frac{\eta_0}{R_{\min,0}} = \frac{m_e^2 c}{\hbar} \approx 2{,}358826 \times 10^{-18}\text{ kg/m}$$
-    </div>
-    <h3>Schritt 2: Relativistische Verdichtung der Bugwelle (γ &gt; 1)</h3>
-    <p>Rückt die Materie voran, staut sich das Raumzeit-Gitter in Bewegungsrichtung. Diese Kompression verengt die Maschenweite des Gitters entlang der Bewegungslinie (Lorentz-Kontraktion der Raumzeit-Zellen):</p>
-    <div class="equation-box">
-      $$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} \qquad \eta(\gamma) = \gamma \cdot \eta_0 \qquad \Xi(\gamma) = \gamma^2 \cdot \Xi_0$$
-    </div>
-    <p>Da sich der Raum dreidimensional verengt ($V(\gamma) \propto R_{\min}(\gamma)^3 \propto \gamma^{-3}$), steigen die Volumendichte und der effektive Ur-Druck in der Bugfront steil an:</p>
-    <div class="equation-box">
-      $$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0} \qquad P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$
-    </div>
-  </div>
-
-  <div class="section-card" id="iii4">
-    <h2>4. Invarianz der Wellenausbreitungsgeschwindigkeit c</h2>
-    <p>Ein zentraler Prüfstein der Wellenraumzeit-Theorie ist die Frage, ob die Ausbreitungsgeschwindigkeit von Netzwellen unter relativistischer Verdichtung konstant bleibt. Setzt man die relativistischen Ausdrücke von Druck und Dichte in die Phasenströmungsgleichung ein:</p>
-    <div class="equation-box">$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s}$$</div>
-    <p>Da sich der Faktor $\gamma^4$ im Zähler und Nenner exakt herauskürzt, bleibt die Phasengeschwindigkeit der Welle in jedem Bewegungszustand strikt invariant. Die Geometrie des Gitters zieht sich zwar zusammen, aber der innere elastische Druck steigt im exakt gleichen Verhältnis an.</p>
-
-    <h3>Der relativistische Phasen-Bugwellen-Winkel θ</h3>
-    <p>Der Phasen-Bugwellen-Winkel $\theta$ beschreibt die geometrische Öffnung der Verdichtungsfront im Raumzeit-Netz. Seine Sinus-Komponente entspricht exakt dem Kehrwert des Lorentz-Faktors:</p>
-    <div class="equation-box">$$\sin(\theta) = \frac{1}{\gamma} = \sqrt{1 - \frac{v^2}{c^2}}$$</div>
-    <table>
-      <thead><tr><th>Zustand</th><th>Geschwindigkeit</th><th>γ</th><th>θ</th></tr></thead>
-      <tbody>
-        <tr><td>Ruhezustand</td><td>$v = 0$</td><td>$\gamma = 1$</td><td>$\theta = 90^\circ$ (kugelsymmetrisch)</td></tr>
-        <tr><td>Relativistisch</td><td>$v = 0{,}8\,c$</td><td>$\gamma \approx 1{,}667$</td><td>$\theta \approx 36{,}87^\circ$</td></tr>
-        <tr><td>Grenzfall</td><td>$v \to c$</td><td>$\gamma \to \infty$</td><td>$\theta \to 0^\circ$ (Stanzfront)</td></tr>
-      </tbody>
-    </table>
-    <div class="insight-box">
-      <strong>Fazit:</strong> Die WRZT beschreibt unser Universum nicht als leeren Behälter, in dem sich
-      Materie bewegt, sondern als ein absolut lebendiges, elastisches Gewebe. Der Raum ist das Medium:
-      Das Vakuum ist kein Nichts, sondern ein aktives, strukturiertes Geflecht. Wenn elementare Gegensätze
-      – wie ein Teilchen und sein Antiteilchen – in diesem Netz aufeinandertreffen, beginnen sie extrem
-      schnell umeinander zu rotieren und verzwirbeln so das lokale Raumzeit-Gewebe. Das, was wir als Licht
-      wahrnehmen, ist genau dieses hochfrequente Vibrieren – eine mikroskopische Gravitationswelle, die
-      als reine Formveränderung durch das 3D-Knotennetzwerk der Raumzeit reist.
-    </div>
-  </div>
-
-
-  <!-- ======================================================= -->
-  <!-- TEIL IV — FIAT LUX                                        -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil4">
-    <span class="part-eyebrow">Teil IV</span>
-    <h1>💡 Fiat Lux — Licht als hochfrequente Gravitationswelle</h1>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card" id="sec1">
-    <h2>1. Einleitung: Was ist Licht?</h2>
-    <p>
-      In dieser Theorie wird Licht als eine hochfrequente Gravitationswelle beschrieben, die durch die
-      schnelle Rotation von Teilchen-Antiteilchen-Paaren oder durch die starke Schwingung von Elektronen
-      entsteht. Jedes <em>Teilchen</em> wird dabei als Raumzeitkrümmung und jedes <em>Antiteilchen</em>
-      als Raumzeit-Wölbung verstanden. Wenn diese Paare mit hoher Geschwindigkeit umeinander rotieren,
-      erzeugen sie eine spezielle Art von Gravitationswelle, die wir als Licht wahrnehmen.
-    </p>
-    <div class="note-box">
-      <strong>Hinweis zur Begrifflichkeit:</strong> Die Vertiefungen und Wölbungen sind primär als
-      elektromagnetische Effekte dargestellt, die sich direkt auf die Raumzeit auswirken, und sollten
-      nicht direkt mit makroskopischer Gravitation oder Antigravitation verwechselt werden.
-    </div>
-    <p>
-      Hochfrequente Gravitationswellen könnten auch entstehen, wenn ein Elektron stark genug hin und her
-      schwingt. Diese Wellen könnten erklären, warum das Licht der Sonne ein breites Spektrum abdeckt und
-      wie sich Eigenschaften des Lichts, wie Polarisation und Spin, aus einer neuen Perspektive verstehen
-      lassen. Im Folgenden werden die Grundlagen dieser Theorie dargelegt, ihre mathematischen
-      Implikationen untersucht und die Verbindungen zu bekannten physikalischen Phänomenen erklärt.
-    </p>
-  </div>
-
-  <div class="section-card" id="sec2">
-    <h2>2. Das Teilchen-Antiteilchen-Konzept</h2>
-    <p>
-      In dieser Theorie spielt das Konzept von Teilchen und Antiteilchen eine zentrale Rolle bei der
-      Entstehung von Licht als hochfrequente Gravitationswelle. Jedes Teilchen erzeugt eine lokale
-      Krümmung der Raumzeit, während jedes Antiteilchen eine entsprechende Wölbung verursacht. Zusammen
-      bilden sie ein Paar, das durch seine schnelle Rotation eine spezielle Form von Gravitationswellen erzeugt.
-    </p>
-    <h3>2.1 Teilchen und Antiteilchen als Raumzeitdeformationen</h3>
-    <p>
-      Teilchen werden als winzige Regionen der Raumzeit betrachtet, die eine Krümmung erzeugen – eine
-      Art „Vertiefung" in der Raumstruktur. Antiteilchen hingegen verursachen eine entgegengesetzte
-      „Wölbung", die die Raumzeit in die andere Richtung verzerrt. Diese beiden Formen ergänzen sich und
-      schaffen eine dynamische Interaktion, die die Grundlage für die Gravitationswellenbildung bildet.
-    </p>
-    <h3>2.2 Rotation und die Entstehung von Gravitationswellen</h3>
-    <p>
-      Wenn sich ein Teilchen und ein Antiteilchen einander nähern, werden sie aufgrund ihres minimalen
-      Eigendrehimpulses (Spins) notgedrungen in eine gebundene Kreisbahn gezwungen. Auf dieser Kreisbahn
-      rotieren sie mit extrem hoher Geschwindigkeit um ihren gemeinsamen Schwerpunkt, was zu einer
-      kontinuierlichen und dynamischen Schwingung der Raumzeit führt. Diese Bewegung bewirkt die Emission
-      hochfrequenter Gravitationswellen, die wir makroskopisch als Licht wahrnehmen. Dabei können sich die
-      beiden Partner nur bis zu einem spezifischen minimalen Radius nähern: Ein noch kleinerer Abstand
-      würde bedeuten, dass die Bahngeschwindigkeit der beteiligten Massepunkte die Lichtgeschwindigkeit
-      $c$ überschreiten müsste, was physikalisch ausgeschlossen ist. Dieser minimale Radius markiert somit
-      eine fundamentale Grenze der Rotationsdynamik. Die Frequenz und die Amplitude der emittierten
-      Gravitationswellen hängen folglich direkt von der Rotationsgeschwindigkeit, dem aktuellen Bahnradius
-      und den Massen der beteiligten Teilchen ab.
-    </p>
-    <h3>2.3 Schwingung von Elektronen als alternative Quelle</h3>
-    <p>
-      Neben der Rotation von Teilchen-Antiteilchen-Paaren könnte auch die starke Schwingung eines
-      Elektrons, das durch äußere Einflüsse in Bewegung gesetzt wird, zur Erzeugung hochfrequenter
-      Gravitationswellen führen. Diese Wellen tragen die Energie und die Eigenschaften des Lichts und
-      manifestieren sich als elektromagnetische Strahlung.
-    </p>
-    <h3>2.4 Kohärenz und Stabilität</h3>
-    <p>
-      Die Synchronisation der Rotation mehrerer solcher Teilchen-Antiteilchen-Paare könnte zur Entstehung
-      kohärenter Gravitationswellen führen, ähnlich wie bei der Erzeugung von kohärentem Licht in Lasern.
-      Diese kohärenten Wellen würden eine gleichmäßige und verstärkte Emission ermöglichen, was eine
-      stabile Lichtquelle schaffen würde.
-    </p>
-  </div>
-
-  <div class="section-card" id="sec2b">
-    <h2>2b. Quantitativer Beweis und Herleitung</h2>
-    <p>
-      Wir zeigen die exakte mathematische und physikalische Identität des Teilchen-Antiteilchen-Modells
-      mit den Grundgleichungen der Quantenmechanik und Elektrodynamik: aus dem Kräftegleichgewicht
-      zwischen Zentripetalkraft $F_Z$ und Coulomb-Kraft $F_C$, kombiniert mit der Feinstrukturkonstante
-      $\alpha$, ergeben sich direkt die Photonenenergie $E = h \cdot f = m_e c^2$ sowie der klassische
-      Elektronenradius $r_e$ und der Compton-Radius $r_C$.
-    </p>
-    <div class="quote-box">„Das Teilchen-Antiteilchen-Paar als Raumzeit-Deformation erzeugt durch seine kreisförmige Dynamik exakt die Frequenz und Energiedichte, die wir in der Quantenmechanik als Photon wahrnehmen."</div>
-
-    <h3>2b.1 Das Kräftegleichgewicht: F<sub>Z</sub> = F<sub>C</sub></h3>
-    <p>Wir betrachten ein gebundenes System aus einem Elektron und einem Positron (Masse jeweils $m_e$, Ladung $e$ bzw. $-e$), die sich auf einer Kreisbahn mit dem Radius $r$ um ein gemeinsames Zentrum bewegen. Der Abstand zwischen beiden Teilchen beträgt somit $2r$. Die Coulomb-Kraft zwischen den beiden Ladungen ist:</p>
-    <div class="equation-box">$$F_C = \frac{1}{4\pi \varepsilon_0} \frac{e^2}{(2r)^2} = \frac{e^2}{16\pi \varepsilon_0 r^2}$$</div>
-    <p>Für die Zentripetalkraft bezüglich des gemeinsamen Schwerpunkts gilt:</p>
-    <div class="equation-box">$$F_Z = \frac{m_e v^2}{r}$$</div>
-    <p>Gleichsetzen beider Kräfte ($F_Z = F_C$) liefert die fundamentale Bewegungsgleichung:</p>
-    <div class="equation-box">$$\frac{m_e v^2}{r} = \frac{e^2}{16\pi \varepsilon_0 r^2} \implies m_e v^2 = \frac{e^2}{16\pi \varepsilon_0 r}$$</div>
-
-    <h3>2b.2 Die Feinstrukturkonstante α und der Grenzfall v → c</h3>
-    <div class="equation-box">$$\alpha = \frac{e^2}{4\pi \varepsilon_0 \hbar c} \approx \frac{1}{137{,}036}$$</div>
-    <p>Daraus folgt $\frac{e^2}{4\pi \varepsilon_0} = \alpha \hbar c$. Eingesetzt in die Kraftgleichung:</p>
-    <div class="equation-box">$$m_e v^2 = \frac{\alpha \hbar c}{4 r}$$</div>
-    <p>Im relativistischen Grenzfall der Lichtgeschwindigkeit ($v \to c$) für die Raumzeit-Wellenrotation ergibt sich:</p>
-    <div class="equation-box">$$m_e c^2 = \frac{\alpha \hbar c}{4 r} \implies r = \frac{\alpha \hbar}{4 m_e c}$$</div>
-
-    <h3>2b.3 Klassischer Elektronenradius vs. Compton-Radius</h3>
-    <p><strong>A. Klassischer Elektronenradius $r_e$:</strong> Aus der reinen elektrostatischen Energiebilanz bei $v = c$ bestimmt sich der minimale elektrostatische Radius der Ladungsverteilung:</p>
-    <div class="equation-box">$$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2} = \alpha \frac{\hbar}{m_e c} \approx 2{,}8179 \times 10^{-15} \text{ m}$$</div>
-    <p><strong>B. Compton-Radius $r_C$:</strong> hängt über den Impuls $p = m_e c$ direkt mit der reduzierten Compton-Wellenlänge $\bar{\lambda}_C$ zusammen:</p>
-    <div class="equation-box">$$r_C = \bar{\lambda}_C = \frac{\hbar}{m_e c} \approx 3{,}8616 \times 10^{-13} \text{ m}$$</div>
-    <p>Die beiden charakteristischen Längenskalen sind über die Feinstrukturkonstante $\alpha$ gekoppelt:</p>
-    <div class="equation-box">$$r_e = \alpha \cdot r_C$$</div>
-
-    <h3>2b.4 Beweis der Energiegleichheit: E = m<sub>e</sub>c² = h·f</h3>
-    <p>Die Frequenz $f$ der durch Rotation emittierten Raumzeitwelle ergibt sich aus der Bahngeschwindigkeit $v = c$ und dem Umfang $U = 2\pi r_C$:</p>
-    <div class="equation-box">$$f = \frac{c}{2\pi r_C} = \frac{c}{2\pi \left(\frac{\hbar}{m_e c}\right)} = \frac{m_e c^2}{2\pi \hbar}$$</div>
-    <p>Da $h = 2\pi \hbar$, folgt unmittelbar $f = \frac{m_e c^2}{h}$, also $E = h \cdot f = m_e c^2$.</p>
-    <p><strong>Numerischer Beweis (Annihilations-Energieniveau):</strong></p>
-    <ul>
-      <li>Gesamtenergie eines Positron-Elektron-Paares: $E_{\text{ges}} = 2 m_e c^2 \approx 1{,}022 \text{ MeV} = 1{,}637 \times 10^{-13} \text{ J}$</li>
-      <li>Rotations-/Schwingungsfrequenz: $f = \frac{m_e c^2}{h} \approx 1{,}2356 \times 10^{20} \text{ Hz}$ — entspricht exakt der Gamma-Strahlung bei der Paarvernichtung.</li>
-    </ul>
-    <h3>2b.5 Kernergebnisse</h3>
-    <ul>
-      <li><strong>Kräftegleichgewicht ($F_Z = F_C$):</strong> Erklärungsmodell für die Begrenzung des minimalen Ladungsradius $r_e$.</li>
-      <li><strong>Rolle von α:</strong> direkte Übersetzung zwischen klassischer Elektrodynamik und quantenmechanischer Compton-Geometrie ($r_e = \alpha \cdot r_C$).</li>
-      <li><strong>Identität $E = m_e c^2 = hf$:</strong> zeigt, wie die WRZT die Quantenenergie nahtlos aus der Rotationsdynamik der Raumzeit-Deformationen herleitet.</li>
-    </ul>
-  </div>
-
-  <div class="section-card" id="sec2c">
-    <h2>2c. Relativistische Verfeinerung: R<sub>min</sub> und Systemkonstanten</h2>
-    <p>
-      Kapitel 2b behandelt den statischen Grenzfall $v \to c$. Die vollständige, relativistisch korrekte
-      Herleitung koppelt die relativistische Gesamtenergie des rotierenden Systems ($E = \gamma m_e c^2$)
-      direkt an die Quantenenergie des emittierten Photons ($E = \hbar \omega$):
-    </p>
-    <div class="equation-box">$$E = \gamma \, m_e \, c^2 = \hbar \cdot \omega$$</div>
-    <p>mit dem Lorentz-Faktor $\gamma = \frac{1}{\sqrt{1-v^2/c^2}}$. Die Raumzeit-Verzerrungen bewegen sich auf einer Kreisbahn mit Radius $R$ und Bahngeschwindigkeit $v$; mit $\omega = v/R$ folgt:</p>
-    <div class="equation-box">$$\gamma \, m_e \, c^2 = \hbar \cdot \frac{v}{R} \implies R = \frac{\hbar \cdot v}{\gamma \, m_e \, c^2}$$</div>
-    <p>Im relativistischen Grenzübergang ($v \to c$) schrumpft der effektive Rotationsradius infolge der Lorentz-Kontraktion des Raumzeit-Netzes dynamisch:</p>
-    <div class="equation-box">$$R(\gamma) = \frac{\hbar \cdot c}{\gamma \, m_e \, c^2} = \frac{\hbar}{\gamma \, m_e \, c} = \frac{\bar{\lambda}_c}{\gamma}$$</div>
-    <p>
-      Der klassische Elektronenradius $r_e$ ist ein rein elektrostatisch-makroskopisches Grenzmaß. Unter
-      Berücksichtigung der Heisenberg'schen Unschärferelation geht dieser über die Feinstrukturkonstante
-      $\alpha$ direkt in das Quanten-Raumzeit-Grenzmaß über: $r_e = \alpha \cdot \bar{\lambda}_c$.
-      Betrachtet man das gebundene Zwei-Körper-System als Rotator um das gemeinsame Zentrum, ergibt sich
-      der ununterbrechbare Minimal-Radius $R_{\min}$ an der reinen Quantengrenze als halbe reduzierte
-      Compton-Wellenlänge:
-    </p>
-    <div class="equation-box">$$\boxed{R_{\text{min}} = \frac{\bar{\lambda}_c}{2} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}}$$</div>
-
-    <div class="note-box">
-      <strong>Warum zwei Radien?</strong> $r_e$ (klassischer Elektronenradius, Kapitel 2b) und $R_{\min}$
-      (Quanten-Minimal-Radius, hier) beschreiben zwei verschiedene physikalische Grenzen desselben
-      Systems: $r_e$ ist die rein elektrostatische Grenze im Ruhesystem, $R_{\min}$ die quantisierte
-      Maschenweite des Raumzeit-Netzes selbst. Beide sind über $\alpha$ und $\bar{\lambda}_c$ miteinander
-      verknüpft und stellen komplementäre, keine widersprüchlichen Aussagen dar.
+    <!-- ================= TITELSEITE ================= -->
+    <div class="header-card">
+      <div class="badge">🌌 Wellenraumzeit-Theorie (WRZT) 🌀</div>
+      <div class="fiat-lux-title">💡 Fiat Lux</div>
+      <h1>Das Gesamt-Manifest der Wellenraumzeit-Theorie</h1>
+      <div class="subtitle">„Es werde Licht" — Von der Architektur des Kosmos zur Natur des Lichts</div>
+      <p class="intro-text">
+        Ein zusammenfassendes Werk aus Einleitung, anschaulichen Erklärungen, mathematischen Herleitungen
+        und offenen Überlegungen: Die WRZT beschreibt das Universum als ein elastisches, dreidimensionales
+        Raumzeit-Netzwerk, in dem Materie gefangener Wirbelschwung und Licht dessen freie, hochfrequente
+        Gravitationswelle ist.
+      </p>
+      <div class="author-info">Gesamtausgabe · Zusammengeführt aus allen Entwicklungsstufen · Autoren: Jo D. (@juppijo) &amp; Zaminia</div>
     </div>
 
-    <h3>Systemkonstanten und Längenskalen</h3>
-    <table>
-      <thead><tr><th>Größe</th><th>Formel</th><th>Wert</th></tr></thead>
-      <tbody>
-        <tr><td>Ur-Spannung der Raumzeit</td><td>$\Xi = \frac{m_e^2 c}{4\hbar}$</td><td>5,897 427 × 10⁻¹⁹ kg/m</td></tr>
-        <tr><td>Raumzeit-Trägheit</td><td>$\eta = \frac{m_e}{2}$</td><td>4,554 300 × 10⁻³¹ kg</td></tr>
-        <tr><td>Klassischer Elektronenradius</td><td>$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td><td>2,817 940 × 10⁻¹⁵ m</td></tr>
-        <tr><td>Dynamischer Radius (γ)</td><td>$R(\gamma) = \frac{\bar{\lambda}_c}{\gamma}$</td><td>skaliert mit $\gamma^{-1}$</td></tr>
-        <tr><td>Quanten-Ruheradius</td><td>$R_{\min} = \frac{\bar{\lambda}_c}{2}$</td><td>1,930 796 × 10⁻¹³ m</td></tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- ================= INHALTSVERZEICHNIS ================= -->
+    <div class="section-card toc-box" id="toc">
+      <h2>📖 Inhaltsverzeichnis</h2>
 
-  <div class="section-card" id="sec3">
-    <h2>3. Eigenschaften des Lichts in dieser neuen Perspektive</h2>
-    <p>
-      In der klassischen Physik wird Licht als elektromagnetische Welle beschrieben oder als
-      Photonenstrom, der bestimmte Quanteneigenschaften zeigt. Mit unserem Modell des
-      Teilchen-Antiteilchen-Paares, das sich um einen gemeinsamen Mittelpunkt dreht und eine spezielle Art
-      von Gravitationswelle erzeugt, können wir diese Eigenschaften aus einer neuen Perspektive betrachten.
-    </p>
-    <h3>3.1 Wellenlänge und Frequenz</h3>
-    <p>
-      Die Drehbewegung des Teilchen-Antiteilchen-Paares könnte die Wellenlänge und Frequenz des Lichts
-      beeinflussen. Je schneller sich das Paar dreht, desto höher wäre die Frequenz der erzeugten
-      Gravitationswelle, was mit Licht im höheren Energiespektrum wie ultravioletter oder Röntgenstrahlung
-      übereinstimmen würde. Langsamere Rotationen würden entsprechend zu niederfrequenterem Licht wie
-      Infrarot- oder Radiowellen führen.
-    </p>
-    <h3>3.2 Polarisation</h3>
-    <p><strong>Wie entsteht Polarisation in der Praxis?</strong></p>
-    <ul>
-      <li><strong>Reflexion:</strong> Wenn Licht auf eine glatte Oberfläche wie Wasser oder Glas trifft, wird es teilweise polarisiert, da die parallel zur Oberfläche schwingenden Komponenten stärker reflektiert werden.</li>
-      <li><strong>Brechung:</strong> Beim Durchgang durch bestimmte Kristalle, wie Kalkspat, kann Licht in zwei polarisierte Strahlen aufgeteilt werden (Doppelbrechung).</li>
-      <li><strong>Streuung:</strong> Die Streuung von Licht an Luftmolekülen, z.&nbsp;B. in der Atmosphäre, führt zur Polarisation. Dies erklärt, warum polarisiertes Licht im Himmel sichtbar ist.</li>
-    </ul>
-    <p><strong>Die physikalische Interpretation der Polarisation in der WRZT:</strong></p>
-    <ul>
-      <li><strong>Räumliche Krümmungs- und Wölbungsbewegung:</strong> Die Art und Weise, wie die Teilchen und Antiteilchen rotieren und die Raumzeit krümmen, könnte die Richtung der Schwingungen der Gravitationswellen bestimmen.</li>
-      <li><strong>Wechselwirkung mit Materie:</strong> Treffen diese Wellen auf Elektronen oder andere Teilchen, könnte die Polarisation den spezifischen Winkel und die Intensität der Wechselwirkung beeinflussen.</li>
-    </ul>
-    <p>Die Polarisation von Licht könnte in diesem Modell durch die Rotationsachse des Teilchen-Antiteilchen-Paares erklärt werden. Je nach Orientierung dieser Achse würde die modulierte Gravitationswelle bestimmte Polarisationseigenschaften zeigen, die wir als linear, zirkular oder elliptisch wahrnehmen.</p>
-    <h3>3.3 Streuung und Beugung</h3>
-    <p>Streuung und Beugung könnten durch die Interaktion der Teilchen-Antiteilchen-Paare mit anderen Teilchen in der Raumzeit beeinflusst werden. Wenn das Licht auf Materie trifft, könnte die Anordnung und Bewegung dieser Paare modifiziert werden, was zu bekannten Phänomenen wie Rayleigh-Streuung (die den blauen Himmel erklärt) oder der Beugung durch Spalten führt.</p>
-    <h3>3.4 Reflexion und Brechung</h3>
-    <p>Reflexion und Brechung von Licht an Oberflächen oder beim Übergang in ein anderes Medium könnten durch die Veränderung der Raumzeitkrümmung erklärt werden, die diese Paare erzeugen. Der Übergang zwischen verschiedenen optischen Medien entspricht dabei einer Verfälschung der lokalen Raumzeit-Spannung $\Xi$, was die Ausbreitungsgeschwindigkeit beeinflusst.</p>
-  </div>
+      <span class="toc-part-label">Teil I — Einleitung &amp; Philosophie</span>
+      <ol>
+        <li><a href="#i1">Vorwort: Was ist Licht?</a></li>
+      </ol>
 
-  <div class="section-card" id="sec4">
-    <h2>4. Spin von Photonen im Kontext dieser Theorie</h2>
-    <p>In dieser Interpretation, in der Licht als hochfrequente Gravitationswelle durch die schnelle Rotation von Teilchen und Antiteilchen entsteht, könnte der Spin des Photons mit der Rotationsrichtung dieser Teilchen und Antiteilchen in Verbindung gebracht werden:</p>
-    <ul>
-      <li><strong>Rotation als Ursprung des Spins:</strong> Rechtsdrehende Rotation erzeugt Photonen mit einem Spin von $+1$ (rechtshändig), linksdrehende Rotation Photonen mit einem Spin von $-1$ (linkshändig).</li>
-      <li><strong>Polarisation und Spin:</strong> Der Spin eines Photons ist eng mit seiner Polarisation verbunden. Die Polarisation ist die sichtbare Manifestation des Spins, der aus der Raumzeitkrümmung resultiert.</li>
-      <li><strong>Quantitative Erklärung:</strong> Symmetrie- und Rotationsbedingungen erklären, warum der Spin von Photonen stets ganzzahlig ist.</li>
-      <li><strong>Verbindung zur Raumzeitstruktur:</strong> Die Richtung des Spins hängt davon ab, ob die Raumzeitkrümmung und -wölbung eine rechts- oder linksdrehende Bewegung erzeugen.</li>
-      <li><strong>Experimentelle Überlegungen:</strong> Untersuchungen zur Wechselwirkung von Licht mit Materie unter Spin-Manipulation (z.&nbsp;B. Spin-Hall-Effekt-Experimente) bieten Ansätze zur Überprüfung dieser Kopplung.</li>
-    </ul>
-  </div>
+      <span class="toc-part-label">Teil II — Die Architektur des Kosmos (Grundlagen)</span>
+      <ol>
+        <li><a href="#ii1">Das elastische Raumzeit-Netzwerk</a></li>
+        <li><a href="#ii2">Das 3D-Knotennetzwerk und die kosmische Elastizität</a></li>
+        <li><a href="#ii3">Materie und Licht als dynamische Netzerregungen</a></li>
+        <li><a href="#ii4">Relativistische Verdichtung und der Lorentz-Faktor γ</a></li>
+      </ol>
 
-  <div class="section-card" id="sec5">
-    <h2>5. Weitere Eigenschaften des Lichts in dieser neuen Perspektive</h2>
-    <h3>5.1 Die Information in der Gravitationswelle</h3>
-    <p>Da jedes Teilchen-Antiteilchen-Paar seine eigene spezifische Gravitationswelle erzeugt, die durch seine Rotation und Wechselwirkung mit der Raumzeit moduliert wird, fungiert diese Welle als Träger von Informationen (energetische Struktur, Frequenz, Polarisation).</p>
-    <h3>5.2 Wechselwirkung mit Elektronen</h3>
-    <p>Trifft diese Gravitationswelle auf ein Elektron, versetzt sie dieses in Schwingung („Anregung"). Das Elektron emittiert daraufhin eine neue Welle in Form von Strahlung. Dies liefert einen gravitativen Erklärungsansatz für Absorption und Emission in Atomen.</p>
-    <h3>5.3 Erzeugung von neuen Wellen</h3>
-    <p>Durch die Schwingung des Elektrons pflanzt sich die neu erzeugte Welle weiter fort. Die Makrodynamik der Lichtausbreitung stützt sich somit fundamental auf mikroskopische Wechselwirkungen zwischen Gravitationswellen der Paare und der Materie im Medium.</p>
-  </div>
+      <span class="toc-part-label">Teil III — Der relativistische Bugwellen-Effekt</span>
+      <ol>
+        <li><a href="#iii1">Geometrische Natur der Raumzeit-Bugwelle</a></li>
+        <li><a href="#iii2">Der Bugwellen-Winkel α und der Lorentz-Faktor γ</a></li>
+        <li><a href="#iii3">Von der Ruhe-Mechanik zur relativistischen Begrenzung</a></li>
+        <li><a href="#iii4">Invarianz der Wellenausbreitungsgeschwindigkeit c</a></li>
+      </ol>
 
-  <div class="section-card" id="sec6">
-    <h2>6. Doppelspaltexperiment und Quantenverschränkung</h2>
-    <h3>6.1 Das Doppelspaltexperiment</h3>
-    <p>Das Doppelspaltexperiment demonstriert die Wellen-Teilchen-Dualität. Selbst wenn Photonen einzeln ausgesendet werden, entsteht über Zeit ein Interferenzmuster.</p>
-    <p><strong>Lösung der Dualität durch die WRZT:</strong></p>
-    <ol>
-      <li><strong>Licht als hochfrequente Gravitationswelle:</strong> Vereint sowohl kontinuierliche Wellen- als auch diskrete Teilcheneigenschaften.</li>
-      <li><strong>Wellen-Teilchen-Dualität als Raumzeitphänomen:</strong> Die Welle verhält sich wie eine Raumzeitdeformation (Interferenz bei freier Ausbreitung), während das Teilchenverhalten das punktuelle Übergreifen der Energie bei Wechselwirkung mit Materie darstellt.</li>
-      <li><strong>Messung und Kollaps der Wellenfunktion:</strong> Die Wechselwirkung mit einem Detektor lokalisiert die Raumzeitverzerrung. Der „Kollaps" ist eine physikalische Re-Lokalisierung der Welle an einem bestimmten Energie-Absorptionspunkt.</li>
-      <li><strong>Superposition am Doppelspalt:</strong> Die vom Paar emittierte Gravitationswelle breitet sich durch beide Spalte gleichzeitig aus und interferiert mit sich selbst, wodurch das Zielmuster auf dem Schirm vorgezeichnet wird.</li>
-      <li><strong>Einfluss der Beobachtung:</strong> Die Messung am Spalt verändert die lokale Raumzeitgeometrie, zerstört die Phasen-Kohärenz der Welle und unterdrückt das Interferenzmuster.</li>
-    </ol>
-    <h3>6.2 Quantenverschränkung</h3>
-    <p>Bei verschränkten Zuständen korrelieren Eigenschaften instantan über große Distanzen. Im WRZT-Modell ist die Information direkt in den gekoppelten Gravitationswellen des Teilchen-Antiteilchen-Systems codiert. Da die beiden Komponenten des Ursprungspaares eine gemeinsame topologische Raumzeitstruktur teilen, sind ihre Wellenfelder verschränkt, was korrelierte Messergebnisse ohne Verletzung der lokalen Kausalität der Raumzeit erklärt.</p>
-  </div>
+      <span class="toc-part-label">Teil IV — Fiat Lux: Licht als hochfrequente Gravitationswelle</span>
+      <ol>
+        <li><a href="#sec1">Einleitung: Was ist Licht?</a></li>
+        <li><a href="#sec2">Das Teilchen-Antiteilchen-Konzept</a></li>
+        <li><a href="#sec2b">Quantitativer Beweis und Herleitung</a></li>
+        <li><a href="#sec2c">Relativistische Verfeinerung: R<sub>min</sub> und Systemkonstanten</a></li>
+        <li><a href="#sec3">Eigenschaften des Lichts</a></li>
+        <li><a href="#sec4">Spin von Photonen</a></li>
+        <li><a href="#sec5">Weitere Eigenschaften des Lichts</a></li>
+        <li><a href="#sec6">Doppelspaltexperiment und Quantenverschränkung</a></li>
+        <li><a href="#sec7">Raumzeitkrümmung vs. Raumzeit-Wölbung</a></li>
+        <li><a href="#sec8">Energieabgabe und Annihilation</a></li>
+        <li><a href="#sec9">Das Licht der Sonne</a></li>
+        <li><a href="#sec10">Hochfrequente Gravitationswellen</a></li>
+        <li><a href="#sec11">Konsequenzen des Modells</a></li>
+        <li><a href="#sec12">Schlusswort</a></li>
+      </ol>
 
-  <div class="section-card" id="sec7">
-    <h2>7. Raumzeitkrümmung vs. Raumzeit-Wölbung</h2>
-    <p>Anstatt Teilchen als punktförmige Massen in einem starren Raum zu sehen, beschreibt die WRZT sie als direkte topologische Verformungen des Gewebes der Raumzeit:</p>
-    <ul>
-      <li><strong>Teilchen als Raumzeitkrümmung:</strong> Eine lokale Einkerbung/Vertiefung der Geometrie, welche Masse, Energie und Trägheit definiert.</li>
-      <li><strong>Antiteilchen als Raumzeit-Wölbung:</strong> Das komplementäre Gegenstück – eine Erhebung/Ausbeulung der Raumzeitgeometrie.</li>
-      <li><strong>Wechselwirkung:</strong> Treffen Krümmung und Wölbung aufeinander, kompensieren sich die geometrischen Verzerrungen. Vor der vollständigen Glättung erzeugt ihre finale, hochfrequente Orbitalbewegung extrem energiereiche Raumzeitwellen.</li>
-    </ul>
-  </div>
+      <span class="toc-part-label">Teil V — Der Undatron-Mechanismus</span>
+      <ol>
+        <li><a href="#v1">Der Tanz an der Lichtgeschwindigkeit</a></li>
+        <li><a href="#v2">Der Undatron-Kollaps</a></li>
+        <li><a href="#v3">Bugwellen-Geometrie und Wellenüberlagerung</a></li>
+      </ol>
 
-  <div class="section-card" id="sec8">
-    <h2>8. Energieabgabe und Auflösung des Teilchen-Antiteilchen-Paars (Annihilation)</h2>
-    <p>Die kontinuierliche Emission von Gravitationswellen entzieht dem rotierenden Paar kinetische Energie.</p>
-    <div class="equation-box">
-      $$E = 2 m_e c^2 \approx 1{,}022\text{ MeV}$$
-      <span style="font-size:0.85em; color:var(--text-muted);">mit $m_e$ = Ruhemasse des Elektrons/Positrons (≈ 0,511 MeV)</span>
+      <span class="toc-part-label">Teil VI — Einordnung, offene Fragen &amp; Ausblick</span>
+      <ol>
+        <li><a href="#vi1">Licht — beschrieben auf verschiedene Arten</a></li>
+        <li><a href="#vi2">Noch offene Fragen und Ausblick</a></li>
+      </ol>
+
+      <span class="toc-part-label">Teil VII — Anhang</span>
+      <ol>
+        <li><a href="#a1">Tabelle der Ur-Konstanten und Längenskalen</a></li>
+        <li><a href="#a2">Das elektromagnetische Spektrum</a></li>
+        <li><a href="#a3">Modellrechnungen: Umdrehungsfrequenz und Bahnradius</a></li>
+      </ol>
     </div>
-    <p>Durch den stetigen Energieverlust nähert sich der Radius des Paares an, die Rotationsfrequenz ändert sich dynamisch, bis das Paar in eine finale Strahlungsform übergeht. Dies erklärt die begrenzte Lebensdauer transienter Paarzustände und liefert eine physikalische Ursache für Zerfallsprozesse.</p>
-  </div>
 
-  <div class="section-card" id="sec9">
-    <h2>9. Das Licht der Sonne: Rotation von Teilchen-Antiteilchen-Paaren</h2>
-    <p>Im Inneren der Sonne herrschen extreme Temperaturen und Drücke. Gemäß WRZT entstehen dort kontinuierlich Unmengen flüchtiger Teilchen-Antiteilchen-Paare:</p>
-    <ul>
-      <li><strong>Breites Spektrum:</strong> Unterschiedliche Radien und Spin-Geschwindigkeiten der Paare erzeugen Frequenzen von Infrarot über sichtbares Licht bis hin zu UV- und Röntgenstrahlung.</li>
-      <li><strong>Kopplung an Kernfusion:</strong> Die Fusionsenergie treibt die Rotationsdynamik der Paare lokal an und hält die hohe Strahlungsleistung der Sonne aufrecht — der Massendefekt der Fusion wird als Lichtenergie emittiert.</li>
-      <li><strong>Dualer Charakter der Sonnenstrahlung:</strong> Das Spektrum ist ein Kontinuum aus überlagerten, hochfrequenten Gravitations- und Elektromagnetik-Wellenfeldern.</li>
-    </ul>
-  </div>
-
-  <div class="section-card" id="sec10">
-    <h2>10. Hochfrequente Gravitationswellen durch schnelle Rotation</h2>
-    <p>Wenn sich Teilchen und Antiteilchen mit nahezu Lichtgeschwindigkeit umeinander bewegen, treten relativistische Effekte auf. Die erzeugte Gravitationswelle nimmt keine einfache niederfrequente Form an (wie bei makroskopischen Schwarzen Löchern), sondern schwingt im ultra-hohen Frequenzbereich ($f > 10^{15}\text{ Hz}$). Diese energiereichen Wellen verzerren die Raumzeit auf subatomarer Skala mit extremer Präzision. Wegen der winzigen Massenträgheit $\eta$ emittieren mikroskopische Rotatoren hochfrequente Schwingungen im Frequenzbereich der elektromagnetischen Wellen.</p>
-  </div>
-
-  <div class="section-card" id="sec11">
-    <h2>11. Die Konsequenzen des Modells: Licht als Gravitationswelle</h2>
-    <ol>
-      <li><strong>Neues Energieverständnis:</strong> Licht wird als fundamentale gravitative Energieform verstanden, was neuartige Ansätze zur Energiewandlung ermöglichen könnte.</li>
-      <li><strong>Vereinheitlichung der Raumzeit:</strong> Elektromagnetismus und Gravitation verschmelzen auf Quantenebene zu Äußerungen derselben Geometriedynamik.</li>
-      <li><strong>Neue Messtechnologien:</strong> Erkenntnisse über hochfrequente Gravitationswellen könnten zur Entwicklung neuartiger Detektoren führen, die weit über heutige Interferometer (wie LIGO) hinausgehen.</li>
-      <li><strong>Entzauberung von Quantenrätseln:</strong> Lokale Geometrieänderungen liefern anschauliche, deterministische Erklärungen für Verschränkung und Superposition.</li>
-      <li><strong>Kosmologische Konsequenzen:</strong> Die Dehnung des Raumzeit-Netzes über große Distanzen könnte die kosmologische Rotverschiebung als kontinuierliche Wellenlängenanpassung erklären.</li>
-    </ol>
-  </div>
-
-  <div class="section-card" id="sec12">
-    <h2>12. Schlusswort: Die neue Perspektive auf Licht und Gravitationswellen</h2>
-    <p>Wir haben Licht als hochfrequente Gravitationswelle interpretiert, hervorgerufen durch rotierende Teilchen-Antiteilchen-Systeme oder schwingende Ladungen. Diese Betrachtungsweise verbindet die Gesetze der Allgemeinen Relativitätstheorie organisch mit den Phänomenen der Quantenphysik.</p>
-    <p>Wir laden Forscher und Interessierte ein, diese mathematischen und konzeptionellen Ansätze weiterzuentwickeln. Es liegt an uns, die Grenzen des bisherigen Wissens zu erweitern.</p>
-    <div class="quote-box">„Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“<span class="author">— Thich Nhat Hanh</span></div>
-  </div>
-
-
-  <!-- ======================================================= -->
-  <!-- TEIL V — DER UNDATRON-MECHANISMUS                         -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil5">
-    <span class="part-eyebrow">Teil V</span>
-    <h1>Der Undatron-Mechanismus</h1>
-    <div class="subtitle">Eine anschauliche Herleitung der Photonenentstehung</div>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card" id="v1">
-    <h2>1. Der Tanz an der Lichtgeschwindigkeit</h2>
-    <h3>Die Grundidee</h3>
-    <p>Stell dir das Universum als ein elastisches, dynamisches Netz vor. Wenn ein Elektron ($e^-$) und ein Positron ($e^+$) aufeinandertreffen, ziehen sie sich extrem stark an. Sie beginnen, sich rasend schnell im gemeinsamen Schwerpunkt zu umkreisen – wie zwei Eiskunstläufer auf einer Kreisbahn.</p>
-    <h3>Bugwellen im Raumzeit-Netz</h3>
-    <p>Da sich die Teilchen nahezu mit Lichtgeschwindigkeit ($v \approx c$) bewegen, erzeugen sie wie ein schnelles Boot auf dem Wasser Mach-artige <strong>Bugwellen</strong> im Raumzeit-Gewebe. Durch die Kreisbewegung überlagern und interferieren diese Raumzeit-Bugwellen kontinuierlich.</p>
-  </div>
-
-  <div class="section-card" id="v2">
-    <h2>2. Der Undatron-Kollaps</h2>
-    <p>Nähert sich der Bahnradius der kritischen Fundamentalgrenze des Raumes ($R_{\min}$, siehe Teil IV, Kapitel 2c), lösen sich die punktförmigen Ladungszentren auf. Die Ruhemasse und Ladung schmelzen in einer konstruktiven Interferenz zusammen: Es entsteht das <strong>Undatron</strong> – ein kohärentes Lichtwellenpaket mit vollständigem Informationsgedächtnis (Spin, Energie, Phasenkopplung).</p>
-    <div class="insight-box">
-      <strong>Anschaulich:</strong> Das Undatron ist der Moment, in dem aus zwei „tanzenden" Massepunkten
-      eine reine, ladungslose Welle wird — die Ladung und Ruhemasse gehen nicht verloren, sondern werden
-      vollständig in die Phasenstruktur der emittierten Welle codiert.
+    <!-- ================= KURZFASSUNG ================= -->
+    <div class="section-card">
+      <h2>⚡ Kurzfassung der WRZT</h2>
+      <p>
+        Die <strong>Wellenraumzeit-Theorie (WRZT)</strong> beschreibt das Universum nicht als leeres,
+        abstraktes Vakuum mit punktförmigen Teilchen, sondern als ein <strong>dreidimensionales, elastisches
+          Knotennetzwerk</strong>. Materie und Strahlung sind keine getrennten Phänomene, sondern lokalisierte,
+        rotierende Deformationswellen (Schwingungswirbel) innerhalb dieser Raumzeit-Struktur.
+      </p>
+      <p>
+        Licht ist in diesem Bild eine hochfrequente, transversale Raumzeit-Welle, die sich mit der
+        charakteristischen Ausbreitungsgeschwindigkeit des Netzes ($c$) bewegt. Ruhemasse entsteht erst dann,
+        wenn diese Welle auf einer geschlossenen Bahn gefangen wird (Quanten-Lokalisierung). Jedes Teilchen
+        entspricht dabei einer lokalen Raumzeitkrümmung (Vertiefung), jedes Antiteilchen einer komplementären
+        Raumzeit-Wölbung.
+      </p>
+      <div class="insight-box">
+        <strong>Zentrale Aussage:</strong> Wenn ein Elektron-Positron-Paar mit nahezu Lichtgeschwindigkeit
+        um seinen gemeinsamen Schwerpunkt rotiert, entstehen hochfrequente Raumzeit-Bugwellen, die wir
+        makroskopisch als Licht wahrnehmen. Der sich aus dem Kräftegleichgewicht ergebende Grenzradius
+        entspricht exakt dem klassischen Elektronenradius $r_e \approx 2{,}8179 \times 10^{-15}\text{ m}$.
+      </div>
     </div>
-  </div>
 
-  <div class="section-card" id="v3">
-    <h2>3. Bugwellen-Geometrie und Wellenüberlagerung</h2>
-    <p>Der Öffnungswinkel $\Theta$ der Raumzeit-Bugwelle (Mach-Effekt im Netz) wird über das Geschwindigkeitsverhältnis bestimmt:</p>
-    <div class="equation-box">$$\sin(\Theta) = \frac{v_{\text{Phase}}}{v} \quad \implies \quad \sec(\Theta) = \frac{1}{\cos(\Theta)}$$</div>
-    <p>Die Überlagerung der Raumzeit-Wellenfunktionen von Elektron und Positron ergibt:</p>
-    <div class="equation-box">$$\Psi_{\text{Netz}}(x,y,z,t) = \left( \Psi_{e^-} + \Psi_{e^+} \right) \cdot \sec(\Theta)$$</div>
-    <p>Beim Zusammenfall unterhalb von $R_{\min}$ entsteht die reine Energie des Undatrons:</p>
-    <div class="equation-box">$$E_{\text{Undatron}} = 2 \cdot m_e c^2 = \hbar \cdot \omega_{\text{Netz}} \approx 1{,}022 \text{ MeV}$$</div>
-  </div>
-
-
-  <!-- ======================================================= -->
-  <!-- TEIL VI — EINORDNUNG & OFFENE FRAGEN                      -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil6">
-    <span class="part-eyebrow">Teil VI</span>
-    <h1>Einordnung, offene Fragen &amp; Ausblick</h1>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card" id="vi1">
-    <h2>Licht — beschrieben auf verschiedene Arten</h2>
-    <p>Licht kann auf verschiedene Arten beschrieben werden, abhängig von der Perspektive und wissenschaftlichen Disziplin:</p>
-    <ul>
-      <li><strong>Elektromagnetismus (klassisch):</strong> Welle aus gekoppelten elektrischen und magnetischen Feldern ($c \approx 299.792.458\text{ m/s}$).</li>
-      <li><strong>Quantentheorie:</strong> Photonen als diskrete Energiequanten mit Wellen-Teilchen-Dualismus.</li>
-      <li><strong>Relativitätstheorie:</strong> Invariante Grenzgeschwindigkeit $c$, die die Kausalitätsstruktur der Raumzeit definiert.</li>
-      <li><strong>Wellenraumzeit-Theorie (WRZT):</strong> Hochfrequente Gravitationswelle, hervorgerufen durch mikroskopische Raumzeitkrümmungen rotierender Paare — die WRZT bettet die Ergebnisse der Standard-Quantenelektrodynamik in ein anschauliches, netzmechanisches Modell ein, ohne deren mathematische Vorhersagekraft zu verletzen.</li>
-    </ul>
-  </div>
-
-  <div class="section-card" id="vi2">
-    <h2>Noch offene Fragen und Ausblick</h2>
-    <ul>
-      <li><strong>Was ist Zeit in dieser Sichtweise?</strong> Ist Zeit eine emergente Eigenschaft, die aus der Frequenz dieser Raumzeit-Oszillationen hervorgeht — das sekundäre Taktsignal der internen Kreis- und Schwingungsfrequenzen des Netzes?</li>
-      <li><strong>Wechselwirkung mit Dunkler Materie / Energie:</strong> Könnten ruhende oder entkoppelte Paare, hoch-kohärente Undatron-Felder, einen Teil der Dunklen Materie erklären?</li>
-      <li><strong>Experimenteller Nachweis:</strong> Wie können Gravitationswellen im Terahertz- und Petahertz-Bereich messtechnisch nachgewiesen werden, etwa über Phasenmodulationen in hochenergetischen Laser-Interferometern?</li>
-      <li><strong>Astrophysikalische Phänomene:</strong> Welche Rolle spielen diese Effekte an den Ereignishorizonten Schwarzer Löcher?</li>
-    </ul>
-    <div class="note-box">
-      <strong>Zum Status dieser Theorie:</strong> Die WRZT ist ein persönliches, in Entwicklung befindliches
-      Gedankenmodell und kein etabliertes, experimentell verifiziertes physikalisches Theoriegebäude. Sie
-      übernimmt bewusst reale Konstanten und Formeln aus Standardmodell und Relativitätstheorie und
-      interpretiert sie neu — ihr Wert liegt aktuell vor allem in der anschaulichen, geometrischen
-      Denkweise, nicht in überprüften neuen Vorhersagen.
+    <!-- Illustration -->
+    <div class="svg-container">
+      <svg width="700" height="320" viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+            <stop offset="30%" stop-color="#00f2fe" stop-opacity="0.8" />
+            <stop offset="70%" stop-color="#4facfe" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#0b0f19" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="antiGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+            <stop offset="30%" stop-color="#e100ff" stop-opacity="0.8" />
+            <stop offset="70%" stop-color="#7f00ff" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#0b0f19" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <g stroke="#1e293b" stroke-width="1">
+          <path d="M 0,50 Q 350,180 700,50" fill="none" />
+          <path d="M 0,100 Q 350,200 700,100" fill="none" />
+          <path d="M 0,150 Q 350,220 700,150" fill="none" />
+          <path d="M 0,200 Q 350,240 700,200" fill="none" />
+          <path d="M 0,250 Q 350,260 700,250" fill="none" />
+        </g>
+        <g fill="none" stroke-width="1.5" opacity="0.6">
+          <circle cx="350" cy="160" r="40" stroke="#00f2fe" stroke-dasharray="4,4" />
+          <circle cx="350" cy="160" r="80" stroke="#00f2fe" opacity="0.8" />
+          <circle cx="350" cy="160" r="130" stroke="#4facfe" opacity="0.5" />
+          <circle cx="350" cy="160" r="190" stroke="#4facfe" opacity="0.3" />
+        </g>
+        <circle cx="320" cy="150" r="24" fill="url(#starGlow)" />
+        <circle cx="380" cy="170" r="24" fill="url(#antiGlow)" />
+        <circle cx="320" cy="150" r="6" fill="#00f2fe" />
+        <circle cx="380" cy="170" r="6" fill="#e100ff" />
+        <path d="M 320,120 A 35,35 0 0,1 385,140" fill="none" stroke="#00f2fe" stroke-width="2" />
+        <path d="M 380,200 A 35,35 0 0,1 315,180" fill="none" stroke="#e100ff" stroke-width="2" />
+        <text x="350" y="300" fill="#94a3b8" font-size="14" text-anchor="middle">Rotierendes Teilchen-Antiteilchen-Paar als Quelle hochfrequenter Raumzeitwellen</text>
+      </svg>
+      <div class="caption">Abbildung: Dynamische Raumzeitverzerrung durch die Rotation gekoppelter Ladungs-/Massezentren in der WRZT.</div>
     </div>
-  </div>
 
 
-  <!-- ======================================================= -->
-  <!-- TEIL VII — ANHANG                                         -->
-  <!-- ======================================================= -->
-  <div class="part-divider" id="teil7">
-    <span class="part-eyebrow">Teil VII</span>
-    <h1>Anhang: Quantitative Modellierung &amp; Konstanten</h1>
-    <div class="part-line"></div>
-  </div>
-
-  <div class="section-card" id="a1">
-    <h2>Tabelle der Ur-Konstanten und Längenskalen</h2>
-    <table>
-      <thead><tr><th>Größe / Konstante</th><th>Symbol / Formel</th><th>Wert</th></tr></thead>
-      <tbody>
-        <tr><td>Ruhe-Raumzeit-Trägheit</td><td>$\eta_0 = \frac{m_e}{2}$</td><td>4,554692 × 10⁻³¹ kg</td></tr>
-        <tr><td>1D-Ruhe-Urspannung</td><td>$\Xi_0 = \frac{m_e^2 c}{\hbar}$</td><td>2,358826 × 10⁻¹⁸ kg/m (kalibriert: 5,897427 × 10⁻¹⁹ kg/m)</td></tr>
-        <tr><td>Minimal-Radius (Ruhe)</td><td>$R_{\min,0} = \frac{\hbar}{2 m_e c}$</td><td>1,930796 × 10⁻¹³ m</td></tr>
-        <tr><td>3D-Ur-Dichte</td><td>$\rho_{\text{Ur},0} = \frac{\eta_0}{R_{\min,0}^3}$</td><td>6,330062 × 10⁷ kg/m³</td></tr>
-        <tr><td>3D-Ur-Druck</td><td>$P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2$</td><td>5,689104 × 10²⁴ N/m²</td></tr>
-        <tr><td>Klassischer Elektronenradius</td><td>$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td><td>2,817940 × 10⁻¹⁵ m</td></tr>
-        <tr><td>Reduzierte Compton-Wellenlänge</td><td>$\bar{\lambda}_C = \frac{\hbar}{m_e c}$</td><td>3,8616 × 10⁻¹³ m</td></tr>
-        <tr><td>Feinstrukturkonstante</td><td>$\alpha = \frac{r_e}{\bar{\lambda}_C}$</td><td>≈ 1/137,036</td></tr>
-        <tr><td>Annihilationsenergie</td><td>$E = 2 m_e c^2$</td><td>≈ 1,022 MeV</td></tr>
-        <tr><td>Lichtgeschwindigkeit</td><td>$c = \frac{\Xi_0}{\eta_0} \cdot R_{\min,0}$</td><td>299.792.458 m/s</td></tr>
-      </tbody>
-    </table>
-    <div class="note-box">
-      <strong>Physikalische Schranke:</strong> Der Radius eines stabilen Systems kann den klassischen
-      Elektronenradius nicht unterschreiten, ohne dass fundamentale Quanten- und Raumzeiteffekte wirksam
-      werden. Als absolute untere Grenze der Raumzeit-Diskretheit gilt die Planck-Länge
-      ($r_P \approx 1{,}616 \times 10^{-35}\text{ m}$).
+    <!-- ======================================================= -->
+    <!-- TEIL I — EINLEITUNG & PHILOSOPHIE                         -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil1">
+      <span class="part-eyebrow">Teil I</span>
+      <h1>Einleitung &amp; Philosophie</h1>
+      <div class="part-line"></div>
     </div>
-  </div>
 
-  <div class="section-card" id="a2">
-    <h2>Das elektromagnetische Spektrum</h2>
-    <ul>
-      <li><strong>Radiowellen:</strong> $3 \times 10^3$ bis $3 \times 10^9$ Hz</li>
-      <li><strong>Mikrowellen:</strong> $3 \times 10^9$ bis $3 \times 10^{12}$ Hz</li>
-      <li><strong>Infrarot:</strong> $3 \times 10^{12}$ bis $4 \times 10^{14}$ Hz</li>
-      <li><strong>Sichtbares Licht:</strong> $4 \times 10^{14}$ bis $7{,}5 \times 10^{14}$ Hz</li>
-      <li><strong>Ultraviolett:</strong> $7{,}5 \times 10^{14}$ bis $3 \times 10^{16}$ Hz</li>
-      <li><strong>Röntgenstrahlen:</strong> $3 \times 10^{16}$ bis $3 \times 10^{19}$ Hz</li>
-      <li><strong>Gammastrahlen:</strong> $10^{19}$ bis $10^{24}$ Hz</li>
-    </ul>
-  </div>
-
-  <div class="section-card" id="a3">
-    <h2>Modellrechnungen: Umdrehungsfrequenz und Bahnradius</h2>
-    <p>Betrachten wir die vereinfachte Modellierung eines Positrons, das ein Elektron umkreist.</p>
-
-    <h3>Fall A: Nicht-relativistischer Ansatz (Bohr-Radius-Analog)</h3>
-    <ul>
-      <li>Bahngeschwindigkeit: $v \approx 2{,}18 \times 10^6\text{ m/s}$</li>
-      <li>Bahnradius: $r \approx 5{,}29 \times 10^{-11}\text{ m}$</li>
-    </ul>
-    <div class="equation-box">Umfang $= 2\pi \times 5{,}29\times10^{-11}\text{ m} \approx 3{,}32 \times 10^{-10}\text{ m}$<br>Frequenz $f = v/\text{Umfang} \approx 6{,}57 \times 10^{15}\text{ Umdrehungen/s}$</div>
-
-    <h3>Fall B: Halbierung des Radius</h3>
-    <ul>
-      <li>Radius: $r \approx 2{,}65 \times 10^{-11}\text{ m}$</li>
-      <li>Geschwindigkeit: $v \approx 4{,}36 \times 10^6\text{ m/s}$</li>
-    </ul>
-    <div class="equation-box">Umfang $\approx 1{,}67 \times 10^{-10}\text{ m}$<br>Frequenz $f \approx 2{,}61 \times 10^{16}\text{ Hz}$</div>
-
-    <h3>Fall C: Grenzbetrachtung bei c (Coulomb-Zentripetal-Gleichgewicht)</h3>
-    <div class="equation-box">
-      $$m c^2 / r = k e^2 / r^2 \implies r = k e^2 / (m c^2)$$
-      Mit $k = 8{,}99\times10^9\,\text{Nm}^2/\text{C}^2$, $e = 1{,}602\times10^{-19}\text{ C}$, $m = 9{,}11\times10^{-31}\text{ kg}$, $c = 3\times10^8\text{ m/s}$:
-      $$r \approx 2{,}81 \times 10^{-15}\text{ m}$$
-      <span style="font-size:0.85em;color:var(--text-muted);">— entspricht genau dem klassischen Elektronenradius!</span>
+    <div class="section-card" id="i1">
+      <h2>Vorwort: Was ist Licht?</h2>
+      <p>
+        Licht ist seit Jahrhunderten eines der faszinierendsten Phänomene, die Wissenschaftler, Philosophen
+        und Denker untersucht haben. Von den ersten Überlegungen zur Natur des Lichts als Welle bis hin zur
+        Entdeckung seiner Dualität als Teilchen und Welle hat die Menschheit stetig versucht, seine wahre
+        Natur zu begreifen. In der klassischen Physik wird Licht als elektromagnetische Welle beschrieben,
+        die sich durch den Raum bewegt. Die Quantenmechanik ergänzt dies, indem sie Licht als eine Ansammlung
+        von Photonen beschreibt – Teilchen mit einer bestimmten Energie und einem Spin.
+      </p>
+      <p>
+        Doch was wäre, wenn Licht mehr als nur ein Zusammenspiel elektrischer und magnetischer Felder ist?
+        Was, wenn Licht selbst eine Form der Raumzeitdeformation darstellt – eine Gravitationswelle? Diese
+        Frage bildet den Ausgangspunkt der <strong>Wellenraumzeit-Theorie (WRZT)</strong>: eine Perspektive,
+        die nicht nur unser Verständnis von Licht verändern könnte, sondern auch tiefergehende Fragen über
+        die Verbindung von Gravitation und Quantenmechanik zu beantworten versucht.
+      </p>
+      <p>
+        Bevor wir zur Natur des Lichts selbst kommen, lohnt sich ein Blick auf die tiefere Bühne, auf der
+        sich dieses Licht abspielt: die Struktur der Raumzeit selbst. Teil II dieses Manifests entwirft
+        diese Bühne — ein elastisches, dreidimensionales Netzwerk, aus dem heraus sich in Teil III und IV
+        Materie, Bewegung und schließlich Licht als notwendige Konsequenzen ergeben.
+      </p>
+      <div class="quote-box">
+        „Man sollte eine Theorie nicht vorschnell verwerfen, nur weil sie Fehler zeigt – sie könnte den Weg
+        zu tieferem Verständnis ebnen.“
+      </div>
+      <p>
+        Dieser Gedanke ist der Leitfaden für die Erforschung neuer Konzepte, die bestehende Annahmen
+        herausfordern und unser Wissen erweitern sollen. Im Folgenden werden die Grundlagen dieser Theorie
+        dargelegt, ihre mathematischen Implikationen untersucht und die Verbindungen zu bekannten
+        physikalischen Phänomenen wie der Quantenverschränkung und der Doppelspalt-Interferenz erklärt.
+        Abschließend werden offene Fragen formuliert, die zu weiterem Nachdenken anregen sollen.
+      </p>
+      <div class="quote-box">
+        „Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“
+        <span class="author">— Thich Nhat Hanh</span>
+      </div>
     </div>
-    <p>Berechnung der maximalen Frequenz bei $c$ und $r = 2{,}81\times10^{-15}\text{ m}$:</p>
-    <div class="equation-box">Umfang $\approx 1{,}77 \times 10^{-14}\text{ m}$<br>Frequenz $f = c/\text{Umfang} \approx 1{,}69 \times 10^{22}\text{ Hz}$</div>
+
+
+    <!-- ======================================================= -->
+    <!-- TEIL II — DIE ARCHITEKTUR DES KOSMOS                      -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil2">
+      <span class="part-eyebrow">Teil II</span>
+      <h1>Die Architektur des Kosmos</h1>
+      <div class="subtitle">Das elastische Raumzeit-Netzwerk der WRZT</div>
+      <div class="part-line"></div>
+    </div>
+
+    <div class="section-card" id="ii1">
+      <h2>Das elastische Raumzeit-Netzwerk</h2>
+      <p>
+        Stell dir das Universum nicht als leere, abstrakte Bühne vor, sondern als ein dreidimensionales,
+        kontinuierliches Gewebe aus feinsten, elastisch miteinander verwobenen Knoten – ähnlich wie ein
+        riesiger, dreidimensionaler Schwamm. Alles, was wir in der Physik als feste Materie oder
+        Elementarteilchen kennen, sind in Wahrheit keine starren Kügelchen, sondern lokal gefangene,
+        hochfrequent rotierende Wirbelwellen innerhalb dieses Netzes.
+      </p>
+      <p>
+        Wenn sich ein solches Wirbelzentrum durch das Raumzeit-Gitter bewegt, gleitet es nicht reibungsfrei
+        hindurch, sondern verdrängt und verdichtet die Maschen vor sich. Es entsteht eine elastische
+        Verdichtungsfront – genau wie die Bugwelle eines Schiffes, das durch das Wasser schneidet. Je
+        schneller sich das Teilchen bewegt, desto enger ziehen sich die Maschen direkt vor ihm zusammen,
+        und desto steifer reagiert das Gewebe gegen eine weitere Beschleunigung.
+      </p>
+      <p>
+        Licht wiederum ist keine isolierte Teilchenströmung, sondern die freie, ungebundene Welle dieses
+        Netzwerks selbst: Wenn rotierende Teilchen-Antiteilchen-Strukturen das Gitter in hochfrequente
+        Vibrationen versetzen, breiten sich diese Auslenkungen als elastische Transversalwellen durch das
+        Netz aus. Licht verhält sich somit fundamental wie eine hochenergetische Raumzeit-Schwingung.
+      </p>
+
+      <div style="border:1px solid #2a2a2a;border-radius:8px;padding:20px;background:#141414;color:#e8e8e4;">
+        <h3 style="margin:0 0 8px;color:#c9a227;">Eine energie Raumzeit-Welle mit Teilchen Eigenschaften.</h3>
+        <p style="margin:0 0 14px;font-size:14px;line-height:1.5;">
+        <p>Licht ist fundamental eine hochenergetische Raumzeit-Schwingung, die sich wellenartig ausbreitet und zugleich quantisierte, teilchenartige Eigenschaften besitzt.</p>
+        <p>Damit verbindest du zwei scheinbar unterschiedliche Aspekte:</p>
+        <p>Welle: Licht besitzt Frequenz, Wellenlänge, Phase und Interferenz.
+          Raumzeit-Schwingung: In deiner WRZT wäre die Lichtwelle nicht bloß eine Schwingung in der Raumzeit, sondern eine dynamische Schwingung der Raumzeit selbst.
+          Energie: Die Energie ist an die Frequenz gekoppelt:
+          E=hf
+          Teilcheneigenschaft: Beim Austausch mit Materie tritt Licht in diskreten Energieportionen, den Photonen, auf.
+          Ausbreitung: Die konstante Lichtgeschwindigkeit wäre dabei eine fundamentale Eigenschaft dieser Raumzeit-Welle.</p>
+        <p>Ein besonders schöner Begriff für deine Theorie wäre daher:</p>
+        <p>„quantisierte Raumzeitwelle“</p>
+        <p>oder etwas ausführlicher:</p>
+        <p>„Licht ist eine quantisierte, hochfrequente Raumzeit-Schwingung mit sowohl wellenartigen als auch teilchenartigen Erscheinungseigenschaften.“</p>
+
+        <button style="background:#c9a227;color:#161200;border:none;border-radius:6px;padding:9px 16px;font-weight:600;cursor:pointer;">Mehr erfahren</button>
+      </div>
+
+
+    </div>
+
+    <div class="section-card" id="ii2">
+      <h2>1. Das 3D-Knotennetzwerk und die kosmische Elastizität</h2>
+      <p>
+        Das kosmische Netz durchdringt den gesamten Raum und besitzt durch seine fundamentale Struktur eine
+        intrinsische <strong>3D-Ur-Volumendichte</strong> $\rho_{\text{Ur},0}$ sowie eine homogene
+        <strong>1D-Ruhe-Urspannung</strong> $\Xi_0$. Analog zu einem feuchten, komprimierten Schwamm, der
+        sich beim Trocknen gleichmäßig in alle Richtungen ausdehnt, befindet sich das Universum in einem
+        Zustand stetiger Expansion, die vor allem an seinen äußeren Rändern neuen Schwingungsraum schafft.
+      </p>
+      <p>
+        Durch diese Expansion wird das Netz nicht zerrissen, sondern behält seine universelle Elastizität.
+        Innerhalb dieser schwammartigen Geometrie existieren kleinste, nicht weiter komprimierbare
+        Hohlräume bzw. Maschenweiten. Die fundamentale Zellgröße dieses ungestörten Netzes wird im
+        Ruhezustand durch den <strong>Quanten-Minimal-Radius</strong> $R_{\min,0}$ definiert:
+      </p>
+      <div class="equation-box">$$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}$$</div>
+      <hr>
+      <div class="equation-box">
+        <p>Wenn du die <strong>Feinstrukturkonstante $\alpha$ explizit in deine Formel einbauen</strong> möchtest, gibt es eine sehr schöne Beziehung: Die reduzierte Compton-Wellenlänge ist</p>
+        <p>$$\bar{\lambda}_C = \frac{\hbar}{m_e c} = \alpha a_0 = \frac{r_e}{\alpha}$$</p>
+        <p>Das ist auch in den CODATA-Werten so angegeben. </p>
+        <p>Da dein Minimalradius die <strong>Hälfte</strong> davon ist, ergibt sich:</p>
+        <p>$$\boxed{R_{\min,0} = \frac{\alpha a_0}{2} = \frac{r_e}{2\alpha} = \frac{\hbar}{2m_e c}}$$</p>
+        <h3>Mit den genauen CODATA-2022-Werten</h3>
+        <p>$$\alpha = 7{,}297,352,5643\times10^{-3}$$</p>
+        <p>$$a_0 = 5{,}291,772,10544\times10^{-11}\ {\rm m}$$</p>
+        <p>Damit:</p>
+        <h3>$$R_{\min,0}=\frac{\left(7{,}297,352,5643\times10^{-3}\right)
+          \left(5{,}291,772,10544\times10^{-11}\right)}
+          {2}\ {\rm m}$$</h3>
+
+        <p>$$\boxed{R_{\min,0}\approx1{,}9307963372\times10^{-13}\ {\rm m}}$$</p>
+        <p>Interessant für deine WRZT ist außerdem die äquivalente Form über den <strong>klassischen Elektronenradius</strong>:</p>
+        <p>$$r_e = 2{,}817,940,3205\times10^{-15}\ {\rm m}$$</p>
+        <p>und somit</p>
+        <p>$$\boxed{R_{\min,0}=\frac{r_e}{2\alpha}}$$</p>
+        <p>also</p>
+        <h3>$$R_{\min,0}=\frac{2{,}817,940,3205\times10^{-15}}
+          {2\left(7{,}297,352,5643\times10^{-3}\right)}
+          $$</h3>
+        <p>$$\boxed{R_{\min,0} = 1,930,796,3372\times10^{-13}\ {\rm m}}$$</p>
+        <p><strong>Für deine Formelsammlung würde ich daher besonders diese Form aufnehmen:</strong></p>
+        <h3>$$\boxed{
+          R_{\min,0}=\frac{\alpha a_0}{2}=\frac{r_e}{2\alpha}=\frac{\hbar}{2m_e c}=1{,}930,796,3372\times10^{-13}\ {\rm m}
+          }$$</h3>
+        <p>Damit ist $\alpha$ nicht einfach zusätzlich eingesetzt, sondern zeigt die <strong>Verknüpfung zwischen Bohr-Radius, klassischem Elektronenradius und reduzierter Compton-Länge</strong>. </p>
+        <p>Das könnte für deine WRZT besonders interessant sein, weil $\alpha$ damit als <strong>Skalierungsfaktor zwischen atomarer und relativistisch/quantum-mechanischer Längenskala</strong> erscheint.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th align="left">Längenskala</th>
+              <th align="center">Symbol</th>
+              <th align="center">Formel</th>
+              <th align="left">Wert</th>
+              <th align="left">Beziehung ($\alpha$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td align="left">Klassischer Elektronenradius</td>
+              <td align="center">$r_e$</td>
+              <td align="center">$\frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td>
+              <td align="left">$2{,}8179 \cdot 10^{-15}\text{ m}$</td>
+              <td align="left">$r_e = \alpha \cdot \bar{\lambda}_e = \alpha^2 \cdot a_0$</td>
+            </tr>
+            <tr>
+              <td align="left">Reduzierte Compton-Wellenlänge</td>
+              <td align="center">$\bar{\lambda}_e$</td>
+              <td align="center">$\frac{\hbar}{m_e c}$</td>
+              <td align="left">$3{,}8616 \cdot 10^{-13}\text{ m}$</td>
+              <td align="left">$\bar{\lambda}_e = \frac{r_e}{\alpha} = \alpha \cdot a_0$</td>
+            </tr>
+            <tr>
+              <td align="left">Bohr-Radius</td>
+              <td align="center">$a_0$</td>
+              <td align="center">$\frac{4\pi \varepsilon_0 \hbar^2}{m_e e^2}$</td>
+              <td align="left">$5{,}2918 \cdot 10^{-11}\text{ m}$</td>
+              <td align="left">$a_0 = \frac{\bar{\lambda}_e}{\alpha} = \frac{r_e}{\alpha^2}$</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+      </div>
+      <hr>
+      <p>In diesem ungestörten Ruhezustand ergeben sich für das Vakuumnetzwerk präzise kalibrierte Grundgrößen:</p>
+      <ul>
+        <li><strong>Ruhe-Raumzeit-Trägheit eines Netzknotens:</strong> $\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31} \text{ kg}$</li>
+        <li><strong>3D-Ur-Dichte:</strong> $\rho_{\text{Ur},0} = \frac{\eta_0}{R_{\min,0}^3} \approx 6{,}330062 \times 10^7 \text{ kg/m}^3$</li>
+        <li><strong>3D-Ur-Druck (Volumenspannung):</strong> $P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2 \approx 5{,}689104 \times 10^{24} \text{ N/m}^2$</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="ii3">
+      <h2>2. Materie und Licht als dynamische Netzerregungen</h2>
+      <p>
+        In diesem Schwingungsmedium manifestieren sich alle physikalischen Phänomene nicht als isolierte
+        Objekte, sondern als unterschiedliche Erregungsformen desselben elastischen Netzwerks:
+      </p>
+      <h3>Stehende Ringwirbelwellen (Materie)</h3>
+      <p>
+        Materie entsteht dort, wo Schwingungsenergie lokal gebunden und in sich geschlossen rotiert. Ein
+        Elementarteilchen (wie das Elektron) bildet eine <strong>stehende ringförmige Wirbelwelle</strong>
+        (Toroid) im 3D-Knotennetz. Die im Kreis gefangene Feldenergie erzeugt nach außen hin das Verhalten
+        einer ruhenden Masse $m_0$. Der Schwerpunkt der Welle bleibt lokalisiert, während die innere
+        Phasenschwingung mit Lichtgeschwindigkeit $c$ den Spin $\hbar$ aufbaut.
+      </p>
+      <h3>Transversale Elastizitätswellen (Licht &amp; Gravitationswellen)</h3>
+      <p>
+        Licht ist die freie, hochfrequente Fortpflanzung einer Scherkraft- oder Torsionsschwingung durch
+        das Knotennetzwerk. Wenn sich Teilchen-Antiteilchen-Deformationen bewegen oder rotieren, versetzen
+        sie die elastischen Stränge in transversale Schwingung. Licht verhält sich somit fundamental wie
+        eine <strong>hochfrequente Gravitationswelle</strong>. Die Phasen- und Ausbreitungsgeschwindigkeit
+        $c$ dieser Wellen ist eine direkte Konsequenz der elastischen Netzparameter:
+      </p>
+      <div class="equation-box">$$c = \sqrt{\frac{P_{\text{Ur}}}{\rho_{\text{Ur}}}} = 299.792.458 \text{ m/s} ←✨→ \frac{\Xi_0}{\eta_0} \cdot R_{\min,0} =1$$</div>
+    </div>
+
+    <div class="section-card" id="ii4">
+      <h2>3. Relativistische Verdichtung und der Lorentz-Faktor γ</h2>
+      <p>
+        Bewegen sich Wirbelzentren oder Wellenfelder mit einer Relativgeschwindigkeit $v$ durch das Netz,
+        verengt und verdichtet sich die Maschenstruktur im Wechselwirkungsbereich. Diese geometrische
+        Kontraktion wird durch den <strong>Lorentz-Faktor</strong> $\gamma$ exakt beschrieben:
+      </p>
+      <div class="equation-box">$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}$$</div>
+      <p>Unter relativistischer Belastung skalieren die fundamentalen Netzvariablen der WRZT dynamisch:</p>
+      <ol>
+        <li><strong>Relativistischer Minimal-Radius (Maschenkompression):</strong>
+          <div class="equation-box">$$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} = \frac{\hbar}{2 \gamma m_e c}$$</div>
+          <p>Der effektive Hohlraum des „Schwamms“ zieht sich unter hoher Energie proportional zu $\gamma^{-1}$ zusammen.</p>
+        </li>
+        <li><strong>Relativistische Knoten-Trägheit:</strong>
+          <div class="equation-box">$$\eta(\gamma) = \gamma \cdot \eta_0$$</div>
+        </li>
+        <li><strong>Relativistische Urspannung (1D-Linienspannung):</strong>
+          <div class="equation-box">$$\Xi(\gamma) = \gamma^2 \cdot \Xi_0$$</div>
+        </li>
+        <li><strong>Relativistische Dichte &amp; Druck (3D-Volumenverdichtung):</strong>
+          <div class="equation-box">$$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0} \qquad P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$</div>
+        </li>
+      </ol>
+      <p>
+        Durch diese dynamische Verfeinerung des Netzes bleibt das Verhältnis von Druck zu Dichte stets
+        invariant, wodurch die Lichtgeschwindigkeit $c$ universell konstant bleibt:
+      </p>
+      <div class="equation-box">$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 P_{\text{Ur},0}}{\gamma^4 \rho_{\text{Ur},0}}} = c$$</div>
+      <div class="insight-box">
+        <strong>Synthese:</strong> Das Universum ist ein gigantischer, elastischer Oszillator. Die
+        scheinbare Leere ist erfüllt von einem dichten, hocheffizienten Knotennetzwerk, das sich kosmisch
+        ausdehnt und dessen minimale Porenweite durch $R_{\min}$ begrenzt ist. Materie ist lokal gefangener
+        Wirbelschwung, Licht ist der freie Wellenimpuls durch die Stränge, und die Relativitätstheorie
+        beschreibt schlicht die geometrische Kompression dieses Schwingungsmediums unter dynamischer Belastung.
+      </div>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- TEIL III — DER RELATIVISTISCHE BUGWELLEN-EFFEKT           -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil3">
+      <span class="part-eyebrow">Teil III</span>
+      <h1>Der relativistische Bugwellen-Effekt der Materie</h1>
+      <div class="part-line"></div>
+    </div>
+
+    <div class="section-card">
+      <h2>Vorbemerkung</h2>
+      <p>
+        Die Betrachtung des Bugwellen-Effekts bei Materie berührt den innersten Kern der Wellenraumzeit-Theorie.
+        Wenn ein Teilchen – verstanden als lokalisierte, rotierende Knoten-Deformation unseres
+        dreidimensionalen Raumzeit-Netzwerks – sich relativ zum ungestörten Vakuumgitter bewegt, gleitet es
+        nicht isoliert durch einen leeren Raum. Es verdrängt und verdichtet die elastischen Stränge des
+        Quellnetzes vor sich und zieht ein dynamisches Wellenfeld hinter sich her.
+      </p>
+    </div>
+
+    <div class="section-card" id="iii1">
+      <h2>1. Geometrische Natur der Raumzeit-Bugwelle</h2>
+      <p>
+        In der klassischen Strömungsmechanik erzeugt ein Objekt, das sich schneller als die
+        Schallgeschwindigkeit eines Mediums bewegt, eine Mach'sche Stoßwelle. In der WRZT wird dieses
+        Konzept fundamental auf das Vakuumgitter übertragen:
+      </p>
+      <ul>
+        <li><strong>Wellenleiter-Medium:</strong> Das 3D-Knotennetzwerk der Raumzeit besitzt eine fundamentale Ausbreitungsgeschwindigkeit für elastische Transversalwellen: die Lichtgeschwindigkeit $c = 299.792.458\text{ m/s}$.</li>
+        <li><strong>Materie als Wellenpaket:</strong> Materie besteht aus lokal gebundenen, hochfrequent rotierenden Raumzeit-Deformationen. Bewegt sich der Schwerpunkt dieser Struktur mit einer Geschwindigkeit ${v ← c}$, überlagern sich die kugelförmigen Phasenwellen asymmetrisch.</li>
+
+        <li><strong>Frontenüberlagerung:</strong> Durch die Eigenbewegung des Knotenzentrums überlagern sich die kreisförmigen bzw. kugelförmigen Phasenwellen in Bewegungsrichtung. Es entsteht eine dynamische Verdichtungsfront: die <strong>Raumzeit-Bugwelle</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="iii2">
+      <h2>2. Der Bugwellen-Winkel α und der Lorentz-Faktor γ</h2>
+      <p>
+        Durch den Bugwellen-Winkel $\alpha$ fügt sich die relativistische Mechanik der WRZT direkt in die
+        Phasen-Geometrie des 3D-Knotennetzwerks ein. Der Lorentz-Faktor $\gamma$ verliert dadurch jegliche
+        Abstraktheit und wird zu einer reinen trigonometrischen Projektion der Raumzeit-Wölbung.
+      </p>
+      <h3>Geometrische Herleitung</h3>
+      <p><strong>1. Definition des Bugwellen-Winkels $\alpha$:</strong> Der Winkel $\alpha$ beschreibt den Neigungswinkel der Phasenfront gegenüber der Ausbreitungsrichtung:</p>
+      <div class="equation-box">$$\sin \alpha = \frac{v}{c} \implies \alpha = \arcsin\left(\frac{v}{c}\right)$$</div>
+      <p><strong>2. Der transversale Projektionsfaktor $\cos \alpha$:</strong></p>
+      <div class="equation-box">$$\cos \alpha = \sqrt{1 - \sin^2 \alpha} = \sqrt{1 - \frac{v^2}{c^2}}$$</div>
+      <p><strong>3. Identität mit dem Lorentz-Faktor $\gamma$:</strong> Der relativistische Korrekturfaktor $\gamma$ entspricht exakt der Sekans-Funktion des Bugwellen-Winkels:</p>
+      <div class="equation-box">$$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} = \frac{1}{\cos \alpha} = \sec \alpha$$</div>
+
+      <h3>Integration in die relativistischen WRZT-Grundgleichungen</h3>
+      <p>Setzt man $\gamma = \sec \alpha$ in die Grundgleichungen des Raumzeitnetzes ein, transformieren sich alle physikalischen Größen direkt in Abhängigkeit vom Bugwellen-Winkel $\alpha$:</p>
+      <ul>
+        <li><strong>Relativistischer Netz-Radius:</strong> $$R(\alpha) = R_{\min,0} \cdot \cos \alpha = \frac{\hbar}{2 \gamma m_e c}$$</li>
+        <li><strong>Dynamische Knotenträgheit:</strong> $$\eta(\alpha) = \eta_0 \cdot \sec \alpha = \frac{\eta_0}{\cos \alpha}$$</li>
+        <li><strong>Dynamische 1D-Urspannung:</strong> $$\Xi(\alpha) = \Xi_0 \cdot \sec^2 \alpha = \frac{\Xi_0}{\cos^2 \alpha}$$</li>
+        <li><strong>3D-Ur-Dichte &amp; Druck:</strong> $$\rho_{\text{Ur}}(\alpha) = \rho_{\text{Ur},0} \cdot \sec^4 \alpha \qquad P_{\text{Ur}}(\alpha) = P_{\text{Ur},0} \cdot \sec^4 \alpha$$</li>
+      </ul>
+      <div class="note-box">
+        <strong>Physikalische Interpretation:</strong> Ein Körper, der sich der Lichtgeschwindigkeit $c$
+        nähert, stellt seine Schwingungsenergie zunehmend in die Längsrichtung der Phasen-Bugwelle ein. Der
+        Winkel $\alpha$ öffnet sich von $0^\circ$ (Ruhezustand) bis hin zu $90^\circ$ (Lichtgeschwindigkeit).
+        Bei $\alpha = 90^\circ$ kollabiert der transversale Radius $R(\alpha)$ auf 0, während die
+        Linienspannung $\Xi(\alpha)$ über alle Grenzen wächst – genau das verhindert, dass ein massiver
+        Knoten die Grenzgeschwindigkeit $c$ überschreiten kann.
+      </div>
+    </div>
+
+    <div class="section-card" id="iii3">
+      <h2>3. Von der Ruhe-Mechanik zur relativistischen Raumzeit-Begrenzung</h2>
+      <p>Um die dynamische Versteifung des Raumes vor dem bewegten Teilchen zu verstehen, betrachten wir den Übergang von den ruhenden Ur-Konstanten zu den relativistisch transformierten Netzgrößen.</p>
+      <h3>Schritt 1: Der ungestörte Ruhe-Zustand (γ = 1)</h3>
+      <p>Für einen einzelnen schwingenden Netzknoten im ungekoppelten Ruhesystem (kalibriert auf ein Paar-System mit der effektiven Trägheit $m_e/2$) gelten die fundamentalen Ruhe-Größen:</p>
+      <div class="equation-box">
+        $$\eta_0 = \frac{m_e}{2} \approx 4{,}554692 \times 10^{-31}\text{ kg}$$
+        $$R_{\min,0} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13}\text{ m}$$
+        $$\Xi_0 = \frac{\eta_0}{R_{\min,0}} = \frac{m_e^2 c}{\hbar} \approx 2{,}358826 \times 10^{-18}\text{ kg/m}$$
+      </div>
+      <h3>Schritt 2: Relativistische Verdichtung der Bugwelle (γ &gt; 1)</h3>
+      <p>Rückt die Materie voran, staut sich das Raumzeit-Gitter in Bewegungsrichtung. Diese Kompression verengt die Maschenweite des Gitters entlang der Bewegungslinie (Lorentz-Kontraktion der Raumzeit-Zellen):</p>
+      <div class="equation-box">
+        $$R_{\min}(\gamma) = \frac{R_{\min,0}}{\gamma} \qquad \eta(\gamma) = \gamma \cdot \eta_0 \qquad \Xi(\gamma) = \gamma^2 \cdot \Xi_0$$
+      </div>
+      <p>Da sich der Raum dreidimensional verengt ($V(\gamma) \propto R_{\min}(\gamma)^3 \propto \gamma^{-3}$), steigen die Volumendichte und der effektive Ur-Druck in der Bugfront steil an:</p>
+      <div class="equation-box">
+        $$\rho_{\text{Ur}}(\gamma) = \gamma^4 \cdot \rho_{\text{Ur},0} \qquad P_{\text{Ur}}(\gamma) = \gamma^4 \cdot P_{\text{Ur},0}$$
+      </div>
+    </div>
+
+    <div class="section-card" id="iii4">
+      <h2>4. Invarianz der Wellenausbreitungsgeschwindigkeit c</h2>
+      <p>Ein zentraler Prüfstein der Wellenraumzeit-Theorie ist die Frage, ob die Ausbreitungsgeschwindigkeit von Netzwellen unter relativistischer Verdichtung konstant bleibt. Setzt man die relativistischen Ausdrücke von Druck und Dichte in die Phasenströmungsgleichung ein:</p>
+      <div class="equation-box">$$c = \sqrt{\frac{P_{\text{Ur}}(\gamma)}{\rho_{\text{Ur}}(\gamma)}} = \sqrt{\frac{\gamma^4 \cdot P_{\text{Ur},0}}{\gamma^4 \cdot \rho_{\text{Ur},0}}} = \sqrt{\frac{P_{\text{Ur},0}}{\rho_{\text{Ur},0}}} = 299.792.458\text{ m/s}$$</div>
+      <p>Da sich der Faktor $\gamma^4$ im Zähler und Nenner exakt herauskürzt, bleibt die Phasengeschwindigkeit der Welle in jedem Bewegungszustand strikt invariant. Die Geometrie des Gitters zieht sich zwar zusammen, aber der innere elastische Druck steigt im exakt gleichen Verhältnis an.</p>
+
+      <h3>Der relativistische Phasen-Bugwellen-Winkel θ</h3>
+      <p>Der Phasen-Bugwellen-Winkel $\theta$ beschreibt die geometrische Öffnung der Verdichtungsfront im Raumzeit-Netz. Seine Sinus-Komponente entspricht exakt dem Kehrwert des Lorentz-Faktors:</p>
+      <div class="equation-box">$$\sin(\theta) = \frac{1}{\gamma} = \sqrt{1 - \frac{v^2}{c^2}}$$</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Zustand</th>
+            <th>Geschwindigkeit</th>
+            <th>γ</th>
+            <th>θ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ruhezustand</td>
+            <td>$v = 0$</td>
+            <td>$\gamma = 1$</td>
+            <td>$\theta = 90^\circ$ (kugelsymmetrisch)</td>
+          </tr>
+          <tr>
+            <td>Relativistisch</td>
+            <td>$v = 0{,}8\,c$</td>
+            <td>$\gamma \approx 1{,}667$</td>
+            <td>$\theta \approx 36{,}87^\circ$</td>
+          </tr>
+          <tr>
+            <td>Grenzfall</td>
+            <td>$v \to c$</td>
+            <td>$\gamma \to \infty$</td>
+            <td>$\theta \to 0^\circ$ (Stanzfront)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="insight-box">
+        <strong>Fazit:</strong> Die WRZT beschreibt unser Universum nicht als leeren Behälter, in dem sich
+        Materie bewegt, sondern als ein absolut lebendiges, elastisches Gewebe. Der Raum ist das Medium:
+        Das Vakuum ist kein Nichts, sondern ein aktives, strukturiertes Geflecht. Wenn elementare Gegensätze
+        – wie ein Teilchen und sein Antiteilchen – in diesem Netz aufeinandertreffen, beginnen sie extrem
+        schnell umeinander zu rotieren und verzwirbeln so das lokale Raumzeit-Gewebe. Das, was wir als Licht
+        wahrnehmen, ist genau dieses hochfrequente Vibrieren – eine mikroskopische Gravitationswelle, die
+        als reine Formveränderung durch das 3D-Knotennetzwerk der Raumzeit reist.
+      </div>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- TEIL IV — FIAT LUX                                        -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil4">
+      <span class="part-eyebrow">Teil IV</span>
+      <h1>💡 Fiat Lux — Licht als hochfrequente Gravitationswelle</h1>
+      <div class="part-line"></div>
+    </div>
+
+    <div class="section-card" id="sec1">
+      <h2>1. Einleitung: Was ist Licht?</h2>
+      <p>
+        In dieser Theorie wird Licht als eine hochfrequente Gravitationswelle beschrieben, die durch die
+        schnelle Rotation von Teilchen-Antiteilchen-Paaren oder durch die starke Schwingung von Elektronen
+        entsteht. Jedes <em>Teilchen</em> wird dabei als Raumzeitkrümmung und jedes <em>Antiteilchen</em>
+        als Raumzeit-Wölbung verstanden. Wenn diese Paare mit hoher Geschwindigkeit umeinander rotieren,
+        erzeugen sie eine spezielle Art von Gravitationswelle, die wir als Licht wahrnehmen.
+      </p>
+      <div class="note-box">
+        <strong>Hinweis zur Begrifflichkeit:</strong> Die Vertiefungen und Wölbungen sind primär als
+        elektromagnetische Effekte dargestellt, die sich direkt auf die Raumzeit auswirken, und sollten
+        nicht direkt mit makroskopischer Gravitation oder Antigravitation verwechselt werden.
+      </div>
+      <p>
+        Hochfrequente Gravitationswellen könnten auch entstehen, wenn ein Elektron stark genug hin und her
+        schwingt. Diese Wellen könnten erklären, warum das Licht der Sonne ein breites Spektrum abdeckt und
+        wie sich Eigenschaften des Lichts, wie Polarisation und Spin, aus einer neuen Perspektive verstehen
+        lassen. Im Folgenden werden die Grundlagen dieser Theorie dargelegt, ihre mathematischen
+        Implikationen untersucht und die Verbindungen zu bekannten physikalischen Phänomenen erklärt.
+      </p>
+    </div>
+
+    <div class="section-card" id="sec2">
+      <h2>2. Das Teilchen-Antiteilchen-Konzept</h2>
+      <p>
+        In dieser Theorie spielt das Konzept von Teilchen und Antiteilchen eine zentrale Rolle bei der
+        Entstehung von Licht als hochfrequente Gravitationswelle. Jedes Teilchen erzeugt eine lokale
+        Krümmung der Raumzeit, während jedes Antiteilchen eine entsprechende Wölbung verursacht. Zusammen
+        bilden sie ein Paar, das durch seine schnelle Rotation eine spezielle Form von Gravitationswellen erzeugt.
+      </p>
+      <h3>2.1 Teilchen und Antiteilchen als Raumzeitdeformationen</h3>
+      <p>
+        Teilchen werden als winzige Regionen der Raumzeit betrachtet, die eine Krümmung erzeugen – eine
+        Art „Vertiefung" in der Raumstruktur. Antiteilchen hingegen verursachen eine entgegengesetzte
+        „Wölbung", die die Raumzeit in die andere Richtung verzerrt. Diese beiden Formen ergänzen sich und
+        schaffen eine dynamische Interaktion, die die Grundlage für die Gravitationswellenbildung bildet.
+      </p>
+      <h3>2.2 Rotation und die Entstehung von Gravitationswellen</h3>
+      <p>
+        Wenn sich ein Teilchen und ein Antiteilchen einander nähern, werden sie aufgrund ihres minimalen
+        Eigendrehimpulses (Spins) notgedrungen in eine gebundene Kreisbahn gezwungen. Auf dieser Kreisbahn
+        rotieren sie mit extrem hoher Geschwindigkeit um ihren gemeinsamen Schwerpunkt, was zu einer
+        kontinuierlichen und dynamischen Schwingung der Raumzeit führt. Diese Bewegung bewirkt die Emission
+        hochfrequenter Gravitationswellen, die wir makroskopisch als Licht wahrnehmen. Dabei können sich die
+        beiden Partner nur bis zu einem spezifischen minimalen Radius nähern: Ein noch kleinerer Abstand
+        würde bedeuten, dass die Bahngeschwindigkeit der beteiligten Massepunkte die Lichtgeschwindigkeit
+        $c$ überschreiten müsste, was physikalisch ausgeschlossen ist. Dieser minimale Radius markiert somit
+        eine fundamentale Grenze der Rotationsdynamik. Die Frequenz und die Amplitude der emittierten
+        Gravitationswellen hängen folglich direkt von der Rotationsgeschwindigkeit, dem aktuellen Bahnradius
+        und den Massen der beteiligten Teilchen ab.
+      </p>
+      <h3>2.3 Schwingung von Elektronen als alternative Quelle</h3>
+      <p>
+        Neben der Rotation von Teilchen-Antiteilchen-Paaren könnte auch die starke Schwingung eines
+        Elektrons, das durch äußere Einflüsse in Bewegung gesetzt wird, zur Erzeugung hochfrequenter
+        Gravitationswellen führen. Diese Wellen tragen die Energie und die Eigenschaften des Lichts und
+        manifestieren sich als elektromagnetische Strahlung.
+      </p>
+      <h3>2.4 Kohärenz und Stabilität</h3>
+      <p>
+        Die Synchronisation der Rotation mehrerer solcher Teilchen-Antiteilchen-Paare könnte zur Entstehung
+        kohärenter Gravitationswellen führen, ähnlich wie bei der Erzeugung von kohärentem Licht in Lasern.
+        Diese kohärenten Wellen würden eine gleichmäßige und verstärkte Emission ermöglichen, was eine
+        stabile Lichtquelle schaffen würde.
+      </p>
+    </div>
+
+    <div class="section-card" id="sec2b">
+      <h2>2b. Quantitativer Beweis und Herleitung</h2>
+      <p>
+        Wir zeigen die exakte mathematische und physikalische Identität des Teilchen-Antiteilchen-Modells
+        mit den Grundgleichungen der Quantenmechanik und Elektrodynamik: aus dem Kräftegleichgewicht
+        zwischen Zentripetalkraft $F_Z$ und Coulomb-Kraft $F_C$, kombiniert mit der Feinstrukturkonstante
+        $\alpha$, ergeben sich direkt die Photonenenergie $E = h \cdot f = m_e c^2$ sowie der klassische
+        Elektronenradius $r_e$ und der Compton-Radius $r_C$.
+      </p>
+      <div class="quote-box">„Das Teilchen-Antiteilchen-Paar als Raumzeit-Deformation erzeugt durch seine kreisförmige Dynamik exakt die Frequenz und Energiedichte, die wir in der Quantenmechanik als Photon wahrnehmen."</div>
+
+      <h3>2b.1 Das Kräftegleichgewicht: F<sub>Z</sub> = F<sub>C</sub></h3>
+      <p>Wir betrachten ein gebundenes System aus einem Elektron und einem Positron (Masse jeweils $m_e$, Ladung $e$ bzw. $-e$), die sich auf einer Kreisbahn mit dem Radius $r$ um ein gemeinsames Zentrum bewegen. Der Abstand zwischen beiden Teilchen beträgt somit $2r$. Die Coulomb-Kraft zwischen den beiden Ladungen ist:</p>
+      <div class="equation-box">$$F_C = \frac{1}{4\pi \varepsilon_0} \frac{e^2}{(2r)^2} = \frac{e^2}{16\pi \varepsilon_0 r^2}$$</div>
+      <p>Für die Zentripetalkraft bezüglich des gemeinsamen Schwerpunkts gilt:</p>
+      <div class="equation-box">$$F_Z = \frac{m_e v^2}{r}$$</div>
+      <p>Gleichsetzen beider Kräfte ($F_Z = F_C$) liefert die fundamentale Bewegungsgleichung:</p>
+      <div class="equation-box">$$\frac{m_e v^2}{r} = \frac{e^2}{16\pi \varepsilon_0 r^2} \implies m_e v^2 = \frac{e^2}{16\pi \varepsilon_0 r}$$</div>
+
+      <h3>2b.2 Die Feinstrukturkonstante α und der Grenzfall v → c</h3>
+      <div class="equation-box">$$\alpha = \frac{e^2}{4\pi \varepsilon_0 \hbar c} \approx \frac{1}{137{,}036}$$</div>
+      <p>Daraus folgt $\frac{e^2}{4\pi \varepsilon_0} = \alpha \hbar c$. Eingesetzt in die Kraftgleichung:</p>
+      <div class="equation-box">$$m_e v^2 = \frac{\alpha \hbar c}{4 r}$$</div>
+      <p>Im relativistischen Grenzfall der Lichtgeschwindigkeit ($v \to c$) für die Raumzeit-Wellenrotation ergibt sich:</p>
+      <div class="equation-box">$$m_e c^2 = \frac{\alpha \hbar c}{4 r} \implies r = \frac{\alpha \hbar}{4 m_e c}$$</div>
+
+      <h3>2b.3 Klassischer Elektronenradius vs. Compton-Radius</h3>
+      <p><strong>A. Klassischer Elektronenradius $r_e$:</strong> Aus der reinen elektrostatischen Energiebilanz bei $v = c$ bestimmt sich der minimale elektrostatische Radius der Ladungsverteilung:</p>
+      <div class="equation-box">$$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2} = \alpha \frac{\hbar}{m_e c} \approx 2{,}8179 \times 10^{-15} \text{ m}$$</div>
+      <p><strong>B. Compton-Radius $r_C$:</strong> hängt über den Impuls $p = m_e c$ direkt mit der reduzierten Compton-Wellenlänge $\bar{\lambda}_C$ zusammen:</p>
+      <div class="equation-box">$$r_C = \bar{\lambda}_C = \frac{\hbar}{m_e c} \approx 3{,}8616 \times 10^{-13} \text{ m}$$</div>
+      <p>Die beiden charakteristischen Längenskalen sind über die Feinstrukturkonstante $\alpha$ gekoppelt:</p>
+      <div class="equation-box">$$r_e = \alpha \cdot r_C$$</div>
+
+      <h3>2b.4 Beweis der Energiegleichheit: E = m<sub>e</sub>c² = h·f</h3>
+      <p>Die Frequenz $f$ der durch Rotation emittierten Raumzeitwelle ergibt sich aus der Bahngeschwindigkeit $v = c$ und dem Umfang $U = 2\pi r_C$:</p>
+      <div class="equation-box">$$f = \frac{c}{2\pi r_C} = \frac{c}{2\pi \left(\frac{\hbar}{m_e c}\right)} = \frac{m_e c^2}{2\pi \hbar}$$</div>
+      <p>Da $h = 2\pi \hbar$, folgt unmittelbar $f = \frac{m_e c^2}{h}$, also $E = h \cdot f = m_e c^2$.</p>
+      <p><strong>Numerischer Beweis (Annihilations-Energieniveau):</strong></p>
+      <ul>
+        <li>Gesamtenergie eines Positron-Elektron-Paares: $E_{\text{ges}} = 2 m_e c^2 \approx 1{,}022 \text{ MeV} = 1{,}637 \times 10^{-13} \text{ J}$</li>
+        <li>Rotations-/Schwingungsfrequenz: $f = \frac{m_e c^2}{h} \approx 1{,}2356 \times 10^{20} \text{ Hz}$ — entspricht exakt der Gamma-Strahlung bei der Paarvernichtung.</li>
+      </ul>
+      <h3>2b.5 Kernergebnisse</h3>
+      <ul>
+        <li><strong>Kräftegleichgewicht ($F_Z = F_C$):</strong> Erklärungsmodell für die Begrenzung des minimalen Ladungsradius $r_e$.</li>
+        <li><strong>Rolle von α:</strong> direkte Übersetzung zwischen klassischer Elektrodynamik und quantenmechanischer Compton-Geometrie ($r_e = \alpha \cdot r_C$).</li>
+        <li><strong>Identität $E = m_e c^2 = hf$:</strong> zeigt, wie die WRZT die Quantenenergie nahtlos aus der Rotationsdynamik der Raumzeit-Deformationen herleitet.</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="sec2c">
+      <h2>2c. Relativistische Verfeinerung: R<sub>min</sub> und Systemkonstanten</h2>
+      <p>
+        Kapitel 2b behandelt den statischen Grenzfall $v \to c$. Die vollständige, relativistisch korrekte
+        Herleitung koppelt die relativistische Gesamtenergie des rotierenden Systems ($E = \gamma m_e c^2$)
+        direkt an die Quantenenergie des emittierten Photons ($E = \hbar \omega$):
+      </p>
+      <div class="equation-box">$$E = \gamma \, m_e \, c^2 = \hbar \cdot \omega$$</div>
+      <p>mit dem Lorentz-Faktor $\gamma = \frac{1}{\sqrt{1-v^2/c^2}}$. Die Raumzeit-Verzerrungen bewegen sich auf einer Kreisbahn mit Radius $R$ und Bahngeschwindigkeit $v$; mit $\omega = v/R$ folgt:</p>
+      <div class="equation-box">$$\gamma \, m_e \, c^2 = \hbar \cdot \frac{v}{R} \implies R = \frac{\hbar \cdot v}{\gamma \, m_e \, c^2}$$</div>
+      <p>Im relativistischen Grenzübergang ($v \to c$) schrumpft der effektive Rotationsradius infolge der Lorentz-Kontraktion des Raumzeit-Netzes dynamisch:</p>
+      <div class="equation-box">$$R(\gamma) = \frac{\hbar \cdot c}{\gamma \, m_e \, c^2} = \frac{\hbar}{\gamma \, m_e \, c} = \frac{\bar{\lambda}_c}{\gamma}$$</div>
+      <p>
+        Der klassische Elektronenradius $r_e$ ist ein rein elektrostatisch-makroskopisches Grenzmaß. Unter
+        Berücksichtigung der Heisenberg'schen Unschärferelation geht dieser über die Feinstrukturkonstante
+        $\alpha$ direkt in das Quanten-Raumzeit-Grenzmaß über: $r_e = \alpha \cdot \bar{\lambda}_c$.
+        Betrachtet man das gebundene Zwei-Körper-System als Rotator um das gemeinsame Zentrum, ergibt sich
+        der ununterbrechbare Minimal-Radius $R_{\min}$ an der reinen Quantengrenze als halbe reduzierte
+        Compton-Wellenlänge:
+      </p>
+      <div class="equation-box">$$\boxed{R_{\text{min}} = \frac{\bar{\lambda}_c}{2} = \frac{\hbar}{2 m_e c} \approx 1{,}930796 \times 10^{-13} \text{ m}}$$</div>
+
+      <div class="note-box">
+        <strong>Warum zwei Radien?</strong> $r_e$ (klassischer Elektronenradius, Kapitel 2b) und $R_{\min}$
+        (Quanten-Minimal-Radius, hier) beschreiben zwei verschiedene physikalische Grenzen desselben
+        Systems: $r_e$ ist die rein elektrostatische Grenze im Ruhesystem, $R_{\min}$ die quantisierte
+        Maschenweite des Raumzeit-Netzes selbst. Beide sind über $\alpha$ und $\bar{\lambda}_c$ miteinander
+        verknüpft und stellen komplementäre, keine widersprüchlichen Aussagen dar.
+      </div>
+
+      <h3>Systemkonstanten und Längenskalen</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Größe</th>
+            <th>Formel</th>
+            <th>Wert</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ur-Spannung der Raumzeit</td>
+            <td>$\Xi = \frac{m_e^2 c}{4\hbar}$</td>
+            <td>5,897 427 × 10⁻¹⁹ kg/m</td>
+          </tr>
+          <tr>
+            <td>Raumzeit-Trägheit</td>
+            <td>$\eta = \frac{m_e}{2}$</td>
+            <td>4,554 300 × 10⁻³¹ kg</td>
+          </tr>
+          <tr>
+            <td>Klassischer Elektronenradius</td>
+            <td>$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td>
+            <td>2,817 940 × 10⁻¹⁵ m</td>
+          </tr>
+          <tr>
+            <td>Dynamischer Radius (γ)</td>
+            <td>$R(\gamma) = \frac{\bar{\lambda}_c}{\gamma}$</td>
+            <td>skaliert mit $\gamma^{-1}$</td>
+          </tr>
+          <tr>
+            <td>Quanten-Ruheradius</td>
+            <td>$R_{\min} = \frac{\bar{\lambda}_c}{2}$</td>
+            <td>1,930 796 × 10⁻¹³ m</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-card" id="sec3">
+      <h2>3. Eigenschaften des Lichts in dieser neuen Perspektive</h2>
+      <p>
+        In der klassischen Physik wird Licht als elektromagnetische Welle beschrieben oder als
+        Photonenstrom, der bestimmte Quanteneigenschaften zeigt. Mit unserem Modell des
+        Teilchen-Antiteilchen-Paares, das sich um einen gemeinsamen Mittelpunkt dreht und eine spezielle Art
+        von Gravitationswelle erzeugt, können wir diese Eigenschaften aus einer neuen Perspektive betrachten.
+      </p>
+      <h3>3.1 Wellenlänge und Frequenz</h3>
+      <p>
+        Die Drehbewegung des Teilchen-Antiteilchen-Paares könnte die Wellenlänge und Frequenz des Lichts
+        beeinflussen. Je schneller sich das Paar dreht, desto höher wäre die Frequenz der erzeugten
+        Gravitationswelle, was mit Licht im höheren Energiespektrum wie ultravioletter oder Röntgenstrahlung
+        übereinstimmen würde. Langsamere Rotationen würden entsprechend zu niederfrequenterem Licht wie
+        Infrarot- oder Radiowellen führen.
+      </p>
+      <h3>3.2 Polarisation</h3>
+      <p><strong>Wie entsteht Polarisation in der Praxis?</strong></p>
+      <ul>
+        <li><strong>Reflexion:</strong> Wenn Licht auf eine glatte Oberfläche wie Wasser oder Glas trifft, wird es teilweise polarisiert, da die parallel zur Oberfläche schwingenden Komponenten stärker reflektiert werden.</li>
+        <li><strong>Brechung:</strong> Beim Durchgang durch bestimmte Kristalle, wie Kalkspat, kann Licht in zwei polarisierte Strahlen aufgeteilt werden (Doppelbrechung).</li>
+        <li><strong>Streuung:</strong> Die Streuung von Licht an Luftmolekülen, z.&nbsp;B. in der Atmosphäre, führt zur Polarisation. Dies erklärt, warum polarisiertes Licht im Himmel sichtbar ist.</li>
+      </ul>
+      <p><strong>Die physikalische Interpretation der Polarisation in der WRZT:</strong></p>
+      <ul>
+        <li><strong>Räumliche Krümmungs- und Wölbungsbewegung:</strong> Die Art und Weise, wie die Teilchen und Antiteilchen rotieren und die Raumzeit krümmen, könnte die Richtung der Schwingungen der Gravitationswellen bestimmen.</li>
+        <li><strong>Wechselwirkung mit Materie:</strong> Treffen diese Wellen auf Elektronen oder andere Teilchen, könnte die Polarisation den spezifischen Winkel und die Intensität der Wechselwirkung beeinflussen.</li>
+      </ul>
+      <p>Die Polarisation von Licht könnte in diesem Modell durch die Rotationsachse des Teilchen-Antiteilchen-Paares erklärt werden. Je nach Orientierung dieser Achse würde die modulierte Gravitationswelle bestimmte Polarisationseigenschaften zeigen, die wir als linear, zirkular oder elliptisch wahrnehmen.</p>
+      <h3>3.3 Streuung und Beugung</h3>
+      <p>Streuung und Beugung könnten durch die Interaktion der Teilchen-Antiteilchen-Paare mit anderen Teilchen in der Raumzeit beeinflusst werden. Wenn das Licht auf Materie trifft, könnte die Anordnung und Bewegung dieser Paare modifiziert werden, was zu bekannten Phänomenen wie Rayleigh-Streuung (die den blauen Himmel erklärt) oder der Beugung durch Spalten führt.</p>
+      <h3>3.4 Reflexion und Brechung</h3>
+      <p>Reflexion und Brechung von Licht an Oberflächen oder beim Übergang in ein anderes Medium könnten durch die Veränderung der Raumzeitkrümmung erklärt werden, die diese Paare erzeugen. Der Übergang zwischen verschiedenen optischen Medien entspricht dabei einer Verfälschung der lokalen Raumzeit-Spannung $\Xi$, was die Ausbreitungsgeschwindigkeit beeinflusst.</p>
+    </div>
+
+    <div class="section-card" id="sec4">
+      <h2>4. Spin von Photonen im Kontext dieser Theorie</h2>
+      <p>In dieser Interpretation, in der Licht als hochfrequente Gravitationswelle durch die schnelle Rotation von Teilchen und Antiteilchen entsteht, könnte der Spin des Photons mit der Rotationsrichtung dieser Teilchen und Antiteilchen in Verbindung gebracht werden:</p>
+      <ul>
+        <li><strong>Rotation als Ursprung des Spins:</strong> Rechtsdrehende Rotation erzeugt Photonen mit einem Spin von $+1$ (rechtshändig), linksdrehende Rotation Photonen mit einem Spin von $-1$ (linkshändig).</li>
+        <li><strong>Polarisation und Spin:</strong> Der Spin eines Photons ist eng mit seiner Polarisation verbunden. Die Polarisation ist die sichtbare Manifestation des Spins, der aus der Raumzeitkrümmung resultiert.</li>
+        <li><strong>Quantitative Erklärung:</strong> Symmetrie- und Rotationsbedingungen erklären, warum der Spin von Photonen stets ganzzahlig ist.</li>
+        <li><strong>Verbindung zur Raumzeitstruktur:</strong> Die Richtung des Spins hängt davon ab, ob die Raumzeitkrümmung und -wölbung eine rechts- oder linksdrehende Bewegung erzeugen.</li>
+        <li><strong>Experimentelle Überlegungen:</strong> Untersuchungen zur Wechselwirkung von Licht mit Materie unter Spin-Manipulation (z.&nbsp;B. Spin-Hall-Effekt-Experimente) bieten Ansätze zur Überprüfung dieser Kopplung.</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="sec5">
+      <h2>5. Weitere Eigenschaften des Lichts in dieser neuen Perspektive</h2>
+      <h3>5.1 Die Information in der Gravitationswelle</h3>
+      <p>Da jedes Teilchen-Antiteilchen-Paar seine eigene spezifische Gravitationswelle erzeugt, die durch seine Rotation und Wechselwirkung mit der Raumzeit moduliert wird, fungiert diese Welle als Träger von Informationen (energetische Struktur, Frequenz, Polarisation).</p>
+      <h3>5.2 Wechselwirkung mit Elektronen</h3>
+      <p>Trifft diese Gravitationswelle auf ein Elektron, versetzt sie dieses in Schwingung („Anregung"). Das Elektron emittiert daraufhin eine neue Welle in Form von Strahlung. Dies liefert einen gravitativen Erklärungsansatz für Absorption und Emission in Atomen.</p>
+      <h3>5.3 Erzeugung von neuen Wellen</h3>
+      <p>Durch die Schwingung des Elektrons pflanzt sich die neu erzeugte Welle weiter fort. Die Makrodynamik der Lichtausbreitung stützt sich somit fundamental auf mikroskopische Wechselwirkungen zwischen Gravitationswellen der Paare und der Materie im Medium.</p>
+    </div>
+
+    <div class="section-card" id="sec6">
+      <h2>6. Doppelspaltexperiment und Quantenverschränkung</h2>
+      <h3>6.1 Das Doppelspaltexperiment</h3>
+      <p>Das Doppelspaltexperiment demonstriert die Wellen-Teilchen-Dualität. Selbst wenn Photonen einzeln ausgesendet werden, entsteht über Zeit ein Interferenzmuster.</p>
+      <p><strong>Lösung der Dualität durch die WRZT:</strong></p>
+      <ol>
+        <li><strong>Licht als hochfrequente Gravitationswelle:</strong> Vereint sowohl kontinuierliche Wellen- als auch diskrete Teilcheneigenschaften.</li>
+        <li><strong>Wellen-Teilchen-Dualität als Raumzeitphänomen:</strong> Die Welle verhält sich wie eine Raumzeitdeformation (Interferenz bei freier Ausbreitung), während das Teilchenverhalten das punktuelle Übergreifen der Energie bei Wechselwirkung mit Materie darstellt.</li>
+        <li><strong>Messung und Kollaps der Wellenfunktion:</strong> Die Wechselwirkung mit einem Detektor lokalisiert die Raumzeitverzerrung. Der „Kollaps" ist eine physikalische Re-Lokalisierung der Welle an einem bestimmten Energie-Absorptionspunkt.</li>
+        <li><strong>Superposition am Doppelspalt:</strong> Die vom Paar emittierte Gravitationswelle breitet sich durch beide Spalte gleichzeitig aus und interferiert mit sich selbst, wodurch das Zielmuster auf dem Schirm vorgezeichnet wird.</li>
+        <li><strong>Einfluss der Beobachtung:</strong> Die Messung am Spalt verändert die lokale Raumzeitgeometrie, zerstört die Phasen-Kohärenz der Welle und unterdrückt das Interferenzmuster.</li>
+      </ol>
+      <h3>6.2 Quantenverschränkung</h3>
+      <p>Bei verschränkten Zuständen korrelieren Eigenschaften instantan über große Distanzen. Im WRZT-Modell ist die Information direkt in den gekoppelten Gravitationswellen des Teilchen-Antiteilchen-Systems codiert. Da die beiden Komponenten des Ursprungspaares eine gemeinsame topologische Raumzeitstruktur teilen, sind ihre Wellenfelder verschränkt, was korrelierte Messergebnisse ohne Verletzung der lokalen Kausalität der Raumzeit erklärt.</p>
+    </div>
+
+    <div class="section-card" id="sec7">
+      <h2>7. Raumzeitkrümmung vs. Raumzeit-Wölbung</h2>
+      <p>Anstatt Teilchen als punktförmige Massen in einem starren Raum zu sehen, beschreibt die WRZT sie als direkte topologische Verformungen des Gewebes der Raumzeit:</p>
+      <ul>
+        <li><strong>Teilchen als Raumzeitkrümmung:</strong> Eine lokale Einkerbung/Vertiefung der Geometrie, welche Masse, Energie und Trägheit definiert.</li>
+        <li><strong>Antiteilchen als Raumzeit-Wölbung:</strong> Das komplementäre Gegenstück – eine Erhebung/Ausbeulung der Raumzeitgeometrie.</li>
+        <li><strong>Wechselwirkung:</strong> Treffen Krümmung und Wölbung aufeinander, kompensieren sich die geometrischen Verzerrungen. Vor der vollständigen Glättung erzeugt ihre finale, hochfrequente Orbitalbewegung extrem energiereiche Raumzeitwellen.</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="sec8">
+      <h2>8. Energieabgabe und Auflösung des Teilchen-Antiteilchen-Paars (Annihilation)</h2>
+      <p>Die kontinuierliche Emission von Gravitationswellen entzieht dem rotierenden Paar kinetische Energie.</p>
+      <div class="equation-box">
+        $$E = 2 m_e c^2 \approx 1{,}022\text{ MeV}$$
+        <span style="font-size:0.85em; color:var(--text-muted);">mit $m_e$ = Ruhemasse des Elektrons/Positrons (≈ 0,511 MeV)</span>
+      </div>
+      <p>Durch den stetigen Energieverlust nähert sich der Radius des Paares an, die Rotationsfrequenz ändert sich dynamisch, bis das Paar in eine finale Strahlungsform übergeht. Dies erklärt die begrenzte Lebensdauer transienter Paarzustände und liefert eine physikalische Ursache für Zerfallsprozesse.</p>
+    </div>
+
+    <div class="section-card" id="sec9">
+      <h2>9. Das Licht der Sonne: Rotation von Teilchen-Antiteilchen-Paaren</h2>
+      <p>Im Inneren der Sonne herrschen extreme Temperaturen und Drücke. Gemäß WRZT entstehen dort kontinuierlich Unmengen flüchtiger Teilchen-Antiteilchen-Paare:</p>
+      <ul>
+        <li><strong>Breites Spektrum:</strong> Unterschiedliche Radien und Spin-Geschwindigkeiten der Paare erzeugen Frequenzen von Infrarot über sichtbares Licht bis hin zu UV- und Röntgenstrahlung.</li>
+        <li><strong>Kopplung an Kernfusion:</strong> Die Fusionsenergie treibt die Rotationsdynamik der Paare lokal an und hält die hohe Strahlungsleistung der Sonne aufrecht — der Massendefekt der Fusion wird als Lichtenergie emittiert.</li>
+        <li><strong>Dualer Charakter der Sonnenstrahlung:</strong> Das Spektrum ist ein Kontinuum aus überlagerten, hochfrequenten Gravitations- und Elektromagnetik-Wellenfeldern.</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="sec10">
+      <h2>10. Hochfrequente Gravitationswellen durch schnelle Rotation</h2>
+      <p>Wenn sich Teilchen und Antiteilchen mit nahezu Lichtgeschwindigkeit umeinander bewegen, treten relativistische Effekte auf. Die erzeugte Gravitationswelle nimmt keine einfache niederfrequente Form an (wie bei makroskopischen Schwarzen Löchern), sondern schwingt im ultra-hohen Frequenzbereich ($f > 10^{15}\text{ Hz}$). Diese energiereichen Wellen verzerren die Raumzeit auf subatomarer Skala mit extremer Präzision. Wegen der winzigen Massenträgheit $\eta$ emittieren mikroskopische Rotatoren hochfrequente Schwingungen im Frequenzbereich der elektromagnetischen Wellen.</p>
+    </div>
+
+    <div class="section-card" id="sec11">
+      <h2>11. Die Konsequenzen des Modells: Licht als Gravitationswelle</h2>
+      <ol>
+        <li><strong>Neues Energieverständnis:</strong> Licht wird als fundamentale gravitative Energieform verstanden, was neuartige Ansätze zur Energiewandlung ermöglichen könnte.</li>
+        <li><strong>Vereinheitlichung der Raumzeit:</strong> Elektromagnetismus und Gravitation verschmelzen auf Quantenebene zu Äußerungen derselben Geometriedynamik.</li>
+        <li><strong>Neue Messtechnologien:</strong> Erkenntnisse über hochfrequente Gravitationswellen könnten zur Entwicklung neuartiger Detektoren führen, die weit über heutige Interferometer (wie LIGO) hinausgehen.</li>
+        <li><strong>Entzauberung von Quantenrätseln:</strong> Lokale Geometrieänderungen liefern anschauliche, deterministische Erklärungen für Verschränkung und Superposition.</li>
+        <li><strong>Kosmologische Konsequenzen:</strong> Die Dehnung des Raumzeit-Netzes über große Distanzen könnte die kosmologische Rotverschiebung als kontinuierliche Wellenlängenanpassung erklären.</li>
+      </ol>
+    </div>
+
+    <div class="section-card" id="sec12">
+      <h2>12. Schlusswort: Die neue Perspektive auf Licht und Gravitationswellen</h2>
+      <p>Wir haben Licht als hochfrequente Gravitationswelle interpretiert, hervorgerufen durch rotierende Teilchen-Antiteilchen-Systeme oder schwingende Ladungen. Diese Betrachtungsweise verbindet die Gesetze der Allgemeinen Relativitätstheorie organisch mit den Phänomenen der Quantenphysik.</p>
+      <p>Wir laden Forscher und Interessierte ein, diese mathematischen und konzeptionellen Ansätze weiterzuentwickeln. Es liegt an uns, die Grenzen des bisherigen Wissens zu erweitern.</p>
+      <div class="quote-box">„Das Licht, das wir suchen, ist bereits in uns. Wir brauchen es nur zu erkennen und zu pflegen.“<span class="author">— Thich Nhat Hanh</span></div>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- TEIL V — DER UNDATRON-MECHANISMUS                         -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil5">
+      <span class="part-eyebrow">Teil V</span>
+      <h1>Der Undatron-Mechanismus</h1>
+      <div class="subtitle">Eine anschauliche Herleitung der Photonenentstehung</div>
+      <div class="part-line"></div>
+    </div>
+
+    <div class="section-card" id="v1">
+      <h2>1. Der Tanz an der Lichtgeschwindigkeit</h2>
+      <h3>Die Grundidee</h3>
+      <p>Stell dir das Universum als ein elastisches, dynamisches Netz vor. Wenn ein Elektron ($e^-$) und ein Positron ($e^+$) aufeinandertreffen, ziehen sie sich extrem stark an. Sie beginnen, sich rasend schnell im gemeinsamen Schwerpunkt zu umkreisen – wie zwei Eiskunstläufer auf einer Kreisbahn.</p>
+      <h3>Bugwellen im Raumzeit-Netz</h3>
+      <p>Da sich die Teilchen nahezu mit Lichtgeschwindigkeit ($v \approx c$) bewegen, erzeugen sie wie ein schnelles Boot auf dem Wasser Mach-artige <strong>Bugwellen</strong> im Raumzeit-Gewebe. Durch die Kreisbewegung überlagern und interferieren diese Raumzeit-Bugwellen kontinuierlich.</p>
+    </div>
+
+    <div class="section-card" id="v2">
+      <h2>2. Der Undatron-Kollaps</h2>
+      <p>Nähert sich der Bahnradius der kritischen Fundamentalgrenze des Raumes ($R_{\min}$, siehe Teil IV, Kapitel 2c), lösen sich die punktförmigen Ladungszentren auf. Die Ruhemasse und Ladung schmelzen in einer konstruktiven Interferenz zusammen: Es entsteht das <strong>Undatron</strong> – ein kohärentes Lichtwellenpaket mit vollständigem Informationsgedächtnis (Spin, Energie, Phasenkopplung).</p>
+      <div class="insight-box">
+        <strong>Anschaulich:</strong> Das Undatron ist der Moment, in dem aus zwei „tanzenden" Massepunkten
+        eine reine, ladungslose Welle wird — die Ladung und Ruhemasse gehen nicht verloren, sondern werden
+        vollständig in die Phasenstruktur der emittierten Welle codiert.
+      </div>
+    </div>
+
+    <div class="section-card" id="v3">
+      <h2>3. Bugwellen-Geometrie und Wellenüberlagerung</h2>
+      <p>Der Öffnungswinkel $\Theta$ der Raumzeit-Bugwelle (Mach-Effekt im Netz) wird über das Geschwindigkeitsverhältnis bestimmt:</p>
+      <div class="equation-box">$$\sin(\Theta) = \frac{v_{\text{Phase}}}{v} \quad \implies \quad \sec(\Theta) = \frac{1}{\cos(\Theta)}$$</div>
+      <p>Die Überlagerung der Raumzeit-Wellenfunktionen von Elektron und Positron ergibt:</p>
+      <div class="equation-box">$$\Psi_{\text{Netz}}(x,y,z,t) = \left( \Psi_{e^-} + \Psi_{e^+} \right) \cdot \sec(\Theta)$$</div>
+      <p>Beim Zusammenfall unterhalb von $R_{\min}$ entsteht die reine Energie des Undatrons:</p>
+      <div class="equation-box">$$E_{\text{Undatron}} = 2 \cdot m_e c^2 = \hbar \cdot \omega_{\text{Netz}} \approx 1{,}022 \text{ MeV}$$</div>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- TEIL VI — EINORDNUNG & OFFENE FRAGEN                      -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil6">
+      <span class="part-eyebrow">Teil VI</span>
+      <h1>Einordnung, offene Fragen &amp; Ausblick</h1>
+      <div class="part-line"></div>
+    </div>
+
+    <div class="section-card" id="vi1">
+      <h2>Licht — beschrieben auf verschiedene Arten</h2>
+      <p>Licht kann auf verschiedene Arten beschrieben werden, abhängig von der Perspektive und wissenschaftlichen Disziplin:</p>
+      <ul>
+        <li><strong>Elektromagnetismus (klassisch):</strong> Welle aus gekoppelten elektrischen und magnetischen Feldern ($c \approx 299.792.458\text{ m/s}$).</li>
+        <li><strong>Quantentheorie:</strong> Photonen als diskrete Energiequanten mit Wellen-Teilchen-Dualismus.</li>
+        <li><strong>Relativitätstheorie:</strong> Invariante Grenzgeschwindigkeit $c$, die die Kausalitätsstruktur der Raumzeit definiert.</li>
+        <li><strong>Wellenraumzeit-Theorie (WRZT):</strong> Hochfrequente Gravitationswelle, hervorgerufen durch mikroskopische Raumzeitkrümmungen rotierender Paare — die WRZT bettet die Ergebnisse der Standard-Quantenelektrodynamik in ein anschauliches, netzmechanisches Modell ein, ohne deren mathematische Vorhersagekraft zu verletzen.</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="vi2">
+      <h2>Noch offene Fragen und Ausblick</h2>
+      <ul>
+        <li><strong>Was ist Zeit in dieser Sichtweise?</strong> Ist Zeit eine emergente Eigenschaft, die aus der Frequenz dieser Raumzeit-Oszillationen hervorgeht — das sekundäre Taktsignal der internen Kreis- und Schwingungsfrequenzen des Netzes?</li>
+        <li><strong>Wechselwirkung mit Dunkler Materie / Energie:</strong> Könnten ruhende oder entkoppelte Paare, hoch-kohärente Undatron-Felder, einen Teil der Dunklen Materie erklären?</li>
+        <li><strong>Experimenteller Nachweis:</strong> Wie können Gravitationswellen im Terahertz- und Petahertz-Bereich messtechnisch nachgewiesen werden, etwa über Phasenmodulationen in hochenergetischen Laser-Interferometern?</li>
+        <li><strong>Astrophysikalische Phänomene:</strong> Welche Rolle spielen diese Effekte an den Ereignishorizonten Schwarzer Löcher?</li>
+      </ul>
+      <div class="note-box">
+        <strong>Zum Status dieser Theorie:</strong> Die WRZT ist ein persönliches, in Entwicklung befindliches
+        Gedankenmodell und kein etabliertes, experimentell verifiziertes physikalisches Theoriegebäude. Sie
+        übernimmt bewusst reale Konstanten und Formeln aus Standardmodell und Relativitätstheorie und
+        interpretiert sie neu — ihr Wert liegt aktuell vor allem in der anschaulichen, geometrischen
+        Denkweise, nicht in überprüften neuen Vorhersagen.
+      </div>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- TEIL VII — ANHANG                                         -->
+    <!-- ======================================================= -->
+    <div class="part-divider" id="teil7">
+      <span class="part-eyebrow">Teil VII</span>
+      <h1>Anhang: Quantitative Modellierung &amp; Konstanten</h1>
+      <div class="part-line"></div>
+    </div>
+
+    <div class="section-card" id="a1">
+      <h2>Tabelle der Ur-Konstanten und Längenskalen</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Größe / Konstante</th>
+            <th>Symbol / Formel</th>
+            <th>Wert</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ruhe-Raumzeit-Trägheit</td>
+            <td>$\eta_0 = \frac{m_e}{2}$</td>
+            <td>4,554692 × 10⁻³¹ kg</td>
+          </tr>
+          <tr>
+            <td>1D-Ruhe-Urspannung</td>
+            <td>$\Xi_0 = \frac{m_e^2 c}{\hbar}$</td>
+            <td>2,358826 × 10⁻¹⁸ kg/m (kalibriert: 5,897427 × 10⁻¹⁹ kg/m)</td>
+          </tr>
+          <tr>
+            <td>Minimal-Radius (Ruhe)</td>
+            <td>$R_{\min,0} = \frac{\hbar}{2 m_e c}$</td>
+            <td>1,930796 × 10⁻¹³ m</td>
+          </tr>
+          <tr>
+            <td>3D-Ur-Dichte</td>
+            <td>$\rho_{\text{Ur},0} = \frac{\eta_0}{R_{\min,0}^3}$</td>
+            <td>6,330062 × 10⁷ kg/m³</td>
+          </tr>
+          <tr>
+            <td>3D-Ur-Druck</td>
+            <td>$P_{\text{Ur},0} = \rho_{\text{Ur},0} \cdot c^2$</td>
+            <td>5,689104 × 10²⁴ N/m²</td>
+          </tr>
+          <tr>
+            <td>Klassischer Elektronenradius</td>
+            <td>$r_e = \frac{e^2}{4\pi \varepsilon_0 m_e c^2}$</td>
+            <td>2,817940 × 10⁻¹⁵ m</td>
+          </tr>
+          <tr>
+            <td>Reduzierte Compton-Wellenlänge</td>
+            <td>$\bar{\lambda}_C = \frac{\hbar}{m_e c}$</td>
+            <td>3,8616 × 10⁻¹³ m</td>
+          </tr>
+          <tr>
+            <td>Feinstrukturkonstante</td>
+            <td>$\alpha = \frac{r_e}{\bar{\lambda}_C}$</td>
+            <td>≈ 1/137,036</td>
+          </tr>
+          <tr>
+            <td>Annihilationsenergie</td>
+            <td>$E = 2 m_e c^2$</td>
+            <td>≈ 1,022 MeV</td>
+          </tr>
+          <tr>
+            <td>Lichtgeschwindigkeit</td>
+            <td>$c = \frac{\Xi_0}{\eta_0} \cdot R_{\min,0}$</td>
+            <td>299.792.458 m/s</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note-box">
+        <strong>Physikalische Schranke:</strong> Der Radius eines stabilen Systems kann den klassischen
+        Elektronenradius nicht unterschreiten, ohne dass fundamentale Quanten- und Raumzeiteffekte wirksam
+        werden. Als absolute untere Grenze der Raumzeit-Diskretheit gilt die Planck-Länge
+        ($r_P \approx 1{,}616 \times 10^{-35}\text{ m}$).
+      </div>
+    </div>
+
+    <div class="section-card" id="a2">
+      <h2>Das elektromagnetische Spektrum</h2>
+      <ul>
+        <li><strong>Radiowellen:</strong> $3 \times 10^3$ bis $3 \times 10^9$ Hz</li>
+        <li><strong>Mikrowellen:</strong> $3 \times 10^9$ bis $3 \times 10^{12}$ Hz</li>
+        <li><strong>Infrarot:</strong> $3 \times 10^{12}$ bis $4 \times 10^{14}$ Hz</li>
+        <li><strong>Sichtbares Licht:</strong> $4 \times 10^{14}$ bis $7{,}5 \times 10^{14}$ Hz</li>
+        <li><strong>Ultraviolett:</strong> $7{,}5 \times 10^{14}$ bis $3 \times 10^{16}$ Hz</li>
+        <li><strong>Röntgenstrahlen:</strong> $3 \times 10^{16}$ bis $3 \times 10^{19}$ Hz</li>
+        <li><strong>Gammastrahlen:</strong> $10^{19}$ bis $10^{24}$ Hz</li>
+      </ul>
+    </div>
+
+    <div class="section-card" id="a3">
+      <h2>Modellrechnungen: Umdrehungsfrequenz und Bahnradius</h2>
+      <p>Betrachten wir die vereinfachte Modellierung eines Positrons, das ein Elektron umkreist.</p>
+
+      <h3>Fall A: Nicht-relativistischer Ansatz (Bohr-Radius-Analog)</h3>
+      <ul>
+        <li>Bahngeschwindigkeit: $v \approx 2{,}18 \times 10^6\text{ m/s}$</li>
+        <li>Bahnradius: $r \approx 5{,}29 \times 10^{-11}\text{ m}$</li>
+      </ul>
+      <div class="equation-box">Umfang $= 2\pi \times 5{,}29\times10^{-11}\text{ m} \approx 3{,}32 \times 10^{-10}\text{ m}$<br>Frequenz $f = v/\text{Umfang} \approx 6{,}57 \times 10^{15}\text{ Umdrehungen/s}$</div>
+
+      <h3>Fall B: Halbierung des Radius</h3>
+      <ul>
+        <li>Radius: $r \approx 2{,}65 \times 10^{-11}\text{ m}$</li>
+        <li>Geschwindigkeit: $v \approx 4{,}36 \times 10^6\text{ m/s}$</li>
+      </ul>
+      <div class="equation-box">Umfang $\approx 1{,}67 \times 10^{-10}\text{ m}$<br>Frequenz $f \approx 2{,}61 \times 10^{16}\text{ Hz}$</div>
+
+      <h3>Fall C: Grenzbetrachtung bei c (Coulomb-Zentripetal-Gleichgewicht)</h3>
+      <div class="equation-box">
+        $$m c^2 / r = k e^2 / r^2 \implies r = k e^2 / (m c^2)$$
+        Mit $k = 8{,}99\times10^9\,\text{Nm}^2/\text{C}^2$, $e = 1{,}602\times10^{-19}\text{ C}$, $m = 9{,}11\times10^{-31}\text{ kg}$, $c = 3\times10^8\text{ m/s}$:
+        $$r \approx 2{,}81 \times 10^{-15}\text{ m}$$
+        <span style="font-size:0.85em;color:var(--text-muted);">— entspricht genau dem klassischen Elektronenradius!</span>
+      </div>
+      <p>Berechnung der maximalen Frequenz bei $c$ und $r = 2{,}81\times10^{-15}\text{ m}$:</p>
+      <div class="equation-box">Umfang $\approx 1{,}77 \times 10^{-14}\text{ m}$<br>Frequenz $f = c/\text{Umfang} \approx 1{,}69 \times 10^{22}\text{ Hz}$</div>
+    </div>
+
+    <footer>
+      <p>WRZT — Wellenraumzeit-Theorie · Gesamt-Manifest · Zusammengeführt aus allen Entwicklungsstufen (Vers. 1.0 – 4.0 &amp; T1)</p>
+      <p>Autoren: Jo D. (@juppijo) &amp; Zaminia</p>
+    </footer>
+
   </div>
 
-  <footer>
-    <p>WRZT — Wellenraumzeit-Theorie · Gesamt-Manifest · Zusammengeführt aus allen Entwicklungsstufen (Vers. 1.0 – 4.0 &amp; T1)</p>
-    <p>Autoren: Jo D. (@juppijo) &amp; Zaminia</p>
-  </footer>
-
-</div>
-
-<script>
-  function setTheme(theme, btnEl) {
-    if (theme === 'cosmic') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', theme);
-    }
-    document.querySelectorAll('.controls-bar .btn').forEach(b => b.classList.remove('active'));
-    if (btnEl) btnEl.classList.add('active');
-  }
-
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(err => {
-        alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
-      });
-    } else {
-      if (document.exitFullscreen) document.exitFullscreen();
-    }
-  }
-
-  // ---- Einklappbare Cards ----
-  document.querySelectorAll('.section-card > h2').forEach(h2 => {
-    h2.addEventListener('click', () => {
-      h2.parentElement.classList.toggle('collapsed');
-    });
-  });
-
-  function collapseAll(state) {
-    document.querySelectorAll('.section-card').forEach(card => {
-      if (card.querySelector(':scope > h2')) {
-        card.classList.toggle('collapsed', state);
+  <script>
+    function setTheme(theme, btnEl) {
+      if (theme === 'cosmic') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
       }
+      document.querySelectorAll('.controls-bar .btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // ---- Einklappbare Cards ----
+    document.querySelectorAll('.section-card > h2').forEach(h2 => {
+      h2.addEventListener('click', () => {
+        h2.parentElement.classList.toggle('collapsed');
+      });
     });
-  }
-</script>
+
+    function collapseAll(state) {
+      document.querySelectorAll('.section-card').forEach(card => {
+        if (card.querySelector(':scope > h2')) {
+          card.classList.toggle('collapsed', state);
+        }
+      });
+    }
+  </script>
 
 </body>
 </html>
