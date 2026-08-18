@@ -90,8 +90,8 @@ Dieser Radius erscheint in zahlreichen WRZT-Gleichungen als fundamentale Längen
         category: "WRZT-Grundkonstanten",
         symbol: "c",
         name: "Lichtgeschwindigkeit aus WRZT",
-        desc: "Herleitung der Lichtgeschwindigkeit aus den WRZT-Grundkonstanten.",
-        formula: "$$c=\\frac{\\Xi\\,R_{min}}{\\eta}$$",
+        desc: "Herleitung der Lichtgeschwindigkeit invarianz aus den WRZT-Grundkonstanten.",
+        formula: "$$1=\\frac{\\Xi\\,R_{min}}{\\eta} \\text{ ← → } c = 299792458 $$",
         value: "299792458",
         unit: "m/s",
         details: `
