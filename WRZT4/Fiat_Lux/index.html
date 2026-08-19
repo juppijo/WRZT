@@ -54,6 +54,123 @@
       line-height:1.7;
     }
     
+    /* ==== STYLE VARIANTEN FÜR DIE STEUERLEISTE ==== */
+
+    /* 0. Standart / Original */
+    .control-bar {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 9999;
+      display: flex;
+      gap: 8px;
+      background: rgba(18, 48, 73, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 8px 12px;
+      border-radius: 30px;
+      border: 1px solid var(--sky-400);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .control-btn {
+      background: var(--sky-500);
+      color: #ffffff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: var(--sky-400);
+      transform: translateY(-1px);
+    }
+
+    /* 1. Glassmorphism Style */
+    .style-glass {
+      background: rgba(255, 255, 255, 0.15) !important;
+      backdrop-filter: blur(12px) !important;
+      border-radius: 50px !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+    .style-glass .control-btn {
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      border-radius: 25px !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .style-glass .control-btn:hover {
+      background: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    /* 2. Neon Glow Style */
+    .style-neon {
+      background: #080d28 !important;
+      border-radius: 12px !important;
+      border: 1px solid #00f0ff !important;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
+    }
+    .style-neon .control-btn {
+      background: transparent !important;
+      color: #00f0ff !important;
+      border: 1px solid #00f0ff !important;
+      border-radius: 8px !important;
+      text-transform: uppercase;
+      font-size: 0.75rem !important;
+      letter-spacing: 0.5px;
+    }
+    .style-neon .control-btn:hover {
+      background: #00f0ff !important;
+      color: #040a58 !important;
+      box-shadow: 0 0 12px #00f0ff;
+    }
+
+    /* 3. Minimal Dark Style */
+    .style-minimal {
+      background: #181b2a !important;
+      border-radius: 10px !important;
+      border: 1px solid #2e344e !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    }
+    .style-minimal .control-btn {
+      background: #252a40 !important;
+      color: #e2e8f0 !important;
+      border: none !important;
+      border-radius: 6px !important;
+    }
+    .style-minimal .control-btn:hover {
+      background: #3b82f6 !important;
+      color: #ffffff !important;
+    }
+
+    /* 4. Gold Luxury Style */
+    .style-gold {
+      background: linear-gradient(145deg, #0b132b, #1c2541) !important;
+      border-radius: 30px !important;
+      border: 1px solid #c9a227 !important;
+      box-shadow: 0 4px 20px rgba(201, 162, 39, 0.3) !important;
+    }
+    .style-gold .control-btn {
+      background: linear-gradient(135deg, #c9a227, #a07e1c) !important;
+      color: #040a28 !important;
+      border: none !important;
+      border-radius: 20px !important;
+      font-weight: 700 !important;
+    }
+    .style-gold .control-btn:hover {
+      background: linear-gradient(135deg, #ffd700, #c9a227) !important;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+    }
+    
     /* ---- Top banner ---- */
     .page-header{
       background:linear-gradient(135deg, var(--sky-400), var(--sky-500) 60%, var(--sky-600));
@@ -230,12 +347,23 @@
       main{ padding:32px 22px 40px; margin-top:-20px; border-radius:12px; }
       main > h1:nth-of-type(2){ font-size:2rem; }
       .page-header{ padding:40px 16px 34px; }
+      .control-bar { top: 10px; right: 10px; padding: 6px 8px; }
+      .control-btn { font-size: 0.75rem; padding: 5px 8px; }
     }
   </style>
 </head>
 <body style="background-color: rgb(4, 10, 88);">
+
+  <!-- Floating Navigation Controls mit Style-Umschalter -->
+  <div class="control-bar" id="controlBar">
+    <button class="control-btn" onclick="cycleStyle()">🎨 Style</button>
+    <button class="control-btn" id="btnTTS" onclick="toggleSpeech()">🔊 Vorlesen</button>
+    <button class="control-btn" id="btnStopTTS" onclick="stopSpeech()" style="display:none;">⏹️ Stopp</button>
+    <button class="control-btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
+  </div>
+
   <div class="page-header"></div>
-  <main style="background-color: rgb(208, 213, 251);">
+  <main style="background-color: rgb(208, 213, 251);" id="mainContent">
 
     <h1>WRZT – Wellenraumzeit-Theorie</h1>
     <h1><strong>✨ <em class="titel1">Fiat Lux</em> 💡</strong></h1>
@@ -751,5 +879,100 @@
     </div>
 
   </main>
+
+  <script>
+    /* ---- Dynamic Style Switcher ---- */
+    const styles = ['', 'style-glass', 'style-neon', 'style-minimal', 'style-gold'];
+    let currentStyleIndex = 0;
+
+    function cycleStyle() {
+      const bar = document.getElementById('controlBar');
+      
+      // Vorherigen Style entfernen
+      if (styles[currentStyleIndex] !== '') {
+        bar.classList.remove(styles[currentStyleIndex]);
+      }
+
+      // Zum nächsten Style wechseln
+      currentStyleIndex = (currentStyleIndex + 1) % styles.length;
+
+      // Neuen Style hinzufügen
+      if (styles[currentStyleIndex] !== '') {
+        bar.classList.add(styles[currentStyleIndex]);
+      }
+    }
+
+    /* ---- Fullscreen Toggle ---- */
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    /* ---- Text-to-Speech (TTS) Engine ---- */
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+    let selectedVoice = null;
+
+    function initVoices() {
+      let voices = synth.getVoices();
+      selectedVoice = voices.find(v => v.lang.startsWith('de') && v.name.includes('Google')) || 
+                      voices.find(v => v.lang.startsWith('de')) || null;
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = initVoices;
+    }
+
+    function toggleSpeech() {
+      if (synth.speaking && !synth.paused) {
+        synth.pause();
+        document.getElementById('btnTTS').innerText = '▶️ Weiter';
+      } else if (synth.paused) {
+        synth.resume();
+        document.getElementById('btnTTS').innerText = '⏸️ Pause';
+      } else {
+        startSpeech();
+      }
+    }
+
+    function startSpeech() {
+      synth.cancel();
+      initVoices();
+
+      let textToRead = document.getElementById('mainContent').innerText;
+      currentUtterance = new SpeechSynthesisUtterance(textToRead);
+      currentUtterance.lang = 'de-DE';
+      if (selectedVoice) {
+        currentUtterance.voice = selectedVoice;
+      }
+      currentUtterance.rate = 0.98;
+      currentUtterance.pitch = 1.05;
+
+      currentUtterance.onend = function() {
+        resetTTSButtons();
+      };
+
+      synth.speak(currentUtterance);
+      document.getElementById('btnTTS').innerText = '⏸️ Pause';
+      document.getElementById('btnStopTTS').style.display = 'inline-flex';
+    }
+
+    function stopSpeech() {
+      synth.cancel();
+      resetTTSButtons();
+    }
+
+    function resetTTSButtons() {
+      document.getElementById('btnTTS').innerText = '🔊 Vorlesen';
+      document.getElementById('btnStopTTS').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
