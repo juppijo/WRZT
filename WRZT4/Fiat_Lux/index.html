@@ -204,7 +204,7 @@
     
     /* ---- Headings ---- */
     h1, h2, h3, h4 {
-      color:var(--sky-200);
+      color:var(--sky-400);  !important;
       font-weight:700;
       line-height:1.25;
     }
@@ -812,6 +812,33 @@
       <li>Verkleinert man den Radius weiter, übertrifft die Rotationsfrequenz selbst den bekannten Bereich der Gammastrahlung ($10^{26}\text{ Hz}$).</li>
       <li><strong>Physikalisches Fazit:</strong> Das Gedankenexperiment veranschaulicht, dass subatomare Teilchenrotations- oder Oszillationsmodelle bei Lichtgeschwindigkeit direkt an die Frequenzen der allerhärtesten elektromagnetischen Strahlung (Annihilations-Gammaquanten) koppeln.</li>
     </ul>
+    <hr>
+<h2>
+  * Energiegleichgewicht *
+    </h2>
+    <p>Im Rahmen deiner Überlegungen – und der klassischen Kopplung zwischen Teilchenmasse und Feldenergie – lässt sich der minimale Radius $R_{\text{min}}$ elegant über den Energieerhaltungssatz herleiten, indem man die Ruheenergie $E_0$ eines Teilchens mit einer charakteristischen kinetischen bzw. Feldenergie $E_{\text{kin}}$ gleichsetzt.</p>
+    <hr>
+    <p><strong>1. Der Ansatz: Energiegleichgewicht</strong></p>
+    <p>Wir betrachten ein rotierendes System oder eine kompakte Ladungs-/Masseverteilung, bei der die gesamte Ruheenergie $E_0$ der kinetischen Umlaufsenergie $E_{\text{kin}}$ an der physikalischen Belastungsgrenze (Bewegung mit Lichtgeschwindigkeit $c$) entspricht:</p>
+    <p>$$E_0 = E_{\text{kin}}$$</p>
+    <ul>
+      <li><strong>Ruheenergie:</strong> $E_0 = m \cdot c^2$</li>
+      <li><strong>Kinetische Umlaufsenergie:</strong> Ein rotierender Wellenwirbel oder ein System mit dem Drehimpuls $L$ besitzt die Rotationsenergie $E_{\text{kin}} = \frac{1}{2} I \omega^2 = \frac{L \cdot c}{2 R}$. Im quantenmechanischen Grundzustand ist der Drehimpuls durch das reduzierte Wirkungsquantum gebunden ($L = \hbar$), woraus sich für ein mit $c$ rotierendes Feld $E_{\text{kin}} \approx \frac{\hbar \cdot c}{R}$ ergibt.</li>
+    </ul>
+    <hr>
+    <p><strong>2. Gleichsetzung und Auflösung nach $R_{\text{min}}$</strong></p>
+    <p>Setzt man die Ruheenergie gleich dieser Grenzenergie der Feldrotation:</p>
+    <p>$$m \cdot c^2 = \frac{\hbar \cdot c}{R_{\text{min}}}$$</p>
+    <p>Erhält man durch Umstellen direkt den minimalen Radius:</p>
+    <p>$$R_{\text{min}} = \frac{\hbar}{m \cdot c}$$</p>
+    <p>Dies entspricht exakt der <strong>reduzierten Compton-Wellenlänge</strong> ($\bar{\lambda}_c$).</p>
+    <hr>
+    <p><strong>3. Physikalische Bedeutung von $R_{\text{min}}$</strong></p>
+    <ul>
+      <li><strong>Singularitätenvermeidung:</strong> $R_{\text{min}}$ stellt die fundamentale Raumskala dar, unterhalb derer ein Teilchen der Masse $m$ nicht weiter lokalisiert werden kann, ohne dass seine kinetische Erzeugungsenergie die eigene Ruhemasse übersteigt.</li>
+      <li><strong>Grenzbereich der Wellendynamik:</strong> Versucht man, die Masse $m$ auf ein kleineres Volumen als $R_{\text{min}}$ zu komprimieren, würde $E_{\text{kin}} &gt; E_0$ werden. Das System weicht dieser Punktsingularität aus, indem das Feld im Gleichgewicht bei $R_{\text{min}}$ als stehende Welle stabilisiert wird.</li>
+    </ul>
+
 
     <hr>
     <p class="signature">Version 1.0 · 08.11.2024, 03:30 · @juppijo · <a href="mailto:juppi.jo@gmail.com">Jo D.</a></p>
