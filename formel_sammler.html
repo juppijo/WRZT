@@ -18,7 +18,7 @@
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
+
     <style>
         :root {
             --bg-color: #121824;
@@ -41,13 +41,13 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
         }
@@ -85,10 +85,79 @@
             transform: scale(0.98);
         }
 
+        button.secondary {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        button.secondary:hover {
+            background-color: var(--inline-bg);
+        }
+
         #status {
             text-align: center;
             color: var(--text-muted);
             font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        /* --- Such- und Filterleiste --- */
+        .controls {
+            display: none;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls.active {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1 1 220px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .control-group input[type="text"],
+        .control-group select {
+            background-color: var(--inline-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .control-group input[type="text"]:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .control-reset {
+            flex: 0 0 auto;
+        }
+
+        #result-count {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
             margin-bottom: 20px;
         }
 
@@ -112,12 +181,45 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .file-title .titles {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .file-title .toggle-icon {
+            color: var(--accent-color);
+            font-size: 14px;
+            transition: transform 0.15s;
+        }
+
+        .file-section.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .file-section.collapsed .formula-list {
+            display: none;
         }
 
         .file-path {
             font-size: 13px;
             color: var(--text-muted);
             font-weight: normal;
+        }
+
+        .badge-count {
+            font-size: 12px;
+            color: var(--accent-color);
+            font-weight: normal;
+            background: rgba(14, 165, 233, 0.12);
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
         .formula-list {
@@ -162,6 +264,13 @@
             word-break: break-all;
         }
 
+        mark {
+            background-color: var(--accent-color);
+            color: #062634;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
         .no-results {
             text-align: center;
             padding: 40px;
@@ -177,13 +286,37 @@
 <div class="container">
     <header>
         <h1>Formelsammlung Generator</h1>
-        <p>Durchsucht HTML-Dateien in Ordnern & Unterordnern nach LaTeX-Formaten.</p>
-        
+        <p>Durchsucht HTML-Dateien in Ordnern & Unterordnern nach LaTeX-Formeln.</p>
+
         <div class="btn-container">
             <button id="scan-btn">Ordner auswählen & scannen</button>
         </div>
         <div id="status">Bereit zum Scannen. Bitte wähle einen Ordner aus.</div>
     </header>
+
+    <div class="controls" id="controls">
+        <div class="control-group" style="flex: 2 1 280px;">
+            <label for="search-input">Suche (Formel-Code oder Dateiname)</label>
+            <input type="text" id="search-input" placeholder="z. B. \alpha, R_min, Fiatlux.html ...">
+        </div>
+        <div class="control-group">
+            <label for="type-filter">Formeltyp</label>
+            <select id="type-filter">
+                <option value="all">Alle Typen</option>
+                <option value="Display Math ($$)">Display Math ($$)</option>
+                <option value="Inline Math ($)">Inline Math ($)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="folder-filter">Ordner</label>
+            <select id="folder-filter">
+                <option value="all">Alle Ordner</option>
+            </select>
+        </div>
+        <button class="secondary control-reset" id="reset-filters">Filter zurücksetzen</button>
+    </div>
+
+    <div id="result-count"></div>
 
     <main id="output">
         <!-- Hier werden die Ergebnisse dynamisch eingefügt -->
@@ -191,10 +324,18 @@
 </div>
 
 <script>
+    // Gesamter Formel-Datenbestand nach dem Scan: [{ relativePath, fileName, folder, formulas: [...] }, ...]
+    let allFiles = [];
+
+    const outputDiv = document.getElementById('output');
+    const statusDiv = document.getElementById('status');
+    const controlsDiv = document.getElementById('controls');
+    const resultCountDiv = document.getElementById('result-count');
+    const searchInput = document.getElementById('search-input');
+    const typeFilter = document.getElementById('type-filter');
+    const folderFilter = document.getElementById('folder-filter');
+
     document.getElementById('scan-btn').addEventListener('click', async () => {
-        const outputDiv = document.getElementById('output');
-        const statusDiv = document.getElementById('status');
-        
         // Überprüfen, ob die API vom Browser unterstützt wird
         if (!window.showDirectoryPicker) {
             alert('Dein Browser unterstützt die File System Access API leider nicht. Bitte nutze einen modernen Browser wie Chrome, Edge oder Opera.');
@@ -205,8 +346,11 @@
             // Ordner-Picker öffnen
             const dirHandle = await window.showDirectoryPicker();
             outputDiv.innerHTML = '';
+            resultCountDiv.textContent = '';
+            controlsDiv.classList.remove('active');
+            allFiles = [];
             statusDiv.textContent = 'Durchsuchen der Ordnerstruktur läuft...';
-            
+
             let fileCount = 0;
             let formulaCount = 0;
 
@@ -214,23 +358,29 @@
             async function scanDirectory(directoryHandle, currentPath = '') {
                 for await (const entry of directoryHandle.values()) {
                     const relativePath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
-                    
+
                     if (entry.kind === 'directory') {
                         // Unterordner rekursiv durchsuchen
                         await scanDirectory(entry, relativePath);
                     } else if (entry.kind === 'file' && entry.name.endsWith('.html')) {
                         fileCount++;
                         statusDiv.textContent = `Scanne Datei: ${relativePath}...`;
-                        
+
                         const file = await entry.getFile();
                         const content = await file.text();
-                        
+
                         // Formeln extrahieren
                         const formulas = extractFormulas(content);
-                        
+
                         if (formulas.length > 0) {
                             formulaCount += formulas.length;
-                            renderFileSection(relativePath, entry.name, formulas);
+                            const folder = currentPath || '(Hauptordner)';
+                            allFiles.push({
+                                relativePath,
+                                fileName: entry.name,
+                                folder,
+                                formulas
+                            });
                         }
                     }
                 }
@@ -238,20 +388,17 @@
 
             // Scan starten
             await scanDirectory(dirHandle);
-            
-            // MathJax triggern, um die neuen Elemente zu rendern
-            statusDiv.textContent = `Scan abgeschlossen! ${fileCount} HTML-Dateien geprüft. ${formulaCount} Formeln gefunden. Rendere mathematische Darstellung...`;
-            
+
+            statusDiv.textContent = `Scan abgeschlossen! ${fileCount} HTML-Dateien geprüft. ${formulaCount} Formeln gefunden.`;
+
             if (formulaCount === 0) {
                 outputDiv.innerHTML = '<div class="no-results">Keine LaTeX-Formeln ($ oder $$) in den HTML-Dateien gefunden.</div>';
-            } else {
-                // MathJax anweisen, die Seite neu zu verarbeiten
-                if (window.MathJax && window.MathJax.typesetPromise) {
-                    window.MathJax.typesetPromise().then(() => {
-                        statusDiv.textContent = `Fertig! ${formulaCount} Formeln erfolgreich gelistet.`;
-                    });
-                }
+                return;
             }
+
+            populateFolderFilter();
+            controlsDiv.classList.add('active');
+            applyFilters();
 
         } catch (err) {
             console.error(err);
@@ -263,18 +410,26 @@
         }
     });
 
+    // Ordner-Dropdown mit den tatsächlich gefundenen Ordnern befüllen
+    function populateFolderFilter() {
+        const folders = [...new Set(allFiles.map(f => f.folder))].sort();
+        folderFilter.innerHTML = '<option value="all">Alle Ordner</option>';
+        folders.forEach(folder => {
+            const opt = document.createElement('option');
+            opt.value = folder;
+            opt.textContent = folder;
+            folderFilter.appendChild(opt);
+        });
+    }
+
     // Reguläre Ausdrücke zum Finden von $$...$$ und $...$
     function extractFormulas(text) {
         const formulas = [];
-        
-        // Temporär Code-Blöcke oder Scripts maskieren/ignorieren, falls nötig.
-        // Hier nutzen wir direkt Regex für die Matches.
-        
+
         // 1. Suche nach Display-Math ($$...$$)
-        // Nutzt [^$] um sicherzustellen, dass wir nicht falsch matchen, steuert Zeilenumbrüche an via [\s\S]
         const displayRegex = /\$\$([\s\S]*?)\$\$/g;
         let match;
-        
+
         while ((match = displayRegex.exec(text)) !== null) {
             if (match[1].trim()) {
                 formulas.push({
@@ -284,9 +439,8 @@
                 });
             }
         }
-        
+
         // 2. Suche nach Inline-Math ($...$)
-        // Verhindert das Matchen von $$ durch Lookarounds oder präzise Abgrenzung
         const inlineRegex = /(?<!\$)\$([^\$\n]+?)\$(?!\$)/g;
         while ((match = inlineRegex.exec(text)) !== null) {
             if (match[1].trim()) {
@@ -297,51 +451,128 @@
                 });
             }
         }
-        
+
         return formulas;
     }
 
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // Hebt den Suchbegriff im übergebenen (bereits escapten) Text hervor
+    function highlight(escapedText, rawQuery) {
+        if (!rawQuery) return escapedText;
+        const escapedQuery = rawQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedNeedle = escapeHtml(rawQuery);
+        const re = new RegExp(escapedNeedle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        return escapedText.replace(re, m => `<mark>${m}</mark>`);
+    }
+
+    // Filter anwenden und neu rendern
+    function applyFilters() {
+        const query = searchInput.value.trim();
+        const queryLower = query.toLowerCase();
+        const selectedType = typeFilter.value;
+        const selectedFolder = folderFilter.value;
+
+        outputDiv.innerHTML = '';
+        let totalShownFormulas = 0;
+        let shownFiles = 0;
+
+        allFiles.forEach(fileEntry => {
+            if (selectedFolder !== 'all' && fileEntry.folder !== selectedFolder) return;
+
+            const matchingFormulas = fileEntry.formulas.filter(f => {
+                if (selectedType !== 'all' && f.type !== selectedType) return false;
+                if (!query) return true;
+                return f.content.toLowerCase().includes(queryLower) ||
+                       fileEntry.fileName.toLowerCase().includes(queryLower) ||
+                       fileEntry.relativePath.toLowerCase().includes(queryLower);
+            });
+
+            if (matchingFormulas.length > 0) {
+                shownFiles++;
+                totalShownFormulas += matchingFormulas.length;
+                renderFileSection(fileEntry, matchingFormulas, query);
+            }
+        });
+
+        if (shownFiles === 0) {
+            outputDiv.innerHTML = '<div class="no-results">Keine Formeln passen zu den aktuellen Filtern.</div>';
+            resultCountDiv.textContent = '';
+        } else {
+            resultCountDiv.textContent = `${totalShownFormulas} Formel(n) in ${shownFiles} Datei(en) angezeigt (von insgesamt ${allFiles.reduce((s, f) => s + f.formulas.length, 0)} Formeln in ${allFiles.length} Dateien).`;
+        }
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise();
+        }
+    }
+
     // Funktion zur Darstellung der Ergebnisse einer Datei
-    function renderFileSection(relativePath, fileName, formulas) {
-        const outputDiv = document.getElementById('output');
-        
+    function renderFileSection(fileEntry, formulas, query) {
         const section = document.createElement('section');
         section.className = 'file-section';
-        
+
         const title = document.createElement('h2');
         title.className = 'file-title';
-        title.innerHTML = `${fileName} <span class="file-path">${relativePath}</span>`;
+        title.innerHTML = `
+            <span class="titles">
+                <span>${escapeHtml(fileEntry.fileName)}</span>
+                <span class="file-path">${escapeHtml(fileEntry.relativePath)}</span>
+                <span class="badge-count">${formulas.length}</span>
+            </span>
+            <span class="toggle-icon">▼</span>
+        `;
+        title.addEventListener('click', () => {
+            section.classList.toggle('collapsed');
+        });
         section.appendChild(title);
-        
+
         const list = document.createElement('ul');
         list.className = 'formula-list';
-        
+
         formulas.forEach(formula => {
             const item = document.createElement('li');
             item.className = 'formula-item';
-            
+
             const type = document.createElement('span');
             type.className = 'formula-type';
             type.textContent = formula.type;
-            
+
             const renderContainer = document.createElement('div');
             renderContainer.className = 'formula-render';
             // Wir geben MathJax den exakten rohen String mit den $-Zeichen zum Parsen
             renderContainer.textContent = formula.raw;
-            
+
             const rawCode = document.createElement('div');
             rawCode.className = 'raw-tex';
-            rawCode.textContent = `Code: ${formula.content}`;
-            
+            rawCode.innerHTML = `Code: ${highlight(escapeHtml(formula.content), query)}`;
+
             item.appendChild(type);
             item.appendChild(renderContainer);
             item.appendChild(rawCode);
             list.appendChild(item);
         });
-        
+
         section.appendChild(list);
         outputDiv.appendChild(section);
     }
+
+    // Filter-Events
+    searchInput.addEventListener('input', applyFilters);
+    typeFilter.addEventListener('change', applyFilters);
+    folderFilter.addEventListener('change', applyFilters);
+    document.getElementById('reset-filters').addEventListener('click', () => {
+        searchInput.value = '';
+        typeFilter.value = 'all';
+        folderFilter.value = 'all';
+        applyFilters();
+    });
 </script>
 </body>
 </html>

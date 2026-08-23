@@ -17,7 +17,7 @@
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
+
     <style>
         :root {
             --bg-color: #121824;
@@ -39,13 +39,13 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
         }
@@ -82,11 +82,97 @@
             transform: scale(0.98);
         }
 
+        button.secondary {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        button.secondary:hover {
+            background-color: #26364d;
+        }
+
+        button.secondary.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
         #status {
             text-align: center;
             color: var(--text-muted);
             font-style: italic;
             margin-bottom: 20px;
+        }
+
+        /* --- Toolbar (Such-, Sortier-, Filter-, Ordnerleiste) --- */
+        #toolbar {
+            display: none;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            gap: 14px;
+            flex-direction: column;
+        }
+
+        .toolbar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .toolbar-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+
+        #search-input {
+            flex: 1;
+            min-width: 200px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        select {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        #folder-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #result-count {
+            font-size: 13px;
+            color: var(--text-muted);
         }
 
         .file-section {
@@ -109,12 +195,63 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .file-title-left {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .file-count-badge {
+            font-size: 12px;
+            font-weight: normal;
+            color: var(--bg-color);
+            background-color: var(--accent-color);
+            padding: 2px 9px;
+            border-radius: 999px;
+        }
+
+        .collapse-arrow {
+            transition: transform 0.15s;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .file-section.collapsed .collapse-arrow {
+            transform: rotate(-90deg);
+        }
+
+        .file-section.collapsed .formula-list {
+            display: none;
         }
 
         .file-path {
             font-size: 13px;
             color: var(--text-muted);
             font-weight: normal;
+        }
+
+        .folder-heading {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 30px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .folder-heading::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: var(--border-color);
         }
 
         .formula-list {
@@ -159,6 +296,13 @@
             word-break: break-all;
         }
 
+        mark {
+            background-color: var(--accent-color);
+            color: #08202f;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
         .no-results {
             text-align: center;
             padding: 40px;
@@ -175,12 +319,36 @@
     <header>
         <h1>Universeller Formelsammlung Generator</h1>
         <p>Scannt alle lesbaren Textdateien (.md, .txt, .tex, .html, .js...) in Ordnern & Unterordnern nach LaTeX</p>
-        
+
         <div class="btn-container">
             <button id="scan-btn">Ordner auswählen & scannen</button>
         </div>
         <div id="status">Bereit zum Scannen. Bitte wähle einen Ordner aus.</div>
     </header>
+
+    <div id="toolbar">
+        <div class="toolbar-row">
+            <input type="text" id="search-input" placeholder="Formeln, Dateinamen oder Pfade durchsuchen...">
+            <select id="sort-select">
+                <option value="path-asc">Pfad (A–Z)</option>
+                <option value="path-desc">Pfad (Z–A)</option>
+                <option value="name-asc">Dateiname (A–Z)</option>
+                <option value="name-desc">Dateiname (Z–A)</option>
+                <option value="count-desc">Formelanzahl (meiste zuerst)</option>
+                <option value="count-asc">Formelanzahl (wenigste zuerst)</option>
+            </select>
+            <select id="type-filter">
+                <option value="all">Alle Formeltypen</option>
+                <option value="display">Nur Display Math ($$)</option>
+                <option value="inline">Nur Inline Math ($)</option>
+            </select>
+        </div>
+        <div class="toolbar-row">
+            <span class="toolbar-label">Ordner:</span>
+            <div id="folder-chips"></div>
+            <span id="result-count" style="margin-left: auto;"></span>
+        </div>
+    </div>
 
     <main id="output">
         <!-- Ergebnisse werden hier eingefügt -->
@@ -190,15 +358,26 @@
 <script>
     // Liste bekannter Binärendungen, die wir sofort überspringen
     const binaryExtensions = new Set([
-        'png', 'jpg', 'jpeg', 'gif', 'ico', 'webp', 'pdf', 'zip', 'tar', 'gz', 
-        '7z', 'rar', 'mp3', 'mp4', 'wav', 'ogg', 'exe', 'dll', 'so', 'dmg', 
+        'png', 'jpg', 'jpeg', 'gif', 'ico', 'webp', 'pdf', 'zip', 'tar', 'gz',
+        '7z', 'rar', 'mp3', 'mp4', 'wav', 'ogg', 'exe', 'dll', 'so', 'dmg',
         'iso', 'bin', 'woff', 'woff2', 'ttf', 'eot', 'db', 'sqlite'
     ]);
 
+    // Gesamtdatensatz aller gescannten Dateien mit Formeln
+    // { path, fileName, folder, formulas: [{raw, content, type}] }
+    let allFiles = [];
+    let activeFolder = 'all';
+
+    const outputDiv = document.getElementById('output');
+    const statusDiv = document.getElementById('status');
+    const toolbar = document.getElementById('toolbar');
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
+    const typeFilter = document.getElementById('type-filter');
+    const folderChips = document.getElementById('folder-chips');
+    const resultCount = document.getElementById('result-count');
+
     document.getElementById('scan-btn').addEventListener('click', async () => {
-        const outputDiv = document.getElementById('output');
-        const statusDiv = document.getElementById('status');
-        
         if (!window.showDirectoryPicker) {
             alert('Dein Browser unterstützt die File System Access API nicht. Bitte nutze Chrome, Edge oder Opera.');
             return;
@@ -207,20 +386,23 @@
         try {
             const dirHandle = await window.showDirectoryPicker();
             outputDiv.innerHTML = '';
+            toolbar.style.display = 'none';
+            allFiles = [];
+            activeFolder = 'all';
             statusDiv.textContent = 'Durchsuchen der Ordnerstruktur...';
-            
+
             let fileCount = 0;
             let formulaCount = 0;
 
             async function scanDirectory(directoryHandle, currentPath = '') {
                 for await (const entry of directoryHandle.values()) {
                     const relativePath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
-                    
+
                     if (entry.kind === 'directory') {
                         await scanDirectory(entry, relativePath);
                     } else if (entry.kind === 'file') {
                         const ext = entry.name.split('.').pop().toLowerCase();
-                        
+
                         // Überspringe bekannte Binärdateien und versteckte Systemdateien (z.B. .DS_Store)
                         if (binaryExtensions.has(ext) || entry.name.startsWith('.')) {
                             continue;
@@ -228,21 +410,27 @@
 
                         fileCount++;
                         statusDiv.textContent = `Scanne Datei: ${relativePath}...`;
-                        
+
                         try {
                             const file = await entry.getFile();
                             const content = await file.text();
-                            
+
                             // Prüfen auf Null-Bytes (Indikator für Binärdateien ohne bekannte Endung)
                             if (content.includes('\x00')) {
-                                continue; 
+                                continue;
                             }
 
                             const formulas = extractFormulas(content);
-                            
+
                             if (formulas.length > 0) {
                                 formulaCount += formulas.length;
-                                renderFileSection(relativePath, entry.name, formulas);
+                                const folder = currentPath ? currentPath.split('/')[0] : '(Hauptordner)';
+                                allFiles.push({
+                                    path: relativePath,
+                                    fileName: entry.name,
+                                    folder: folder,
+                                    formulas: formulas
+                                });
                             }
                         } catch (fileErr) {
                             // Falls eine Datei nicht gelesen werden kann (z.B. Zugriffsrechte), still überspringen
@@ -253,17 +441,15 @@
             }
 
             await scanDirectory(dirHandle);
-            
-            statusDiv.textContent = `Scan abgeschlossen! ${fileCount} lesbare Dateien geprüft. ${formulaCount} Formeln gefunden. Rendere Live-Ansicht...`;
-            
+
+            statusDiv.textContent = `Scan abgeschlossen! ${fileCount} lesbare Dateien geprüft. ${formulaCount} Formeln gefunden.`;
+
             if (formulaCount === 0) {
                 outputDiv.innerHTML = '<div class="no-results">Keine LaTeX-Formeln ($ oder $$) in den untersuchten Dateien gefunden.</div>';
             } else {
-                if (window.MathJax && window.MathJax.typesetPromise) {
-                    window.MathJax.typesetPromise().then(() => {
-                        statusDiv.textContent = `Fertig! ${formulaCount} Formeln erfolgreich aus allen Textdateien extrahiert.`;
-                    });
-                }
+                setupToolbar();
+                toolbar.style.display = 'flex';
+                applyAndRender();
             }
 
         } catch (err) {
@@ -278,21 +464,22 @@
 
     function extractFormulas(text) {
         const formulas = [];
-        
+
         // 1. Suche nach Display-Math ($$...$$)
         const displayRegex = /\$\$([\s\S]*?)\$\$/g;
         let match;
-        
+
         while ((match = displayRegex.exec(text)) !== null) {
             if (match[1].trim()) {
                 formulas.push({
                     raw: match[0],
                     content: match[1].trim(),
-                    type: 'Display Math ($$)'
+                    type: 'Display Math ($$)',
+                    typeKey: 'display'
                 });
             }
         }
-        
+
         // 2. Suche nach Inline-Math ($...$)
         const inlineRegex = /(?<!\$)\$([^\$\n]+?)\$(?!\$)/g;
         while ((match = inlineRegex.exec(text)) !== null) {
@@ -300,52 +487,179 @@
                 formulas.push({
                     raw: match[0],
                     content: match[1].trim(),
-                    type: 'Inline Math ($)'
+                    type: 'Inline Math ($)',
+                    typeKey: 'inline'
                 });
             }
         }
-        
+
         return formulas;
     }
 
-    function renderFileSection(relativePath, fileName, formulas) {
-        const outputDiv = document.getElementById('output');
-        
+    // --- Toolbar-Aufbau (Ordner-Chips etc.) ---
+    function setupToolbar() {
+        const folders = Array.from(new Set(allFiles.map(f => f.folder))).sort((a, b) => a.localeCompare(b));
+
+        folderChips.innerHTML = '';
+        const allChip = makeFolderChip('Alle Ordner', 'all');
+        folderChips.appendChild(allChip);
+        folders.forEach(folder => {
+            folderChips.appendChild(makeFolderChip(folder, folder));
+        });
+        updateChipStates();
+    }
+
+    function makeFolderChip(label, value) {
+        const btn = document.createElement('button');
+        btn.className = 'secondary folder-chip';
+        btn.textContent = label;
+        btn.dataset.value = value;
+        btn.addEventListener('click', () => {
+            activeFolder = value;
+            updateChipStates();
+            applyAndRender();
+        });
+        return btn;
+    }
+
+    function updateChipStates() {
+        document.querySelectorAll('.folder-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.value === activeFolder);
+        });
+    }
+
+    searchInput.addEventListener('input', applyAndRender);
+    sortSelect.addEventListener('change', applyAndRender);
+    typeFilter.addEventListener('change', applyAndRender);
+
+    // --- Filtern, Sortieren, Rendern ---
+    function applyAndRender() {
+        const query = searchInput.value.trim().toLowerCase();
+        const typeVal = typeFilter.value;
+        const sortVal = sortSelect.value;
+
+        // 1. Ordner-Filter + Formel-Typ-Filter + Suche anwenden
+        let filtered = allFiles
+            .filter(f => activeFolder === 'all' || f.folder === activeFolder)
+            .map(f => {
+                let formulas = f.formulas;
+                if (typeVal !== 'all') {
+                    formulas = formulas.filter(fm => fm.typeKey === typeVal);
+                }
+                if (query) {
+                    const pathMatches = f.path.toLowerCase().includes(query);
+                    formulas = pathMatches
+                        ? formulas
+                        : formulas.filter(fm => fm.content.toLowerCase().includes(query) || fm.raw.toLowerCase().includes(query));
+                }
+                return { ...f, formulas };
+            })
+            .filter(f => f.formulas.length > 0);
+
+        // 2. Sortieren
+        filtered.sort((a, b) => {
+            switch (sortVal) {
+                case 'path-asc': return a.path.localeCompare(b.path);
+                case 'path-desc': return b.path.localeCompare(a.path);
+                case 'name-asc': return a.fileName.localeCompare(b.fileName);
+                case 'name-desc': return b.fileName.localeCompare(a.fileName);
+                case 'count-desc': return b.formulas.length - a.formulas.length;
+                case 'count-asc': return a.formulas.length - b.formulas.length;
+                default: return 0;
+            }
+        });
+
+        renderResults(filtered, query);
+    }
+
+    function renderResults(files, query) {
+        outputDiv.innerHTML = '';
+
+        const totalFormulas = files.reduce((sum, f) => sum + f.formulas.length, 0);
+        resultCount.textContent = `${files.length} Datei(en) · ${totalFormulas} Formel(n)`;
+
+        if (files.length === 0) {
+            outputDiv.innerHTML = '<div class="no-results">Keine Formeln entsprechen den aktuellen Filtern/der Suche.</div>';
+            return;
+        }
+
+        // Gruppierung nach Ordner nur anzeigen, wenn "Alle Ordner" aktiv ist
+        if (activeFolder === 'all') {
+            const folders = Array.from(new Set(files.map(f => f.folder)));
+            folders.forEach(folder => {
+                const heading = document.createElement('div');
+                heading.className = 'folder-heading';
+                heading.textContent = folder;
+                outputDiv.appendChild(heading);
+
+                files.filter(f => f.folder === folder).forEach(f => renderFileSection(f, query));
+            });
+        } else {
+            files.forEach(f => renderFileSection(f, query));
+        }
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise();
+        }
+    }
+
+    function highlight(text, query) {
+        if (!query) return text;
+        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    function renderFileSection(f, query) {
         const section = document.createElement('section');
         section.className = 'file-section';
-        
+
         const title = document.createElement('h2');
         title.className = 'file-title';
-        title.innerHTML = `${fileName} <span class="file-path">${relativePath}</span>`;
+        title.innerHTML = `
+            <span class="file-title-left">
+                <span class="collapse-arrow">▼</span>
+                ${highlight(f.fileName, query)}
+                <span class="file-path">${highlight(f.path, query)}</span>
+            </span>
+            <span class="file-count-badge">${f.formulas.length}</span>
+        `;
+        title.addEventListener('click', () => section.classList.toggle('collapsed'));
         section.appendChild(title);
-        
+
         const list = document.createElement('ul');
         list.className = 'formula-list';
-        
-        formulas.forEach(formula => {
+
+        f.formulas.forEach(formula => {
             const item = document.createElement('li');
             item.className = 'formula-item';
-            
+
             const type = document.createElement('span');
             type.className = 'formula-type';
             type.textContent = formula.type;
-            
+
             const renderContainer = document.createElement('div');
             renderContainer.className = 'formula-render';
             renderContainer.textContent = formula.raw;
-            
+
             const rawCode = document.createElement('div');
             rawCode.className = 'raw-tex';
-            rawCode.textContent = `Code: ${formula.content}`;
-            
+            rawCode.innerHTML = `Code: ${highlight(escapeHtml(formula.content), query)}`;
+
             item.appendChild(type);
             item.appendChild(renderContainer);
             item.appendChild(rawCode);
             list.appendChild(item);
         });
-        
+
         section.appendChild(list);
         outputDiv.appendChild(section);
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 </script>
 </body>
