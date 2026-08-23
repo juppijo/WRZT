@@ -33,7 +33,7 @@ Die WRZT beschreibt die Raumzeit als ein dynamisches Wellennetzwerk. Die grundle
 | **Minimal-Radius** | $R_{\min}$ | $7{,}716 \times 10^{-13} \text{ m}$ |
 
 ### Lichtgeschwindigkeit $c$
-$$c = \frac{\Xi}{\eta} \cdot R_{\min} \approx 299.792.458 \text{ m/s}$$
+$$\frac{\Xi}{\eta} \cdot R_{\min} = 1 \text{←〰️→} c = 299.792.458 \text{ m/s}$$
 
 ---
 

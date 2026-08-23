@@ -34,7 +34,7 @@ $$\Psi(\vec{r},t) = \frac{\Xi}{|\vec{r} - \vec{r}_s(t)|} \cdot \cos\left(\omega 
 * **Retardierte Position ($\vec{r}_i(t_{\text{ret}})$):** Die Position der $i$-ten Quelle zum Zeitpunkt der Emission:
     $$t_{\text{ret}} = t - \frac{|\vec{r} - \vec{r}_i|}{c}$$
 * **Wellengeschwindigkeit ($c$):** Wird direkt aus deiner Raumzeit-Strukturformel berechnet:
-    $$c = \frac{\Xi}{\eta} \cdot R_{\text{min}}$$
+    $$\frac{\Xi}{\eta} \cdot R_{\text{min}} = 1 \text{ ←〰→ } c = 299.792.458 \text{ m/s} $$
 * **Phasenterm ($\Phi_i$):** Beinhaltet die Rotation und die Kompression der Wellenfront (Bugwelle):
     $$\Phi_i(\vec{r},t) = \omega \left( t - \frac{|\vec{r} - \vec{r}_i|}{c} \cdot (1 - M\cos(\alpha_i)) \right) + \Delta\phi_i$$
     * $M = \frac{a \cdot \omega}{c}$ repräsentiert die **Mach-Zahl der Raumzeit**.
