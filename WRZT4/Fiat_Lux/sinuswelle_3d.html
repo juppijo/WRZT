@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Entstehung der Sinuswelle aus der Kreisbewegung</title>
+    <title>3D Entstehung der Sinuswelle aus der Kreisbewegung mit veränderlichem Winkel</title>
     <style>
         :root {
             --bg-color: #0b0f19;
             --card-bg: rgba(30, 41, 59, 0.7);
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #38bdf8;
+            --accent: #facc15;
         }
 
         * {
@@ -154,17 +154,22 @@
 <div class="ui-overlay">
     <div class="ui-card">
         <h1>3D Sinuswelle & Kreisbewegung</h1>
-        <p>Ein Punkt dreht sich in der YZ-Ebene auf einer Kreisbahn. Seine kontinuierliche Bewegung wird entlang der X-Achse (Zeitachse) zu einer dreidimensionalen Sinuswelle entfaltet.</p>
+        <p>Ein Punkt dreht sich auf einer Kreisbahn. Der veränderliche Winkel &theta; bestimmt die Neigung der Kreisebene relativ zur Zeitachse.</p>
 
         <div class="controls">
             <div class="control-group">
-                <label for="speedSlider">Winkelgeschwindigkeit (ω): <span id="speedVal">1.0</span></label>
+                <label for="speedSlider">Winkelgeschwindigkeit (&omega;): <span id="speedVal">1.0</span></label>
                 <input type="range" id="speedSlider" min="0.2" max="3.0" step="0.1" value="1.0">
             </div>
 
             <div class="control-group">
                 <label for="ampSlider">Radius / Amplitude (r): <span id="ampVal">2.5</span></label>
                 <input type="range" id="ampSlider" min="1.0" max="4.0" step="0.1" value="2.5">
+            </div>
+
+            <div class="control-group">
+                <label for="thetaSlider">Neigungswinkel (&theta;): <span id="thetaVal">0°</span></label>
+                <input type="range" id="thetaSlider" min="-90" max="90" step="1" value="0">
             </div>
 
             <div class="btn-group">
@@ -211,7 +216,7 @@
     dirLight.position.set(10, 20, 15);
     scene.add(dirLight);
 
-    const pointLight = new THREE.PointLight(0x38bdf8, 2, 20);
+    const pointLight = new THREE.PointLight(0xfacc15, 2, 20);
     scene.add(pointLight);
 
     // Helper function: Create a thick line using TubeGeometry
@@ -241,6 +246,7 @@
     // Parameters
     let omega = 1.0;
     let radius = 2.5;
+    let thetaRad = 0; // Neigungswinkel in Bogenmaß
     let isRunning = true;
     let angle = 0;
 
@@ -257,15 +263,15 @@
     scene.add(circleGroup);
 
     // Circle Line (Thick)
-    const circleLineObj = createThickLine(0.04, 0x38bdf8, true, 0.7);
+    const circleLineObj = createThickLine(0.03, 0x38bdf8, true, 0.3);
     circleGroup.add(circleLineObj.mesh);
 
     function updateCircleGeometry() {
         const points = [];
         const segments = 64;
         for (let i = 0; i < segments; i++) {
-            const theta = (i / segments) * Math.PI * 2;
-            points.push(new THREE.Vector3(0, radius * Math.sin(theta), radius * Math.cos(theta)));
+            const t = (i / segments) * Math.PI * 2;
+            points.push(new THREE.Vector3(0, radius * Math.sin(t), radius * Math.cos(t)));
         }
         updateThickLineGeometry(circleLineObj, points, true);
     }
@@ -276,37 +282,39 @@
         new THREE.Vector3(-1, 0, 0),
         new THREE.Vector3(waveLengthX + 2, 0, 0)
     ];
-    const timeAxisObj = createThickLine(0.04, 0x64748b, true, 0.6);
+    const timeAxisObj = createThickLine(0.03, 0x64748b, true, 0.6);
     updateThickLineGeometry(timeAxisObj, timeAxisPoints, false);
     scene.add(timeAxisObj.mesh);
 
     // Rotating Radius Vector (Thick)
-    const vectorObj = createThickLine(0.02, 0x38bdf8);
+    const vectorObj = createThickLine(0.03, 0x38bdf8);
     circleGroup.add(vectorObj.mesh);
 
     // Rotating Point Mesh
     const pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
-    const pointMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, roughness: 0.2 });
+    const pointMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xd97706, roughness: 0.2 });
     const rotatingPoint = new THREE.Mesh(pointGeo, pointMat);
     circleGroup.add(rotatingPoint);
 
     // Vertical Projection Vector (Y Component, Thick)
-    const yProjObj = createThickLine(0.02, 0xf59e0b);
+    const yProjObj = createThickLine(0.03, 0xf59e0b);
     circleGroup.add(yProjObj.mesh);
 
     // Projection Line from Circle Point to Wave Head (Thick)
-    const projLineObj = createThickLine(0.02, 0x38bdf8, true, 0.5);
+    const projLineObj = createThickLine(0.03, 0xfacc15, true, 0.5);
     scene.add(projLineObj.mesh);
 
-    // Wave Line (Thick)
-    const waveLineObj = createThickLine(0.03, 0xfacc15);
+    // Wave Line (Thick & Gelb)
+    const waveLineObj = createThickLine(0.04, 0xfacc15); // Gelb: 0xfacc15
     scene.add(waveLineObj.mesh);
 
     // UI Listeners
     const speedSlider = document.getElementById('speedSlider');
     const ampSlider = document.getElementById('ampSlider');
+    const thetaSlider = document.getElementById('thetaSlider');
     const speedVal = document.getElementById('speedVal');
     const ampVal = document.getElementById('ampVal');
+    const thetaVal = document.getElementById('thetaVal');
     const toggleBtn = document.getElementById('toggleBtn');
     const resetBtn = document.getElementById('resetBtn');
 
@@ -320,6 +328,13 @@
         ampVal.textContent = radius.toFixed(1);
         updateCircleGeometry();
         gridHelper.position.y = -radius - 0.5;
+    });
+
+    thetaSlider.addEventListener('input', (e) => {
+        const deg = parseFloat(e.target.value);
+        thetaRad = THREE.MathUtils.degToRad(deg);
+        thetaVal.textContent = deg + "°";
+        circleGroup.rotation.y = thetaRad; // Drehung der Kreisebene relativ zur Zeitachse
     });
 
     toggleBtn.addEventListener('click', () => {
@@ -351,49 +366,53 @@
         if (isRunning) {
             angle += delta * omega * 2.5;
 
-            const y = radius * Math.sin(angle);
-            const z = radius * Math.cos(angle);
+            // Lokale Koordinaten im kreiseigenen System
+            const yLocal = radius * Math.sin(angle);
+            const zLocal = radius * Math.cos(angle);
 
-            // Update Rotating Vector Line
+            // Aktualisiere Vektor und Punkt in der CircleGroup
             updateThickLineGeometry(vectorObj, [
                 new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(0, y, z)
+                new THREE.Vector3(0, yLocal, zLocal)
             ]);
 
-            // Update Rotating Point
-            rotatingPoint.position.set(0, y, z);
-            pointLight.position.set(0, y, z);
+            rotatingPoint.position.set(0, yLocal, zLocal);
 
-            // Update Vertical Projection
             updateThickLineGeometry(yProjObj, [
-                new THREE.Vector3(0, 0, z),
-                new THREE.Vector3(0, y, z)
+                new THREE.Vector3(0, 0, zLocal),
+                new THREE.Vector3(0, yLocal, zLocal)
             ]);
 
-            // Add new point to wave
-            wavePoints.unshift(new THREE.Vector3(0, y, z));
+            // Weltkoordinaten des aktuellen rotierenden Punktes ermitteln
+            const worldPos = new THREE.Vector3();
+            rotatingPoint.getWorldPosition(worldPos);
 
-            // Shift wave points along +X axis
+            pointLight.position.copy(worldPos);
+
+            // Füge neuen Punkt zur Welle hinzu
+            wavePoints.unshift(new THREE.Vector3(worldPos.x, worldPos.y, worldPos.z));
+
+            // Vorschub entlang der X-Achse
             const speedX = 0.05 * omega;
             for (let i = 0; i < wavePoints.length; i++) {
-                wavePoints[i].x = i * speedX;
+                wavePoints[i].x += speedX;
             }
 
-            // Trim points beyond waveLengthX
+            // Entferne Punkte, die die maximale Länge überschreiten
             while (wavePoints.length > 0 && wavePoints[wavePoints.length - 1].x > waveLengthX) {
                 wavePoints.pop();
             }
 
-            // Update Wave Line
+            // Aktualisiere Wellenlinie
             if (wavePoints.length >= 2) {
                 updateThickLineGeometry(waveLineObj, wavePoints);
             }
 
-            // Update Projection Line from Circle to Wave
+            // Projektionslinie von der Kreisbahn zum Wellenkopf
             if (wavePoints.length > 0) {
                 updateThickLineGeometry(projLineObj, [
-                    new THREE.Vector3(0, y, z),
-                    new THREE.Vector3(wavePoints[0].x, y, z)
+                    worldPos,
+                    wavePoints[0]
                 ]);
             }
         }
