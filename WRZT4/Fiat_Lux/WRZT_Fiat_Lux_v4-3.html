@@ -387,6 +387,9 @@
         margin-top: 10px;
         text-align: center;
     }
+    .lese{
+      text-align: justify;
+    }
     
     .fiat-lux {
       color: #ffff00;
@@ -627,6 +630,7 @@
       <summary style="cursor:pointer;">
         <a><strong> ✨ WRZT Logik 〰️🌀⭕💡🌌 </strong></a>
       </summary>
+      <div class="lese">
       <h3>
         ⭕ Kreisbahn Elektron und Positron.
       </h3>
@@ -636,7 +640,7 @@
       <p>Dieser gemeinsame Orbit ist physikalisch notwendig, um den Gesamtdrehimpuls des Systems zu erhalten. Die Teilchen können ihre kinetische Energie und ihren Impuls nicht schlagartig im Nichts auflösen. Sie müssen sich erst spiralförmig aufeinander zubewegen, während sie sich umkreisen.</p>
       <p>Erst durch diese erzwungene Rotationsbewegung wird ein stabiler Übergangszustand geschaffen, bei dem sich die beiden gegensätzlichen Wellenmuster exakt überlagern und schließlich vollständig in reine Strahlungsenergie umwandeln können.</p>
 
-
+			 </div>
       <p><strong>Das dynamische Einlenken: Warum Annihilation zwingend über einen Orbit verläuft</strong></p>
       <p>Bevor sich ein Elektron und ein Positron gegenseitig auflösen können, erlaubt die Natur keine direkte, frontale Kollision. Die Entstehung eines kurzzeitigen gemeinsamen Orbits – des Positroniums – ist ein physikalisch erzwungener Zwischenschritt, der sich aus drei Grundprinzipien der Raumzeit-Dynamik ergibt:</p>
       <ul>
@@ -1217,7 +1221,7 @@
         if (!container) return;
 
         // Nur Absätze und Listenpunkte mit tatsächlichem Textinhalt auswählen
-        const allElements = container.querySelectorAll('h1, h2, h3, p, li, details, summary, .quote-box, .note-box, .formula-card, .caption');
+        const allElements = container.querySelectorAll('h1, h2, h3, p, li, summary, .quote-box, .note-box, .formula-card, .caption');
         elementsToRead = Array.from(allElements).filter(el => el.innerText.trim().length > 0);
 
         currentIndex = 0;
