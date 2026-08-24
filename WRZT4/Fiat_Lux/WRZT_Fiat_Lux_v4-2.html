@@ -195,6 +195,13 @@
         border-radius: 4px;      /* Leicht abgerundete Ecken */
         object-fit: cover;
     }
+        /* Formatierung für das kleine Titelbild */
+    .logo-img {
+        height: 45px;          
+        width: auto;
+        border-radius: 4px;      /* Leicht abgerundete Ecken */
+        object-fit: cover;
+    }
     
     .meta-tag {
         color: var(--accent-cyan);
@@ -388,7 +395,9 @@
 
     <!-- Fixed Toolbar -->
     <div class="toolbar">
-      <div class="toolbar-title">🌌 WRZT — Wellenraumzeit-Theorie 🌀</div>
+      <div class="toolbar-title">
+        <img src="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/favicon.png" alt="logo" class="logo-img">
+        🌌 WRZT — Wellenraumzeit-Theorie 🌀</div>
       <div class="controls">
         <label for="themeSelect" style="font-size: 0.85rem; font-weight: 600;">Design:</label>
         <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
