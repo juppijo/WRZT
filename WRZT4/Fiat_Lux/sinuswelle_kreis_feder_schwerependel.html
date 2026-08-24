@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entstehung einer Sinuswelle - Kreis, Federpendel & Schwerependel</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-circle: #38bdf8;
+            --accent-spring: #f43f5e;
+            --accent-gravity: #10b981;
+            --line-color: rgba(255, 255, 255, 0.2);
+            --grid-color: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1050px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            color: #f1f5f9;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            background: #090d16;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .control-group input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent-circle);
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-family: monospace;
+            font-size: 0.9rem;
+            min-width: 45px;
+            color: #38bdf8;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #475569;
+        }
+
+        button.active {
+            background: var(--accent-circle);
+            color: #0f172a;
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .info-card {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-circle);
+        }
+
+        .info-card.spring {
+            border-left-color: var(--accent-spring);
+        }
+
+        .info-card.gravity {
+            border-left-color: var(--accent-gravity);
+        }
+
+        .info-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .info-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .math-expr {
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+            color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Physikalische & Mathematische Entstehung der Sinuswelle</h1>
+        <p>Vergleich von Kreisbewegung, Federpendel und Schwerependel (Fadenpendel) bei kleinem Auslenkungswinkel.</p>
+    </header>
+
+    <div class="canvas-container">
+        <canvas id="simCanvas" width="980" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+        <div class="btn-group">
+            <button id="toggleBtn" class="active">Pause</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+
+        <div class="control-group">
+            <label for="speedSlider">Frequenz (ω):</label>
+            <input type="range" id="speedSlider" min="0.2" max="3.0" step="0.1" value="1.0">
+            <span class="value-display" id="speedVal">1.0 Hz</span>
+        </div>
+
+        <div class="control-group">
+            <label for="ampSlider">Amplitude (r):</label>
+            <input type="range" id="ampSlider" min="30" max="75" step="1" value="55">
+            <span class="value-display" id="ampVal">55 px</span>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-card">
+            <h3>1. Kreisbewegung</h3>
+            <p>Die vertikale Projektion des rotierenden Vektors ergibt den Exakten Wert <span class="math">y(t) = r · sin(ωt)</span>.</p>
+        </div>
+        <div class="info-card spring">
+            <h3>2. Federpendel</h3>
+            <p>Die harmonische Schwingung der Masse an der Feder folgt direkt dem Gesetz der Sinuswelle.</p>
+        </div>
+        <div class="info-card gravity">
+            <h3>3. Schwerependel</h3>
+            <p>Für kleine Auslenkungen (<span class="math">φ &lt; 15°</span>) gilt die Kleinwinkelnäherung (<span class="math">sin φ ≈ φ</span>), wodurch die Bewegung nahezu perfekt harmonisch ist.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Controls
+    const toggleBtn = document.getElementById('toggleBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const speedSlider = document.getElementById('speedSlider');
+    const ampSlider = document.getElementById('ampSlider');
+    const speedVal = document.getElementById('speedVal');
+    const ampVal = document.getElementById('ampVal');
+
+    // State
+    let isRunning = true;
+    let angle = 0; // Phase angle theta = omega * t
+    let wavePoints = [];
+    const maxWavePoints = 460;
+
+    // Parameters
+    let omega = parseFloat(speedSlider.value);
+    let radius = parseFloat(ampSlider.value);
+
+    // Layout Y coordinates
+    const centerY_Circle = 110;
+    const centerY_Spring = 300;
+    const centerY_Gravity = 490;
+
+    const centerX = 110;
+    const waveStartX = 260;
+
+    speedSlider.addEventListener('input', (e) => {
+        omega = parseFloat(e.target.value);
+        speedVal.textContent = omega.toFixed(1) + ' Hz';
+    });
+
+    ampSlider.addEventListener('input', (e) => {
+        radius = parseFloat(e.target.value);
+        ampVal.textContent = Math.round(radius) + ' px';
+    });
+
+    toggleBtn.addEventListener('click', () => {
+        isRunning = !isRunning;
+        toggleBtn.textContent = isRunning ? 'Pause' : 'Start';
+        toggleBtn.classList.toggle('active', isRunning);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        angle = 0;
+        wavePoints = [];
+        draw();
+    });
+
+    function drawGrid() {
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+
+        // Horizontal axes
+        [centerY_Circle, centerY_Spring, centerY_Gravity].forEach(y => {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        });
+
+        // Vertical starting line for wave
+        ctx.beginPath();
+        ctx.moveTo(waveStartX, 0);
+        ctx.lineTo(waveStartX, canvas.height);
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function drawCircleSection() {
+        // Main circle
+        ctx.beginPath();
+        ctx.arc(centerX, centerY_Circle, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Rotating vector
+        const pointX = centerX + radius * Math.cos(angle);
+        const pointY = centerY_Circle - radius * Math.sin(angle);
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY_Circle);
+        ctx.lineTo(pointX, pointY);
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Point
+        ctx.beginPath();
+        ctx.arc(pointX, pointY, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fill();
+
+        // Vertical projection line (Y component)
+        ctx.beginPath();
+        ctx.moveTo(pointX, centerY_Circle);
+        ctx.lineTo(pointX, pointY);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Horizontal dashed line
+        ctx.beginPath();
+        ctx.moveTo(pointX, pointY);
+        ctx.lineTo(waveStartX, pointY);
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px sans-serif';
+        ctx.fillText('1. Kreisbewegung', centerX - 45, centerY_Circle - radius - 12);
+
+        return pointY;
+    }
+
+    function drawSpringSection() {
+        const currentY = centerY_Spring - radius * Math.sin(angle);
+
+        // Top Mount
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(centerX - 30, centerY_Spring - radius - 30, 60, 5);
+
+        // Spring
+        const topY = centerY_Spring - radius - 25;
+        const coils = 10;
+        const springWidth = 10;
+        const heightDiff = currentY - topY - 12;
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, topY);
+        for (let i = 0; i <= coils; i++) {
+            const y = topY + (heightDiff / coils) * i;
+            const x = centerX + (i % 2 === 0 ? springWidth : -springWidth);
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(centerX, currentY - 12);
+        ctx.strokeStyle = '#f43f5e';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Mass
+        ctx.beginPath();
+        ctx.arc(centerX, currentY, 12, 0, Math.PI * 2);
+        ctx.fillStyle = '#f43f5e';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Horizontal dashed line
+        ctx.beginPath();
+        ctx.moveTo(centerX, currentY);
+        ctx.lineTo(waveStartX, currentY);
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = 'rgba(244, 63, 94, 0.5)';
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px sans-serif';
+        ctx.fillText('2. Federpendel', centerX - 35, centerY_Spring - radius - 40);
+
+        return currentY;
+    }
+
+    function drawGravitySection() {
+        // Simple Gravity Pendulum (Fadenpendel)
+        // Length of pendulum string
+        const L = 160;
+        // Swing angle theta_gravity derived from displacement
+        // Small angle approximation: x = L * sin(phi) approx L * phi => phi = (radius/L) * sin(angle)
+        const maxPhi = radius / L;
+        const currentPhi = maxPhi * Math.sin(angle);
+
+        const pivotX = centerX;
+        const pivotY = centerY_Gravity - L;
+
+        const bobX = pivotX + L * Math.sin(currentPhi);
+        const bobY = pivotY + L * Math.cos(currentPhi);
+
+        // Ceiling Mount
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(pivotX - 30, pivotY - 5, 60, 5);
+
+        // Pendulum Rod/String
+        ctx.beginPath();
+        ctx.moveTo(pivotX, pivotY);
+        ctx.lineTo(bobX, bobY);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Pendulum Bob
+        ctx.beginPath();
+        ctx.arc(bobX, bobY, 12, 0, Math.PI * 2);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Horizontal position projection line (translating horizontal swing x(t) to wave Y for visualization alignment)
+        // To map the horizontal deflection x(t) to the vertical wave, we project bobX relative to pivotX.
+        const mappedY = centerY_Gravity - (bobX - pivotX);
+
+        ctx.beginPath();
+        ctx.moveTo(bobX, bobY);
+        ctx.lineTo(waveStartX, mappedY);
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px sans-serif';
+        ctx.fillText('3. Schwerependel (horizontal x(t))', centerX - 75, centerY_Gravity - L - 15);
+
+        return mappedY;
+    }
+
+    function drawWaves() {
+        if (wavePoints.length > 1) {
+            // Wave 1: Circle
+            ctx.beginPath();
+            for (let i = 0; i < wavePoints.length; i++) {
+                const x = waveStartX + i * 1.5;
+                const y = wavePoints[i].yCircle;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Wave 2: Spring
+            ctx.beginPath();
+            for (let i = 0; i < wavePoints.length; i++) {
+                const x = waveStartX + i * 1.5;
+                const y = wavePoints[i].ySpring;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = '#fb7185';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Wave 3: Gravity Pendulum
+            ctx.beginPath();
+            for (let i = 0; i < wavePoints.length; i++) {
+                const x = waveStartX + i * 1.5;
+                const y = wavePoints[i].yGravity;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+
+        // Time axis labels
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px sans-serif';
+        ctx.fillText('Zeit t →', canvas.width - 55, centerY_Circle + 20);
+        ctx.fillText('Zeit t →', canvas.width - 55, centerY_Spring + 20);
+        ctx.fillText('Zeit t →', canvas.width - 55, centerY_Gravity + 20);
+        
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('y(t) = r · sin(ωt)', waveStartX + 20, centerY_Circle - radius - 12);
+    }
+
+    function update() {
+        if (!isRunning) return;
+
+        angle += 0.03 * omega;
+
+        const yCircle = centerY_Circle - radius * Math.sin(angle);
+        const ySpring = centerY_Spring - radius * Math.sin(angle);
+        
+        // Horizontal displacement of gravity pendulum
+        const L = 160;
+        const maxPhi = radius / L;
+        const currentPhi = maxPhi * Math.sin(angle);
+        const bobX = centerX + L * Math.sin(currentPhi);
+        const yGravity = centerY_Gravity - (bobX - centerX);
+
+        wavePoints.unshift({ yCircle, ySpring, yGravity });
+
+        if (wavePoints.length > maxWavePoints) {
+            wavePoints.pop();
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawGrid();
+        drawCircleSection();
+        drawSpringSection();
+        drawGravitySection();
+        drawWaves();
+    }
+
+    function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    loop();
+</script>
+
+</body>
+</html>
