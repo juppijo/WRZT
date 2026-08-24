@@ -401,34 +401,38 @@
     
     .audio-controls {
       display: flex;
-      gap: 10px;
-      margin: 15px 0;
+      gap: 2px;
+      margin: 2px 0;
       flex-wrap: wrap;
     }
     
     .audio-controls button {
-      padding: 8px 14px;
+      font-size: 1.3rem;
+      padding: 4px 4px;
       border: 1px solid #a8c3a8;
       border-radius: 6px;
-      background-color: #f4f8f4;
+      background-color: #4488aa;
       cursor: pointer;
       transition: background 0.2s;
     }
     
     .audio-controls button:hover {
-      background-color: #dceada;
+      background-color: #88aaff;
     }
     
     .speech-status-text {
-      font-size: 0.85em;
-      color: #666;
+      font-size: 0.95em;
+      color: #667788;
       margin-bottom: 10px;
     }
     
     /* Klares optisches Feedback für den aktuell vorgelesenen Absatz */
     .active-paragraph {
       background-color: rgba(168, 195, 168, 0.25);
+              outline: 2px solid var(--accent-cyan);
+        outline-offset: 4px;
       border-left: 4px solid #4a7c59;
+      border-radius: 6px;
       padding-left: 8px;
       transition: background-color 0.3s ease;
     }
@@ -445,15 +449,13 @@
       </div>
       <div class="controls">
         <div class="audio-controls">
-          <button id="btn-prev" onclick="speechModule.prevParagraph()">⏮ Vorheriger Absatz</button>
-          <button id="btn-play" onclick="speechModule.togglePlay()">▶️ Vorlesen / Pause</button>
-          <button id="btn-stop" onclick="speechModule.stop()">⏹ Stopp</button>
-          <button id="btn-next" onclick="speechModule.nextParagraph()">⏭ Nächster Absatz</button>
+          <button id="btn-prev" onclick="speechModule.prevParagraph()">⏮️</button>
+          <button id="btn-play" onclick="speechModule.togglePlay()">▶️⏸️</button>
+          <button id="btn-stop" onclick="speechModule.stop()">⏹️</button>
+          <button id="btn-next" onclick="speechModule.nextParagraph()">⏭️</button>
         </div>
-
         <!-- Anzeige des aktuellen Fortschritts (optional) -->
         <div id="speech-status" class="speech-status-text">Absatz 0 von 0</div>
-
 
         <label for="themeSelect" style="font-size: 0.85rem; font-weight: 600;">Design:</label>
         <select id="themeSelect" class="theme-select" onchange="changeTheme(this.value)">
@@ -1180,8 +1182,29 @@
     <p>Autor: Jo D. (@juppijo) & Zaminia • Erstellt im Rahmen der WRZT Dokumentation</p>
   </footer>
 
-<!-- JavaScript for Dynamic Interactions & Text-to-Speech -->
+  <!-- JavaScript for Dynamic Interactions & Text-to-Speech -->
   <script>
+    function changeTheme(themeName) {
+      if (themeName === 'dark-space') {
+        document.documentElement.setAttribute('data-theme', 'dark-space');
+      } else if (themeName === 'paper-classic') {
+        document.documentElement.setAttribute('data-theme', 'paper-classic');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
     const speechModule = (() => {
       const synth = window.speechSynthesis;
       let elementsToRead = [];
@@ -1194,7 +1217,7 @@
         if (!container) return;
 
         // Nur Absätze und Listenpunkte mit tatsächlichem Textinhalt auswählen
-        const allElements = container.querySelectorAll('p, li');
+        const allElements = container.querySelectorAll('h1, h2, h3, p, li, .quote-box, .note-box, .formula-card, .caption');
         elementsToRead = Array.from(allElements).filter(el => el.innerText.trim().length > 0);
 
         currentIndex = 0;
@@ -1214,7 +1237,7 @@
         }
 
         const currentElement = elementsToRead[currentIndex];
-        
+
         // Falls das Element in einem eingeklappten <details> liegt, klappe es automatisch auf
         const parentDetails = currentElement.closest('details');
         if (parentDetails && !parentDetails.open) {
@@ -1225,7 +1248,7 @@
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
         utterance.lang = 'de-DE'; // Sprache auf Deutsch setzen
-        utterance.rate = 0.95;    // Angenehme, entspannte Vorlesegeschwindigkeit
+        utterance.rate = 0.95; // Angenehme, entspannte Vorlesegeschwindigkeit
 
         utterance.onend = () => {
           if (isSpeaking && currentIndex < elementsToRead.length - 1) {
@@ -1307,7 +1330,7 @@
         if (targetElement) {
           // 1. Optische Hervorhebung
           targetElement.classList.add('active-paragraph');
-          
+
           // 2. Weiches Scrollen in die Bildschirmmitte
           targetElement.scrollIntoView({
             behavior: 'smooth',
