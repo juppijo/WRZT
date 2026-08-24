@@ -5,18 +5,41 @@
   <title>Meine Seite</title>
   <style>
     body {
+      
+      max-width: 990px;
+      margin: 90px auto 40px auto;
+      padding: 0 20px;
       font-family: sans-serif;
-      margin: 40px;
+      line-height: 1.4;
       color: #061551;
       background: #d9d6f0;
+      text-align: justify;
     }
     h1 {
       color: #93df07;
     }
+    
+    .btn-fullscreen {
+      cursor:pointer;
+      color: #061551;
+      background: #d9d6f0;
+      border-radius: 9px;
+    }
+    
+    .btn-fullscreen:hover {
+      color: #d9d6f0;
+      background:  #061551;
+    }
+    
       
   </style>
 </head>
 <body>
+  <div style="text-align: right;">
+      <button class="btn-fullscreen" onclick="toggleFullScreen()"><strong>Vollbild Mode ⛶</strong></button>
+  </div>
+
+
   <h1> ✨ WRZT Logik 〰️🌀⭕💡🌌</h1>
 
   <h2>
@@ -71,16 +94,41 @@
     <a href="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/sinuswelle_kreis_feder_schwerependel.html" target="_blank" rel="noopener noreferrer" aria-label="Öffnet die interaktive Seite zur Sinuswellen-Entstehung in einem neuen Tab">
       Physikalische & Mathematische Entstehung der Sinuswelle
     </a>
-    
+
   </p>
   <p>
-        Und in 3D : 
+    Und in 3D :
     <a href="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/sinuswelle_3d.html" target="_blank" rel="noopener noreferrer" aria-label="Öffnet die interaktive Seite zur Sinuswellen-3D in einem neuen Tab">
-        Entstehung der Sinuswelle 3D
+      Entstehung der Sinuswelle 3D
     </a>
   </p>
-  
+
   <hr>
+
+  <!-- JavaScript for Dynamic Interactions -->
+  <script>
+    function changeTheme(themeName) {
+      if (themeName === 'dark-space') {
+        document.documentElement.setAttribute('data-theme', 'dark-space');
+      } else if (themeName === 'paper-classic') {
+        document.documentElement.setAttribute('data-theme', 'paper-classic');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
 
 </body>
 </html>
