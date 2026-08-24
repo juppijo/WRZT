@@ -1217,7 +1217,7 @@
         if (!container) return;
 
         // Nur Absätze und Listenpunkte mit tatsächlichem Textinhalt auswählen
-        const allElements = container.querySelectorAll('h1, h2, h3, p, li, .quote-box, .note-box, .formula-card, .caption');
+        const allElements = container.querySelectorAll('h1, h2, h3, p, li, details, summary, .quote-box, .note-box, .formula-card, .caption');
         elementsToRead = Array.from(allElements).filter(el => el.innerText.trim().length > 0);
 
         currentIndex = 0;
