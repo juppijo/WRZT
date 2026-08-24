@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Entstehung der Sinuswelle aus der Kreisbewegung</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 360px;
+            pointer-events: none;
+        }
+
+        .ui-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 18px;
+            pointer-events: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: #f1f5f9;
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        button {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        button:hover {
+            background: #475569;
+        }
+
+        button.active {
+            background: var(--accent);
+            color: #0f172a;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            pointer-events: none;
+        }
+    </style>
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="ui-overlay">
+    <div class="ui-card">
+        <h1>3D Sinuswelle & Kreisbewegung</h1>
+        <p>Ein Punkt dreht sich in der YZ-Ebene auf einer Kreisbahn. Seine kontinuierliche Bewegung wird entlang der X-Achse (Zeitachse) zu einer dreidimensionalen Sinuswelle entfaltet.</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="speedSlider">Winkelgeschwindigkeit (ω): <span id="speedVal">1.0</span></label>
+                <input type="range" id="speedSlider" min="0.2" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <label for="ampSlider">Radius / Amplitude (r): <span id="ampVal">2.5</span></label>
+                <input type="range" id="ampSlider" min="1.0" max="4.0" step="0.1" value="2.5">
+            </div>
+
+            <div class="btn-group">
+                <button id="toggleBtn" class="active">Pause</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="instructions">
+    💡 Steuerung: Links-Klick + Ziehen zum Rotieren | Rechts-Klick zum Verschieben | Scrollen zum Zoomen
+</div>
+
+<script>
+    // Scene setup
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0f19);
+    scene.fog = new THREE.FogExp2(0x0b0f19, 0.015);
+
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(12, 8, 16);
+
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+
+    // Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(3, 0, 0);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(10, 20, 15);
+    scene.add(dirLight);
+
+    const pointLight = new THREE.PointLight(0x38bdf8, 2, 20);
+    scene.add(pointLight);
+
+    // Helper function: Create a thick line using TubeGeometry
+    function createThickLine(radius, color, transparent = false, opacity = 1.0) {
+        const material = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.3,
+            roughness: 0.3,
+            metalness: 0.1,
+            transparent: transparent,
+            opacity: opacity
+        });
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), material);
+        return { mesh, material, radius };
+    }
+
+    function updateThickLineGeometry(lineObj, points, isClosed = false) {
+        if (!points || points.length < 2) return;
+        const curve = new THREE.CatmullRomCurve3(points, isClosed);
+        const segments = Math.max(points.length * 2, 32);
+        const newGeo = new THREE.TubeGeometry(curve, segments, lineObj.radius, 8, isClosed);
+        lineObj.mesh.geometry.dispose();
+        lineObj.mesh.geometry = newGeo;
+    }
+
+    // Parameters
+    let omega = 1.0;
+    let radius = 2.5;
+    let isRunning = true;
+    let angle = 0;
+
+    const waveLengthX = 14;
+    const wavePoints = [];
+
+    // Grid
+    const gridHelper = new THREE.GridHelper(30, 30, 0x334155, 0x1e293b);
+    gridHelper.position.set(5, -radius - 0.5, 0);
+    scene.add(gridHelper);
+
+    // Main Circle Group
+    const circleGroup = new THREE.Group();
+    scene.add(circleGroup);
+
+    // Circle Line (Thick)
+    const circleLineObj = createThickLine(0.04, 0x38bdf8, true, 0.7);
+    circleGroup.add(circleLineObj.mesh);
+
+    function updateCircleGeometry() {
+        const points = [];
+        const segments = 64;
+        for (let i = 0; i < segments; i++) {
+            const theta = (i / segments) * Math.PI * 2;
+            points.push(new THREE.Vector3(0, radius * Math.sin(theta), radius * Math.cos(theta)));
+        }
+        updateThickLineGeometry(circleLineObj, points, true);
+    }
+    updateCircleGeometry();
+
+    // Time Axis (Thick)
+    const timeAxisPoints = [
+        new THREE.Vector3(-1, 0, 0),
+        new THREE.Vector3(waveLengthX + 2, 0, 0)
+    ];
+    const timeAxisObj = createThickLine(0.04, 0x64748b, true, 0.6);
+    updateThickLineGeometry(timeAxisObj, timeAxisPoints, false);
+    scene.add(timeAxisObj.mesh);
+
+    // Rotating Radius Vector (Thick)
+    const vectorObj = createThickLine(0.02, 0x38bdf8);
+    circleGroup.add(vectorObj.mesh);
+
+    // Rotating Point Mesh
+    const pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
+    const pointMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, roughness: 0.2 });
+    const rotatingPoint = new THREE.Mesh(pointGeo, pointMat);
+    circleGroup.add(rotatingPoint);
+
+    // Vertical Projection Vector (Y Component, Thick)
+    const yProjObj = createThickLine(0.02, 0xf59e0b);
+    circleGroup.add(yProjObj.mesh);
+
+    // Projection Line from Circle Point to Wave Head (Thick)
+    const projLineObj = createThickLine(0.02, 0x38bdf8, true, 0.5);
+    scene.add(projLineObj.mesh);
+
+    // Wave Line (Thick)
+    const waveLineObj = createThickLine(0.03, 0xfacc15);
+    scene.add(waveLineObj.mesh);
+
+    // UI Listeners
+    const speedSlider = document.getElementById('speedSlider');
+    const ampSlider = document.getElementById('ampSlider');
+    const speedVal = document.getElementById('speedVal');
+    const ampVal = document.getElementById('ampVal');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    speedSlider.addEventListener('input', (e) => {
+        omega = parseFloat(e.target.value);
+        speedVal.textContent = omega.toFixed(1);
+    });
+
+    ampSlider.addEventListener('input', (e) => {
+        radius = parseFloat(e.target.value);
+        ampVal.textContent = radius.toFixed(1);
+        updateCircleGeometry();
+        gridHelper.position.y = -radius - 0.5;
+    });
+
+    toggleBtn.addEventListener('click', () => {
+        isRunning = !isRunning;
+        toggleBtn.textContent = isRunning ? 'Pause' : 'Start';
+        toggleBtn.classList.toggle('active', isRunning);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        angle = 0;
+        wavePoints.length = 0;
+    });
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animation Loop
+    const clock = new THREE.Clock();
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        const delta = clock.getDelta();
+
+        if (isRunning) {
+            angle += delta * omega * 2.5;
+
+            const y = radius * Math.sin(angle);
+            const z = radius * Math.cos(angle);
+
+            // Update Rotating Vector Line
+            updateThickLineGeometry(vectorObj, [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, y, z)
+            ]);
+
+            // Update Rotating Point
+            rotatingPoint.position.set(0, y, z);
+            pointLight.position.set(0, y, z);
+
+            // Update Vertical Projection
+            updateThickLineGeometry(yProjObj, [
+                new THREE.Vector3(0, 0, z),
+                new THREE.Vector3(0, y, z)
+            ]);
+
+            // Add new point to wave
+            wavePoints.unshift(new THREE.Vector3(0, y, z));
+
+            // Shift wave points along +X axis
+            const speedX = 0.05 * omega;
+            for (let i = 0; i < wavePoints.length; i++) {
+                wavePoints[i].x = i * speedX;
+            }
+
+            // Trim points beyond waveLengthX
+            while (wavePoints.length > 0 && wavePoints[wavePoints.length - 1].x > waveLengthX) {
+                wavePoints.pop();
+            }
+
+            // Update Wave Line
+            if (wavePoints.length >= 2) {
+                updateThickLineGeometry(waveLineObj, wavePoints);
+            }
+
+            // Update Projection Line from Circle to Wave
+            if (wavePoints.length > 0) {
+                updateThickLineGeometry(projLineObj, [
+                    new THREE.Vector3(0, y, z),
+                    new THREE.Vector3(wavePoints[0].x, y, z)
+                ]);
+            }
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    animate();
+</script>
+
+</body>
+</html>
