@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT - Gestauchte Bugwellen & Sinuswelle Simulation</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: #58a6ff;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    p.description {
+      font-size: 0.95rem;
+      color: #8b949e;
+      margin-bottom: 20px;
+      max-width: 680px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .container {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    canvas {
+      background-color: #05070a;
+      border-radius: 8px;
+      border: 1px solid #21262d;
+      display: block;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 640px;
+      background: #0d1117;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+    label {
+      color: #8b949e;
+    }
+    input[type=range] {
+      accent-color: #58a6ff;
+      cursor: pointer;
+    }
+    .btn {
+      background-color: #238636;
+      color: #ffffff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .btn:hover {
+      background-color: #2ea043;
+    }
+    .btn.paused {
+      background-color: #d29922;
+    }
+    .btn.paused:hover {
+      background-color: #e3b341;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.85rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot.elektron { background-color: #58a6ff; box-shadow: 0 0 6px #58a6ff; }
+    .dot.positron { background-color: #ff7b72; box-shadow: 0 0 6px #ff7b72; }
+    .dot.sinus { background-color: #7ee787; box-shadow: 0 0 6px #7ee787; }
+  </style>
+</head>
+<body>
+
+  <h1>WRZT: Stauchung der Bugwellen & Sinus-Genese</h1>
+  <p class="description">
+    Durch die Bewegung stauchen sich die Bugwellen in Fahrtrichtung vorne eng zusammen. Das rhythmische Vorbeiziehen dieser gestauchten Verdichtungen bildet die Sinuswelle.
+  </p>
+
+  <div class="container">
+    <canvas id="simCanvas" width="640" height="400"></canvas>
+    
+    <div class="legend">
+      <div class="legend-item"><div class="dot elektron"></div> Elektron (-)</div>
+      <div class="legend-item"><div class="dot positron"></div> Positron (+)</div>
+      <div class="legend-item"><div class="dot sinus"></div> Vorwärtslaufende Sinuswelle</div>
+    </div>
+
+    <div class="controls">
+      <button id="pauseBtn" class="btn">Pause</button>
+
+      <div class="control-group">
+        <label for="compression">Bug-Stauchung:</label>
+        <input type="range" id="compression" min="0" max="0.8" value="0.5" step="0.05">
+      </div>
+
+      <div class="control-group">
+        <label for="radius">Radius:</label>
+        <input type="range" id="radius" min="15" max="80" value="45" step="1">
+      </div>
+
+      <div class="control-group">
+        <label for="speed">Rotation:</label>
+        <input type="range" id="speed" min="0.5" max="5" value="2" step="0.5">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const radiusInput = document.getElementById('radius');
+    const speedInput = document.getElementById('speed');
+    const compressionInput = document.getElementById('compression');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    // Parameter
+    let angle = 0;
+    let isRunning = true;
+    const centerX = 160;
+    const centerY = 200;
+    const waveStartX = 260;
+    
+    const waveHistory = [];
+    const maxHistory = 360;
+
+    pauseBtn.addEventListener('click', () => {
+      isRunning = !isRunning;
+      if (isRunning) {
+        pauseBtn.textContent = 'Pause';
+        pauseBtn.classList.remove('paused');
+        draw();
+      } else {
+        pauseBtn.textContent = 'Weiter';
+        pauseBtn.classList.add('paused');
+      }
+    });
+
+    // Hilfsfunktion zum Zeichnen gestauchter Exzentrischer Wellenringe (Doppler-Bugwelle)
+    function drawCompressedWaves(particleX, particleY, particleAngle, colorHex, compFactor) {
+      const tangentAngle = particleAngle + Math.PI / 2;
+      const numRings = 6;
+
+      for (let i = 1; i <= numRings; i++) {
+        const baseRadius = i * 14;
+        // Der Mittelpunkt der früheren Wellenringe verschiebt sich nach hinten (entgegen der Tangentialbewegung)
+        const offset = baseRadius * compFactor;
+        const ringCenterX = particleX - Math.cos(tangentAngle) * offset;
+        const ringCenterY = particleY - Math.sin(tangentAngle) * offset;
+
+        const opacity = Math.max(0, 1 - (i / (numRings + 1)));
+
+        ctx.beginPath();
+        ctx.arc(ringCenterX, ringCenterY, baseRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = colorHex.replace('1)', `${opacity * 0.35})`);
+        ctx.stroke();
+      }
+    }
+
+    function draw() {
+      if (!isRunning) return;
+
+      ctx.fillStyle = '#05070a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const orbitRadius = parseFloat(radiusInput.value);
+      const rotSpeed = parseFloat(speedInput.value) * 0.02;
+      const compFactor = parseFloat(compressionInput.value);
+
+      angle += rotSpeed;
+
+      const eX = centerX + Math.cos(angle) * orbitRadius;
+      const eY = centerY + Math.sin(angle) * orbitRadius;
+
+      const pX = centerX + Math.cos(angle + Math.PI) * orbitRadius;
+      const pY = centerY + Math.sin(angle + Math.PI) * orbitRadius;
+
+      // --- 1. KREISBAHN ---
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, orbitRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#21262d';
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // --- 2. GESTAUCHTE BUGWELLEN (DOPPLER-EFFEKT) ---
+      drawCompressedWaves(eX, eY, angle, 'rgba(88, 166, 255, 1)', compFactor);
+      drawCompressedWaves(pX, pY, angle + Math.PI, 'rgba(255, 123, 114, 1)', compFactor);
+
+      // Verbindungslinie der Teilchen
+      ctx.beginPath();
+      ctx.moveTo(eX, eY);
+      ctx.lineTo(pX, pY);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.stroke();
+
+      // Elektron (-)
+      ctx.beginPath();
+      ctx.arc(eX, eY, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#58a6ff';
+      ctx.shadowColor = '#58a6ff';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+
+      // Positron (+)
+      ctx.beginPath();
+      ctx.arc(pX, pY, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff7b72';
+      ctx.shadowColor = '#ff7b72';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+
+      // --- 3. SINUSWELLE PROJEKTION ---
+      const currentY = eY;
+
+      waveHistory.unshift(currentY);
+      if (waveHistory.length > maxHistory) {
+        waveHistory.pop();
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(eX, eY);
+      ctx.lineTo(waveStartX, eY);
+      ctx.strokeStyle = 'rgba(126, 231, 135, 0.3)';
+      ctx.setLineDash([2, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.moveTo(waveStartX, centerY);
+      ctx.lineTo(canvas.width - 20, centerY);
+      ctx.strokeStyle = '#30363d';
+      ctx.stroke();
+
+      if (waveHistory.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(waveStartX, waveHistory[0]);
+        for (let i = 1; i < waveHistory.length; i++) {
+          const x = waveStartX + (i * 2 * 0.8);
+          if (x > canvas.width - 20) break;
+          ctx.lineTo(x, waveHistory[i]);
+        }
+        ctx.strokeStyle = '#7ee787';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#7ee787';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.beginPath();
+      ctx.arc(waveStartX, currentY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#7ee787';
+      ctx.fill();
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
