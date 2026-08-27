@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Meine Seite</title>
+
+  <!-- MathJax for rendering LaTeX equations -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* ===== RESET & BASE STYLES ===== */
+    /* Eine sanfte, aber gründliche Grundreinigung für dein Layout */
+    * {
+      box-sizing: border-box; /* Jedes Element inkl. Padding/Border in der Breite */
+      margin: 10;              /* Keine störenden Außenabstände */
+      padding: 10;             /* Keine ungewollten Innenabstände */
+    }
+    
+    /* ===== BODY STYLES ===== */
+    /* Der Rahmen deiner kreativen Welt */
+    body {
+      line-height: 1.7;               /* Angenehmer Lesefluss */
+      padding: 40px 20px;             /* Luft nach oben/unten, weniger seitlich */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;        /* Korrigiert: align-items → justify-content! */
+      align-items:  justify;            /* Zentriert horizontal (optional) */
+      font-family: 'Segoe UI', sans-serif; /* Modernere Schriftfamilie */
+      margin: 40px auto;              /* Auto für horizontale Zentrierung */
+      max-width: 1000px;              /* Begrenzung für bessere Lesbarkeit */
+      color: #222222;                 /* Tiefes, angenehmes Grau */
+      background: #f8f9ff;            /* Ein Hauch von Himmelblau */
+      box-shadow: 0 4px 12px rgba(0, 0, 30, 0.35); /* Sanfter Schatten für Tiefe */
+    }
+    
+    /* ===== TYPOGRAPHIE ===== */
+    /* Farben wie Akzente in einem Gemälde */
+    h1 {
+      color: #8227b9;                 /* Ein tiefes, königliches Violett */
+      font-size: 2.5rem;              /* Großzügige Überschrift */
+      margin-bottom: 1rem;            /* Abstand zum nächsten Element */
+      text-align: center;           /* Zentrierte Überschrift */
+    }
+    
+    h2 {
+      color: #2992b7;                 /* Ein frisches, marines Blau */
+      font-size: 1.8rem;              /* Etwas kleiner als h1 */
+      margin: 1.5rem 0 0.8rem 0;      /* Strukturierter Abstand */
+      border-bottom: 2px solid #e0e0ff; /* Unterstrich als visuelle Trennung */
+      padding-bottom: 0.5rem;         /* Abstand zum Text */
+      text-align: center;           /* Zentrierte Überschrift */
+    }
+    
+    strong {
+      color: #000080;                 /* Ein klassisches, tiefes Blau */
+      font-weight: 600;               /* Fett, aber nicht zu dominant */
+    }
+    p{
+            text-align: justify;             /* Zentrierte Überschrift */
+    }
+    /* Ästhetische Box mit sanften Schatten und Hover-Effekt */
+        .simulation-box {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #ff6b6b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+    
+        .simulation-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+    
+        .simulation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 1rem;
+        }
+    
+        .simulation-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 1rem;
+            background: #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+    
+        .simulation-title {
+            font-family: 'Segoe UI', sans-serif;
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+    
+        .simulation-description {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+    
+        .simulation-link {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+    
+        .simulation-link:hover {
+            background-color: #2980b9;
+            color: #f8f9fa;
+        }
+    
+        /* Responsives Design */
+        @media (max-width: 600px) {
+            .simulation-box {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+    
+            .simulation-header {
+                flex-direction: column;
+                text-align: center;
+            }
+    
+            .simulation-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    
+    
+  </style>
+</head>
+<body>
+  <h1>WRZT Annihilation</h1>
+
+  <h2>
+    <strong>Physikalische Erklärung der Paarvernichtung (Annihilation)</strong>
+  </h2>
+
+  <p>In der klassischen Quantenelektrodynamik (QED) und im Rahmen der Wellenraumzeit-Theorie (WRZT) beschreibt die Annihilation von Elektron ($e^-$) und Positron ($e^+$) den Prozess, bei dem Materie und Antimaterie in reine Strahlungsenergie umgewandelt werden.</p>
+  <hr>
+  <p><strong>1. Inspiral-Phase (Gebundener Zustand &amp; Bugwellen-Dynamik)</strong></p>
+  <ul>
+    <li>
+      <p><strong>Relativistische Bewegung</strong>: Das negativ geladene Elektron und das positiv geladene Positron ziehen sich elektrostatisch an. Wenn sie einander umkreisen, beschleunigen sie auf ihren Spiralbahnen.</p>
+    </li>
+    <li>
+      <p><strong>Dispersions- &amp; Bugwellen</strong>: Durch die hohe Bahngeschwindigkeit erzeugt jedes Teilchen eine Richtstörung im Umgebungsmedium – analog zu einer Mach-Bugwelle bei Überschallströmungen oder der Kelvin-Bugwelle auf Wasseroberflächen.</p>
+    </li>
+    <li>
+      <p><strong>Chirp-Effekt (Frequenzanstieg)</strong>: Mit abnehmendem Bahnradius $r$ steigt die Frequenz $\omega$ der Umlaufbewegung dramatisch an. Die emittierten Raumzeit-Wellen verkürzen ihre Wellenlänge, während die Amplitude durch die höhere Beschleunigung wächst.</p>
+    </li>
+  </ul>
+  <hr>
+  <p><strong>2. Annihilation (Teilchenauflösung &amp; Quantenübergang)</strong></p>
+  <ul>
+    <li><strong>Masse-Energie-Äquivalenz</strong>: Unterschreiten die Teilchen den kritischen Abstand, bricht die lokalisierte Wellenstruktur (das Soliton bzw. die Knotenstruktur der Teilchen) zusammen. Die Ruhemasse $m_e$ beider Partner wird vollständig nach Einsteins Äquivalenzprinzip freigesetzt:</li>
+  </ul>
+  <p>$$E_{\text{ges}} = 2 \cdot m_e c^2 \approx 1{,}022 \text{ MeV}$$</p>
+  <hr>
+  <p><strong>3. Abstrahlung der $\gamma$-Quanten (Impulserhaltung)</strong></p>
+  <ul>
+    <li>
+      <p><strong>Symmetrische Abstrahlung</strong>: Aus Gründen der Impulserhaltung im Schwerpunktsystem ($\vec{p}_{\text{ges}} = 0$) kann sich die Energie nicht in eine einzelne Welle auflösen. Es entstehen mindestens zwei hochenergetische Photonen ($\gamma$-Quanten), die sich exakt entgegengesetzt (in einem Winkel von $180^\circ$) ausbreiten.</p>
+    </li>
+    <li>
+      <p><strong>Kugelwelle &amp; Raumzeit-Relaxation</strong>: Das lokale Feld entspannt sich impulsartig. Die freigesetzte Energie breitet sich als sphärische Transversalwelle mit Lichtgeschwindigkeit $c$ aus, während das ursprüngliche Netz in seinen Grundzustand zurückkehrt.</p>
+    </li>
+  </ul>
+  <article class="simulation-box">
+    <header class="simulation-header">
+      <div class="simulation-icon" aria-hidden="true">⚡</div>
+      <h1 class="simulation-title">Fiat Lux - Elektron-Positron-Paarerzeugung</h1>
+    </header>
+
+    <p class="simulation-description">
+      Tauche ein in die faszinierende Welt der Quantenphysik! Diese interaktive Simulation zeigt dir, wie aus einem hochenergetischen Photon ein Elektron-Positron-Paar entsteht – ein fundamentales Phänomen der Teilchenphysik.
+    </p>
+
+    <a href="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/elektron-positron.html" class="simulation-link" target="_blank" rel="noopener noreferrer" aria-label="Öffne die interaktive Elektron-Positron-Simulation in einem neuen Tab">
+      Simulation starten
+    </a>
+  </article>
+</body>
+</html>
