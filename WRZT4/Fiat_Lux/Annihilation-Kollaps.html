@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Meine Seite</title>
+
+  <!-- MathJax configuration for inline & display math -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      color: #222222;
+      background: #ededfd;
+    }
+    h1 {
+      color: #5522aa;
+    }
+    h2 {
+      color: #7722aa;
+    }
+  </style>
+</head>
+<body>
+  <h1>WRZT Kollaps-Annihilation</h1>
+
+  <h2>
+    Gegenseitigen Annäherung von Elektron und Positron
+  </h2>
+
+  <p>Bei der gegenseitigen Annäherung von Elektron und Positron (einem gebundenen System namens <strong>Positronium</strong>) reicht die klassische Newton- bzw. Coulomb-Mechanik nicht aus. Da beschleunigte Ladungen elektromagnetische Strahlung emittieren (Synchrotron- bzw. Bremsstrahlung), verliert das System kontinuierlich Energie. Dadurch spiralen die Teilchen ineinander.</p>
+  <h3>1. Grundlegende Differentialgleichung</h3>
+  <p>Die elektromagnetische Strahlungsleistung $P$ zweier beschleunigter Ladungen wird durch die <strong>Larmor-Formel</strong> beschrieben. Zusammen mit dem 2. Newtonschen Gesetz und der Coulomb-Kraft ergibt sich der Energieverlust $dE/dt$.</p>
+  <p>Für ein klassisches System zweier geladener Teilchen der Masse $m$ und Ladung $e$ im Abstand $r$ ergibt sich für die zeitliche Änderung des Radius $r(t)$:</p>
+  <p>$$\frac{dr}{dt} = -\frac{1}{3 \pi \varepsilon_0^3 c^3} \cdot \frac{e^6}{m^2 r^3}$$</p>
+  <hr>
+  <h3>2. Radius als Funktion der Zeit $r(t)$</h3>
+  <p>Durch Integration dieser Differentialgleichung erhält man den Radius in Abhängigkeit von der Zeit $t$. Startet das System zum Zeitpunkt $t = 0$ bei einem Anfangsabstand $r_0$, lautet das Gesetz für den Zerfall des Radius:</p>
+  <p>$$r(t) = \left( r_0^4 - \frac{4 e^6}{3 \pi \varepsilon_0^3 m^2 c^3} , t \right)^{1/4}$$</p>
+  <p>Das bedeutet: Der Radius nimmt zunächst langsam ab, bricht aber am Ende überproportional schnell ein, bis die Teilchen kollidieren und annihilieren.</p>
+  <hr>
+  <h3>3. Lebensdauer / Absturzdauer $t_{\text{kollaps}}$</h3>
+  <p>Die Zeit $t_{\text{kollaps}}$, die vergeht, bis der Abstand theoretisch auf $0$ schrumpft ($r = 0$), berechnet sich zu:</p>
+  <p>$$t_{\text{kollaps}} = \frac{3 \pi \varepsilon_0^3 m^2 c^3}{4 e^6} \cdot r_0^4$$</p>
+  <hr>
+  <h3>4. Geschwindigkeit $v(r)$ und Beschleunigung $a(r)$</h3>
+  <p>Nimmt man näherungsweise eine kreisförmige Spirale an, lässt sich die Geschwindigkeit $v$ aus dem Gleichgewicht von Coulomb-Kraft und Zentripetalkraft bestimmen:</p>
+  <ul>
+    <li>
+      <p><strong>Geschwindigkeit:</strong>
+        $$v(r) = \sqrt{\frac{e^2}{8 \pi \varepsilon_0 m , r}}$$</p>
+    </li>
+    <li>
+      <p><strong>Zentripetalbeschleunigung:</strong>
+        $$a(r) = \frac{v^2}{r} = \frac{e^2}{8 \pi \varepsilon_0 m , r^2}$$</p>
+    </li>
+  </ul>
+  <p>Da $r(t)$ mit der Zeit schrumpft, setzen Sie $r(t)$ aus der obigen Formel ein, um $v(t)$ und $a(t)$ direkt als Funktion der Zeit zu erhalten.</p>
+  <hr>
+  <h3>Quantenmechanische Grenzen</h3>
+  <p>Sobald die Teilchen Abstände in der Größenordnung der Bohrschen Radien bzw. der Compton-Wellenlänge erreichen ($r \approx 10^{-11} \text{ bis } 10^{-12} \text{ m}$), verliert dieses klassische Spiralmodell seine Gültigkeit:</p>
+  <ul>
+    <li>Das System geht in quantenmechanische Zustände über (Para- oder Ortho-Positronium).</li>
+    <li>Die Geschwindigkeiten erreichen relativistische Bereiche, wodurch die relativistische Elektrodynamik angewendet werden muss.</li>
+    <li>Die Annihilation erfolgt schließlich direkt aus dem gebundenen Zustand in zwei oder drei Photomen ($\gamma$-Quanten).</li>
+  </ul>
+
+  <h2>
+    Genaue Herleitung der Kollaps-Annihilation
+  </h2>
+
+  <p>Detaillierte, schrittweise mathematische und physikalische Herleitung der Kollaps-Annihilation für das <strong>WRZT-Konzept</strong>.</p>
+  <hr>
+  <h3>Phase 1: Dynamische Ausgangslage &amp; Energetik</h3>
+  <p>Wir betrachten ein System aus zwei entgegengesetzt geladenen Teilchen ($q_1 = -e$, $q_2 = +e$) mit der Ruhemasse $m_e$.</p>
+  <ol>
+    <li><strong>Reduzierte Masse:</strong>
+      Da beide Teilchen gleich schwer sind und sich um ein gemeinsames Zentrum bewegen, nutzen wir die reduzierte Masse $\mu$:</li>
+  </ol>
+  <p>$$\mu = \frac{m_e \cdot m_e}{m_e + m_e} = \frac{m_e}{2}$$</p>
+  <ol start="2">
+    <li><strong>Kräftegleichgewicht auf der Momentanbahn:</strong>
+      Unter der Annahme näherungsweise kreisförmiger Umlaufbahnen während des langsamen Einscherens entspricht die Coulomb-Anziehung der Zentripetalkraft:</li>
+  </ol>
+  <p>$$\frac{\mu v^2}{r} = \frac{e^2}{4\pi\varepsilon_0 r^2} \implies v^2 = \frac{e^2}{4\pi\varepsilon_0 \mu r} = \frac{e^2}{2\pi\varepsilon_0 m_e r}$$</p>
+  <ol start="3">
+    <li><strong>Mechanische Gesamtenergie:</strong>
+      Die Summe aus kinetischer und potentieller Energie ergibt die Bindungsenergie des Systems:</li>
+  </ol>
+  <p>$$E_{\text{mech}}(r) = E_{\text{kin}} + E_{\text{pot}} = \frac{1}{2}\mu v^2 - \frac{e^2}{4\pi\varepsilon_0 r} = \frac{e^2}{4\pi\varepsilon_0 r} - \frac{e^2}{4\pi\varepsilon_0 r} = -\frac{e^2}{8\pi\varepsilon_0 r}$$</p>
+  <hr>
+  <h3>Phase 2: Strahlungsleistung &amp; Schrumpfungsdynamik</h3>
+  <p>Jede geladene Masse auf einer gekrümmten Bahn erfährt eine Radialbeschleunigung $a$ und emittiert nach der klassischen Larmor-Formel elektromagnetische Feldenergie.</p>
+  <ol>
+    <li>
+      <p><strong>Zentripetalbeschleunigung:</strong>
+        $$a = \frac{v^2}{r} = \frac{e^2}{2\pi\varepsilon_0 m_e r^2}$$</p>
+    </li>
+    <li>
+      <p><strong>Gesamte Abstrahlungsleistung $P(r)$:</strong>
+        Beide Teilchen strahlen synchron ab. Die Gesamtleistung $P$ des Systems beträgt:</p>
+    </li>
+  </ol>
+  <p>$$P(r) = 2 \cdot \frac{e^2 a^2}{6\pi\varepsilon_0 c^3} = \frac{e^2}{3\pi\varepsilon_0 c^3} \cdot \left( \frac{e^2}{2\pi\varepsilon_0 m_e r^2} \right)^2 = \frac{e^6}{12 \pi^3 \varepsilon_0^3 m_e^2 c^3 r^4}$$</p>
+  <ol start="3">
+    <li><strong>Kopplung an den Energieverlust (Differentialgleichung):</strong>
+      Der Abfluss an Strahlungsenergie senkt die mechanische Energie $E_{\text{mech}}$ des gebundenen Systems:</li>
+  </ol>
+  <p>$$P(r) = -\frac{\mathrm{d}E_{\text{mech}}}{\mathrm{d}t} = -\frac{\mathrm{d}}{\mathrm{d}t} \left( -\frac{e^2}{8\pi\varepsilon_0 r} \right) = -\frac{e^2}{8\pi\varepsilon_0 r^2} \frac{\mathrm{d}r}{\mathrm{d}t}$$</p>
+  <ol start="4">
+    <li><strong>Radialgeschwindigkeit $\frac{\mathrm{d}r}{\mathrm{d}t}$:</strong>
+      Durch Gleichsetzen und Umstellen erhalten wir die Schrumprate des Radius:</li>
+  </ol>
+  <p>$$\frac{\mathrm{d}r}{\mathrm{d}t} = -\frac{2}{3} \frac{e^4}{\pi^2 \varepsilon_0^2 m_e^2 c^3} \cdot \frac{1}{r^2}$$</p>
+  <hr>
+  <h3>Phase 3: Integration der Abstrahlungsbilanz</h3>
+  <p>Um zu prüfen, wie viel Energie während des Kollapses emittiert wird, integrieren wir die Leistung $P(t)$ über die Zeit von $t=0$ bis zum Kollapszeitpunkt $t_{\text{kollaps}}$ ($r \to r_{\text{min}}$):</p>
+  <p>$$E_{\text{strahl}} = \int_{0}^{t_{\text{kollaps}}} P(t) , \mathrm{d}t = \int_{r_0}^{r_{\text{min}}} P(r) \cdot \left( \frac{\mathrm{d}r}{\mathrm{d}t} \right)^{-1} \mathrm{d}r$$</p>
+  <p>Durch Einsetzen der Ausdrücke für $P(r)$ und $\frac{\mathrm{d}r}{\mathrm{d}t}$ kürzen sich die komplexen Konstanten vollständig weg:</p>
+  <p>$$E_{\text{strahl}} = \int_{r_0}^{r_{\text{min}}} \left( -\frac{e^2}{8\pi\varepsilon_0 r^2} \right) \mathrm{d}r = \left[ \frac{e^2}{8\pi\varepsilon_0 r} \right]<em>{r_0}^{r</em>{\text{min}}} = \frac{e^2}{8\pi\varepsilon_0 r_{\text{min}}} - \frac{e^2}{8\pi\varepsilon_0 r_0}$$</p>
+  <p>Da der Anfangsabstand $r_0$ im Vergleich zum subatomen Endradius sehr groß ist ($r_0 \gg r_{\text{min}}$), geht der Term $\frac{e^2}{8\pi\varepsilon_0 r_0} \to 0$:</p>
+  <p>$$E_{\text{strahl}} \approx \frac{e^2}{8\pi\varepsilon_0 r_{\text{min}}}$$</p>
+  <hr>
+  <h3>Phase 4: Herleitung der Schwellengrenze $r_{\text{min}}$</h3>
+  <p>Gemäß dem Massen-Energie-Äquivalenzprinzip der WRZT muss die abgestrahlte Gesamtfeldenergie am Ende des Kollapses genau der ursprünglichen doppelten Ruheenergie beider Massen ($2 m_e c^2$) entsprechen:</p>
+  <p>$$E_{\text{strahl}} \stackrel{!}{=} 2 m_e c^2$$</p>
+  <p>Daraus lässt sich der fundamentale Schwellenradius $r_{\text{min}}$ direkt isolieren:</p>
+  <p>$$\frac{e^2}{8\pi\varepsilon_0 r_{\text{min}}} = 2 m_e c^2 \implies r_{\text{min}} = \frac{e^2}{8\pi\varepsilon_0 \cdot (2 m_e c^2)}$$</p>
+  <p><strong>Zahlenwert-Berechnung:</strong></p>
+  <p>$$r_{\text{min}} = \frac{(1{,}60218 \times 10^{-19})^2}{8\pi \cdot (8{,}85419 \times 10^{-12}) \cdot (2 \cdot 9{,}10938 \times 10^{-31} \cdot (2{,}99792 \times 10^8)^2)} \approx 7{,}048 \times 10^{-16},\text{m}$$</p>
+  <p>Verglichen mit dem klassischen Elektronenradius $r_e = \frac{e^2}{4\pi\varepsilon_0 m_e c^2}$ gilt exakt:</p>
+  <p>$$r_{\text{min}} = \frac{1}{4} r_e \approx 0{,}705,\text{fm}$$</p>
+  <hr>
+  <h3>Erkenntnis für die Wellenraumzeit-Theorie</h3>
+  <ul>
+    <li><strong>Relativistische Dämpfung:</strong> Bei $r \to r_{\text{min}}$ nähern sich Beschleunigung und Strahlungsleistung theoretisch sehr hohen Werten. Die erzeugte Strahlungsdämpfung (<em>Radiation Reaction</em>) verhindert, dass die Teilchen die Lichtgeschwindigkeit überschreiten.</li>
+    <li><strong>Vollständige Transmutation:</strong> Der Kollaps endet punktgenau bei $r_{\text{min}}$, wo die mechanische Bindungsenergie des Systems die gesamte Ruhemasse der Teilchen aufgezehrt hat. Die Materie löst sich kontinuierlich in das hochenergetische Wellenfeld der Raumzeit auf.</li>
+  </ul>
+
+  <h2>
+    Analogie zu Lorentz-Faktor  $\gamma$
+  </h2>
+
+  <p>Ja, es gibt sowohl im <strong>klassischen Strahlungsmodell</strong> als auch im <strong>Wellenbild</strong> (wie der Wellenmechanik und Feldtheorie) direkte Entsprechungen und Analogien zum Lorentz-Faktor $\gamma$.</p>
+  <hr>
+  <h3>1. Die Wellen-Analogie (Relativistischer Doppler-Effekt)</h3>
+  <p>Wenn ein Teilchen oder System mit der Geschwindigkeit $v$ durch ein Medium oder Feld zieht, verändern sich Frequenzen und Wellenlängen. Der Lorentz-Faktor $\gamma = \frac{1}{\sqrt{1 - v^2/c^2}}$ beschreibt dabei die rein geometrisch-kinematische Wellenstauchung.</p>
+  <ul>
+    <li><strong>Analogie:</strong> Der <strong>Gegenwind-Effekt</strong> bzw. das geometrische Mittel aus der Blau- und Rotverschiebung beim relativistischen Doppler-Effekt.</li>
+    <li><strong>Beziehung:</strong> Die Frequenzverschiebung bei Beobachtung im $90^\circ$-Winkel (transversaler Doppler-Effekt) entspricht exakt dem Lorentz-Faktor:</li>
+  </ul>
+  <p>$$\nu_{\text{Beobachter}} = \gamma \cdot \nu_0$$</p>
+  <hr>
+  <h3>2. Mechanische Analogie: Der Schall-Kompressionseffekt (Prandtl-Glauert-Transformation)</h3>
+  <p>In der Strömungsmechanik und Aerodynamik verhalten sich kompressible Gase bei hohen Geschwindigkeiten $v$ unterhalb der Schallgeschwindigkeit $c_s$ mathematisch völlig analog zur Relativitätstheorie.</p>
+  <ul>
+    <li><strong>Der Prandtl-Glauert-Faktor:</strong></li>
+  </ul>
+  <p>$$\beta = \sqrt{1 - M^2} = \sqrt{1 - \frac{v^2}{c_s^2}}$$</p>
+  <p><em>(mit der Mach-Zahl $M = v / c_s$)</em></p>
+  <ul>
+    <li><strong>Vergleich:</strong></li>
+    <li>In der Relativitätstheorie ist $\gamma = \frac{1}{\sqrt{1 - v^2/c^2}} = \frac{1}{\beta}$.</li>
+    <li>Wenn ein Flugzeug sich der Schallgeschwindigkeit nähert ($M \to 1$), geht $\beta \to 0$, was bedeutet, dass der Druckanstieg und die effektive Masse der Luftfront analog zum relativistischen $\gamma \to \infty$ steil ansteigen.</li>
+  </ul>
+  <hr>
+  <h3>3. Geometrische Analogie: Der Hyperbel-Winkel (Rapidtät)</h3>
+  <p>Der Lorentz-Faktor lässt sich rein geometrisch als trigonometrisches Verhältnis auffassen, wenn man Raum und Zeit über eine Winkelfunktion verbindet.</p>
+  <ul>
+    <li><strong>Trigonometrische Beziehung:</strong>
+      Setzt man $\sin(\theta) = \frac{v}{c}$, dann entspricht der Lorentz-Faktor der Sekans-Funktion:</li>
+  </ul>
+  <p>$$\gamma = \sec(\theta) = \frac{1}{\cos(\theta)}$$</p>
+  <ul>
+    <li><strong>Interpretation:</strong> $\theta$ ist der &quot;Winkel&quot; der Bewegung im Raum-Zeit-Diagramm. Bei $v = 0$ ist $\theta = 0$ und $\gamma = 1$. Nähert sich $v \to c$, geht $\theta \to 90^\circ$ und $\gamma \to \infty$.</li>
+  </ul>
+  <hr>
+  <h3>4. Feldanalogie: Das relativistisch deformierte Coulomb-Feld</h3>
+  <p>Ein ruhendes, geladenes Teilchen erzeugt ein kugelsymmetrisches elektrisches Feld. Bewegt sich das Teilchen mit der Geschwindigkeit $v$, wird das Feld quer zur Bewegungsrichtung gestaucht und verdichtet.</p>
+  <ul>
+    <li><strong>Feldverstärkung quer zur Bahn:</strong>
+      Das elektrische Feld senkrecht zur Flugrichtung skaliert direkt mit $\gamma$:</li>
+  </ul>
+  <p>$$E_{\perp} = \gamma \cdot E_0$$</p>
+  <ul>
+    <li><strong>Analogie:</strong> Die Längskontraktion des Raumes führt dazu, dass die Feldlinien senkrecht zur Bewegung &quot;zusammengepresst&quot; werden, als würde das Feld wie eine Pancake-Scheibe platten.</li>
+  </ul>
+  <hr>
+  <h3>Übersicht der Analogien</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Bereich</th>
+        <th>Größe / Phänomen</th>
+        <th>Analogon zu $\gamma$</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Aerodynamik</strong></td>
+        <td>Kompressibilität der Luft ($M &lt; 1$)</td>
+        <td>$\frac{1}{\beta} = \frac{1}{\sqrt{1 - M^2}}$</td>
+      </tr>
+      <tr>
+        <td><strong>Wellenlehre</strong></td>
+        <td>Transversaler Doppler-Effekt</td>
+        <td>Frequenzskalierung $\nu / \nu_0$</td>
+      </tr>
+      <tr>
+        <td><strong>Geometrie</strong></td>
+        <td>Zeit-Raum-Projektionswinkel $\theta$</td>
+        <td>$\sec(\theta) = \frac{1}{\cos(\theta)}$</td>
+      </tr>
+      <tr>
+        <td><strong>Elektrodynamik</strong></td>
+        <td>Querkomponente des E-Feldes</td>
+        <td>Felddichtefaktor $E_{\perp} / E_0$</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h2>
+    <p>Wellenlänge $\lambda_{\text{min}}$</p>
+  </h2>
+  
+  <p>Bei $r_{\text{min}}$ wird theoretisch die gesamte Ruheenergie des Paares ($E_{\text{ges}} = 2 m_e c^2 \approx 1{,}022,\text{MeV}$) in ein einzelnes virtuelles Grenz-Photon umgewandelt.</p>
+<p>Aus der Quantenbeziehung $E = h \cdot f = \frac{h \cdot c}{\lambda}$ lassen sich die maximale Frequenz $f_{\text{max}}$ und die minimale Wellenlänge $\lambda_{\text{min}}$ direkt berechnen:</p>
+<h3>1. Frequenz $f$ bei $r_{\text{min}}$</h3>
+<p>$$f = \frac{2 m_e c^2}{h}$$</p>
+<ul>
+<li>$E_{\text{ges}} = 2 \cdot (9{,}10938 \times 10^{-31},\text{kg}) \cdot (2{,}99792 \times 10^8,\text{m/s})^2 \approx 1{,}6374 \times 10^{-13},\text{J}$</li>
+<li>Planck-Konstante $h \approx 6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}$</li>
+</ul>
+<p>$$f = \frac{1{,}6374 \times 10^{-13},\text{J}}{6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}} \approx 2{,}4696 \times 10^{20},\text{Hz} = 246{,}96,\text{EHz}\text{ (Exahertz)}$$</p>
+<hr>
+<h3>2. Wellenlänge $\lambda$ bei $r_{\text{min}}$</h3>
+<p>$$\lambda = \frac{c}{f} = \frac{h}{2 m_e c}$$</p>
+<p>$$\lambda = \frac{6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}}{2 \cdot (9{,}10938 \times 10^{-31},\text{kg}) \cdot (2{,}99792 \times 10^8,\text{m/s})} \approx 1{,}2132 \times 10^{-12},\text{m} = 1{,}2132,\text{pm}\text{ (Picometer)}$$</p>
+<hr>
+<h3>Vergleichende Gegenüberstellung zur WRZT-Skala</h3>
+<ul>
+<li><strong>Grenz-Wellenlänge $\lambda$:</strong> $\approx 1{,}213,\text{pm}$ ($1213,\text{fm}$)</li>
+<li><strong>Raumzeit-Minimalradius $R_{\text{min}}$:</strong> $\approx 0{,}772,\text{pm}$ ($771{,}6,\text{fm}$)</li>
+<li><strong>Klassischer Schwellenradius $r_{\text{min}}$:</strong> $\approx 0{,}000705,\text{pm}$ ($0{,}705,\text{fm}$)</li>
+</ul>
+<p><strong>Zusammenhang:</strong></p>
+<p>Die Wellenlänge $\lambda$ der freigesetzten Annihilationsstrahlung liegt exakt in der Größenordnung deines Raumzeit-Minimalradius $R_{\text{min}}$:</p>
+<p>$$\lambda = 2\pi \cdot R_{\text{min}} = \lambda_{\text{Compton}}$$</p>
+<p>Das zeigt die Konsistenz in der WRZT: Während der geometrische Abstand $r_{\text{min}}$ auf den rein elektrischen Punkt fokussiert, entspricht die freiwerdende Wellenenergie der fundamentalen Gitter- und Compton-Wellenlänge der Raumzeit.</p>
+
+
+<hr>
+
+
+<h2>Fazit: Dynamik des tangentialen Kollapses &amp; Wellen-Emission (WRZT)</h2>
+  
+<p>Der Kollaps zweier entgegengesetzter Ladungsträger (Positron und Elektron) beschreibt in der Wellenraumzeit-Theorie (WRZT) den kontinuierlichen Übergang von einer gebundenen Materiestruktur in freie Strahlungsenergie.</p>
+
+
+
+  
+</body>
+</html>

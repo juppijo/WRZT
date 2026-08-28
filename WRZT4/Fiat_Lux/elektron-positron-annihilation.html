@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Elektron–Positron Annihilation · WRZT Simulation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; background:#07070a; overflow:hidden; font-family:'Barlow', sans-serif; }
+  canvas { display:block; }
+
+  #hud {
+    position:fixed; top:24px; left:28px; z-index:10;
+    color:#d8b869; pointer-events:none;
+    text-shadow: 0 0 12px rgba(216,184,105,0.35);
+  }
+  #hud h1 {
+    font-family:'Bebas Neue', sans-serif;
+    font-size:28px; letter-spacing:3px; font-weight:400;
+    color:#f1dfa8;
+  }
+  #hud p {
+    font-size:12px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#8a7346; margin-top:4px;
+  }
+
+  #legend {
+    position:fixed; bottom:22px; left:28px; z-index:10;
+    font-size:11px; letter-spacing:1px; color:#79654a; text-transform:uppercase;
+    display:flex; gap:22px;
+  }
+  #legend span { display:flex; align-items:center; gap:7px; }
+  .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .e  { background:#4fb4ff; box-shadow:0 0 8px #4fb4ff; }
+  .p  { background:#ff5a4f; box-shadow:0 0 8px #ff5a4f; }
+  .g  { background:#f1dfa8; box-shadow:0 0 8px #f1dfa8; }
+
+  #phase {
+    position:fixed; top:24px; right:28px; z-index:10;
+    font-family:'Bebas Neue', sans-serif; font-size:14px; letter-spacing:3px;
+    color:#8a7346; text-transform:uppercase;
+  }
+
+  #controls {
+    position:fixed; bottom:22px; right:28px; z-index:10;
+    display:flex; flex-direction:column; gap:14px;
+    background:rgba(15,13,8,0.55); border:1px solid rgba(216,184,105,0.22);
+    border-radius:8px; padding:14px 18px; backdrop-filter: blur(4px);
+    width:200px;
+  }
+  .slider-row label {
+    display:flex; justify-content:space-between;
+    font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#8a7346; margin-bottom:6px;
+  }
+  .slider-row label span.val { color:#f1dfa8; }
+  .slider-row input[type="range"] {
+    -webkit-appearance:none; width:100%; height:2px;
+    background:rgba(216,184,105,0.3); outline:none; border-radius:2px;
+  }
+  .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:12px; height:12px; border-radius:50%;
+    background:#f1dfa8; box-shadow:0 0 8px rgba(241,223,168,0.6); cursor:pointer;
+  }
+  .slider-row input[type="range"]::-moz-range-thumb {
+    width:12px; height:12px; border-radius:50%; border:none;
+    background:#f1dfa8; box-shadow:0 0 8px rgba(241,223,168,0.6); cursor:pointer;
+  }
+
+  #topButtons {
+    position:fixed; top:24px; right:170px; z-index:10;
+    display:flex; gap:10px;
+  }
+  .iconBtn {
+    background:rgba(15,13,8,0.55); border:1px solid rgba(216,184,105,0.35);
+    border-radius:6px; color:#f1dfa8; font-family:'Barlow', sans-serif;
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    padding:7px 14px; cursor:pointer; display:flex; align-items:center; gap:7px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .iconBtn:hover {
+    background:rgba(216,184,105,0.15); border-color:rgba(216,184,105,0.6);
+  }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <h1>e⁻ · e⁺ Annihilation</h1>
+  <p>Wellenraumzeit-Netz — Simulation</p>
+</div>
+<div id="phase">Inspiral</div>
+<div id="topButtons">
+  <button id="pauseBtn" class="iconBtn">⏸ Pause</button>
+  <button id="fullscreenBtn" class="iconBtn">⛶ Vollbild</button>
+</div>
+<div id="legend">
+  <span><i class="dot e"></i>Elektron</span>
+  <span><i class="dot p"></i>Positron</span>
+  <span><i class="dot g"></i>Photon (γ)</span>
+</div>
+<div id="controls">
+  <div class="slider-row">
+    <label>Geschwindigkeit <span class="val" id="speedVal">1.0×</span></label>
+    <input type="range" id="speedSlider" min="0.3" max="2.5" step="0.05" value="1">
+  </div>
+  <div class="slider-row">
+    <label>Intensität <span class="val" id="ampVal">1.0×</span></label>
+    <input type="range" id="ampSlider" min="0.2" max="2.5" step="0.05" value="1">
+  </div>
+  <div class="slider-row">
+    <label>Ablauf <span class="val" id="progressVal">Inspiral</span></label>
+    <input type="range" id="progressSlider" min="0" max="1000" step="1" value="0">
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  // ---------- Basic setup ----------
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x07070a, 0.0062);
+
+  const camera = new THREE.PerspectiveCamera(52, window.innerWidth/window.innerHeight, 0.1, 2000);
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  document.body.appendChild(renderer.domElement);
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ---------- Mouse controls: drag to rotate, scroll to zoom, right-drag to pan ----------
+  camera.position.set(78, 36, 78);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 6, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.minDistance = 18;
+  controls.maxDistance = 230;
+  controls.maxPolarAngle = Math.PI * 0.49;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.35;
+  controls.update();
+
+  // ---------- Lights ----------
+  scene.add(new THREE.AmbientLight(0x2a2210, 1.2));
+  const keyLight = new THREE.DirectionalLight(0xd8b869, 0.5);
+  keyLight.position.set(40, 80, 20);
+  scene.add(keyLight);
+
+  const electronLight = new THREE.PointLight(0x4fb4ff, 3, 60);
+  const positronLight = new THREE.PointLight(0xff5a4f, 3, 60);
+  scene.add(electronLight, positronLight);
+
+  // ---------- Speed / Intensity sliders ----------
+  let speedMul = 1, ampMul = 1;
+  const speedSlider = document.getElementById('speedSlider');
+  const ampSlider = document.getElementById('ampSlider');
+  const speedVal = document.getElementById('speedVal');
+  const ampVal = document.getElementById('ampVal');
+  speedSlider.addEventListener('input', () => {
+    speedMul = parseFloat(speedSlider.value);
+    speedVal.textContent = speedMul.toFixed(1) + '×';
+  });
+  ampSlider.addEventListener('input', () => {
+    ampMul = parseFloat(ampSlider.value);
+    ampVal.textContent = ampMul.toFixed(1) + '×';
+  });
+
+  // ---------- Fullscreen toggle ----------
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  fullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    fullscreenBtn.textContent = document.fullscreenElement ? '⛶ Vollbild beenden' : '⛶ Vollbild';
+  });
+
+  // ---------- Pause toggle ----------
+  let paused = false;
+  const pauseBtn = document.getElementById('pauseBtn');
+  pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? '▶ Weiter' : '⏸ Pause';
+  });
+
+  // ---------- The Net (space-time grid) ----------
+  const GRID_SIZE = 150;
+  const SEGMENTS = 72;
+  const gridGeo = new THREE.PlaneGeometry(GRID_SIZE, GRID_SIZE, SEGMENTS, SEGMENTS);
+  gridGeo.rotateX(-Math.PI/2);
+
+  const basePositions = gridGeo.attributes.position.array.slice(); // flat reference (y=0)
+  const vertexCount = gridGeo.attributes.position.count;
+
+  const colors = new Float32Array(vertexCount * 3);
+  gridGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const gridMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.55,
+    vertexColors: true
+  });
+  const gridMesh = new THREE.Mesh(gridGeo, gridMat);
+  scene.add(gridMesh);
+
+  // net base color (magenta); wave colors blend/lerp on top per vertex
+  const baseColor = new THREE.Color(0xff00ff);
+  const glowYellow = new THREE.Color(0xffff00); // outgoing transversal ring wave
+  const glowBlue  = new THREE.Color(0x4fb4ff);
+  const glowRed   = new THREE.Color(0xff5a4f);
+
+  // ---------- Particles: electron & positron ----------
+  function makeParticle(color) {
+    const g = new THREE.Group();
+    const core = new THREE.Mesh(
+      new THREE.SphereGeometry(1.3, 32, 32),
+      new THREE.MeshStandardMaterial({ color, emissive:color, emissiveIntensity:1.4, roughness:0.3, metalness:0.2 })
+    );
+    const halo = new THREE.Mesh(
+      new THREE.SphereGeometry(2.4, 24, 24),
+      new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.18, blending: THREE.AdditiveBlending, depthWrite:false })
+    );
+    g.add(core, halo);
+    g.userData.core = core;
+    g.userData.halo = halo;
+    return g;
+  }
+
+  const electron = makeParticle(0x4fb4ff);
+  const positron = makeParticle(0xff5a4f);
+  scene.add(electron, positron);
+
+  // ---------- Photons (emitted at annihilation) ----------
+  function makePhoton() {
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(0.55, 16, 16),
+      new THREE.MeshBasicMaterial({ color:0xf1dfa8, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false })
+    );
+    scene.add(m);
+    return m;
+  }
+  const photonA = makePhoton();
+  const photonB = makePhoton();
+  let photonDir = new THREE.Vector3(1,0,0);
+  let photonAge = 0;
+  const PHOTON_LIFE = 2.4;
+  const PHOTON_SPEED = 46;
+
+  // ---------- Continuous cycle (no pause: inspiral restarts the instant the ---
+  // ---------- bow wave detaches and hands off into the outgoing ring wave) ----
+  const WAVE_K = 0.55;   // spatial frequency - shared by bow wave & ring wave
+  const WAVE_W = 6.5;    // angular frequency - shared, so the crest pattern
+                          // never jumps when the near field becomes far field
+
+  const INSPIRAL_DURATION = 9.0;
+  const RIPPLE_LIFE = 4.2;
+  const RING_SPEED = 17.5;
+  const RING_WIDTH = 9;
+  const PAUSE_DURATION = 1.6; // short pause after each cycle before the next pair spins up
+  const CYCLE_LENGTH = INSPIRAL_DURATION + PAUSE_DURATION;
+
+  const R0 = 46;
+  const ORBIT_HEIGHT0 = 13;
+
+  // Real Kelvin wake angle (deep-water gravity waves): arcsin(1/3) ≈ 19.47°.
+  // Famously independent of the source's speed — only the wake's internal
+  // ripple density and amplitude change with speed, not its opening angle.
+  const KELVIN_TAN = Math.tan(Math.asin(1/3));
+
+  // Orbital phase as the integral of the instantaneous angular frequency —
+  // the same technique used to compute the phase of a real gravitational-
+  // wave inspiral chirp. Precomputing it as a table lets the timeline
+  // slider jump to any point in the cycle instantly and exactly, instead
+  // of having to replay the whole integration from t=0.
+  const ANGLE_TABLE_SIZE = 2000;
+  const angleTable = new Float32Array(ANGLE_TABLE_SIZE + 1);
+  (function buildAngleTable(){
+    let acc = 0;
+    const dtTab = INSPIRAL_DURATION / ANGLE_TABLE_SIZE;
+    for (let i = 1; i <= ANGLE_TABLE_SIZE; i++) {
+      const tt = i / ANGLE_TABLE_SIZE;
+      const r = R0 * Math.pow(1 - tt, 1.7) + 0.15;
+      const sf = Math.pow(R0 / r, 1.5);
+      const om = 0.045 * Math.min(sf, 90);
+      acc += om * dtTab;
+      angleTable[i] = acc;
+    }
+  })();
+  function angleAtProgress(t) {
+    t = THREE.MathUtils.clamp(t, 0, 1);
+    const idx = t * ANGLE_TABLE_SIZE;
+    const i0 = Math.floor(idx);
+    const i1 = Math.min(i0 + 1, ANGLE_TABLE_SIZE);
+    const frac = idx - i0;
+    return angleTable[i0] * (1 - frac) + angleTable[i1] * frac;
+  }
+
+  let phaseTime = 0;
+  let baseAngle = Math.random() * Math.PI * 2;
+  let spinDir = Math.random() < 0.5 ? 1 : -1;
+
+  let eX=0, eZ=0, eY=0, pX=0, pZ=0, pY=0;
+  let waveAmp = 0;      // bow-wave crest strength, tied to orbital speed
+  let wakeStrength = 0; // trailing Kelvin-wake strength (scales faster than
+                         // linear with speed, like real wake energy ~ v²)
+
+  // bow-wave shape: a single forward-pushed crest per particle (no periodic
+  // oscillation) that grows with speed and widens laterally as it dissolves
+  let eTanX=1, eTanZ=0, eNX=0, eNZ=1, eLeadX=0, eLeadZ=0;
+  let pTanX=1, pTanZ=0, pNX=0, pNZ=1, pLeadX=0, pLeadZ=0;
+  let bowWFront = 8, bowWBack = 2.5, bowWPerp = 4.5;
+
+  // outgoing transversal ring wave, seeded by the bow wave at the moment of merger
+  let rippleActive = false;
+  let rippleStart = 0;
+  let rippleAmp0 = 0;
+  let rippleCenter = new THREE.Vector3(0,0,0);
+
+  let orbitPaused = false;
+  let pauseTimer = 0;
+
+  let labelTimer = 0;
+  const phaseLabel = document.getElementById('phase');
+
+  function resetOrbit() {
+    phaseTime = 0;
+    baseAngle = Math.random() * Math.PI * 2;
+    spinDir = Math.random() < 0.5 ? 1 : -1;
+    electron.visible = true;
+    positron.visible = true;
+    electron.userData.core.material.opacity = 1;
+    positron.userData.core.material.opacity = 1;
+    electron.scale.set(1,1,1);
+    positron.scale.set(1,1,1);
+    phaseLabel.textContent = 'Inspiral';
+  }
+
+  // ---------- Animation loop ----------
+  const clock = new THREE.Clock();
+  const tmpVec = new THREE.Vector3();
+
+  // Pure positioning/wave-shape calculation for a given progress t∈[0,1] —
+  // shared by normal playback and by the timeline slider (scrubbing), so
+  // both produce exactly the same physical state for the same t.
+  function computeOrbitState(t) {
+    const radius = R0 * Math.pow(1 - t, 1.7) + 0.15;
+    const speedFactor = Math.pow(R0 / radius, 1.5);
+    const omega = 0.045 * Math.min(speedFactor, 90);
+
+    const angleE = baseAngle + angleAtProgress(t) * spinDir;
+    const angleP = angleE + Math.PI;
+    const height = ORBIT_HEIGHT0 * (1 - t * 0.92);
+
+    eX = Math.cos(angleE) * radius; eZ = Math.sin(angleE) * radius; eY = height;
+    pX = Math.cos(angleP) * radius; pZ = Math.sin(angleP) * radius; pY = height;
+
+    electron.position.set(eX, eY, eZ);
+    positron.position.set(pX, pY, pZ);
+
+    // smoothstep fade in/out — physically continuous (no kink), unlike a
+    // linear ramp, matching how real transient processes rise and decay
+    const fadeIn = THREE.MathUtils.smoothstep(t, 0, 0.05);
+    const fadeOut = 1 - THREE.MathUtils.smoothstep(t, 0.78, 1);
+    const fade = fadeIn * fadeOut;
+
+    const scl = 0.25 + 0.75 * fade;
+    electron.scale.set(scl, scl, scl);
+    positron.scale.set(scl, scl, scl);
+    electron.userData.core.material.opacity = fade;
+    positron.userData.core.material.opacity = fade;
+    electron.userData.halo.material.opacity = 0.18 * fade;
+    positron.userData.halo.material.opacity = 0.18 * fade;
+
+    electronLight.position.set(eX, eY, eZ);
+    positronLight.position.set(pX, pY, pZ);
+    electronLight.intensity = 2 + Math.min(speedFactor, 40) * 0.06;
+    positronLight.intensity = electronLight.intensity;
+
+    // bow-wave amplitude tied to tangential speed and the intensity slider
+    const tangentialSpeed = omega * radius;
+    waveAmp = THREE.MathUtils.clamp(tangentialSpeed * 0.9, 0.15, 6.5) * fade * fade * ampMul;
+
+    // trailing Kelvin wake: real wake energy grows roughly with the square
+    // of the source speed, so it builds in much more sharply than the bow
+    // crest as the pair accelerates through the final chirp
+    const speedNorm = THREE.MathUtils.clamp(tangentialSpeed / 7, 0, 1);
+    wakeStrength = waveAmp * (0.35 + 0.65 * speedNorm * speedNorm);
+
+    // --- bow-wave geometry: single crest pushed ahead of each particle,
+    // growing with speed, widening laterally and losing its forward bias
+    // as the pair approaches merger (dissolves into a lateral wave) ---
+    const sizeMul = 1 + speedNorm * 1.8;
+    const lateralMix = THREE.MathUtils.smoothstep(t, 0.6, 0.95);
+    const leadDist = THREE.MathUtils.lerp(3 * sizeMul, 0.6, lateralMix);
+    bowWFront = THREE.MathUtils.lerp(8 * sizeMul, 4, lateralMix);
+    bowWBack  = THREE.MathUtils.lerp(2.5, 4, lateralMix);
+    bowWPerp  = THREE.MathUtils.lerp(4.5 * sizeMul, 4.5 * sizeMul * 3.2, lateralMix);
+
+    eTanX = -Math.sin(angleE) * spinDir; eTanZ = Math.cos(angleE) * spinDir;
+    eNX = Math.cos(angleE); eNZ = Math.sin(angleE);
+    pTanX = -Math.sin(angleP) * spinDir; pTanZ = Math.cos(angleP) * spinDir;
+    pNX = Math.cos(angleP); pNZ = Math.sin(angleP);
+    eLeadX = eX + eTanX * leadDist; eLeadZ = eZ + eTanZ * leadDist;
+    pLeadX = pX + pTanX * leadDist; pLeadZ = pZ + pTanZ * leadDist;
+
+    return tangentialSpeed;
+  }
+
+  function updateOrbit(simTime) {
+    const t = Math.min(phaseTime / INSPIRAL_DURATION, 1);
+    const tangentialSpeed = computeOrbitState(t);
+
+    if (t >= 1 && !orbitPaused) {
+      // Annihilation: the bow wave/wake detach from the vanishing source and
+      // hand off into an outward-travelling transversal ring wave. The
+      // ring's own attack ramp (see updateGrid) makes this handoff seamless
+      // instead of an abrupt amplitude jump.
+      electron.visible = false;
+      positron.visible = false;
+      rippleCenter.set((eX+pX)/2, 0, (eZ+pZ)/2);
+      rippleAmp0 = Math.max(THREE.MathUtils.clamp(tangentialSpeed * 0.9, 0.15, 6.5) * 2.2, 3.5) * ampMul;
+      rippleStart = simTime;
+      rippleActive = true;
+
+      const dirAngle = Math.random() * Math.PI * 2;
+      photonDir.set(Math.cos(dirAngle), 0.08, Math.sin(dirAngle));
+      photonAge = 0;
+      photonA.position.copy(rippleCenter);
+      photonB.position.copy(rippleCenter);
+      photonA.material.opacity = 1;
+      photonB.material.opacity = 1;
+
+      phaseLabel.textContent = 'Annihilation';
+      labelTimer = 1.2;
+
+      // short pause before the next pair spins up, while the ring wave
+      // from this event keeps propagating outward through the net
+      orbitPaused = true;
+      pauseTimer = PAUSE_DURATION;
+    }
+  }
+
+  function updatePhotons(dt) {
+    photonAge += dt;
+    if (photonAge > PHOTON_LIFE) return;
+    photonA.position.copy(rippleCenter).addScaledVector(photonDir, PHOTON_SPEED * photonAge);
+    photonB.position.copy(rippleCenter).addScaledVector(photonDir, -PHOTON_SPEED * photonAge);
+    const pOpacity = 1 - photonAge / PHOTON_LIFE;
+    photonA.material.opacity = pOpacity;
+    photonB.material.opacity = pOpacity;
+  }
+
+  function updateLabel(dt) {
+    if (labelTimer > 0) {
+      labelTimer -= dt;
+      if (labelTimer <= 0 && orbitPaused) phaseLabel.textContent = 'Vakuum';
+    }
+  }
+
+  // single forward-pushed crest, no periodic oscillation — an asymmetric
+  // anisotropic bump: wide/tall ahead of the source, sharply cut off behind
+  function bowBump(x, z, leadX, leadZ, tanX, tanZ, nX, nZ, amp) {
+    const rx = x - leadX, rz = z - leadZ;
+    const sPar = rx * tanX + rz * tanZ;
+    const sPerp = rx * nX + rz * nZ;
+    const wPar = sPar >= 0 ? bowWFront : bowWBack;
+    return amp * Math.exp(-(sPar*sPar) / (wPar*wPar)) * Math.exp(-(sPerp*sPerp) / (bowWPerp*bowWPerp));
+  }
+
+  // real Kelvin wake: two straight cusp lines trailing the source at a
+  // fixed ±19.47° from its direction of travel, carrying transverse
+  // ripples that propagate along them and dissipate with distance behind
+  function kelvinWake(x, z, px, pz, tanX, tanZ, nX, nZ, amp, simTime) {
+    const rx = x - px, rz = z - pz;
+    const sBack = -(rx * tanX + rz * tanZ); // distance behind the source
+    if (sBack <= 0.05) return 0;
+    const sPerp = rx * nX + rz * nZ;
+    const cusp = sBack * KELVIN_TAN;
+    const distToLine = Math.abs(Math.abs(sPerp) - cusp);
+    const lineWidth = 1.1 + sBack * 0.045;       // wake lines broaden as they trail back
+    const envelope = Math.exp(-(distToLine*distToLine) / (lineWidth*lineWidth));
+    const decay = 1 / Math.sqrt(sBack * 0.5 + 1); // energy spreads & dissipates behind
+    const ripple = Math.cos(sBack * WAVE_K * 1.3 - simTime * WAVE_W * 0.8);
+    const lengthFade = Math.exp(-sBack / 38);     // finite wake length
+    return amp * envelope * decay * ripple * lengthFade;
+  }
+
+  function updateGrid(simTime) {
+    const pos = gridGeo.attributes.position.array;
+    const col = gridGeo.attributes.color.array;
+
+    let ringRadius = 0, ringAmp = 0;
+    if (rippleActive) {
+      const rippleAge = simTime - rippleStart;
+      if (rippleAge > RIPPLE_LIFE) {
+        rippleActive = false;
+      } else {
+        ringRadius = rippleAge * RING_SPEED;
+        // smooth attack (ramps in as the bow wave hands off) then a gentle
+        // decay as the pulse spreads and travels out — no amplitude jump
+        const attack = THREE.MathUtils.smoothstep(rippleAge, 0, 0.5);
+        const decay = 1 - rippleAge / RIPPLE_LIFE;
+        ringAmp = rippleAmp0 * attack * decay;
+      }
+    }
+
+    for (let i = 0; i < vertexCount; i++) {
+      const ix = i*3, iy = i*3+1, iz = i*3+2;
+      const x = basePositions[ix];
+      const z = basePositions[iz];
+
+      let y = 0;
+      col[ix] = baseColor.r; col[iy] = baseColor.g; col[iz] = baseColor.b;
+
+      // single, non-pulsating bow wave crest pushed ahead of each particle
+      if (waveAmp > 0.001) {
+        const wE = bowBump(x, z, eLeadX, eLeadZ, eTanX, eTanZ, eNX, eNZ, waveAmp);
+        const wP = bowBump(x, z, pLeadX, pLeadZ, pTanX, pTanZ, pNX, pNZ, waveAmp);
+        y += wE + wP;
+
+        const dE = Math.hypot(x - eLeadX, z - eLeadZ);
+        const dP = Math.hypot(x - pLeadX, z - pLeadZ);
+        const closeE = Math.exp(-dE / 14);
+        const closeP = Math.exp(-dP / 14);
+        col[ix] += (glowBlue.r - baseColor.r) * closeE + (glowRed.r - baseColor.r) * closeP;
+        col[iy] += (glowBlue.g - baseColor.g) * closeE + (glowRed.g - baseColor.g) * closeP;
+        col[iz] += (glowBlue.b - baseColor.b) * closeE + (glowRed.b - baseColor.b) * closeP;
+      }
+
+      // trailing Kelvin wake (real ±19.47° cusp pattern), independent of
+      // the forward bow crest above
+      if (wakeStrength > 0.001) {
+        y += kelvinWake(x, z, eX, eZ, eTanX, eTanZ, eNX, eNZ, wakeStrength, simTime);
+        y += kelvinWake(x, z, pX, pZ, pTanX, pTanZ, pNX, pNZ, wakeStrength, simTime);
+      }
+
+      // outward-travelling transversal ring wave left behind by the last
+      // annihilation — a genuine propagating sine wave, unlike the bow wave
+      if (rippleActive && ringAmp > 0.001) {
+        const d = Math.hypot(x - rippleCenter.x, z - rippleCenter.z);
+        const envelope = Math.exp(-Math.pow((d - ringRadius) / RING_WIDTH, 2));
+        const ring = ringAmp * Math.sin(d * WAVE_K - simTime * WAVE_W) * envelope;
+        y += ring;
+        const ri = Math.min(1, Math.abs(ring) / 3);
+        col[ix] = THREE.MathUtils.lerp(col[ix], glowYellow.r, ri);
+        col[iy] = THREE.MathUtils.lerp(col[iy], glowYellow.g, ri);
+        col[iz] = THREE.MathUtils.lerp(col[iz], glowYellow.b, ri);
+      }
+
+      pos[iy] = y;
+    }
+
+    gridGeo.attributes.position.needsUpdate = true;
+    gridGeo.attributes.color.needsUpdate = true;
+  }
+
+  let simTime = 0;
+
+  // ---------- Timeline (Ablauf) slider: scrub the cycle forward/backward ----------
+  const progressSlider = document.getElementById('progressSlider');
+  const progressVal = document.getElementById('progressVal');
+  progressSlider.addEventListener('input', () => {
+    if (!paused) { paused = true; pauseBtn.textContent = '▶ Weiter'; }
+    const frac = progressSlider.value / 1000;
+    const newTime = frac * CYCLE_LENGTH;
+
+    if (newTime <= INSPIRAL_DURATION) {
+      orbitPaused = false;
+      phaseTime = newTime;
+      electron.visible = true;
+      positron.visible = true;
+      const t = Math.min(phaseTime / INSPIRAL_DURATION, 1);
+      computeOrbitState(t);
+      progressVal.textContent = t < 0.6 ? 'Inspiral' : (t < 1 ? 'Chirp' : 'Annihilation');
+    } else {
+      orbitPaused = true;
+      phaseTime = INSPIRAL_DURATION;
+      pauseTimer = CYCLE_LENGTH - newTime;
+      electron.visible = false;
+      positron.visible = false;
+      waveAmp = 0;
+      wakeStrength = 0;
+      progressVal.textContent = 'Vakuum';
+    }
+
+    updateGrid(simTime);
+    renderer.render(scene, camera);
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const dtReal = Math.min(clock.getDelta(), 0.05);
+
+    if (!paused) {
+      const dt = dtReal * speedMul; // speed slider scales the whole simulation clock
+      simTime += dt;
+
+      if (orbitPaused) {
+        pauseTimer -= dt;
+        if (pauseTimer <= 0) {
+          orbitPaused = false;
+          resetOrbit();
+        }
+      } else {
+        phaseTime += dt;
+        updateOrbit(simTime);
+      }
+
+      updatePhotons(dt);
+      updateLabel(dt);
+      updateGrid(simTime);
+
+      // keep the timeline slider in sync with normal playback
+      const cycleProgress = orbitPaused
+        ? INSPIRAL_DURATION + (PAUSE_DURATION - Math.max(pauseTimer, 0))
+        : phaseTime;
+      progressSlider.value = Math.round((cycleProgress / CYCLE_LENGTH) * 1000);
+      progressVal.textContent = orbitPaused ? (phaseLabel.textContent === 'Annihilation' ? 'Annihilation' : 'Vakuum') : (phaseTime / INSPIRAL_DURATION < 0.6 ? 'Inspiral' : 'Chirp');
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  animate();
+})();
+</script>
+</body>
+</html>
