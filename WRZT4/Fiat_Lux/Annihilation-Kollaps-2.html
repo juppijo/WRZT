@@ -1,0 +1,1099 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <title>WRZT – Herleitung von Kollaps und Annihilation</title>
+
+  <!-- =========================================================
+       MathJax-Konfiguration
+       Unterstützt:
+       $...$        Inline
+       $$...$$      Display
+       \( ... \)    Inline
+       \[ ... \]    Display
+       ========================================================= -->
+
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+
+  <script
+    id="MathJax-script"
+    async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 950px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.7;
+      color: #222;
+      background: #ededfd;
+    }
+
+    h1 {
+      color: #5522aa;
+      border-bottom: 2px solid #5522aa;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #7722aa;
+      margin-top: 45px;
+    }
+
+    h3 {
+      color: #5522aa;
+      margin-top: 30px;
+    }
+
+    p {
+      margin: 1em 0;
+    }
+
+    .formula {
+      background: #f7f7ff;
+      border-left: 4px solid #7722aa;
+      padding: 15px 20px;
+      margin: 20px 0;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .important {
+      background: #eee8ff;
+      border-left: 5px solid #5522aa;
+      padding: 18px 22px;
+      margin: 25px 0;
+    }
+
+    .step {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .process {
+      text-align: center;
+      font-size: 1.15em;
+      margin: 30px 0;
+      line-height: 2.2;
+    }
+
+    .note {
+      background: #f0f0f8;
+      border-left: 4px solid #999;
+      padding: 15px 20px;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #eee8ff;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<h1>WRZT – Kollaps und Annihilation</h1>
+
+<h2>Herleitung und physikalische Erklärung</h2>
+
+<p>
+Diese Darstellung beschreibt den Kollaps eines Elektron-Positron-Systems
+und die anschließende Annihilation im Rahmen des in der WRZT verwendeten
+Modells.
+</p>
+
+<div class="important">
+
+<strong>Grundidee:</strong>
+
+<p>
+Ein Elektron und ein Positron besitzen entgegengesetzte elektrische
+Ladungen. Sie ziehen sich gegenseitig an. Bei ihrer Annäherung werden
+sie beschleunigt und geben elektromagnetische Energie ab.
+</p>
+
+<p>
+Dadurch verliert das System Energie und der Abstand zwischen den
+Teilchen wird kleiner. Der kleinere Abstand führt wiederum zu einer
+stärkeren Beschleunigung.
+</p>
+
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>1. Ausgangssituation</h2>
+
+<p>
+Wir betrachten ein Elektron und ein Positron mit den Ladungen
+</p>
+
+<div class="formula">
+  $$q_1=-e,\qquad q_2=+e$$
+</div>
+
+<p>
+und jeweils der Ruhemasse $m_e$.
+</p>
+
+<p>
+Da beide Teilchen die gleiche Masse besitzen, wird für die Beschreibung
+der Relativbewegung die reduzierte Masse verwendet:
+</p>
+
+<div class="formula">
+  $$\mu =
+  \frac{m_e m_e}{m_e+m_e}
+  =
+  \frac{m_e}{2}$$
+</div>
+
+<p>
+Die reduzierte Masse beschreibt dabei die Bewegung des Zweikörpersystems
+so, als würde sich eine effektive Masse $\mu$ relativ zum gemeinsamen
+Schwerpunkt bewegen.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>2. Elektrische Anziehung</h2>
+
+<p>
+Zwischen Elektron und Positron wirkt die Coulomb-Kraft.
+Für zwei entgegengesetzte Ladungen ist sie anziehend:
+</p>
+
+<div class="formula">
+  $$F_C =
+  \frac{e^2}{4\pi\varepsilon_0 r^2}$$
+</div>
+
+<p>
+Dabei bedeutet:
+</p>
+
+<table>
+<tr>
+  <th>Symbol</th>
+  <th>Bedeutung</th>
+</tr>
+
+<tr>
+  <td>$e$</td>
+  <td>Elementarladung</td>
+</tr>
+
+<tr>
+  <td>$\varepsilon_0$</td>
+  <td>elektrische Feldkonstante</td>
+</tr>
+
+<tr>
+  <td>$r$</td>
+  <td>Abstand zwischen Elektron und Positron</td>
+</tr>
+</table>
+
+<p>
+Der entscheidende Punkt ist die Abhängigkeit
+</p>
+
+<div class="formula">
+  $$F_C \propto \frac{1}{r^2}$$
+</div>
+
+<p>
+Je kleiner der Abstand wird, desto stärker wird also die elektrische
+Anziehung.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>3. Geschwindigkeit aus dem Kräftegleichgewicht</h2>
+
+<p>
+Für eine näherungsweise kreisförmige Bewegung wird die Coulomb-Kraft
+mit der Zentripetalkraft gleichgesetzt.
+</p>
+
+<div class="formula">
+  $$\frac{\mu v^2}{r}
+  =
+  \frac{e^2}{4\pi\varepsilon_0 r^2}$$
+</div>
+
+<p>
+Wir multiplizieren zunächst beide Seiten mit $r$:
+</p>
+
+<div class="formula">
+  $$\mu v^2
+  =
+  \frac{e^2}{4\pi\varepsilon_0 r}$$
+</div>
+
+<p>
+Anschließend teilen wir durch $\mu$:
+</p>
+
+<div class="formula">
+  $$v^2 =
+  \frac{e^2}
+  {4\pi\varepsilon_0\mu r}$$
+</div>
+
+<p>
+Mit
+</p>
+
+<div class="formula">
+  $$\mu=\frac{m_e}{2}$$
+</div>
+
+<p>
+folgt:
+</p>
+
+<div class="formula">
+  $$v^2 =
+  \frac{e^2}
+  {2\pi\varepsilon_0m_e r}$$
+</div>
+
+<p>
+und damit:
+</p>
+
+<div class="formula">
+  $$v(r)=
+  \sqrt{
+  \frac{e^2}
+  {2\pi\varepsilon_0m_e r}
+  }$$
+</div>
+
+<div class="important">
+
+<strong>Wichtig:</strong>
+
+<p>
+Diese Gleichung ist eine klassische Näherung. Sie beschreibt die
+momentane Kreisbewegung während des Einscherens. Bei sehr kleinen
+Abständen werden relativistische und quantenmechanische Effekte
+wichtig.
+</p>
+
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>4. Mechanische Energie des Systems</h2>
+
+<p>
+Die Gesamtenergie setzt sich aus kinetischer und potentieller Energie
+zusammen:
+</p>
+
+<div class="formula">
+  $$E_{\text{mech}}
+  =
+  E_{\text{kin}}+E_{\text{pot}}$$
+</div>
+
+<p>
+Die kinetische Energie der Relativbewegung beträgt:
+</p>
+
+<div class="formula">
+  $$E_{\text{kin}}
+  =
+  \frac{1}{2}\mu v^2$$
+</div>
+
+<p>
+Das elektrische Potential zweier entgegengesetzter Ladungen ist:
+</p>
+
+<div class="formula">
+  $$E_{\text{pot}}
+  =
+  -\frac{e^2}{4\pi\varepsilon_0r}$$
+</div>
+
+<p>
+Setzen wir die Geschwindigkeit aus dem vorherigen Schritt ein:
+</p>
+
+<div class="formula">
+  $$E_{\text{kin}}
+  =
+  \frac{1}{2}\mu
+  \frac{e^2}{4\pi\varepsilon_0\mu r}$$
+</div>
+
+<p>
+Die Masse $\mu$ kürzt sich:
+</p>
+
+<div class="formula">
+  $$E_{\text{kin}}
+  =
+  \frac{e^2}
+  {8\pi\varepsilon_0r}$$
+</div>
+
+<p>
+Damit ergibt sich:
+</p>
+
+<div class="formula">
+  $$E_{\text{mech}}
+  =
+  \frac{e^2}{8\pi\varepsilon_0r}
+  -
+  \frac{e^2}{4\pi\varepsilon_0r}$$
+</div>
+
+<p>
+und somit:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  E_{\text{mech}}
+  =
+  -\frac{e^2}
+  {8\pi\varepsilon_0r}
+  }$$
+</div>
+
+<p>
+Die negative Energie zeigt, dass es sich um einen gebundenen Zustand
+handelt.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>5. Warum entsteht Strahlung?</h2>
+
+<p>
+Die geladenen Teilchen bewegen sich auf einer gekrümmten Bahn.
+Dadurch besitzen sie eine Beschleunigung.
+</p>
+
+<p>
+Die Zentripetalbeschleunigung ist:
+</p>
+
+<div class="formula">
+  $$a=\frac{v^2}{r}$$
+</div>
+
+<p>
+Mit der zuvor bestimmten Geschwindigkeit folgt:
+</p>
+
+<div class="formula">
+  $$a(r)
+  =
+  \frac{e^2}
+  {2\pi\varepsilon_0m_e r^2}$$
+</div>
+
+<p>
+Damit gilt:
+</p>
+
+<div class="formula">
+  $$a\propto\frac{1}{r^2}$$
+</div>
+
+<p>
+Wenn $r$ kleiner wird, steigt die Beschleunigung also sehr stark an.
+</p>
+
+<p>
+Beschleunigte Ladungen strahlen elektromagnetische Energie ab.
+Im klassischen Modell wird dafür die Larmor-Formel verwendet.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>6. Strahlungsleistung</h2>
+
+<p>
+Für ein Teilchen lautet die klassische Larmor-Leistung:
+</p>
+
+<div class="formula">
+  $$P_1=
+  \frac{e^2a^2}
+  {6\pi\varepsilon_0c^3}$$
+</div>
+
+<p>
+Da Elektron und Positron beide strahlen, wird die Leistung verdoppelt:
+</p>
+
+<div class="formula">
+  $$P=2P_1$$
+</div>
+
+<p>
+Also:
+</p>
+
+<div class="formula">
+  $$P=
+  \frac{e^2a^2}
+  {3\pi\varepsilon_0c^3}$$
+</div>
+
+<p>
+Setzt man die Beschleunigung ein, erhält man:
+</p>
+
+<div class="formula">
+  $$P(r)=
+  \frac{e^6}
+  {12\pi^3\varepsilon_0^3m_e^2c^3r^4}$$
+</div>
+
+<p>
+Damit entsteht ein besonders wichtiger Zusammenhang:
+</p>
+
+<div class="formula">
+  $$\boxed{P(r)\propto\frac{1}{r^4}}$$
+</div>
+
+<p>
+Die Strahlungsleistung steigt also beim Kollaps extrem stark an.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>7. Energieverlust führt zum Kollaps</h2>
+
+<p>
+Die abgestrahlte Energie muss aus der mechanischen Energie des Systems
+kommen. Deshalb gilt:
+</p>
+
+<div class="formula">
+  $$P=-\frac{dE_{\text{mech}}}{dt}$$
+</div>
+
+<p>
+Aus
+</p>
+
+<div class="formula">
+  $$E_{\text{mech}}
+  =
+  -\frac{e^2}
+  {8\pi\varepsilon_0r}$$
+</div>
+
+<p>
+folgt durch Ableiten nach der Zeit:
+</p>
+
+<div class="formula">
+  $$\frac{dE_{\text{mech}}}{dt}
+  =
+  \frac{e^2}
+  {8\pi\varepsilon_0r^2}
+  \frac{dr}{dt}$$
+</div>
+
+<p>
+Damit:
+</p>
+
+<div class="formula">
+  $$P=
+  -\frac{e^2}
+  {8\pi\varepsilon_0r^2}
+  \frac{dr}{dt}$$
+</div>
+
+<p>
+Setzt man hier die Strahlungsleistung ein und löst nach
+$\frac{dr}{dt}$ auf, erhält man:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  \frac{dr}{dt}
+  =
+  -\frac{2}{3}
+  \frac{e^4}
+  {\pi^2\varepsilon_0^2m_e^2c^3}
+  \frac{1}{r^2}
+  }$$
+</div>
+
+<p>
+Das Minuszeichen bedeutet, dass der Abstand kleiner wird.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>8. Warum beschleunigt sich der Kollaps?</h2>
+
+<p>
+Die letzte Gleichung zeigt unmittelbar:
+</p>
+
+<div class="formula">
+  $$\frac{dr}{dt}\propto-\frac{1}{r^2}$$
+</div>
+
+<p>
+Bei großem $r$ ist die Schrumpfung langsam.
+Bei kleinem $r$ wird sie immer schneller.
+</p>
+
+<div class="process">
+
+  großer Abstand
+  <br>
+  ↓
+  <br>
+  langsamer Energieverlust
+  <br>
+  ↓
+  <br>
+  kleinerer Abstand
+  <br>
+  ↓
+  <br>
+  stärkere Beschleunigung
+  <br>
+  ↓
+  <br>
+  stärkere Strahlung
+  <br>
+  ↓
+  <br>
+  noch schnellerer Kollaps
+
+</div>
+
+<p>
+Es entsteht damit eine Art Rückkopplung:
+</p>
+
+<div class="important">
+
+<strong>
+kleinerer Abstand → höhere Beschleunigung → mehr Strahlung →
+größerer Energieverlust → noch kleinerer Abstand
+</strong>
+
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>9. Energie der Annihilation</h2>
+
+<p>
+Ein Elektron besitzt die Ruheenergie
+</p>
+
+<div class="formula">
+  $$E_e=m_ec^2$$
+</div>
+
+<p>
+und das Positron besitzt ebenfalls:
+</p>
+
+<div class="formula">
+  $$E_p=m_ec^2$$
+</div>
+
+<p>
+Die gesamte Ruheenergie des Paares beträgt deshalb:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  E_{\text{ges}}=2m_ec^2
+  }$$
+</div>
+
+<p>
+Numerisch:
+</p>
+
+<div class="formula">
+  $$E_{\text{ges}}\approx1{,}022\,\text{MeV}$$
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>10. Herleitung des Minimalradius</h2>
+
+<p>
+Im WRZT-Modell wird angenommen, dass die beim Kollaps abgestrahlte
+Energie am Grenzpunkt der gesamten Ruheenergie des Elektron-Positron-
+Paares entspricht:
+</p>
+
+<div class="formula">
+  $$E_{\text{strahl}}
+  =
+  2m_ec^2$$
+</div>
+
+<p>
+Aus der Energieintegration des Modells ergibt sich für den Grenzradius:
+</p>
+
+<div class="formula">
+  $$E_{\text{strahl}}
+  \approx
+  \frac{e^2}
+  {8\pi\varepsilon_0r_{\text{min}}}$$
+</div>
+
+<p>
+Nun setzen wir beide Ausdrücke gleich:
+</p>
+
+<div class="formula">
+  $$\frac{e^2}
+  {8\pi\varepsilon_0r_{\text{min}}}
+  =
+  2m_ec^2$$
+</div>
+
+<p>
+Wir lösen nach $r_{\text{min}}$ auf:
+</p>
+
+<div class="formula">
+  $$r_{\text{min}}
+  =
+  \frac{e^2}
+  {16\pi\varepsilon_0m_ec^2}$$
+</div>
+
+<p>
+Der klassische Elektronenradius ist definiert als:
+</p>
+
+<div class="formula">
+  $$r_e=
+  \frac{e^2}
+  {4\pi\varepsilon_0m_ec^2}$$
+</div>
+
+<p>
+Vergleicht man beide Gleichungen, ergibt sich:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  r_{\text{min}}=\frac{1}{4}r_e
+  }$$
+</div>
+
+<p>
+Mit den in der Datei verwendeten Konstanten ergibt sich:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  r_{\text{min}}
+  \approx7{,}05\times10^{-16}\,\text{m}
+  =
+  0{,}705\,\text{fm}
+  }$$
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>11. Von der Ruheenergie zur Welle</h2>
+
+<p>
+Die gesamte Annihilationsenergie kann über die Planck-Beziehung mit
+einer Frequenz verbunden werden:
+</p>
+
+<div class="formula">
+  $$E=hf$$
+</div>
+
+<p>
+Daraus folgt:
+</p>
+
+<div class="formula">
+  $$f=
+  \frac{E}{h}$$
+</div>
+
+<p>
+Mit
+</p>
+
+<div class="formula">
+  $$E=2m_ec^2$$
+</div>
+
+<p>
+erhält man:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  f=
+  \frac{2m_ec^2}{h}
+  }$$
+</div>
+
+<p>
+Numerisch ergibt sich:
+</p>
+
+<div class="formula">
+  $$f\approx2{,}47\times10^{20}\,\text{Hz}$$
+</div>
+
+<p>
+Die entsprechende Wellenlänge erhält man aus:
+</p>
+
+<div class="formula">
+  $$\lambda=\frac{c}{f}$$
+</div>
+
+<p>
+und damit:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  \lambda=
+  \frac{h}{2m_ec}
+  }$$
+</div>
+
+<p>
+Mit den verwendeten Konstanten:
+</p>
+
+<div class="formula">
+  $$\boxed{
+  \lambda\approx1{,}213\,\text{pm}
+  }$$
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>12. Bedeutung für die WRZT</h2>
+
+<p>
+Bis hierhin handelt es sich um die mathematische Beschreibung des
+Kollapses innerhalb der in der Datei verwendeten klassischen
+Näherung.
+</p>
+
+<p>
+Die eigentliche WRZT-Interpretation geht einen Schritt weiter:
+Die Materiestruktur wird nicht als etwas betrachtet, das einfach
+„verschwindet“, sondern als eine lokalisierte Form von Energie, die
+wieder in ein Wellenfeld übergehen kann.
+</p>
+
+<div class="important">
+
+<strong>WRZT-Bild:</strong>
+
+<div class="process">
+
+Materiestruktur
+<br>
+↓
+<br>
+elektromagnetische Wechselwirkung
+<br>
+↓
+<br>
+Annäherung
+<br>
+↓
+<br>
+Energieverlust
+<br>
+↓
+<br>
+Kollaps
+<br>
+↓
+<br>
+Annihilation
+<br>
+↓
+<br>
+Wellenenergie
+
+</div>
+
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>13. Zusammenhang mit der Compton-Wellenlänge</h2>
+
+<p>
+Die im Modell erhaltene Wellenlänge ist:
+</p>
+
+<div class="formula">
+  $$\lambda
+  =
+  \frac{h}{2m_ec}$$
+</div>
+
+<p>
+Die reduzierte Compton-Länge des Elektrons lautet:
+</p>
+
+<div class="formula">
+  $$\bar{\lambda}_C
+  =
+  \frac{\hbar}{m_ec}$$
+</div>
+
+<p>
+Da
+</p>
+
+<div class="formula">
+  $$h=2\pi\hbar$$
+</div>
+
+<p>
+kann die Annihilationswellenlänge auch geschrieben werden als:
+</p>
+
+<div class="formula">
+  $$\lambda
+  =
+  \pi\frac{\hbar}{m_ec}$$
+</div>
+
+<p>
+Sie liegt damit unmittelbar auf der Compton-Skala des Elektrons.
+</p>
+
+
+<!-- ========================================================= -->
+
+<h2>14. Das Gesamtbild</h2>
+
+<p>
+Die gesamte Herleitung lässt sich auf eine einfache Kette reduzieren:
+</p>
+
+<div class="formula">
+
+$$
+F_C\propto\frac{1}{r^2}
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+v^2\propto\frac{1}{r}
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+a\propto\frac{1}{r^2}
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+P\propto\frac{1}{r^4}
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+\text{starker Energieverlust}
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+r\rightarrow r_{\text{min}}
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+E_{\text{ges}}=2m_ec^2
+$$
+
+$$
+\Downarrow
+$$
+
+$$
+\text{Annihilation und Wellenemission}
+$$
+
+</div>
+
+
+<!-- ========================================================= -->
+
+<h2>15. Kurzfassung</h2>
+
+<div class="important">
+
+<p>
+<strong>1.</strong> Elektron und Positron ziehen sich elektrisch an.
+</p>
+
+<p>
+<strong>2.</strong> Bei ihrer Annäherung werden sie beschleunigt.
+</p>
+
+<p>
+<strong>3.</strong> Beschleunigte Ladungen geben elektromagnetische
+Strahlung ab.
+</p>
+
+<p>
+<strong>4.</strong> Dadurch verliert das System Energie.
+</p>
+
+<p>
+<strong>5.</strong> Der Abstand wird kleiner und die Strahlung nimmt
+stark zu.
+</p>
+
+<p>
+<strong>6.</strong> Im verwendeten WRZT-Modell wird ein Minimalradius
+$r_{\text{min}}\approx0{,}705\,\text{fm}$ als Energieschwelle bestimmt.
+</p>
+
+<p>
+<strong>7.</strong> Die Ruheenergie des Elektron-Positron-Paares beträgt
+$2m_ec^2\approx1{,}022\,\text{MeV}$.
+</p>
+
+<p>
+<strong>8.</strong> Diese Energie entspricht einer charakteristischen
+Frequenz von etwa $2{,}47\times10^{20}\,\text{Hz}$.
+</p>
+
+<p>
+<strong>9.</strong> Die zugehörige Wellenlänge beträgt etwa
+$1{,}213\,\text{pm}$.
+</p>
+
+<p>
+<strong>10.</strong> In der WRZT wird die Annihilation als Übergang
+einer lokalisierten Materiestruktur in ein hochenergetisches
+Wellenfeld interpretiert.
+</p>
+
+</div>
+
+
+<h2>Fazit</h2>
+
+<p>
+Der zentrale Gedanke des Modells ist somit:
+</p>
+
+<div class="important">
+
+<h3>
+Materie → Kollaps → Energie → Welle
+</h3>
+
+<p>
+Die Annihilation wird dabei als Grenzprozess verstanden, bei dem die
+gebundene Energie des Elektron-Positron-Systems in elektromagnetische
+Wellenenergie übergeht.
+</p>
+
+</div>
+
+</body>
+</html>
