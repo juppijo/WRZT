@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>WRZT - Annihilations-Spiralkollaps Simulation</title>
+
+  <!-- MathJax configuration for inline & display math -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+        background-color: #0d1117;
+        color: #c9d1d9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 { color: #58a6ff; margin-bottom: 5px; }
+    p { color: #8b949e; margin-top: 0; }
+    #sim-container {
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    canvas {
+        background-color: #010409;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .dashboard {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .metric {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #21262d;
+        padding-bottom: 6px;
+    }
+    .metric-label { color: #8b949e; font-size: 0.9em; }
+    .metric-value { font-weight: bold; font-family: monospace; }
+    .controls {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+    }
+    button {
+        background-color: #238636;
+        color: #ffffff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    button:hover { background-color: #2ea043; }
+    button:disabled { background-color: #21262d; color: #484f58; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <h1>WRZT: Spiralkollaps & Annihilation</h1>
+  <p>Simulation des elektrodynamischen Kollapses ($r \to r_{\text{min}}$)</p>
+
+  <div id="sim-container">
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <div class="dashboard">
+      <div class="metric">
+        <span class="metric-label">Radius $r$:</span>
+        <span id="val-r" class="metric-value" style="color: #79c0ff;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Geschwindigkeit $v/c$:</span>
+        <span id="val-v" class="metric-value" style="color: #d2a8ff;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Lorentz-Faktor $\gamma$:</span>
+        <span id="val-gamma" class="metric-value" style="color: #ffa657;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Beschleunigung $a$:</span>
+        <span id="val-a" class="metric-value" style="color: #7ee787;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Strahlungsfrequenz $f$:</span>
+        <span id="val-f" class="metric-value" style="color: #ff7b72;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Status:</span>
+        <span id="val-status" class="metric-value" style="color: #e3b341;">Initialisiert</span>
+      </div>
+
+      <div class="controls">
+        <button id="btn-start">Start / Pause</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Naturkonstanten (skaliert für optische Simulation)
+    const C_LIGHT = 1.0;
+    let r = 220; // Startradius auf Canvas
+    const R_MIN_QUANTUM = 60; // Skalierter R_min (Quantenebene)
+    const R_MIN_CLASSIC = 8; // Skalierter r_min (Klassische Schwelle)
+
+    let angle = 0;
+    let isRunning = false;
+    let animId = null;
+    let trail = [];
+
+    function getMetrics(currentR) {
+      // Relativistisch skalierte Geschwindigkeits- und Beschleunigungsdynamik
+      let v_ratio = Math.min(0.9999, Math.sqrt(R_MIN_CLASSIC / currentR));
+      let gamma = 1 / Math.sqrt(1 - v_ratio * v_ratio);
+      let accel = (1 / (currentR * currentR)) * 1000;
+
+      // Frequenz skaliert mit der Energie
+      let freq_EHz = (246.96 * (R_MIN_CLASSIC / currentR)).toFixed(2);
+
+      return {
+        v_ratio,
+        gamma,
+        accel,
+        freq_EHz
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // 1. Schwellen-Radien einzeichnen
+      // R_min (Quanten-Wellenfeld)
+      ctx.beginPath();
+      ctx.arc(cx, cy, R_MIN_QUANTUM, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(88, 166, 255, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#58a6ff';
+      ctx.fillText("R_min (Quanten-Skala)", cx + R_MIN_QUANTUM + 5, cy - 5);
+
+      // r_min (Klassische Schwelle)
+      ctx.beginPath();
+      ctx.arc(cx, cy, R_MIN_CLASSIC, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 123, 114, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 2. Trajektorie (Spirale) zeichnen
+      if (trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(trail[0].x, trail[0].y);
+        for (let i = 1; i < trail.length; i++) {
+          ctx.lineTo(trail[i].x, trail[i].y);
+        }
+        ctx.strokeStyle = 'rgba(210, 168, 255, 0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // 3. Positionen der beiden Teilchen (Elektron & Positron)
+      const x1 = cx + r * Math.cos(angle);
+      const y1 = cy + r * Math.sin(angle);
+      const x2 = cx - r * Math.cos(angle);
+      const y2 = cy - r * Math.sin(angle);
+
+      // Teilchen 1 (Elektron - Blau)
+      ctx.beginPath();
+      ctx.arc(x1, y1, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#79c0ff';
+      ctx.fill();
+
+      // Teilchen 2 (Positron - Rot)
+      ctx.beginPath();
+      ctx.arc(x2, y2, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff7b72';
+      ctx.fill();
+
+      // Verbindungslinie (Feld)
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function update() {
+      if (!isRunning) return;
+
+      let m = getMetrics(r);
+
+      // Aktualisierung des Winkels (Winkelgeschwindigkeit wächst bei r -> 0)
+      let dAngle = (0.02 + (15 / r)) * (m.v_ratio + 0.1);
+      angle += dAngle;
+
+      // Strahlungsdämpfung: Radius schrumpft proportional zur Beschleunigung
+      let dr = 0.05 * (1 + (R_MIN_QUANTUM / r) ** 2);
+      r -= dr;
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      trail.push({
+        x: cx + r * Math.cos(angle),
+        y: cy + r * Math.sin(angle)
+      });
+
+      // Dashboard Werte aktualisieren
+      document.getElementById('val-r').innerText = `${r.toFixed(1)} fm`;
+      document.getElementById('val-v').innerText = `${m.v_ratio.toFixed(4)} c`;
+      document.getElementById('val-gamma').innerText = m.gamma.toFixed(3);
+      document.getElementById('val-a').innerText = `${m.accel.toFixed(1)} a₀`;
+      document.getElementById('val-f').innerText = `${m.freq_EHz} EHz`;
+
+      if (r <= R_MIN_QUANTUM && r > R_MIN_CLASSIC + 1) {
+        document.getElementById('val-status').innerText = "Quanten-Kopplung (R_min)";
+        document.getElementById('val-status').style.color = "#79c0ff";
+      }
+
+      // Abbruch bei Erreichen der klassischen Schwelle r_min (Annihilationspunkt)
+      if (r <= R_MIN_CLASSIC) {
+        r = R_MIN_CLASSIC;
+        isRunning = false;
+        document.getElementById('val-status').innerText = "Annihilation bei r_min!";
+        document.getElementById('val-status').style.color = "#ff7b72";
+        draw();
+        return;
+      }
+
+      draw();
+      animId = requestAnimationFrame(update);
+    }
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      if (r <= R_MIN_CLASSIC) return;
+      isRunning = !isRunning;
+      if (isRunning) {
+        document.getElementById('val-status').innerText = "Kollaps läuft...";
+        document.getElementById('val-status').style.color = "#7ee787";
+        update();
+      } else {
+        document.getElementById('val-status').innerText = "Pausiert";
+        document.getElementById('val-status').style.color = "#e3b341";
+      }
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      isRunning = false;
+      cancelAnimationFrame(animId);
+      r = 220;
+      angle = 0;
+      trail = [];
+      document.getElementById('val-status').innerText = "Bereit";
+      document.getElementById('val-status').style.color = "#e3b341";
+
+      let m = getMetrics(r);
+      document.getElementById('val-r').innerText = `${r.toFixed(1)} fm`;
+      document.getElementById('val-v').innerText = `${m.v_ratio.toFixed(4)} c`;
+      document.getElementById('val-gamma').innerText = m.gamma.toFixed(3);
+      document.getElementById('val-a').innerText = `${m.accel.toFixed(1)} a₀`;
+      document.getElementById('val-f').innerText = `${m.freq_EHz} EHz`;
+
+      draw();
+    });
+
+    // Erstes Zeichnen
+    draw();
+  </script>
+</body>
+</html>
