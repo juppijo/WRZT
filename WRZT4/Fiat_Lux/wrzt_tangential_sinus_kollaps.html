@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>WRZT - Tangentialer Kollaps & Wellen-Emission</title>
+
+  <!-- MathJax configuration for inline & display math -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+        background-color: #0d1117;
+        color: #c9d1d9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 { color: #58a6ff; margin-bottom: 5px; margin-top: 10px; font-size: 22px; }
+    p { color: #8b949e; margin-top: 0; font-size: 14px; }
+    #sim-container {
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    canvas {
+        background-color: #010409;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .dashboard {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        width: 330px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .metric {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #21262d;
+        padding-bottom: 6px;
+    }
+    .metric-label { color: #8b949e; font-size: 0.9em; }
+    .metric-value { font-weight: bold; font-family: monospace; }
+    .controls {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+    }
+    button {
+        background-color: #238636;
+        color: #ffffff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+        flex: 1;
+    }
+    button:hover { background-color: #2ea043; }
+  </style>
+</head>
+<body>
+
+  <h1>WRZT: Tangentialer Anflug & Wellen-Emission</h1>
+  <p>Rot (Positron) von links, Blau (Elektron) von rechts → Sinuswellen bei $r_{ ext{min}}$</p>
+
+  <div id="sim-container">
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <div class="dashboard">
+      <div class="metric">
+        <span class="metric-label">Phase:</span>
+        <span id="val-phase" class="metric-value" style="color: #e3b341;">Tangentialer Anflug</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Abstand $r$:</span>
+        <span id="val-r" class="metric-value" style="color: #79c0ff;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Geschwindigkeit $v/c$:</span>
+        <span id="val-v" class="metric-value" style="color: #d2a8ff;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Lorentz-Faktor $\gamma$:</span>
+        <span id="val-gamma" class="metric-value" style="color: #ffa657;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Beschleunigung $a$:</span>
+        <span id="val-a" class="metric-value" style="color: #7ee787;">-</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Strahlungsfrequenz $f$:</span>
+        <span id="val-f" class="metric-value" style="color: #ff7b72;">-</span>
+      </div>
+
+      <div class="controls">
+        <button id="btn-start">Start / Pause</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const R_MIN_QUANTUM = 90; // Radiusebene R_min (Canvas-Pixel)
+    const R_MIN_CLASSIC = 12; // Radiusebene r_min (Canvas-Pixel)
+
+    // Anfangspositionen: Rot von links nach rechts (unten), Blau von rechts nach links (oben)
+    let p_red = {
+      x: -280,
+      y: R_MIN_QUANTUM
+    }; // Rot (Positron) fliegt nach rechts (+x)
+    let p_blue = {
+      x: 280,
+      y: -R_MIN_QUANTUM
+    }; // Blau (Elektron) fliegt nach links (-x)
+
+    let state = 'approach'; // 'approach', 'orbit', 'waves'
+    let angle = -Math.PI / 2; // Startwinkel für Gegen-Uhrzeigersinn (Rotation nach oben/links)
+    let r_orbit = R_MIN_QUANTUM;
+
+    let isRunning = false;
+    let animId = null;
+    let trailRed = [];
+    let trailBlue = [];
+    let waveOffset = 0; // Animation der emittierten Sinuswellen
+
+    function getMetrics(dist) {
+      let r_effective = Math.max(dist / 2, R_MIN_CLASSIC);
+      let v_ratio = Math.min(0.9999, Math.sqrt(R_MIN_CLASSIC / r_effective));
+      let gamma = 1 / Math.sqrt(1 - v_ratio * v_ratio);
+      let accel = (1 / (r_effective * r_effective)) * 1000;
+      let freq_EHz = (246.96 * (R_MIN_CLASSIC / r_effective)).toFixed(2);
+      return {
+        v_ratio,
+        gamma,
+        accel,
+        freq_EHz
+      };
+    }
+
+    function resetSimulation() {
+      isRunning = false;
+      cancelAnimationFrame(animId);
+      state = 'approach';
+      p_red = {
+        x: 280,
+        y: -R_MIN_QUANTUM
+      };
+      p_blue = {
+        x: -280,
+        y: R_MIN_QUANTUM
+      };
+      angle = -Math.PI / 2;
+      r_orbit = R_MIN_QUANTUM;
+      trailRed = [];
+      trailBlue = [];
+      waveOffset = 0;
+
+      document.getElementById('val-phase').innerText = "Tangentialer Anflug";
+      document.getElementById('val-phase').style.color = "#e3b341";
+
+      let dist = Math.hypot(p_red.x - p_blue.x, p_red.y - p_blue.y);
+      let m = getMetrics(dist);
+      document.getElementById('val-r').innerText = `${(dist/2).toFixed(1)} fm`;
+      document.getElementById('val-v').innerText = `0.2000 c`;
+      document.getElementById('val-gamma').innerText = `1.021`;
+      document.getElementById('val-a').innerText = `${m.accel.toFixed(1)} a₀`;
+      document.getElementById('val-f').innerText = `${m.freq_EHz} EHz`;
+
+      draw();
+    }
+
+    function drawTrail(trail, color) {
+      if (trail.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(trail[0].x, trail[0].y);
+      for (let i = 1; i < trail.length; i++) {
+        ctx.lineTo(trail[i].x, trail[i].y);
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    function drawSineWave(startX, startY, dirX, dirY, length, amplitude, frequency, phase, color) {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+
+      // Senkrechter Vektor für Sinus-Ausschlag
+      let perpX = -dirY;
+      let perpY = dirX;
+
+      for (let d = 0; d <= length; d += 2) {
+        let sineVal = Math.sin((d / frequency) - phase) * amplitude * Math.sin((d / length) * Math.PI); // Envelope
+        let px = startX + dirX * d + perpX * sineVal;
+        let py = startY + dirY * d + perpY * sineVal;
+
+        if (d === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // 1. Radien-Ebenen
+      ctx.beginPath();
+      ctx.arc(cx, cy, R_MIN_QUANTUM, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(88, 166, 255, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#58a6ff';
+      ctx.fillText("R_min (Quanten-Wellenfeld)", cx + R_MIN_QUANTUM + 8, cy - 8);
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, R_MIN_CLASSIC, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 123, 114, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 2. Trajektorien zeichnen
+      drawTrail(trailRed, 'rgba(255, 123, 114, 0.6)');
+      drawTrail(trailBlue, 'rgba(121, 192, 255, 0.6)');
+
+      // 3. Positionen berechnen
+      let currRed, currBlue;
+      if (state === 'approach') {
+        currRed = {
+          x: cx + p_red.x,
+          y: cy + p_red.y
+        };
+        currBlue = {
+          x: cx + p_blue.x,
+          y: cy + p_blue.y
+        };
+      } else {
+        // Rotation Gegen den Uhrzeigersinn (-angle)
+        currRed = {
+          x: cx + r_orbit * Math.cos(-angle),
+          y: cy + r_orbit * Math.sin(-angle)
+        };
+        currBlue = {
+          x: cx - r_orbit * Math.cos(-angle),
+          y: cy - r_orbit * Math.sin(-angle)
+        };
+      }
+
+      if (state !== 'waves') {
+        // Verbindungslinie
+        ctx.beginPath();
+        ctx.moveTo(currRed.x, currRed.y);
+        ctx.lineTo(currBlue.x, currBlue.y);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Rot (Positron)
+        ctx.beginPath();
+        ctx.arc(currRed.x, currRed.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff7b72';
+        ctx.fill();
+
+        // Blau (Elektron)
+        ctx.beginPath();
+        ctx.arc(currBlue.x, currBlue.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#79c0ff';
+        ctx.fill();
+      } else {
+        // Phase 3: Abstrahlung zweier Sinuswellen in entgegengesetzte Richtungen
+        waveOffset += 0.15;
+        // Welle 1 (nach oben links)
+        drawSineWave(cx, cy, -0.707, -0.707, 180, 15, 12, waveOffset, '#ff7b72');
+        // Welle 2 (nach unten rechts)
+        drawSineWave(cx, cy, 0.707, 0.707, 180, 15, 12, waveOffset, '#79c0ff');
+
+        // Zentrum-Blitz
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+      }
+    }
+
+    function update() {
+      if (!isRunning) return;
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      if (state === 'approach') {
+        let v_app = 3.5;
+        p_red.x += v_app; // Rot fliegt nach rechts
+        p_blue.x -= v_app; // Blau fliegt nach links
+
+        trailRed.push({
+          x: cx + p_red.x,
+          y: cy + p_red.y
+        });
+        trailBlue.push({
+          x: cx + p_blue.x,
+          y: cy + p_blue.y
+        });
+
+        let currentDist = Math.hypot(p_red.x - p_blue.x, p_red.y - p_blue.y);
+        let currentRadius = currentDist / 2;
+
+        let m = getMetrics(currentDist);
+        document.getElementById('val-r').innerText = `${currentRadius.toFixed(1)} fm`;
+        document.getElementById('val-v').innerText = `0.2500 c`;
+        document.getElementById('val-gamma').innerText = `1.032`;
+        document.getElementById('val-a').innerText = `${m.accel.toFixed(1)} a₀`;
+        document.getElementById('val-f').innerText = `${m.freq_EHz} EHz`;
+
+        if (p_red.x >= 0) {
+          state = 'orbit';
+          r_orbit = R_MIN_QUANTUM;
+          angle = Math.PI / 2; // Startet die Rotation fließend gegen den Uhrzeigersinn
+          document.getElementById('val-phase').innerText = "Gegenzeigersinn-Spirale (R_min)";
+          document.getElementById('val-phase').style.color = "#58a6ff";
+        }
+      } else if (state === 'orbit') {
+        let m = getMetrics(r_orbit * 2);
+
+        // Rotation gegen den Uhrzeigersinn
+        let dAngle = (0.03 + (12 / r_orbit)) * (m.v_ratio + 0.1);
+        angle += dAngle;
+
+        let dr = 0.25 * (1 + (R_MIN_QUANTUM / r_orbit) ** 1.5);
+        r_orbit -= dr;
+
+        let posRed = {
+          x: cx + r_orbit * Math.cos(-angle),
+          y: cy + r_orbit * Math.sin(-angle)
+        };
+        let posBlue = {
+          x: cx - r_orbit * Math.cos(-angle),
+          y: cy - r_orbit * Math.sin(-angle)
+        };
+
+        trailRed.push(posRed);
+        trailBlue.push(posBlue);
+
+        document.getElementById('val-r').innerText = `${r_orbit.toFixed(1)} fm`;
+        document.getElementById('val-v').innerText = `${m.v_ratio.toFixed(4)} c`;
+        document.getElementById('val-gamma').innerText = m.gamma.toFixed(3);
+        document.getElementById('val-a').innerText = `${m.accel.toFixed(1)} a₀`;
+        document.getElementById('val-f').innerText = `${m.freq_EHz} EHz`;
+
+        if (r_orbit <= R_MIN_CLASSIC) {
+          r_orbit = R_MIN_CLASSIC;
+          state = 'waves';
+          document.getElementById('val-phase').innerText = "Annihilation & Wellen-Emission!";
+          document.getElementById('val-phase').style.color = "#ff7b72";
+        }
+      } else if (state === 'waves') {
+        // Animation läuft weiter für die Sinuswellen
+      }
+
+      draw();
+      animId = requestAnimationFrame(update);
+    }
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      isRunning = !isRunning;
+      if (isRunning) {
+        update();
+      }
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', resetSimulation);
+
+    // Erstes Zeichnen
+    resetSimulation();
+  </script>
+</body>
+</html>
