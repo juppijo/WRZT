@@ -26,17 +26,52 @@
 
   <style>
     body {
-      font-family: sans-serif;
-      margin: 40px;
-      color: #222222;
+      font-family: Arial, sans-serif;
+      max-width: 950px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.7;
+      color: #222;
       background: #ededfd;
     }
+    
     h1 {
       color: #5522aa;
+      border-bottom: 2px solid #5522aa;
+      padding-bottom: 10px;
     }
+    
     h2 {
       color: #7722aa;
+      margin-top: 45px;
     }
+    
+    h3 {
+      color: #5522aa;
+      margin-top: 30px;
+    }
+    
+    p {
+      margin: 1em 0;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      background: white;
+    }
+    
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    
+    th {
+      background: #eee8ff;
+    }
+    
   </style>
 </head>
 <body>
@@ -156,7 +191,7 @@
   </ul>
 
   <h2>
-    Analogie zu Lorentz-Faktor  $\gamma$
+    Analogie zu Lorentz-Faktor $\gamma$
   </h2>
 
   <p>Ja, es gibt sowohl im <strong>klassischen Strahlungsmodell</strong> als auch im <strong>Wellenbild</strong> (wie der Wellenmechanik und Feldtheorie) direkte Entsprechungen und Analogien zum Lorentz-Faktor $\gamma$.</p>
@@ -236,46 +271,44 @@
       </tr>
     </tbody>
   </table>
-  
+
   <h2>
     <p>Wellenlänge $\lambda_{\text{min}}$</p>
   </h2>
-  
+
   <p>Bei $r_{\text{min}}$ wird theoretisch die gesamte Ruheenergie des Paares ($E_{\text{ges}} = 2 m_e c^2 \approx 1{,}022,\text{MeV}$) in ein einzelnes virtuelles Grenz-Photon umgewandelt.</p>
-<p>Aus der Quantenbeziehung $E = h \cdot f = \frac{h \cdot c}{\lambda}$ lassen sich die maximale Frequenz $f_{\text{max}}$ und die minimale Wellenlänge $\lambda_{\text{min}}$ direkt berechnen:</p>
-<h3>1. Frequenz $f$ bei $r_{\text{min}}$</h3>
-<p>$$f = \frac{2 m_e c^2}{h}$$</p>
-<ul>
-<li>$E_{\text{ges}} = 2 \cdot (9{,}10938 \times 10^{-31},\text{kg}) \cdot (2{,}99792 \times 10^8,\text{m/s})^2 \approx 1{,}6374 \times 10^{-13},\text{J}$</li>
-<li>Planck-Konstante $h \approx 6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}$</li>
-</ul>
-<p>$$f = \frac{1{,}6374 \times 10^{-13},\text{J}}{6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}} \approx 2{,}4696 \times 10^{20},\text{Hz} = 246{,}96,\text{EHz}\text{ (Exahertz)}$$</p>
-<hr>
-<h3>2. Wellenlänge $\lambda$ bei $r_{\text{min}}$</h3>
-<p>$$\lambda = \frac{c}{f} = \frac{h}{2 m_e c}$$</p>
-<p>$$\lambda = \frac{6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}}{2 \cdot (9{,}10938 \times 10^{-31},\text{kg}) \cdot (2{,}99792 \times 10^8,\text{m/s})} \approx 1{,}2132 \times 10^{-12},\text{m} = 1{,}2132,\text{pm}\text{ (Picometer)}$$</p>
-<hr>
-<h3>Vergleichende Gegenüberstellung zur WRZT-Skala</h3>
-<ul>
-<li><strong>Grenz-Wellenlänge $\lambda$:</strong> $\approx 1{,}213,\text{pm}$ ($1213,\text{fm}$)</li>
-<li><strong>Raumzeit-Minimalradius $R_{\text{min}}$:</strong> $\approx 0{,}772,\text{pm}$ ($771{,}6,\text{fm}$)</li>
-<li><strong>Klassischer Schwellenradius $r_{\text{min}}$:</strong> $\approx 0{,}000705,\text{pm}$ ($0{,}705,\text{fm}$)</li>
-</ul>
-<p><strong>Zusammenhang:</strong></p>
-<p>Die Wellenlänge $\lambda$ der freigesetzten Annihilationsstrahlung liegt exakt in der Größenordnung deines Raumzeit-Minimalradius $R_{\text{min}}$:</p>
-<p>$$\lambda = 2\pi \cdot R_{\text{min}} = \lambda_{\text{Compton}}$$</p>
-<p>Das zeigt die Konsistenz in der WRZT: Während der geometrische Abstand $r_{\text{min}}$ auf den rein elektrischen Punkt fokussiert, entspricht die freiwerdende Wellenenergie der fundamentalen Gitter- und Compton-Wellenlänge der Raumzeit.</p>
+  <p>Aus der Quantenbeziehung $E = h \cdot f = \frac{h \cdot c}{\lambda}$ lassen sich die maximale Frequenz $f_{\text{max}}$ und die minimale Wellenlänge $\lambda_{\text{min}}$ direkt berechnen:</p>
+  <h3>1. Frequenz $f$ bei $r_{\text{min}}$</h3>
+  <p>$$f = \frac{2 m_e c^2}{h}$$</p>
+  <ul>
+    <li>$E_{\text{ges}} = 2 \cdot (9{,}10938 \times 10^{-31},\text{kg}) \cdot (2{,}99792 \times 10^8,\text{m/s})^2 \approx 1{,}6374 \times 10^{-13},\text{J}$</li>
+    <li>Planck-Konstante $h \approx 6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}$</li>
+  </ul>
+  <p>$$f = \frac{1{,}6374 \times 10^{-13},\text{J}}{6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}} \approx 2{,}4696 \times 10^{20},\text{Hz} = 246{,}96,\text{EHz}\text{ (Exahertz)}$$</p>
+  <hr>
+  <h3>2. Wellenlänge $\lambda$ bei $r_{\text{min}}$</h3>
+  <p>$$\lambda = \frac{c}{f} = \frac{h}{2 m_e c}$$</p>
+  <p>$$\lambda = \frac{6{,}62607 \times 10^{-34},\text{J}\cdot\text{s}}{2 \cdot (9{,}10938 \times 10^{-31},\text{kg}) \cdot (2{,}99792 \times 10^8,\text{m/s})} \approx 1{,}2132 \times 10^{-12},\text{m} = 1{,}2132,\text{pm}\text{ (Picometer)}$$</p>
+  <hr>
+  <h3>Vergleichende Gegenüberstellung zur WRZT-Skala</h3>
+  <ul>
+    <li><strong>Grenz-Wellenlänge $\lambda$:</strong> $\approx 1{,}213,\text{pm}$ ($1213,\text{fm}$)</li>
+    <li><strong>Raumzeit-Minimalradius $R_{\text{min}}$:</strong> $\approx 0{,}772,\text{pm}$ ($771{,}6,\text{fm}$)</li>
+    <li><strong>Klassischer Schwellenradius $r_{\text{min}}$:</strong> $\approx 0{,}000705,\text{pm}$ ($0{,}705,\text{fm}$)</li>
+  </ul>
+  <p><strong>Zusammenhang:</strong></p>
+  <p>Die Wellenlänge $\lambda$ der freigesetzten Annihilationsstrahlung liegt exakt in der Größenordnung deines Raumzeit-Minimalradius $R_{\text{min}}$:</p>
+  <p>$$\lambda = 2\pi \cdot R_{\text{min}} = \lambda_{\text{Compton}}$$</p>
+  <p>Das zeigt die Konsistenz in der WRZT: Während der geometrische Abstand $r_{\text{min}}$ auf den rein elektrischen Punkt fokussiert, entspricht die freiwerdende Wellenenergie der fundamentalen Gitter- und Compton-Wellenlänge der Raumzeit.</p>
 
 
-<hr>
+  <hr>
 
 
-<h2>Fazit: Dynamik des tangentialen Kollapses &amp; Wellen-Emission (WRZT)</h2>
-  
-<p>Der Kollaps zweier entgegengesetzter Ladungsträger (Positron und Elektron) beschreibt in der Wellenraumzeit-Theorie (WRZT) den kontinuierlichen Übergang von einer gebundenen Materiestruktur in freie Strahlungsenergie.</p>
+  <h2>Fazit: Dynamik des tangentialen Kollapses &amp; Wellen-Emission (WRZT)</h2>
+
+  <p>Der Kollaps zweier entgegengesetzter Ladungsträger (Positron und Elektron) beschreibt in der Wellenraumzeit-Theorie (WRZT) den kontinuierlichen Übergang von einer gebundenen Materiestruktur in freie Strahlungsenergie.</p>
 
 
-
-  
 </body>
 </html>
