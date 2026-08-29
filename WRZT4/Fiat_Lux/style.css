@@ -26,9 +26,9 @@
     --border: rgba(105, 231, 223, 0.20);
     --border-hover: rgba(105, 231, 223, 0.45);
 
-    /* Layout & Spacing - Erhöhter Mindestabstand am Rand (1.5rem statt 1rem/1.25rem) */
+    /* Layout & Spacing - Großzügiger Randabstand (2rem Minimum statt 1.5rem) */
     --max-width: 1000px;
-    --content-padding: clamp(1.5rem, 5vw, 3.5rem);
+    --content-padding: clamp(2rem, 6vw, 4.5rem);
     --radius: 12px;
 
     /* Typografie */
@@ -41,11 +41,11 @@
     --h3-size: clamp(1.3rem, 2vw + 0.2rem, 1.75rem);
     --h4-size: clamp(1.1rem, 1.5vw, 1.35rem);
 
-    --space-xs: 0.5rem;
-    --space-sm: 0.75rem;
-    --space-md: 1.25rem;
-    --space-lg: 2rem;
-    --space-xl: 3.5rem;
+    --space-xs: 0.6rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2.5rem;
+    --space-xl: 4.5rem;
 }
 
 /* ---------------------------------------------------------
@@ -85,7 +85,7 @@ body {
 main {
     width: 100%;
     max-width: var(--max-width);
-    margin: var(--space-lg) auto;
+    margin: clamp(var(--space-lg), 5vw, var(--space-xl)) auto;
     padding-inline: var(--content-padding);
 }
 
@@ -101,7 +101,7 @@ main {
    --------------------------------------------------------- */
 header {
     width: 100%;
-    padding: clamp(2rem, 6vw, 4.5rem) var(--content-padding);
+    padding: clamp(2.5rem, 7vw, 5.5rem) var(--content-padding);
     text-align: center;
     border-bottom: 1px solid var(--border);
     background: linear-gradient(180deg, rgba(16, 40, 61, 0.8) 0%, rgba(7, 18, 31, 0.95) 100%);
@@ -115,7 +115,7 @@ nav {
     align-items: center;
     gap: var(--space-sm);
     flex-wrap: wrap;
-    padding: 0.8rem var(--content-padding);
+    padding: 1rem var(--content-padding);
     border-bottom: 1px solid var(--border);
     background: rgba(7, 18, 31, 0.85);
     backdrop-filter: blur(12px);
@@ -218,7 +218,7 @@ em {
 .formula {
     width: 100%;
     margin: var(--space-md) 0;
-    padding: clamp(1.2rem, 3vw, 1.8rem);
+    padding: clamp(1.4rem, 3.5vw, 2.2rem);
     background: var(--surface);
     border-left: 4px solid var(--accent);
     border-radius: var(--radius);
@@ -314,7 +314,7 @@ tr:hover {
 
 .info-box, .chapter {
     margin: var(--space-lg) 0;
-    padding: clamp(1.5rem, 4vw, 2.5rem);
+    padding: clamp(1.75rem, 5vw, 3rem);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -391,7 +391,7 @@ hr {
 
 footer {
     margin-top: var(--space-xl);
-    padding: var(--space-lg) var(--content-padding);
+    padding: calc(var(--space-lg) * 1.2) var(--content-padding);
     text-align: center;
     border-top: 1px solid var(--border);
     color: var(--text-muted);
@@ -403,20 +403,26 @@ footer {
    --------------------------------------------------------- */
 @media (max-width: 600px) {
     :root {
-        /* Auch auf Smartphones mindestens 1.25rem Abstände zum Rand */
-        --content-padding: 1.25rem;
+        /* Auch auf Smartphones spürbarer Abstand zum Rand */
+        --content-padding: 1.5rem;
+        --space-lg: 2rem;
+        --space-xl: 3rem;
     }
 
     nav {
-        gap: 0.3rem;
+        gap: 0.4rem;
     }
 
     nav a {
-        padding: 0.3rem 0.5rem;
+        padding: 0.35rem 0.6rem;
     }
 
     .info-box, .chapter {
-        padding: 1.25rem;
+        padding: 1.5rem;
+    }
+
+    .math, .equation, .formula {
+        padding: 1.2rem;
     }
 }
 
