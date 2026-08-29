@@ -39,8 +39,8 @@ $$\frac{\Xi}{\eta} \cdot R_{\min} = 1 \text{←〰️→} c = 299.792.458 \text{
 
 ## 🔬 Wichtige Herleitungen
 
-* **[Das Einheits-Manifest](./01_Manifest/)**: Die 10 Meilensteine der WRZT.
-* **[Klassischer Elektronenradius](./02_Herleitungen/)**: Gleichsetzung von Zentrifugalkraft ($v=c$) und Coulomb-Kraft:
+* **[Das Einheits-Manifest](https://juppijo.github.io/WRZT/Fiat-Lux%E2%80%93Einheits-Manifest.html)**: Die 10 Meilensteine der WRZT.
+* **[Klassischer Elektronenradius](https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/WRZT_Gesamtmanifest.html)**: Gleichsetzung von Zentrifugalkraft ($v=c$) und Coulomb-Kraft:
   $$r_e = \frac{1}{4\pi\varepsilon_0} \cdot \frac{e^2}{m_e c^2}$$
 * **Winkel-Notation**:
   * $\Theta$ = Wellenwinkel / Bugwinkel
@@ -50,8 +50,8 @@ $$\frac{\Xi}{\eta} \cdot R_{\min} = 1 \text{←〰️→} c = 299.792.458 \text{
 
 ## 🧰 Interaktive Tools & Simulationen
 
-* 📊 **[HTML-Rechner & Visualisierungen](./03_Tools_Simulationen/)**
-* 🧮 **[Plasmasequenzen & Wellenmodelle](./03_Tools_Simulationen/)**
+* 📊 **[HTML-Rechner & Visualisierungen](https://juppijo.github.io/WRZT/WRZT2/Latex-Rechner-Cl/index.html)**
+* 🧮 **[Plasmasequenzen & Wellenmodelle](https://juppijo.github.io/WRZT/WRZT3/WRZT_Sim.html)**
 
 ---
 
