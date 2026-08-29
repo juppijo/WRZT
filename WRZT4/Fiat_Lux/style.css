@@ -1,17 +1,18 @@
 /* =========================================================
-   WRZT – Responsives CSS
+   WRZT – Responsives & Modernes CSS
    Wellenraumzeit-Theorie
    ========================================================= */
 
 /* ---------------------------------------------------------
-   1. Grundvariablen
+   1. Grundvariablen & Design-Tokens
    --------------------------------------------------------- */
-
 :root {
+    /* Farbpalette */
     --bg: #07121f;
     --bg-secondary: #0b1c2d;
-    --surface: #10283d;
-    --surface-light: #15344d;
+    --surface: rgba(16, 40, 61, 0.65);
+    --surface-solid: #10283d;
+    --surface-hover: rgba(53, 208, 197, 0.08);
 
     --text: #e8e4da;
     --text-soft: #b9c7d2;
@@ -20,35 +21,36 @@
     --accent: #35d0c5;
     --accent-light: #69e7df;
     --accent-dark: #199e98;
+    --accent-glow: rgba(53, 208, 197, 0.25);
 
     --border: rgba(105, 231, 223, 0.20);
+    --border-hover: rgba(105, 231, 223, 0.45);
 
+    /* Layout & Spacing */
     --max-width: 1000px;
-    --content-padding: clamp(1rem, 4vw, 3rem);
+    --content-padding: clamp(1.25rem, 4vw, 3rem);
+    --radius: 12px;
 
-    --radius: 10px;
+    /* Flüssige Typografie (Fluid Typography) */
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
 
-    /* Responsive Schriftgrößen */
     --text-size: clamp(1rem, 0.35vw + 0.9rem, 1.15rem);
+    --h1-size: clamp(2.2rem, 5vw + 1rem, 3.8rem);
+    --h2-size: clamp(1.6rem, 3vw + 0.5rem, 2.4rem);
+    --h3-size: clamp(1.3rem, 2vw + 0.2rem, 1.75rem);
+    --h4-size: clamp(1.1rem, 1.5vw, 1.35rem);
 
-    --h1-size: clamp(2rem, 5vw, 4rem);
-    --h2-size: clamp(1.5rem, 3vw, 2.5rem);
-    --h3-size: clamp(1.25rem, 2vw, 1.8rem);
-    --h4-size: clamp(1.1rem, 1.5vw, 1.4rem);
-
-    /* Abstände */
-    --space-xs: 0.4rem;
-    --space-sm: 0.7rem;
-    --space-md: 1rem;
-    --space-lg: 1.8rem;
-    --space-xl: 3rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1.25rem;
+    --space-lg: 2rem;
+    --space-xl: 3.5rem;
 }
 
-
 /* ---------------------------------------------------------
-   2. Globales Reset
+   2. Globales Reset & Basis
    --------------------------------------------------------- */
-
 *,
 *::before,
 *::after {
@@ -57,707 +59,396 @@
 
 html {
     scroll-behavior: smooth;
-    font-size: 100%;
+    color-scheme: dark;
 }
 
 body {
     margin: 0;
     padding: 0;
-
-    background:
-        radial-gradient(
-            circle at top,
-            rgba(53, 108, 250, 0.06),
-            transparent 35%
-        ),
+    background: 
+        radial-gradient(circle at 50% 0%, rgba(53, 208, 197, 0.08), transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(11, 28, 45, 0.5), transparent 50%),
         var(--bg);
-
+    background-attachment: fixed;
     color: var(--text);
-
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
+    font-family: var(--font-sans);
     font-size: var(--text-size);
-    line-height: 1.65;
-
+    line-height: 1.7;
     min-height: 100vh;
-
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
-
 
 /* ---------------------------------------------------------
-   3. Hauptcontainer
+   3. Hauptcontainer & Layout
    --------------------------------------------------------- */
 main {
-    font-family: Arial, sans-serif;
-    max-width: 950px;
-    margin: clamp(20px, 4vw, 40px) auto;
-    padding: clamp(15px, 3vw, 30px);
-    line-height: 1.7;
+    width: 100%;
+    max-width: var(--max-width);
+    margin: var(--space-lg) auto;
+    padding-inline: var(--content-padding);
 }
+
 .container {
-    width: min(
-        calc(100% - 2 * var(--content-padding)),
-        var(--max-width)
-    );
+    width: min(100%, var(--max-width));
     margin-inline: auto;
 }
 
-
 /* ---------------------------------------------------------
-   4. Header
+   4. Header & Navigation
    --------------------------------------------------------- */
-
 header {
     width: 100%;
-
-    padding:
-        clamp(1.5rem, 5vw, 4rem)
-        var(--content-padding);
-
+    padding: clamp(2rem, 6vw, 4.5rem) var(--content-padding);
     text-align: center;
-
     border-bottom: 1px solid var(--border);
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(16, 40, 61, 0.95),
-            rgba(7, 18, 31, 0.85)
-        );
+    background: linear-gradient(180deg, rgba(16, 40, 61, 0.8) 0%, rgba(7, 18, 31, 0.95) 100%);
+    backdrop-filter: blur(10px);
 }
 
+nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    padding: 0.8rem var(--content-padding);
+    border-bottom: 1px solid var(--border);
+    background: rgba(7, 18, 31, 0.85);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav a {
+    padding: 0.4rem 0.8rem;
+    border-radius: calc(var(--radius) / 2);
+    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    color: var(--text-soft);
+}
+
+nav a:hover {
+    background: var(--surface-hover);
+    color: var(--accent-light);
+    text-decoration: none;
+}
 
 /* ---------------------------------------------------------
-   5. Haupttitel
+   5. Typografie & Hierarchie
    --------------------------------------------------------- */
-
-h1 {
-    margin: 0;
-
-    font-size: var(--h1-size);
-
-    line-height: 1.1;
-
-    font-weight: 700;
-
-    letter-spacing: -0.02em;
-
+h1, h2, h3, h4 {
     color: var(--accent-light);
-
+    font-weight: 700;
+    letter-spacing: -0.02em;
     text-wrap: balance;
 }
 
-
-/* ---------------------------------------------------------
-   6. Überschriften
-   --------------------------------------------------------- */
+h1 {
+    margin: 0;
+    font-size: var(--h1-size);
+    line-height: 1.15;
+    text-shadow: 0 0 30px rgba(105, 231, 223, 0.2);
+}
 
 h2 {
     margin-top: var(--space-xl);
     margin-bottom: var(--space-md);
-
     font-size: var(--h2-size);
-
-    line-height: 1.2;
-
-    color: var(--accent-light);
-
-    text-wrap: balance;
+    line-height: 1.25;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4rem;
 }
 
 h3 {
-    margin-top: 2.2rem;
-    margin-bottom: 0.8rem;
-
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
     font-size: var(--h3-size);
-
-    line-height: 1.3;
-
     color: var(--accent);
 }
 
 h4 {
-    margin-top: 1.5rem;
-
+    margin-top: var(--space-md);
     font-size: var(--h4-size);
-
     color: var(--text);
 }
-
-
-/* ---------------------------------------------------------
-   7. Fließtext
-   --------------------------------------------------------- */
 
 p {
-    margin:
-        0.9em
-        0;
-
+    margin: 0 0 var(--space-md) 0;
     color: var(--text);
-
-    max-width: 75ch;
+    max-width: 72ch;
 }
 
+p:last-child {
+    margin-bottom: 0;
+}
 
 /* ---------------------------------------------------------
-   8. Links
+   6. Auszeichnungen & Links
    --------------------------------------------------------- */
-
 a {
     color: var(--accent-light);
-
     text-decoration: none;
-
-    transition:
-        color 0.2s ease,
-        opacity 0.2s ease;
+    transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 a:hover {
-    color: white;
+    color: #ffffff;
     text-decoration: underline;
 }
 
-
-/* ---------------------------------------------------------
-   9. Listen
-   --------------------------------------------------------- */
-
-ul,
-ol {
-    padding-left: 1.5rem;
-
-    max-width: 75ch;
-}
-
-li {
-    margin-bottom: 0.45rem;
-}
-
-
-/* ---------------------------------------------------------
-   10. Wissenschaftliche Hervorhebung
-   --------------------------------------------------------- */
-
 strong {
     color: #ffffff;
-
-    font-weight: 650;
+    font-weight: 600;
 }
 
 em {
     color: var(--accent-light);
+    font-style: italic;
 }
 
-
 /* ---------------------------------------------------------
-   11. Formelbereich
+   7. Formeln & MathJax
    --------------------------------------------------------- */
-
 .math,
 .equation,
 .formula {
     width: 100%;
-
-    margin:
-        clamp(1.2rem, 3vw, 2.5rem)
-        0;
-
-    padding:
-        clamp(0.8rem, 2vw, 1.5rem);
-
-    background: rgba(16, 40, 61, 0.65);
-
-    border-left:
-        3px solid
-        var(--accent);
-
+    margin: var(--space-md) 0;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
     border-radius: var(--radius);
-
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     overflow-x: auto;
-
-    -webkit-overflow-scrolling: touch;
+    backdrop-filter: blur(5px);
 }
-
-
-/* ---------------------------------------------------------
-   12. MathJax
-   --------------------------------------------------------- */
 
 mjx-container {
     max-width: 100%;
-
     overflow-x: auto;
     overflow-y: hidden;
-
     padding-block: 0.2rem;
 }
 
-
-/* Formel anklickbar */
 mjx-container[display="true"] {
     cursor: pointer;
-
-    transition:
-        transform 0.2s ease,
-        filter 0.2s ease;
+    transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 mjx-container[display="true"]:hover {
-    filter: brightness(1.15);
+    filter: brightness(1.2);
+    transform: scale(1.01);
 }
 
-
 /* ---------------------------------------------------------
-   13. Code
+   8. Code-Blöcke
    --------------------------------------------------------- */
-
 code {
-    padding:
-        0.15em
-        0.4em;
-
-    border-radius: 5px;
-
-    background: #0a1826;
-
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    background: rgba(10, 24, 38, 0.8);
     color: var(--accent-light);
-
-    font-family:
-        "Cascadia Code",
-        "Fira Code",
-        Consolas,
-        monospace;
-
-    font-size: 0.9em;
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    border: 1px solid rgba(105, 231, 223, 0.1);
 }
 
 pre {
-    margin: 1.5rem 0;
-
-    padding: 1.2rem;
-
-    background: #06101b;
-
-    border:
-        1px solid
-        var(--border);
-
+    margin: var(--space-md) 0;
+    padding: var(--space-md);
+    background: #040a12;
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-
     overflow-x: auto;
-
-    font-size: clamp(0.8rem, 1vw, 0.95rem);
+    font-size: clamp(0.85rem, 1vw, 0.95rem);
 }
 
 pre code {
     padding: 0;
-
     background: none;
-
-    color: var(--text);
+    border: none;
+    color: var(--text-soft);
 }
 
-
 /* ---------------------------------------------------------
-   14. Tabellen
+   9. Komponenten (Tabellen, Info-Boxen, Kapitel)
    --------------------------------------------------------- */
-
 .table-wrapper {
     width: 100%;
-
-    margin: 1.5rem 0;
-
+    margin: var(--space-md) 0;
     overflow-x: auto;
-
-    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
 }
 
 table {
     width: 100%;
-
     border-collapse: collapse;
-
     min-width: 600px;
-
-    background: rgba(16, 40, 61, 0.5);
+    background: var(--surface);
 }
 
-th,
-td {
-    padding:
-        0.75rem
-        1rem;
-
-    border:
-        1px solid
-        var(--border);
-
+th, td {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border);
     text-align: left;
 }
 
 th {
     color: var(--accent-light);
+    background: var(--surface-solid);
+    font-weight: 600;
+}
 
-    background: var(--surface);
+tr:last-child td {
+    border-bottom: none;
 }
 
 tr:hover {
-    background: rgba(53, 208, 197, 0.05);
+    background: var(--surface-hover);
 }
 
-
-/* ---------------------------------------------------------
-   15. Infobox
-   --------------------------------------------------------- */
-
-.info-box {
-    margin:
-        1.5rem
-        0;
-
-    padding:
-        clamp(1rem, 3vw, 1.5rem);
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(16, 40, 61, 0.9),
-            rgba(11, 28, 45, 0.8)
-        );
-
-    border:
-        1px solid
-        var(--border);
-
+.info-box, .chapter {
+    margin: var(--space-lg) 0;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-
-    box-shadow:
-        0 8px 30px
-        rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    transition: border-color 0.3s ease;
 }
 
-.info-box h3 {
-    margin-top: 0;
+.info-box:hover, .chapter:hover {
+    border-color: var(--border-hover);
 }
-
-
-/* ---------------------------------------------------------
-   16. Warnung / Hinweis
-   --------------------------------------------------------- */
 
 .warning {
-    margin: 1.5rem 0;
-
-    padding: 1rem 1.2rem;
-
-    border-left:
-        4px solid
-        #d6a84f;
-
-    background:
-        rgba(214, 168, 79, 0.08);
-
+    margin: var(--space-md) 0;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid #e5b555;
+    background: rgba(229, 181, 85, 0.08);
+    border-radius: 0 var(--radius) var(--radius) 0;
     color: var(--text);
 }
 
-
 /* ---------------------------------------------------------
-   17. Navigation
+   10. Interaktive Elemente & Buttons
    --------------------------------------------------------- */
-
-nav {
-    width: 100%;
-
-    display: flex;
-
-    justify-content: center;
-
+button, .button {
+    display: inline-flex;
     align-items: center;
-
-    gap: clamp(0.5rem, 2vw, 1.5rem);
-
-    flex-wrap: wrap;
-
-    padding: 1rem var(--content-padding);
-
-    border-bottom: 1px solid var(--border);
-
-    background: rgba(7, 18, 31, 0.9);
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 100;
-}
-
-nav a {
-    padding: 0.4rem 0.7rem;
-
-    border-radius: 6px;
-
-    font-size: clamp(0.85rem, 1.2vw, 1rem);
-}
-
-nav a:hover {
+    justify-content: center;
+    padding: 0.65rem 1.3rem;
+    border: 1px solid var(--accent);
+    border-radius: calc(var(--radius) / 1.5);
     background: rgba(53, 208, 197, 0.1);
+    color: var(--accent-light);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
+button:hover, .button:hover {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: translateY(-2px);
     text-decoration: none;
 }
 
-
 /* ---------------------------------------------------------
-   18. Karten / Kapitel
+   11. Listen, Medien & Trennlinien
    --------------------------------------------------------- */
-
-.chapter {
-    margin:
-        clamp(2rem, 5vw, 4rem)
-        0;
-
-    padding:
-        clamp(1.2rem, 3vw, 2rem);
-
-    background:
-        rgba(16, 40, 61, 0.35);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius: var(--radius);
+ul, ol {
+    padding-left: 1.4rem;
+    margin-bottom: var(--space-md);
+    max-width: 72ch;
 }
 
-
-/* ---------------------------------------------------------
-   19. Buttons
-   --------------------------------------------------------- */
-
-button,
-.button {
-    display: inline-block;
-
-    padding:
-        0.65rem
-        1.1rem;
-
-    border: 1px solid var(--accent);
-
-    border-radius: 7px;
-
-    background:
-        rgba(53, 208, 197, 0.08);
-
-    color: var(--accent-light);
-
-    font: inherit;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
+li {
+    margin-bottom: var(--space-xs);
 }
-
-button:hover,
-.button:hover {
-    background:
-        rgba(53, 208, 197, 0.18);
-
-    transform: translateY(-1px);
-}
-
-
-/* ---------------------------------------------------------
-   20. Bilder
-   --------------------------------------------------------- */
 
 img {
     display: block;
-
     max-width: 100%;
-
     height: auto;
-
     border-radius: var(--radius);
 }
 
-
-/* ---------------------------------------------------------
-   21. Horizontale Linie
-   --------------------------------------------------------- */
-
 hr {
-    margin:
-        clamp(2rem, 5vw, 4rem)
-        0;
-
+    margin: var(--space-xl) 0;
     border: 0;
-
-    border-top:
-        1px solid
-        var(--border);
+    border-top: 1px solid var(--border);
 }
-
-
-/* ---------------------------------------------------------
-   22. Footer
-   --------------------------------------------------------- */
 
 footer {
-    margin-top: 4rem;
-
-    padding:
-        2rem
-        var(--content-padding);
-
+    margin-top: var(--space-xl);
+    padding: var(--space-lg) var(--content-padding);
     text-align: center;
-
-    border-top:
-        1px solid
-        var(--border);
-
+    border-top: 1px solid var(--border);
     color: var(--text-muted);
-
-    font-size: 0.9rem;
+    font-size: 0.88rem;
 }
 
-
-/* =========================================================
-   RESPONSIVE BEREICHE
-   ========================================================= */
-
-
 /* ---------------------------------------------------------
-   23. Kleine Smartphones
+   12. Media Queries & Accessibility
    --------------------------------------------------------- */
-
-@media (max-width: 480px) {
-
+@media (max-width: 600px) {
     :root {
         --content-padding: 1rem;
     }
 
-    body {
-        line-height: 1.6;
-    }
-
     nav {
-        gap: 0.25rem;
+        gap: 0.3rem;
     }
 
     nav a {
-        padding: 0.35rem 0.5rem;
+        padding: 0.3rem 0.5rem;
     }
 
-    .chapter {
-        padding: 1rem;
-    }
-
-    .math,
-    .equation,
-    .formula {
-        padding: 0.7rem;
+    .info-box, .chapter {
+        padding: 1.1rem;
     }
 }
-
-
-/* ---------------------------------------------------------
-   24. Tablets
-   --------------------------------------------------------- */
-
-@media (min-width: 481px) and (max-width: 900px) {
-
-    :root {
-        --content-padding: clamp(1.5rem, 4vw, 2.5rem);
-    }
-}
-
-
-/* ---------------------------------------------------------
-   25. Große Bildschirme
-   --------------------------------------------------------- */
 
 @media (min-width: 1400px) {
-
     :root {
         --max-width: 1100px;
     }
 }
 
-
-/* ---------------------------------------------------------
-   26. Sehr große Bildschirme
-   --------------------------------------------------------- */
-
-@media (min-width: 1800px) {
-
-    :root {
-        --max-width: 1200px;
-    }
-}
-
-
-/* ---------------------------------------------------------
-   27. Bewegungen reduzieren
-   --------------------------------------------------------- */
-
 @media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
-
-        transition: none !important;
     }
 }
-
-
-/* ---------------------------------------------------------
-   28. Druckversion
-   --------------------------------------------------------- */
 
 @media print {
-
     body {
         background: white;
-
         color: black;
     }
 
-    nav,
-    button {
+    nav, button, .button {
         display: none;
     }
 
-    h1,
-    h2,
-    h3 {
+    h1, h2, h3, h4, strong, em {
         color: black;
     }
 
-    p {
-        max-width: none;
-    }
-
-    .chapter,
-    .info-box,
-    .math,
-    .equation,
-    .formula {
-        background: white;
-
-        border-color: #999;
-
+    .chapter, .info-box, .math, .equation, .formula {
+        background: transparent;
+        border: 1px solid #ccc;
         box-shadow: none;
     }
 }
