@@ -1,5 +1,5 @@
 /* =========================================================
-   WRZT – Responsives & Modernes CSS
+   WRZT – Responsives & Modernes CSS (Optimierter Randabstand)
    Wellenraumzeit-Theorie
    ========================================================= */
 
@@ -26,12 +26,12 @@
     --border: rgba(105, 231, 223, 0.20);
     --border-hover: rgba(105, 231, 223, 0.45);
 
-    /* Layout & Spacing */
+    /* Layout & Spacing - Erhöhter Mindestabstand am Rand (1.5rem statt 1rem/1.25rem) */
     --max-width: 1000px;
-    --content-padding: clamp(1.25rem, 4vw, 3rem);
+    --content-padding: clamp(1.5rem, 5vw, 3.5rem);
     --radius: 12px;
 
-    /* Flüssige Typografie (Fluid Typography) */
+    /* Typografie */
     --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
 
@@ -80,7 +80,7 @@ body {
 }
 
 /* ---------------------------------------------------------
-   3. Hauptcontainer & Layout
+   3. Hauptcontainer & Layout (Garantiert großzügigen Rand)
    --------------------------------------------------------- */
 main {
     width: 100%;
@@ -90,8 +90,10 @@ main {
 }
 
 .container {
-    width: min(100%, var(--max-width));
+    width: 100%;
+    max-width: var(--max-width);
     margin-inline: auto;
+    padding-inline: var(--content-padding);
 }
 
 /* ---------------------------------------------------------
@@ -216,7 +218,7 @@ em {
 .formula {
     width: 100%;
     margin: var(--space-md) 0;
-    padding: clamp(1rem, 2.5vw, 1.5rem);
+    padding: clamp(1.2rem, 3vw, 1.8rem);
     background: var(--surface);
     border-left: 4px solid var(--accent);
     border-radius: var(--radius);
@@ -312,7 +314,7 @@ tr:hover {
 
 .info-box, .chapter {
     margin: var(--space-lg) 0;
-    padding: clamp(1.25rem, 3vw, 2rem);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -365,7 +367,7 @@ button:hover, .button:hover {
    11. Listen, Medien & Trennlinien
    --------------------------------------------------------- */
 ul, ol {
-    padding-left: 1.4rem;
+    padding-left: 1.75rem;
     margin-bottom: var(--space-md);
     max-width: 72ch;
 }
@@ -401,7 +403,8 @@ footer {
    --------------------------------------------------------- */
 @media (max-width: 600px) {
     :root {
-        --content-padding: 1rem;
+        /* Auch auf Smartphones mindestens 1.25rem Abstände zum Rand */
+        --content-padding: 1.25rem;
     }
 
     nav {
@@ -413,7 +416,7 @@ footer {
     }
 
     .info-box, .chapter {
-        padding: 1.1rem;
+        padding: 1.25rem;
     }
 }
 
