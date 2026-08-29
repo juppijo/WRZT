@@ -12,11 +12,11 @@
 body {
   font-family: sans-serif;
   margin: 40px;
-  color: #222222;
-  background: #fdfdfd;
+  color: #112255;
+  background: #ededfd;
 }
 h1 {
-  color: #c9a227;
+  color: #112299;
 }
 </style>
 </head>
