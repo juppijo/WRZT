@@ -67,7 +67,7 @@ body {
     background:
         radial-gradient(
             circle at top,
-            rgba(53, 208, 197, 0.06),
+            rgba(53, 108, 250, 0.06),
             transparent 35%
         ),
         var(--bg);
@@ -87,7 +87,6 @@ body {
     min-height: 100vh;
 
     overflow-x: hidden;
-		/* background: red; */
 }
 
 
