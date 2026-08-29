@@ -36,7 +36,7 @@
     --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
 
     --text-size: clamp(1rem, 0.35vw + 0.9rem, 1.15rem);
-    --h1-size: clamp(2.2rem, 5vw + 1rem, 3.8rem);
+    --h1-size: clamp(2.0rem, 4vw + 1rem, 3.2rem);
     --h2-size: clamp(1.6rem, 3vw + 0.5rem, 2.4rem);
     --h3-size: clamp(1.3rem, 2vw + 0.2rem, 1.75rem);
     --h4-size: clamp(1.1rem, 1.5vw, 1.35rem);
