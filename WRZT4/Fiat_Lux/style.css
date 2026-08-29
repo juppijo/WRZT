@@ -412,7 +412,7 @@ footer {
       backdrop-filter: blur(12px);
       margin-bottom: 25px;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: right;
     }
 /* ---------------------------------------------------------
    12. Media Queries & Accessibility
