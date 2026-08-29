@@ -95,7 +95,7 @@ body {
    --------------------------------------------------------- */
 main {
     font-family: Arial, sans-serif;
-    max-width: 950px
+    max-width: 950px;
     margin: clamp(20px, 4vw, 40px) auto;
     padding: clamp(15px, 3vw, 30px);
     line-height: 1.7;
