@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilder-Anzeige</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #4285f4;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #3367d6;
+    }
+    .browser-window {
+      width: 400px;
+      height: 300px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      font-family: sans-serif;
+    }
+    .browser-bar {
+      background: #e0e0e0;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #555;
+      border-bottom: 1px solid #ccc;
+    }
+    iframe {
+      width: 100%;
+      height: calc(100% - 29px);
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h3>Google Fotos Album</h3>
+    <p>Klicke auf den Button, um das Bild direkt bei Google Fotos zu öffnen:</p>
+    <a href="https://photos.app.goo.gl/3hPyF3kJh2NVLi5v5" target="_blank" rel="noopener noreferrer" class="btn">
+      Bild ansehen
+    </a>
+  </div>
+
+  <div class="card">
+    <a href="https://i.postimg.cc/1tR38rwk/image1.jpgL" target="_blank">
+      <img src="DEIN_KOPIERTER_BILD_LINK" alt="Vorschaubild" style="width:200px; border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+    </a>
+  </div>
+  <div class="card">
+    <a href="https://ibb.co/0yc5J65J" target="_blank">
+      <img src="thumbnail.jpg" alt="Miniaturansicht" style="width:200px; border-radius:8px;">
+    </a>
+  </div>
+<div class="browser-window" style="width:300px; padding:10px; border:1px solid #ccc; border-radius:8px;">
+  <img src="https://ibb.co/0yc5J65J" alt="Vorschaubild" style="width:100%; border-radius:4px;">
+</div>
+</body>
+</html>
