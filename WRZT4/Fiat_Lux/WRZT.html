@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌀 WRZT</title>
+
+  <!-- MathJax configuration for inline & display math -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Externes CSS : body, main, header, nav, h1, p etc.) sowie Klassen (z. B. .container, .math, .info-box, .table-wrapper -->
+  <link rel="stylesheet" href="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/style.css">
+  <!-- Internes CSS 	
+  <link rel="stylesheet"
+      href="C:\Users\juppi\Documents\GitHub\WRZT\WRZT4\Fiat_Lux\style.css">
+	-->
+
+  <style>
+    /* Ein bisschen CSS für eine schöne Darstellung */
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    
+    figcaption {
+        margin-top: 1rem;
+        font-style: italic;
+        color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!-- Interactive Controls Bar -->
+  <div class="controls-bar">
+    <button class="btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
+  </div>
+  <div class="container">
+
+    <h1>WRZT – Wellenraumzeit-Theorie</h1>
+
+    <h2>Was ist Licht?</h2>
+
+    <h3>
+      Überlegung.
+    </h3>
+    <p>Um das Wesen des Lichts zu verstehen, gehen wir von bekannten Energiezuständen aus.</p>
+    <p>Nach dem Energieerhaltungssatz wird bei der Paarvernichtung (Annihilation) eines Elektron-Positron-Paares ohne zusätzliche kinetische Energie die gesamte Ruheenergie ihrer Massen vollständig in Photonenenergie umgewandelt. Es gilt somit $E_0 = E_{\text{kin}}$.</p>
+    <p>Beide Gleichungen sind aus der Physik bekannt, wodurch sich die entsprechende Wellenlänge bestimmen lässt. Elektromagnetische Wellen verlaufen sinusoidal – ein klarer Indikator für eine zugrundeliegende Kreisbewegung. Daraus lässt sich eine Kreisfrequenz ableiten. Da die maximale Kreisgeschwindigkeit der Lichtgeschwindigkeit $c$ entspricht, ergibt sich ein minimaler Radius $R_{\text{min}}$, den das Elektron-Positron-Paar nicht unterschreiten kann.</p>
+    <p>Die Teilchen ziehen sich durch die Coulomb- und die Lorentzkraft an, während die Zentrifugalkraft dieser Anziehung entgegenwirkt. Setzt man diese Kräfte ins Gleichgewicht, erhält man erneut einen minimalen Radius $r_{\text{min}}$. Das Verhältnis beider Radien entspricht einem Vielfachen der Feinstrukturkonstante ($k \cdot \alpha$).</p>
+    <p>Für die Zentrifugalkraft gilt allgemein die Formel: </p>
+    <p>$$F_z = \frac{m \cdot v^2}{r}$$</p>
+    <p>Betrachten wir das Elektron-Positron-Paar mit der Masse $2m$ auf einer Kreisbahn mit dem Umfang $U = 2\pi r$. Die mechanische Arbeit ($W = F \cdot s$) beziehungsweise die Energie einer vollständigen Umdrehung berechnet sich wie folgt: </p>
+    <p>$$E = F_z \cdot U = \frac{2m \cdot v^2}{r} \cdot 2\pi r = 2m \cdot v^2 \cdot 2\pi$$</p>
+    <p>Nimmt die Geschwindigkeit ihren maximalen Wert $v = c$ an, folgt:</p>
+    <p>$$E = 2m \cdot c^2 \cdot 2\pi$$</p>
+    <p>Dies erinnert sehr stark an Einsteins bekannte Gleichung $E = m \cdot c^2$.</p>
+    <p>Eine exaktere mathematische Herleitung lässt sich über die Formel eines Wirbel-Kollapses führen (dazu an späterer Stelle mehr).</p>
+
+    <p>
+    </p>
+    <hr>
+    <h2>
+      Herleitung.
+    </h2>
+    <p>Ausgehend von den Grundannahmen der <strong>Wellenraumzeit-Theorie (WRZT)</strong> lässt sich der minimale Radius $R_{\text{min}}$ über die Kreisfrequenz $\omega$ bei der Maximalgeschwindigkeit $v = c$ für das Elektron-Positron-System (zwei Massen $m_e$) wie folgt herleiten:</p>
+    <hr>
+    <h3>1. Ausgangsgleichung für die Energie</h3>
+    <p>Die kinetische/rotatorische Energie des Systems aus zwei gleich großen Massen $2m_e$ auf einer Kreisbahn bei Maximalgeschwindigkeit $v = c$ entspricht der doppelten Ruhemasse-Energie:</p>
+    <p>$$E = 2 m_e c^2$$</p>
+    <p>Nach den Gesetzmäßigkeiten der quantenmechanischen Wellenbewegung und der WRZT ist diese Energie auch direkt an die Kreisfrequenz $\omega$ gekoppelt:</p>
+    <p>$$E = \hbar \cdot \omega$$</p>
+    <p>Gleichsetzen beider Ansätze liefert:</p>
+    <p>$$2 m_e c^2 = \hbar \cdot \omega$$</p>
+    <hr>
+    <h3>2. Verknüpfung von Kreisfrequenz $\omega$ und Lichtgeschwindigkeit $c$</h3>
+    <p>Für eine rotierende Wellenbewegung auf der Kreisbahn mit dem Radius $R_{\text{min}}$ gilt für die Bahngeschwindigkeit $v$:</p>
+    <p>$$v = \omega \cdot R_{\text{min}}$$</p>
+    <p>Im Grenzfall $v = c$ ergibt sich die maximal mögliche Kreisfrequenz:</p>
+    <p>$$\omega = \frac{c}{R_{\text{min}}}$$</p>
+    <hr>
+    <h3>3. Herleitung von $R_{\text{min}}$</h3>
+    <p>Setzt man $\omega = \frac{c}{R_{\text{min}}}$ in die Energiegleichung ein:</p>
+    <p>$$2 m_e c^2 = \hbar \cdot \frac{c}{R_{\text{min}}}$$</p>
+    <p>Kürzt man die Lichtgeschwindigkeit $c$ auf beiden Seiten:</p>
+    <p>$$2 m_e c = \frac{\hbar}{R_{\text{min}}}$$</p>
+    <p>Stellt man nun nach dem minimalen Radius $R_{\text{min}}$ um, erhält man:</p>
+    <p>$$R_{\text{min}} = \frac{\hbar}{2 m_e c} = \frac{\bar{\lambda}_c}{2}$$</p>
+    <p>(Wobei $\bar{\lambda}_c = \frac{\hbar}{m_e c}$ die reduzierte Compton-Wellenlänge des Elektrons ist.)</p>
+    <hr>
+    <h3>4. Zahlenwert-Berechnung</h3>
+    <p>Setzt man die bekannten Fundamentalkonstanten ein:</p>
+    <ul>
+      <li>$\hbar = \frac{h}{2\pi} \approx 1{,}05457 \times 10^{-34} \text{ J}\cdot\text{s}$</li>
+      <li>$m_e \approx 9{,}10938 \times 10^{-31} \text{ kg}$</li>
+      <li>$c = 299.792.458 \text{ m/s}$</li>
+    </ul>
+    <p>$$R_{\text{min}} = \frac{1{,}05457 \times 10^{-34}}{2 \cdot (9{,}10938 \times 10^{-31}) \cdot 299.792.458}$$</p>
+    <p>$$R_{\text{min}} \approx 1{,}9308 \times 10^{-13} \text{ m}$$</p>
+
+
+    <p>
+    </p>
+    <hr>
+
+    <h2>
+      Zentrifugalkraft vs Coulomb-Anziehungskraft
+    </h2>
+
+    <p>In der Theorie des zweikörperigen Kreisgleichgewichts (wie beim Elektron-Positron-Paar / Undatron) wird für die Zentrifugalkraft die <strong>reduzierte Masse</strong> $\mu$ verwendet. Bei zwei gleichen Massen ($m_1 = m_2 = m_e$) beträgt die reduzierte Masse $\mu = \frac{m_e}{2}$.</p>
+    <p>Hier sind die Formeln für die Gleichsetzung der Zentrifugalkraft $F_z$ mit der Coulomb-Kraft $F_c$:</p>
+    <hr>
+    <h3>1. Grundgleichung der Gleichsetzung ($F_z = F_c$)</h3>
+    <p>Standardmäßige Gleichsetzung der Zentrifugalkraft mit der Coulomb-Anziehungskraft:</p>
+    <p>$$F_z = F_c$$</p>
+    <p>$$\mu \cdot \frac{v^2}{r} = \frac{e^2}{4 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <p>Da $\mu = \frac{m_e}{2}$ gilt, eingesetzt:</p>
+    <p>$$\frac{m_e \cdot v^2}{2r} = \frac{e^2}{4 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <hr>
+    <h3>2. Spezifische Form mit der 4-Quadranten-Geometrie (aus dem WRZT-Manifest)</h3>
+    <p>Unter Berücksichtigung der vollen Distanz des Teiles-Paares über 4 Quadranten (Radius bezogen auf den Schwerpunkt mit Abstand $2r$) lautet der Coulomb-Term im Manifest:</p>
+    <p>$$\frac{m_e \cdot v^2}{r} = \frac{e^2}{16 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <hr>
+    <h3>3. Formulierung über die Kreisfrequenz ($\omega$)</h3>
+    <p>Ausgedrückt über die Kreisfrequenz $\omega$ mit $v = \omega \cdot r$:</p>
+    <p>$$\mu \cdot r \cdot \omega^2 = \frac{e^2}{16 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <p>$$\left(\frac{m_e}{2}\right) \cdot r \cdot \omega^2 = \frac{e^2}{16 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <hr>
+    
+    <h3>
+      Herleitung des minimalen Bahnradius $r_{\text{min}}$
+    </h3>
+
+    <p>Die Herleitung des minimalen Bahnradius $r_{\text{min}}$ aus dem Gleichgewicht von Zentrifugalkraft $F_z$ und Coulomb-Kraft $F_c$ kann auf zwei physikalischen Wegen erfolgen: über den <strong>Quantenansatz</strong> (mit Drehimpulsquantisierung) oder über den <strong>relativistischen Ansatz</strong> (Grenzgeschwindigkeit $v=c$).</p>
+    <hr>
+    <h3>Ansatz 1: Herleitung über den quantisierten Drehimpuls ($n = 1$)</h3>
+    <p>Ausgangspunkt ist die Gleichsetzung von Zentripetalkraft und Coulomb-Kraft unter Verwendung der reduzierten Masse $\mu = \frac{m_e}{2}$:</p>
+    <p>$$F_z = F_c$$</p>
+    <p>$$\mu \cdot r \cdot \omega^2 = \frac{e^2}{16 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <ol>
+      <li><strong>Einsetzen der reduzierten Masse $\mu = \frac{m_e}{2}$</strong>:</li>
+    </ol>
+    <p>$$\left(\frac{m_e}{2}\right) \cdot r \cdot \omega^2 = \frac{e^2}{16 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <ol start="2">
+      <li><strong>Vereinfachen</strong> (Multiplikation mit $2$ auf beiden Seiten):</li>
+    </ol>
+    <p>$$m_e \cdot r \cdot \omega^2 = \frac{e^2}{8 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <ol start="3">
+      <li><strong>Verwendung der Drehimpulsquantisierung</strong> ($L = \mu \cdot r^2 \cdot \omega = n \cdot \hbar$):
+        Für den Grundzustand ($n = 1$) gilt:</li>
+    </ol>
+    <p>$$\left(\frac{m_e}{2}\right) \cdot r^2 \cdot \omega = \hbar \implies \omega = \frac{2\hbar}{m_e \cdot r^2}$$</p>
+    <ol start="4">
+      <li><strong>Einsetzen von $\omega$ in die Kraftgleichung</strong>:</li>
+    </ol>
+    <p>$$m_e \cdot r \cdot \left(\frac{2\hbar}{m_e \cdot r^2}\right)^2 = \frac{e^2}{8 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <p>$$m_e \cdot r \cdot \frac{4\hbar^2}{m_e^2 \cdot r^4} = \frac{e^2}{8 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <p>$$\frac{4\hbar^2}{m_e \cdot r^3} = \frac{e^2}{8 \pi \varepsilon_0 \cdot r^2}$$</p>
+    <ol start="5">
+      <li><strong>Auflösen nach $r_{\text{min}}$</strong> (Multiplikation mit $r^3$ und Umstellen):</li>
+    </ol>
+    <p>$$r_{\text{min}} = \frac{32 \pi \varepsilon_0 \hbar^2}{m_e \cdot e^2} = 2 \cdot a_0$$</p>
+    <p><em>(Wobei $a_0 = \frac{4 \pi \varepsilon_0 \hbar^2}{m_e e^2}$ den Bohrschen Radius bezeichnet.)</em></p>
+    <hr>
+    <h3>Ansatz 2: Relativistische Grenzbetrachtung ($v \to c$)</h3>
+    <p>Möchte man den absoluten minimalen Radius bestimmen, unterhalb dessen die Bahngeschwindigkeit die Lichtgeschwindigkeit $c$ überschreiten würde:</p>
+    <ol>
+      <li><strong>Kraftgleichgewicht mit $v = c$</strong>:</li>
+    </ol>
+    <p>$$\frac{m_e \cdot c^2}{2 \cdot r_{\text{min}}} = \frac{e^2}{16 \pi \varepsilon_0 \cdot r_{\text{min}}^2}$$</p>
+    <ol start="2">
+      <li><strong>Auflösen nach $r_{\text{min}}$</strong> (Multiplikation mit $r_{\text{min}}^2$ und Umstellen):</li>
+    </ol>
+    <p>$$r_{\text{min}} = \frac{e^2}{8 \pi \varepsilon_0 \cdot m_e c^2} = \frac{1}{2} r_0$$</p>
+    <p><em>(Wobei $r_0 = \frac{e^2}{4 \pi \varepsilon_0 m_e c^2}$ der klassische Elektronenradius ist.)</em></p>
+
+
+    <h3>Größendefinitionen:</h3>
+    <ul>
+      <li>
+        <p><strong>$m_e$</strong>: Elektronenmasse ($9{,}109 \times 10^{-31} \text{ kg}$)</p>
+      </li>
+      <li>
+        <p><strong>$\mu$</strong>: Reduzierte Masse des Paares ($\mu = \frac{m_e}{2}$)</p>
+      </li>
+      <li>
+        <p><strong>$v$</strong>: Bahngeschwindigkeit der Teilchen</p>
+      </li>
+      <li>
+        <p><strong>$r$</strong>: Bahnradius</p>
+      </li>
+      <li>
+        <p><strong>$e$</strong>: Elementarladung ($1{,}602 \times 10^{-19} \text{ C}$)</p>
+      </li>
+      <li>
+        <p><strong>$\varepsilon_0$</strong>: Elektrische Feldkonstante ($8{,}854 \times 10^{-12} \text{ F/m}$)</p>
+      </li>
+      <li>
+        <p><strong>$\omega$</strong>: Kreisfrequenz ($v / r$)</p>
+      </li>
+    </ul>
+
+
+  </div>
+  <!-- JavaScript for Fullscreen Mode -->
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
