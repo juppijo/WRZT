@@ -41,12 +41,12 @@ Wellenraumzeit-Theorie
   --h3-size: clamp(1.15rem, 1.6vw + 0.3rem, 1.5rem);
   --h4-size: clamp(1.0rem, 1.2vw, 1.2rem);
 
-  /* Abstände (Vergrößert) */
-  --space-xs: 0.5rem;
-  --space-sm: 0.8rem;
-  --space-md: 1.1rem;
-  --space-lg: 1.8rem;
-  --space-xl: 3.2rem;
+/* Abstände (+50 % & aufgerundet) */
+  --space-xs: 0.8rem;   /* (0.5 * 1.5 = 0.75 -> aufgerundet) */
+  --space-sm: 1.2rem;   /* (0.8 * 1.5 = 1.2) */
+  --space-md: 1.7rem;   /* (1.1 * 1.5 = 1.65 -> aufgerundet) */
+  --space-lg: 2.7rem;   /* (1.8 * 1.5 = 2.7) */
+  --space-xl: 4.8rem;   /* (3.2 * 1.5 = 4.8) */
 }
 
 /* ---------------------------------------------------------
