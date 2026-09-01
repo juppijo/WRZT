@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektron-Oszillation & Abstrahlung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 5px; color: #4da6ff; }
+        p { max-width: 800px; text-align: center; color: #ccc; }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+        canvas {
+            background-color: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .controls {
+            background-color: #262626;
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 300px;
+            flex: 1;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .stats {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            border-left: 3px solid #4da6ff;
+        }
+        .val { color: #00ffcc; font-weight: bold; }
+        .warn { color: #ff6666; }
+    </style>
+</head>
+<body>
+
+    <h1>Elektron-Abstrahlung im Wechselfeld</h1>
+    <p>Simulation der Oszillation eines einzelnen Elektrons und Berechnung der abgestrahlten Leistung nach der Larmor-Formel vs. Quantenenergie.</p>
+
+    <div class="container">
+        <canvas id="simCanvas" width="500" height="400"></canvas>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="freq">Frequenz: <span id="freqVal" class="val">100</span> MHz</label>
+                <input type="range" id="freq" min="10" max="1000" step="10" value="100">
+            </div>
+            
+            <div class="control-group">
+                <label for="drift">Driftgeschwindigkeit ($v_0$): <span id="driftVal" class="val">0.10</span> mm/s</label>
+                <input type="range" id="drift" min="0.01" max="1.0" step="0.01" value="0.10">
+            </div>
+
+            <div class="stats" id="output">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Physikalische Konstanten
+        const e = 1.602176634e-19;       // C
+        const eps0 = 8.8541878128e-12;   // F/m
+        const c = 299792458;             // m/s
+        const h = 6.62607015e-34;        // J*s
+        const eV = 1.602176634e-19;      // J
+
+        // Eingabeelemente
+        const freqInput = document.getElementById('freq');
+        const driftInput = document.getElementById('drift');
+        const freqVal = document.getElementById('freqVal');
+        const driftVal = document.getElementById('driftVal');
+        const output = document.getElementById('output');
+
+        let time = 0;
+
+        function updateSim() {
+            const f_MHz = parseFloat(freqInput.value);
+            const v0_mms = parseFloat(driftInput.value);
+
+            freqVal.innerText = f_MHz;
+            driftVal.innerText = v0_mms.toFixed(2);
+
+            // Umrechnung in SI-Einheiten
+            const f = f_MHz * 1e6;
+            const omega = 2 * Math.PI * f;
+            const v0 = v0_mms * 1e-3;
+
+            // Berechnungen
+            const x0 = v0 / omega;                          // Auslenkungsamplitude
+            const a0 = v0 * omega;                          // Beschleunigungsamplitude
+            const P_avg = (Math.pow(e, 2) * Math.pow(a0, 2)) / (12 * Math.PI * eps0 * Math.pow(c, 3)); // Larmor
+            const T = 1 / f;
+            const E_cycle = P_avg * T;                      // Klassische Energie pro Schwingung
+            const E_photon = h * f;                         // Quantenenergie
+            const cycles_needed = E_photon / E_cycle;
+
+            // HTML Ausgabewerte aktualisieren
+            output.innerHTML = `
+                <b>Exakte Werte für 1 Elektron:</b><br>
+                Auslenkung ($x_0$): <span class="val">${x0.toExponential(3)} m</span><br>
+                Max. Beschleunigung: <span class="val">${a0.toExponential(3)} m/s²</span><br>
+                Leistung ($\langle P \rangle$): <span class="val">${P_avg.toExponential(3)} W</span><br>
+                <hr style="border: 0.5px solid #444;">
+                E_klassisch / Periode: <span class="val">${E_cycle.toExponential(3)} J</span><br>
+                E_Photon ($h \\cdot f$): <span class="val">${E_photon.toExponential(3)} J</span><br>
+                <hr style="border: 0.5px solid #444;">
+                <span class="warn">Nötige Schwingungen für 1 Photon:</span><br>
+                <span class="val">${cycles_needed.toExponential(2)}</span> Schwingungen
+            `;
+
+            draw(x0, a0, omega);
+        }
+
+        function draw(x0, a0, omega) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Visuelle Oszillation (Skaliert für Darstellung)
+            const visualAmp = 120;
+            const currentX = centerX + Math.sin(time) * visualAmp;
+
+            // Antennendraht (Hintergrund)
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(centerX - visualAmp - 20, centerY);
+            ctx.lineTo(centerX + visualAmp + 20, centerY);
+            ctx.stroke();
+
+            // Elektronenbahn / Feldwellen (Symbolisch)
+            ctx.strokeStyle = 'rgba(77, 166, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = -150; i <= 150; i++) {
+                let waveY = centerY + Math.sin((i * 0.05) - time * 2) * 30 * Math.cos(time);
+                if (i === -150) ctx.moveTo(centerX + i, waveY);
+                else ctx.lineTo(centerX + i, waveY);
+            }
+            ctx.stroke();
+
+            // Elektron
+            ctx.fillStyle = '#00ffcc';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00ffcc';
+            ctx.beginPath();
+            ctx.arc(currentX, centerY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0; // Reset
+
+            // Beschleunigungsvektor
+            const accelLength = -Math.sin(time) * 40;
+            ctx.strokeStyle = '#ff6666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(currentX, centerY - 20);
+            ctx.lineTo(currentX + accelLength, centerY - 20);
+            ctx.stroke();
+
+            // Beschriftung
+            ctx.fillStyle = '#aaa';
+            ctx.font = '12px Arial';
+            ctx.fillText('Antennenleiter', centerX - 40, centerY + 50);
+            ctx.fillStyle = '#ff6666';
+            ctx.fillText('Beschleunigung (a)', currentX - 25, centerY - 30);
+
+            time += 0.05;
+            requestAnimationFrame(() => updateSim());
+        }
+
+        freqInput.addEventListener('input', updateSim);
+        driftInput.addEventListener('input', updateSim);
+
+        // Start der Simulation
+        updateSim();
+    </script>
+</body>
+</html>

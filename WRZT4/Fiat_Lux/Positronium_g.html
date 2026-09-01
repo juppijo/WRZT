@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elektron-Positron Simulation mit Strahlungseffekten</title>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --panel-bg: rgba(22, 27, 34, 0.9);
+      --text-color: #c9d1d9;
+      --accent-color: #58a6ff;
+      --border-color: #30363d;
+      --elec-color: #00d2ff;
+      --pos-color: #ff4757;
+      --synch-color: rgba(255, 230, 0, 0.6);
+      --bow-color: rgba(0, 225, 255, 0.4);
+    }
+
+    body.light-mode {
+      --bg-color: #f6f8fa;
+      --panel-bg: rgba(255, 255, 255, 0.95);
+      --text-color: #24292f;
+      --accent-color: #0969da;
+      --border-color: #d0d7de;
+      --elec-color: #0077cc;
+      --pos-color: #d63031;
+      --synch-color: rgba(200, 160, 0, 0.6);
+      --bow-color: rgba(0, 150, 200, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ui-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      width: 330px;
+      padding: 20px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      width: 360px;
+      padding: 20px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      font-size: 0.88rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--accent-color);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-color);
+      cursor: pointer;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    button {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .data-label {
+      opacity: 0.85;
+    }
+
+    .data-value {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-weight: bold;
+    }
+
+    .legend {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.8rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container">
+    <canvas id="simCanvas"></canvas>
+  </div>
+
+  <div class="ui-panel">
+    <h2>Parameter Steuerung</h2>
+    
+    <div class="control-group">
+      <label for="simSpeed">Simulations-Tempo: <span id="val-simSpeed">0.20 ×</span></label>
+      <input type="range" id="simSpeed" min="0" max="1" step="0.01" value="0.2">
+    </div>
+
+    <div class="control-group">
+      <label for="radius">Bahnradius $r$: <span id="val-radius">1.06 Å</span></label>
+      <input type="range" id="radius" min="0.1" max="5.0" step="0.05" value="1.06">
+    </div>
+
+    <div class="control-group">
+      <label for="speed">Bahngeschwindigkeit $v$: <span id="val-speed">1.09 × 10⁶ m/s</span></label>
+      <input type="range" id="speed" min="0.1" max="5.0" step="0.05" value="1.09">
+    </div>
+
+    <div class="control-group">
+      <label for="bfield">Ext. Magnetfeld $B_z$: <span id="val-bfield">0.0 T</span></label>
+      <input type="range" id="bfield" min="-10.0" max="10.0" step="0.5" value="0.0">
+    </div>
+
+    <div class="button-group">
+      <button id="btn-style">Style Wechseln</button>
+      <button id="btn-fullscreen">Vollbild</button>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <h2>Exakte Messwerte & Kräfte</h2>
+    
+    <div class="data-row">
+      <span class="data-label">Abstand ($d = 2r$):</span>
+      <span class="data-value" id="calc-dist">0.00 m</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">Coulomb-Kraft ($F_C$):</span>
+      <span class="data-value" id="calc-fc">0.00 N</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">Zentrifugalkraft ($F_Z$):</span>
+      <span class="data-value" id="calc-fz">0.00 N</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">Lorentz-Kraft ($F_L$):</span>
+      <span class="data-value" id="calc-fl">0.00 N</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">Total Radiale Kraft ($F_{\text{rad}}$):</span>
+      <span class="data-value" id="calc-fnet">0.00 N</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">de-Broglie Wellenlänge ($\lambda$):</span>
+      <span class="data-value" id="calc-lambda">0.00 pm</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">Umlauffrequenz ($f$):</span>
+      <span class="data-value" id="calc-freq">0.00 Hz</span>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="color-box" style="background: #00d2ff;"></div> Elektron ($e^-$) / Positron ($e^+$)</div>
+      <div class="legend-item"><div class="color-box" style="background: #2ed573;"></div> Geschwindigkeit ($\vec{v}$)</div>
+      <div class="legend-item"><div class="color-box" style="background: var(--synch-color);"></div> Synchrotron-Strahlung (EM-Wellen)</div>
+      <div class="legend-item"><div class="color-box" style="background: var(--bow-color);"></div> Bugwelle (Vakuum-Feld)</div>
+    </div>
+  </div>
+
+  <script>
+    // Physikalische Konstanten (SI)
+    const e = 1.602176634e-19;
+    const m_e = 9.1093837015e-31;
+    const epsilon_0 = 8.8541878128e-12;
+    const h = 6.62607015e-34;
+
+    // DOM-Elemente
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const inputSimSpeed = document.getElementById('simSpeed');
+    const inputRadius = document.getElementById('radius');
+    const inputSpeed = document.getElementById('speed');
+    const inputBField = document.getElementById('bfield');
+    
+    const valSimSpeed = document.getElementById('val-simSpeed');
+    const valRadius = document.getElementById('val-radius');
+    const valSpeed = document.getElementById('val-speed');
+    const valBField = document.getElementById('val-bfield');
+
+    const calcDist = document.getElementById('calc-dist');
+    const calcFc = document.getElementById('calc-fc');
+    const calcFz = document.getElementById('calc-fz');
+    const calcFl = document.getElementById('calc-fl');
+    const calcFnet = document.getElementById('calc-fnet');
+    const calcLambda = document.getElementById('calc-lambda');
+    const calcFreq = document.getElementById('calc-freq');
+
+    const btnStyle = document.getElementById('btn-style');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+
+    // Statusvariablen
+    let angle = 0;
+    let timeSpeed = parseFloat(inputSimSpeed.value);
+    let r_scale = parseFloat(inputRadius.value);
+    let v_scale = parseFloat(inputSpeed.value);
+    let B_z = parseFloat(inputBField.value);
+
+    // Wellen-Objekt-Klassen für sauberes Rendering ohne Absturz
+    const waves = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Event Listener
+    inputSimSpeed.addEventListener('input', (ev) => {
+      timeSpeed = parseFloat(ev.target.value);
+      valSimSpeed.textContent = `${timeSpeed.toFixed(2)} ×`;
+    });
+
+    inputRadius.addEventListener('input', (ev) => {
+      r_scale = parseFloat(ev.target.value);
+      valRadius.textContent = `${r_scale.toFixed(2)} Å`;
+    });
+
+    inputSpeed.addEventListener('input', (ev) => {
+      v_scale = parseFloat(ev.target.value);
+      valSpeed.textContent = `${v_scale.toFixed(2)} × 10⁶ m/s`;
+    });
+
+    inputBField.addEventListener('input', (ev) => {
+      B_z = parseFloat(ev.target.value);
+      valBField.textContent = `${B_z.toFixed(1)} T`;
+    });
+
+    btnStyle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+    });
+
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    });
+
+    // Pfeil-Vektoren zeichnen
+    function drawVector(fromX, fromY, vecX, vecY, color, lengthPixel) {
+      if (lengthPixel <= 0) return;
+      const toX = fromX + vecX * lengthPixel;
+      const toY = fromY + vecY * lengthPixel;
+      const headLen = 7;
+      const vecAngle = Math.atan2(vecY, vecX);
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLen * Math.cos(vecAngle - Math.PI / 6), toY - headLen * Math.sin(vecAngle - Math.PI / 6));
+      ctx.lineTo(toX - headLen * Math.cos(vecAngle + Math.PI / 6), toY - headLen * Math.sin(vecAngle + Math.PI / 6));
+      ctx.lineTo(toX, toY);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    // Erzeuge Wellen-Pulse
+    let frameCounter = 0;
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Physikalische Berechnungen
+      const r_real = r_scale * 1e-10; 
+      const d_real = 2 * r_real;      
+      const v_real = v_scale * 1e6;   
+
+      const F_C = (1 / (4 * Math.PI * epsilon_0)) * ((e * e) / (d_real * d_real));
+      const F_Z = (m_e * v_real * v_real) / r_real;
+      const F_L_mag = e * v_real * Math.abs(B_z);
+      const F_L_rad = -e * v_real * B_z;
+      const F_net_rad = F_C - F_Z + F_L_rad;
+      const lambda = h / (m_e * v_real);
+      const freq = v_real / (2 * Math.PI * r_real);
+
+      // UI-Werte
+      calcDist.textContent = `${d_real.toExponential(3)} m`;
+      calcFc.textContent = `${F_C.toExponential(3)} N`;
+      calcFz.textContent = `${F_Z.toExponential(3)} N`;
+      calcFl.textContent = `${F_L_mag.toExponential(3)} N`;
+      calcFnet.textContent = `${Math.abs(F_net_rad).toExponential(3)} N`;
+      calcLambda.textContent = `${(lambda * 1e12).toFixed(3)} pm`;
+      calcFreq.textContent = `${freq.toExponential(3)} Hz`;
+
+      // Skalierung für Canvas
+      const pxRadius = Math.min(canvas.width, canvas.height) * 0.1 * r_scale;
+
+      const elecX = centerX + pxRadius * Math.cos(angle);
+      const elecY = centerY + pxRadius * Math.sin(angle);
+      const posX = centerX - pxRadius * Math.cos(angle);
+      const posY = centerY - pxRadius * Math.sin(angle);
+
+      // Erzeuge neue Strahlungs- & Bugwellen im Rhythmus
+      frameCounter++;
+      if (timeSpeed > 0 && frameCounter % Math.max(1, Math.floor(10 / (timeSpeed + 0.1))) === 0) {
+        // Bugwelle vor Elektron (Kegel/Bogen)
+        waves.push({
+          x: elecX, y: elecY, radius: 2, maxRadius: pxRadius * 1.8,
+          alpha: 0.8, type: 'bow', angle: angle + Math.PI / 2
+        });
+        // Synchrotron-Strahlung Positron (Abgestrahlte Kugelwelle)
+        waves.push({
+          x: posX, y: posY, radius: 2, maxRadius: pxRadius * 2.2,
+          alpha: 0.8, type: 'synchrotron', angle: angle - Math.PI / 2
+        });
+      }
+
+      // Zeichne Welleneffekte
+      for (let i = waves.length - 1; i >= 0; i--) {
+        const w = waves[i];
+        w.radius += 1.5 * (1 + v_scale * 0.2);
+        w.alpha -= 0.012;
+
+        if (w.alpha <= 0 || w.radius >= w.maxRadius) {
+          waves.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, w.alpha);
+
+        if (w.type === 'synchrotron') {
+          // Synchrotron-Wellenringe
+          ctx.beginPath();
+          ctx.arc(w.x, w.y, w.radius, 0, 2 * Math.PI);
+          ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--synch-color');
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else if (w.type === 'bow') {
+          // Bugwelle als gerichteter Bogen
+          ctx.beginPath();
+          ctx.arc(w.x, w.y, w.radius, w.angle - 0.8, w.angle + 0.8);
+          ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--bow-color');
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      // Bahnorbit
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, pxRadius, 0, 2 * Math.PI);
+      ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--border-color');
+      ctx.setLineDash([3, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Richtungsvektoren
+      const dirX = Math.cos(angle);
+      const dirY = Math.sin(angle);
+      const tanX = -Math.sin(angle);
+      const tanY = Math.cos(angle);
+
+      const forceScale = 2e10;
+      const velScale = 18;
+
+      // Kraft- und Geschwindigkeitsvektoren
+      drawVector(elecX, elecY, tanX, tanY, '#2ed573', v_scale * velScale);
+      drawVector(elecX, elecY, -dirX, -dirY, '#eccc68', F_C * forceScale);
+      drawVector(elecX, elecY, dirX, dirY, '#ff7f50', F_Z * forceScale);
+
+      if (Math.abs(B_z) > 0) {
+        const lorDirX = B_z > 0 ? dirX : -dirX;
+        const lorDirY = B_z > 0 ? dirY : -dirY;
+        drawVector(elecX, elecY, lorDirX, lorDirY, '#a55eea', F_L_mag * forceScale);
+      }
+
+      // Elektron zeichnen
+      ctx.beginPath();
+      ctx.arc(elecX, elecY, 9, 0, 2 * Math.PI);
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--elec-color');
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText('e-', elecX - 5, elecY + 4);
+
+      // Positron zeichnen
+      ctx.beginPath();
+      ctx.arc(posX, posY, 9, 0, 2 * Math.PI);
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--pos-color');
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText('e+', posX - 6, posY + 4);
+
+      // Zeit-Schritt
+      const omega = v_real / r_real;
+      angle += omega * 1e-16 * timeSpeed;
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

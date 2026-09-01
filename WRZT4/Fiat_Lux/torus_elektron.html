@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT Simulation: Schwingendes Torus-Elektron</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #03060d;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #d0f4f7;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(8, 16, 28, 0.90);
+            backdrop-filter: blur(8px);
+            border: 1px solid #1a3a5c;
+            border-radius: 10px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 8px 32px 0 rgba(0, 255, 204, 0.2);
+            z-index: 100;
+        }
+        h2 {
+            margin: 0 0 8px 0;
+            color: #00ffcc;
+            font-size: 1.1rem;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+        p {
+            font-size: 0.8rem;
+            color: #a0c0d0;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            margin-bottom: 3px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00ffcc;
+            background: #102030;
+        }
+        .val {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+        .data-box {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #1a3a5c;
+            font-family: monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        .highlight { color: #ff66cc; }
+        .warn { color: #ffcc00; }
+    </style>
+    <!-- Three.js & Controls über Unpkg CDN für maximale Kompatibilität -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="ui-panel">
+        <h2>Schwingendes Torus-Elektron</h2>
+        <p>WRZT: Dynamik eines Torus-Wirbels bei Oszillation im Raumzeit-Netz.</p>
+
+        <div class="control-group">
+            <label>Schwingfrequenz (f): <span id="valFreq" class="val">1.2</span> Hz</label>
+            <input type="range" id="freq" min="0.2" max="3.0" step="0.1" value="1.2">
+        </div>
+
+        <div class="control-group">
+            <label>Auslenkung (x₀): <span id="valAmp" class="val">3.5</span></label>
+            <input type="range" id="amp" min="1.0" max="6.0" step="0.2" value="3.5">
+        </div>
+
+        <div class="control-group">
+            <label>Präzession (Kreisel-Nicken): <span id="valPrecession" class="val">0.30</span> rad</label>
+            <input type="range" id="precession" min="0" max="0.8" step="0.02" value="0.30">
+        </div>
+
+        <div class="control-group">
+            <label>Poloidale Zirkulation: <span id="valPoloid" class="val">3.0</span>x</label>
+            <input type="range" id="speedPoloid" min="0.5" max="6.0" step="0.5" value="3.0">
+        </div>
+
+        <div class="data-box">
+            <div>Beschleunigung: a(t) = -ω² x(t)</div>
+            <div><span class="highlight">Präzessions-Nicken:</span> max bei a_max</div>
+            <div><span class="warn">Deformation:</span> Trägheits-Stauchung</div>
+            <hr style="border: 0.5px solid #1a3a5c; margin: 6px 0;">
+            <div>Netz-Welle: Transversal + Torsion</div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            // Szenen-Setup
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x03060d, 0.02);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 18);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x03060d, 1);
+            container.appendChild(renderer.domElement);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Beleuchtung (Helles Umgebungslicht verhindert schwarze Flächen)
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+            scene.add(ambientLight);
+
+            const torusLight = new THREE.PointLight(0x00ffcc, 3, 30);
+            scene.add(torusLight);
+
+            // Torus Geometrie
+            const R = 1.8;  // Großradius
+            const r = 0.55; // Schlauchradius
+            const torusGeo = new THREE.TorusGeometry(R, r, 24, 80);
+
+            const torusMat = new THREE.MeshBasicMaterial({
+                color: 0x00ffcc,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.45
+            });
+
+            // Gruppe zur Aufnahme aller Torus-Komponenten
+            const torusGroup = new THREE.Group();
+            const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+            torusMesh.rotation.x = Math.PI / 2;
+            torusGroup.add(torusMesh);
+            scene.add(torusGroup);
+
+            // Strömungsteilchen (Wirbel-Quanten)
+            const numParticles = 700;
+            const particleGeo = new THREE.BufferGeometry();
+            const particlePos = new Float32Array(numParticles * 3);
+            const particleColors = new Float32Array(numParticles * 3);
+            const particleUV = [];
+
+            for (let i = 0; i < numParticles; i++) {
+                const u = Math.random() * Math.PI * 2;
+                const v = Math.random() * Math.PI * 2;
+                particleUV.push({ u: u, v: v });
+
+                const color = (Math.random() > 0.35) ? new THREE.Color(0x00ffcc) : new THREE.Color(0xff66cc);
+                particleColors[i * 3] = color.r;
+                particleColors[i * 3 + 1] = color.g;
+                particleColors[i * 3 + 2] = color.b;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+            particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particleSystem = new THREE.Points(particleGeo, particleMat);
+            torusGroup.add(particleSystem);
+
+            // Spin-Pfeil (Vektor)
+            const arrowHelper = new THREE.ArrowHelper(
+                new THREE.Vector3(0, 1, 0),
+                new THREE.Vector3(0, -1.5, 0),
+                3.0,
+                0x00ffcc,
+                0.3,
+                0.15
+            );
+            torusGroup.add(arrowHelper);
+
+            // Antennen-Leiterbahn (Visualisierung der Achse)
+            const axisGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-12, 0, 0),
+                new THREE.Vector3(12, 0, 0)
+            ]);
+            const axisMat = new THREE.LineBasicMaterial({ color: 0x336699, transparent: true, opacity: 0.6 });
+            const axisLine = new THREE.Line(axisGeo, axisMat);
+            scene.add(axisLine);
+
+            // Raumzeit-Netz als Verformbares Gitter
+            const gridGridSize = 50;
+            const gridSegments = 50;
+            const gridGeo = new THREE.PlaneGeometry(gridGridSize, gridGridSize, gridSegments, gridSegments);
+            gridGeo.rotateX(-Math.PI / 2);
+
+            const gridMat = new THREE.MeshBasicMaterial({
+                color: 0x005577,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+
+            const gridMesh = new THREE.Mesh(gridGeo, gridMat);
+            gridMesh.position.y = -2.2;
+            scene.add(gridMesh);
+
+            // Ursprüngliche Scheitelpunkte sichern
+            const gridInitialY = new Float32Array(gridGeo.attributes.position.count);
+            for (let i = 0; i < gridGeo.attributes.position.count; i++) {
+                gridInitialY[i] = gridGeo.attributes.position.getY(i);
+            }
+
+            // UI Inputs
+            const freqInput = document.getElementById('freq');
+            const ampInput = document.getElementById('amp');
+            const precessionInput = document.getElementById('precession');
+            const speedPoloidInput = document.getElementById('speedPoloid');
+
+            let clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const delta = clock.getDelta();
+                const time = clock.getElapsedTime();
+
+                const f = parseFloat(freqInput.value);
+                const x0 = parseFloat(ampInput.value);
+                const maxPrec = parseFloat(precessionInput.value);
+                const speedV = parseFloat(speedPoloidInput.value);
+
+                document.getElementById('valFreq').innerText = f.toFixed(1);
+                document.getElementById('valAmp').innerText = x0.toFixed(1);
+                document.getElementById('valPrecession').innerText = maxPrec.toFixed(2);
+                document.getElementById('valPoloid').innerText = speedV.toFixed(1);
+
+                const omega = 2 * Math.PI * f;
+
+                // 1. HARMONISCHE SCHWINGUNG
+                const currentX = Math.sin(omega * time) * x0;
+                const currentA = -Math.sin(omega * time) * x0 * Math.pow(omega, 2);
+
+                // Torus bewegen
+                torusGroup.position.x = currentX;
+                torusLight.position.x = currentX;
+
+                // 2. PRÄZESSIONS-NICKEN (Kopplung an Trägheitsbeschleunigung a)
+                const precAngle = (currentA / (x0 * Math.pow(omega, 2) || 1)) * maxPrec;
+                torusGroup.rotation.z = precAngle;
+                torusGroup.rotation.y = Math.sin(time * 2) * 0.1;
+
+                // 3. DEFORMATION DES SCHLAUCHS (Stauchung bei Umkehrpunkten)
+                const compressionFactor = 1.0 - Math.abs(precAngle) * 0.25;
+                torusMesh.scale.set(1.0 + Math.abs(precAngle) * 0.15, compressionFactor, compressionFactor);
+
+                // 4. PARTIKELSTRÖMUNG
+                const positions = particleSystem.geometry.attributes.position.array;
+                for (let i = 0; i < numParticles; i++) {
+                    let p = particleUV[i];
+                    p.u += delta * 1.5;
+                    p.v += delta * speedV * 2.5;
+
+                    positions[i * 3]     = (R + r * Math.cos(p.v)) * Math.cos(p.u);
+                    positions[i * 3 + 1] = r * Math.sin(p.v);
+                    positions[i * 3 + 2] = (R + r * Math.cos(p.v)) * Math.sin(p.u);
+                }
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+
+                // 5. NETZWELLEN DEFORMATION
+                const gridPositions = gridGeo.attributes.position;
+                const vertexCount = gridPositions.count;
+
+                for (let i = 0; i < vertexCount; i++) {
+                    const vx = gridPositions.getX(i);
+                    const vz = gridPositions.getZ(i);
+
+                    const dx = vx - currentX;
+                    const dz = vz;
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+
+                    const waveK = 1.2;
+                    const waveSpeed = 8.0;
+                    const damping = Math.exp(-dist * 0.18);
+                    
+                    const waveY = Math.sin(dist * waveK - time * waveSpeed) * damping * (0.6 + Math.abs(precAngle));
+
+                    gridPositions.setY(i, gridInitialY[i] + waveY);
+                }
+                gridGeo.attributes.position.needsUpdate = true;
+
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+        });
+    </script>
+</body>
+</html>
