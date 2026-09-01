@@ -1,479 +1,479 @@
 /* =========================================================
-   WRZT – Responsives & Modernes CSS (Optimierter Randabstand)
-   Wellenraumzeit-Theorie
-   ========================================================= */
+WRZT – Responsives & Modernes CSS (Optimierter Randabstand)
+Wellenraumzeit-Theorie
+========================================================= */
 
 /* ---------------------------------------------------------
-   1. Grundvariablen & Design-Tokens
-   --------------------------------------------------------- */
+1. Grundvariablen & Design-Tokens
+--------------------------------------------------------- */
 :root {
-    /* Farbpalette */
-    --bg: #07121f;
-    --bg-secondary: #0b1c2d;
-    --surface: rgba(16, 40, 61, 0.65);
-    --surface-solid: #10283d;
-    --surface-hover: rgba(53, 208, 197, 0.08);
+/* Farbpalette */
+--bg: #07121f;
+--bg-secondary: #0b1c2d;
+--surface: rgba(16, 40, 61, 0.65);
+--surface-solid: #10283d;
+--surface-hover: rgba(53, 208, 197, 0.08);
 
-    --text: #e8e4da;
-    --text-soft: #b9c7d2;
-    --text-muted: #8799a8;
+--text: #e8e4da;
+--text-soft: #b9c7d2;
+--text-muted: #8799a8;
 
-    --accent: #35d0c5;
-    --accent-light: #69e7df;
-    --accent-dark: #199e98;
-    --accent-glow: rgba(53, 208, 197, 0.25);
+--accent: #35d0c5;
+--accent-light: #69e7df;
+--accent-dark: #199e98;
+--accent-glow: rgba(53, 208, 197, 0.25);
 
-    --border: rgba(105, 231, 223, 0.20);
-    --border-hover: rgba(105, 231, 223, 0.45);
+--border: rgba(105, 231, 223, 0.20);
+--border-hover: rgba(105, 231, 223, 0.45);
 
-    /* Layout & Spacing - Großzügiger Randabstand (2rem Minimum statt 1.5rem) */
-    --max-width: 1000px;
-    --content-padding: clamp(2rem, 6vw, 4.5rem);
-    --radius: 12px;
+/* Layout & Spacing - Großzügiger Randabstand (2rem Minimum statt 1.5rem) */
+--max-width: 1000px;
+--content-padding: clamp(2rem, 6vw, 4.5rem);
+--radius: 12px;
 
-    /* Typografie */
-    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+/* Typografie */
+--font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+--font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
 
-    --text-size: clamp(1rem, 0.35vw + 0.9rem, 1.15rem);
-		--h1-size: clamp(1.8rem, 4vw + 0.8rem, 3rem);
-    --h2-size: clamp(1.6rem, 3vw + 0.5rem, 2.4rem);
-    --h3-size: clamp(1.3rem, 2vw + 0.2rem, 1.75rem);
-    --h4-size: clamp(1.1rem, 1.5vw, 1.35rem);
+--text-size: clamp(0.7rem, 0.25vw + 0.63rem, 0.81rem);
+--h1-size: clamp(1.26rem, 2.8vw + 0.56rem, 2.1rem);
+--h2-size: clamp(1.12rem, 2.1vw + 0.35rem, 1.68rem);
+--h3-size: clamp(0.91rem, 1.4vw + 0.14rem, 1.23rem);
+--h4-size: clamp(0.77rem, 1.05vw, 0.95rem);
 
-    --space-xs: 0.6rem;
-    --space-sm: 1rem;
-    --space-md: 1.5rem;
-    --space-lg: 2.5rem;
-    --space-xl: 4.5rem;
+--space-xs: 0.42rem;
+--space-sm: 0.7rem;
+--space-md: 1.05rem;
+--space-lg: 1.75rem;
+--space-xl: 3.15rem;
 }
 
 /* ---------------------------------------------------------
-   2. Globales Reset & Basis
-   --------------------------------------------------------- */
+2. Globales Reset & Basis
+--------------------------------------------------------- */
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
-    color-scheme: dark;
+scroll-behavior: smooth;
+color-scheme: dark;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background: 
-        radial-gradient(circle at 50% 0%, rgba(53, 208, 197, 0.08), transparent 45%),
-        radial-gradient(circle at 100% 100%, rgba(11, 28, 45, 0.5), transparent 50%),
-        var(--bg);
-    background-attachment: fixed;
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: var(--text-size);
-    line-height: 1.7;
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
+margin: 0;
+padding: 0;
+background:
+radial-gradient(circle at 50% 0%, rgba(53, 208, 197, 0.08), transparent 45%),
+radial-gradient(circle at 100% 100%, rgba(11, 28, 45, 0.5), transparent 50%),
+var(--bg);
+background-attachment: fixed;
+color: var(--text);
+font-family: var(--font-sans);
+font-size: var(--text-size);
+line-height: 1.7;
+min-height: 100vh;
+overflow-x: hidden;
+-webkit-font-smoothing: antialiased;
 }
 
 /* ---------------------------------------------------------
-   3. Hauptcontainer & Layout (Garantiert großzügigen Rand)
-   --------------------------------------------------------- */
+3. Hauptcontainer & Layout (Garantiert großzügigen Rand)
+--------------------------------------------------------- */
 main {
-    width: 100%;
-    max-width: var(--max-width);
-    margin: clamp(var(--space-lg), 5vw, var(--space-xl)) auto;
-    padding-inline: var(--content-padding);
+width: 100%;
+max-width: var(--max-width);
+margin: clamp(var(--space-lg), 5vw, var(--space-xl)) auto;
+padding-inline: var(--content-padding);
 }
 
 .container {
-    width: 100%;
-    max-width: var(--max-width);
-    margin-inline: auto;
-    padding-inline: var(--content-padding);
+width: 100%;
+max-width: var(--max-width);
+margin-inline: auto;
+padding-inline: var(--content-padding);
 }
 
 /* ---------------------------------------------------------
-   4. Header & Navigation
-   --------------------------------------------------------- */
+4. Header & Navigation
+--------------------------------------------------------- */
 header {
-    width: 100%;
-    padding: clamp(2.5rem, 7vw, 5.5rem) var(--content-padding);
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(16, 40, 61, 0.8) 0%, rgba(7, 18, 31, 0.95) 100%);
-    backdrop-filter: blur(10px);
+width: 100%;
+padding: clamp(2.5rem, 7vw, 5.5rem) var(--content-padding);
+text-align: center;
+border-bottom: 1px solid var(--border);
+background: linear-gradient(180deg, rgba(16, 40, 61, 0.8) 0%, rgba(7, 18, 31, 0.95) 100%);
+backdrop-filter: blur(10px);
 }
 
 nav {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-sm);
-    flex-wrap: wrap;
-    padding: 1rem var(--content-padding);
-    border-bottom: 1px solid var(--border);
-    background: rgba(7, 18, 31, 0.85);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+width: 100%;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: var(--space-sm);
+flex-wrap: wrap;
+padding: 1rem var(--content-padding);
+border-bottom: 1px solid var(--border);
+background: rgba(7, 18, 31, 0.85);
+backdrop-filter: blur(12px);
+position: sticky;
+top: 0;
+z-index: 100;
 }
 
 nav a {
-    padding: 0.4rem 0.8rem;
-    border-radius: calc(var(--radius) / 2);
-    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
-    color: var(--text-soft);
+padding: 0.4rem 0.8rem;
+border-radius: calc(var(--radius) / 2);
+font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+color: var(--text-soft);
 }
 
 nav a:hover {
-    background: var(--surface-hover);
-    color: var(--accent-light);
-    text-decoration: none;
+background: var(--surface-hover);
+color: var(--accent-light);
+text-decoration: none;
 }
 
 /* ---------------------------------------------------------
-   5. Typografie & Hierarchie
-   --------------------------------------------------------- */
+5. Typografie & Hierarchie
+--------------------------------------------------------- */
 h1, h2, h3, h4 {
-    color: var(--accent-light);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
+color: var(--accent-light);
+font-weight: 800;
+letter-spacing: -0.02em;
+text-wrap: balance;
 }
 
 h1 {
-    margin: 0;
-    font-size: var(--h1-size);
-    line-height: 1.15;
-    text-shadow: 0 0 30px rgba(105, 231, 223, 0.2);
+margin: 0;
+font-size: var(--h1-size);
+line-height: 1.15;
+text-shadow: 0 0 30px rgba(105, 231, 223, 0.2);
 }
 
 h2 {
-    margin-top: var(--space-xl);
-    margin-bottom: var(--space-md);
-    font-size: var(--h2-size);
-    line-height: 1.25;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.4rem;
+margin-top: var(--space-xl);
+margin-bottom: var(--space-md);
+font-size: var(--h2-size);
+line-height: 1.25;
+border-bottom: 1px solid var(--border);
+padding-bottom: 0.4rem;
 }
 
 h3 {
-    margin-top: var(--space-lg);
-    margin-bottom: var(--space-sm);
-    font-size: var(--h3-size);
-    color: var(--accent);
+margin-top: var(--space-lg);
+margin-bottom: var(--space-sm);
+font-size: var(--h3-size);
+color: var(--accent);
 }
 
 h4 {
-    margin-top: var(--space-md);
-    font-size: var(--h4-size);
-    color: var(--text);
+margin-top: var(--space-md);
+font-size: var(--h4-size);
+color: var(--text);
 }
 
 p {
-    margin: 0 0 var(--space-md) 0;
-    color: var(--text);
-    max-width: 100%;
+margin: 0 0 var(--space-md) 0;
+color: var(--text);
+max-width: 100%;
 }
 
 p:last-child {
-    margin-bottom: 0;
+margin-bottom: 0;
 }
 
 /* ---------------------------------------------------------
-   6. Auszeichnungen & Links
-   --------------------------------------------------------- */
+6. Auszeichnungen & Links
+--------------------------------------------------------- */
 a {
-    color: var(--accent-light);
-    text-decoration: none;
-    transition: color 0.2s ease, opacity 0.2s ease;
+color: var(--accent-light);
+text-decoration: none;
+transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 a:hover {
-    color: #ffffff;
-    text-decoration: underline;
+color: #ffffff;
+text-decoration: underline;
 }
 
 strong {
-    color: #ffffff;
-    font-weight: 600;
+color: #ffffff;
+font-weight: 600;
 }
 
 em {
-    color: var(--accent-light);
-    font-style: italic;
+color: var(--accent-light);
+font-style: italic;
 }
 
 /* ---------------------------------------------------------
-   7. Formeln & MathJax
-   --------------------------------------------------------- */
+7. Formeln & MathJax
+--------------------------------------------------------- */
 .math,
 .equation,
 .formula {
-    width: 100%;
-    margin: var(--space-md) 0;
-    padding: clamp(1.4rem, 3.5vw, 2.2rem);
-    background: var(--surface);
-    border-left: 4px solid var(--accent);
-    border-radius: var(--radius);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    overflow-x: auto;
-    backdrop-filter: blur(5px);
+width: 100%;
+margin: var(--space-md) 0;
+padding: clamp(1.4rem, 3.5vw, 2.2rem);
+background: var(--surface);
+border-left: 4px solid var(--accent);
+border-radius: var(--radius);
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+overflow-x: auto;
+backdrop-filter: blur(5px);
 }
 
 mjx-container {
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-block: 0.2rem;
+max-width: 100%;
+overflow-x: auto;
+overflow-y: hidden;
+padding-block: 0.2rem;
 }
 
 mjx-container[display="true"] {
-    cursor: pointer;
-    transition: transform 0.2s ease, filter 0.2s ease;
+cursor: pointer;
+transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 mjx-container[display="true"]:hover {
-    filter: brightness(1.2);
-    transform: scale(1.01);
+filter: brightness(1.2);
+transform: scale(1.01);
 }
 
 /* ---------------------------------------------------------
-   8. Code-Blöcke
-   --------------------------------------------------------- */
+8. Code-Blöcke
+--------------------------------------------------------- */
 code {
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    background: rgba(10, 24, 38, 0.8);
-    color: var(--accent-light);
-    font-family: var(--font-mono);
-    font-size: 0.88em;
-    border: 1px solid rgba(105, 231, 223, 0.1);
+padding: 0.2em 0.4em;
+border-radius: 4px;
+background: rgba(10, 24, 38, 0.8);
+color: var(--accent-light);
+font-family: var(--font-mono);
+font-size: 0.88em;
+border: 1px solid rgba(105, 231, 223, 0.1);
 }
 
 pre {
-    margin: var(--space-md) 0;
-    padding: var(--space-md);
-    background: #040a12;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow-x: auto;
-    font-size: clamp(0.85rem, 1vw, 0.95rem);
+margin: var(--space-md) 0;
+padding: var(--space-md);
+background: #040a12;
+border: 1px solid var(--border);
+border-radius: var(--radius);
+overflow-x: auto;
+font-size: clamp(0.85rem, 1vw, 0.95rem);
 }
 
 pre code {
-    padding: 0;
-    background: none;
-    border: none;
-    color: var(--text-soft);
+padding: 0;
+background: none;
+border: none;
+color: var(--text-soft);
 }
 
 /* ---------------------------------------------------------
-   9. Komponenten (Tabellen, Info-Boxen, Kapitel)
-   --------------------------------------------------------- */
+9. Komponenten (Tabellen, Info-Boxen, Kapitel)
+--------------------------------------------------------- */
 .table-wrapper {
-    width: 100%;
-    margin: var(--space-md) 0;
-    overflow-x: auto;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
+width: 100%;
+margin: var(--space-md) 0;
+overflow-x: auto;
+border-radius: var(--radius);
+border: 1px solid var(--border);
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-    background: var(--surface);
+width: 100%;
+border-collapse: collapse;
+min-width: 600px;
+background: var(--surface);
 }
 
 th, td {
-    padding: 0.85rem 1.1rem;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
+padding: 0.85rem 1.1rem;
+border-bottom: 1px solid var(--border);
+text-align: left;
 }
 
 th {
-    color: var(--accent-light);
-    background: var(--surface-solid);
-    font-weight: 600;
+color: var(--accent-light);
+background: var(--surface-solid);
+font-weight: 600;
 }
 
 tr:last-child td {
-    border-bottom: none;
+border-bottom: none;
 }
 
 tr:hover {
-    background: var(--surface-hover);
+background: var(--surface-hover);
 }
 
 .info-box, .chapter {
-    margin: var(--space-lg) 0;
-    padding: clamp(1.75rem, 5vw, 3rem);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(8px);
-    transition: border-color 0.3s ease;
+margin: var(--space-lg) 0;
+padding: clamp(1.75rem, 5vw, 3rem);
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+backdrop-filter: blur(8px);
+transition: border-color 0.3s ease;
 }
 
 .info-box:hover, .chapter:hover {
-    border-color: var(--border-hover);
+border-color: var(--border-hover);
 }
 
 .warning {
-    margin: var(--space-md) 0;
-    padding: 1rem 1.25rem;
-    border-left: 4px solid #e5b555;
-    background: rgba(229, 181, 85, 0.08);
-    border-radius: 0 var(--radius) var(--radius) 0;
-    color: var(--text);
+margin: var(--space-md) 0;
+padding: 1rem 1.25rem;
+border-left: 4px solid #e5b555;
+background: rgba(229, 181, 85, 0.08);
+border-radius: 0 var(--radius) var(--radius) 0;
+color: var(--text);
 }
 
 /* ---------------------------------------------------------
-   10. Interaktive Elemente & Buttons
-   --------------------------------------------------------- */
+10. Interaktive Elemente & Buttons
+--------------------------------------------------------- */
 button, .button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.65rem 1.3rem;
-    border: 1px solid var(--accent);
-    border-radius: calc(var(--radius) / 1.5);
-    background: rgba(53, 208, 197, 0.1);
-    color: var(--accent-light);
-    font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 0.65rem 1.3rem;
+border: 1px solid var(--accent);
+border-radius: calc(var(--radius) / 1.5);
+background: rgba(53, 208, 197, 0.1);
+color: var(--accent-light);
+font-family: inherit;
+font-size: 0.95rem;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.2s ease;
 }
 
 button:hover, .button:hover {
-    background: var(--accent);
-    color: var(--bg);
-    box-shadow: 0 0 15px var(--accent-glow);
-    transform: translateY(-2px);
-    text-decoration: none;
+background: var(--accent);
+color: var(--bg);
+box-shadow: 0 0 15px var(--accent-glow);
+transform: translateY(-2px);
+text-decoration: none;
 }
 
 /* ---------------------------------------------------------
-   11. Listen, Medien & Trennlinien
-   --------------------------------------------------------- */
+11. Listen, Medien & Trennlinien
+--------------------------------------------------------- */
 ul, ol {
-    padding-left: 1.75rem;
-    margin-bottom: var(--space-md);
-    max-width: 72ch;
+padding-left: 1.75rem;
+margin-bottom: var(--space-md);
+max-width: 72ch;
 }
 
 li {
-    margin-bottom: var(--space-xs);
+margin-bottom: var(--space-xs);
 }
 
 img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    border-radius: var(--radius);
+display: block;
+max-width: 100%;
+height: auto;
+border-radius: var(--radius);
 }
 
 hr {
-    margin: var(--space-xl) 0;
-    border: 0;
-    border-top: 1px solid var(--border);
+margin: var(--space-xl) 0;
+border: 0;
+border-top: 1px solid var(--border);
 }
 
 footer {
-    margin-top: var(--space-xl);
-    padding: calc(var(--space-lg) * 1.2) var(--content-padding);
-    text-align: center;
-    border-top: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 0.88rem;
+margin-top: var(--space-xl);
+padding: calc(var(--space-lg) * 1.2) var(--content-padding);
+text-align: center;
+border-top: 1px solid var(--border);
+color: var(--text-muted);
+font-size: 0.88rem;
 }
 /* Top Controls Bar */
-    .controls-bar {
-      position: sticky;
-      top: 10px;
-      z-index: 1000;
-      display: flex;
-      gap: 10px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 8px 16px;
-      border-radius: 30px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(12px);
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-      justify-content: right;
-    }
+.controls-bar {
+position: sticky;
+top: 10px;
+z-index: 1000;
+display: flex;
+gap: 10px;
+background: var(--card-bg);
+border: 1px solid var(--card-border);
+padding: 8px 16px;
+border-radius: 30px;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+backdrop-filter: blur(12px);
+margin-bottom: 25px;
+flex-wrap: wrap;
+justify-content: right;
+}
 /* ---------------------------------------------------------
-   12. Media Queries & Accessibility
-   --------------------------------------------------------- */
+12. Media Queries & Accessibility
+--------------------------------------------------------- */
 @media (max-width: 600px) {
-    :root {
-        /* Auch auf Smartphones spürbarer Abstand zum Rand */
-        --content-padding: 1.5rem;
-        --space-lg: 2rem;
-        --space-xl: 3rem;
-    }
+:root {
+/* Auch auf Smartphones spürbarer Abstand zum Rand */
+--content-padding: 1.5rem;
+--space-lg: 2rem;
+--space-xl: 3rem;
+}
 
-    nav {
-        gap: 0.4rem;
-    }
+nav {
+gap: 0.4rem;
+}
 
-    nav a {
-        padding: 0.35rem 0.6rem;
-    }
+nav a {
+padding: 0.35rem 0.6rem;
+}
 
-    .info-box, .chapter {
-        padding: 1.5rem;
-    }
+.info-box, .chapter {
+padding: 1.5rem;
+}
 
-    .math, .equation, .formula {
-        padding: 1.2rem;
-    }
+.math, .equation, .formula {
+padding: 1.2rem;
+}
 }
 
 @media (min-width: 1400px) {
-    :root {
-        --max-width: 1100px;
-    }
+:root {
+--max-width: 1100px;
+}
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
+*, *::before, *::after {
+animation-duration: 0.01ms !important;
+animation-iteration-count: 1 !important;
+transition-duration: 0.01ms !important;
+scroll-behavior: auto !important;
+}
 }
 
 @media print {
-    body {
-        background: white;
-        color: black;
-    }
+body {
+background: white;
+color: black;
+}
 
-    nav, button, .button {
-        display: none;
-    }
+nav, button, .button {
+display: none;
+}
 
-    h1, h2, h3, h4, strong, em {
-        color: black;
-    }
+h1, h2, h3, h4, strong, em {
+color: black;
+}
 
-    .chapter, .info-box, .math, .equation, .formula {
-        background: transparent;
-        border: 1px solid #ccc;
-        box-shadow: none;
-    }
+.chapter, .info-box, .math, .equation, .formula {
+background: transparent;
+border: 1px solid #ccc;
+box-shadow: none;
+}
 }
