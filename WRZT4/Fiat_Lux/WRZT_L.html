@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌀 WRZT – Wellenraumzeit-Theorie</title>
+
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <link rel="stylesheet" href="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/style.css">
+
+  <style>
+    /* Dynamic Layout & Typography Adjustments */
+    :root {
+      --current-font-size: 1.05rem;
+    }
+
+    body {
+      text-align: justify;
+      font-size: var(--current-font-size);
+      line-height: 1.7;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    mjx-container {
+      font-size: 110% !important;
+    }
+
+    h1, h2, h3, h4 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: var(--max-width, 1000px);
+      margin: 0 auto;
+      padding: clamp(1rem, 4vw, 2.5rem);
+    }
+
+    /* Style Switcher Controls Bar */
+    .controls-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 8px;
+      background: var(--surface-solid, #10283d);
+      border: 1px solid var(--border, rgba(105, 231, 223, 0.2));
+      padding: 10px 16px;
+      border-radius: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .controls-bar label {
+      font-size: 0.85rem;
+      color: var(--text-soft, #b9c7d2);
+      margin-right: 4px;
+    }
+
+    /* Theme Variants */
+    body.theme-light {
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-solid: #ffffff;
+      --text: #1a202c;
+      --text-soft: #4a5568;
+      --accent: #008080;
+      --accent-light: #0056b3;
+      --border: rgba(0, 0, 0, 0.15);
+      background: #f4f6f8;
+      color: #1a202c;
+    }
+
+    body.theme-turquoise {
+      --bg: #031b1e;
+      --surface: rgba(6, 44, 48, 0.7);
+      --surface-solid: #062c30;
+      --text: #e0f7f6;
+      --text-soft: #a0e0dd;
+      --accent: #35d0c5;
+      --accent-light: #7ef4ec;
+      --border: rgba(53, 208, 197, 0.3);
+      background: radial-gradient(circle at 50% 0%, #083c42, #031b1e);
+      color: #e0f7f6;
+    }
+
+    /* Media & Canvas Layout */
+    .canvas-card {
+      width: 100%;
+      max-width: 750px;
+      margin: 2.5rem auto;
+      padding: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius, 12px);
+      text-align: center;
+    }
+
+    figcaption {
+      margin-top: 1rem;
+      font-style: italic;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls-bar">
+    <div class="controls-group">
+      <label>Design:</label>
+      <button class="button" onclick="setTheme('default')">🌌 Deep Dark</button>
+      <button class="button" onclick="setTheme('turquoise')">🌊 Blau-Türkis</button>
+      <button class="button" onclick="setTheme('light')">☀️ Light</button>
+    </div>
+    
+    <div class="controls-group" style="margin-left: 10px;">
+      <label>Text:</label>
+      <button class="button" onclick="adjustFontSize(0.1)">A+</button>
+      <button class="button" onclick="adjustFontSize(-0.1)">A-</button>
+    </div>
+
+    <div class="controls-group" style="margin-left: 10px;">
+      <button class="button" onclick="toggleFullscreen()">⛶ Vollbild</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>💫 WRZT 〰️</h1>
+      <h1>✨ Wellenraumzeit-Theorie 🌀</h1>
+    </header>
+
+    <main>
+      <section class="chapter">
+        <h2>Was ist Licht?</h2>
+        <h3>Überlegung</h3>
+        <blockquote>
+          <ul>
+            <li>Um das Wesen des Lichts zu verstehen, gehen wir von bekannten Energiezuständen aus.</li>
+          </ul>
+        </blockquote>
+
+        <p>Nach dem Energieerhaltungssatz wird bei der Paarvernichtung (Annihilation) eines Elektron-Positron-Paares ohne zusätzliche kinetische Energie die gesamte Ruheenergie ihrer Massen vollständig in Photonenenergie umgewandelt. Es gilt somit $E_0 = E_{\text{kin}}$.</p>
+
+        <p>Beide Gleichungen sind aus der Physik bekannt, wodurch sich die entsprechende Wellenlänge bestimmen lässt. Elektromagnetische Wellen verlaufen sinusoidal – ein klarer Indikator für eine zugrundeliegende Kreisbewegung. Daraus lässt sich eine Kreisfrequenz deriveieren. Da die maximale Kreisgeschwindigkeit der Lichtgeschwindigkeit $c$ entspricht, ergibt sich ein minimaler Radius $R_{\text{min}}$, den das Elektron-Positron-Paar nicht unterschreiten kann.</p>
+
+        <ul>
+          <li>Die Teilchen ziehen sich durch die Coulomb- und die Lorentzkraft an, während die Zentrifugalkraft dieser Anziehung entgegenwirkt. Setzt man diese Kräfte ins Gleichgewicht, erhält man erneut einen minimalen Radius $r_{\text{min}}$. Das Verhältnis beider Radien entspricht einem Vielfachen der Feinstrukturkonstante ($k \cdot \alpha$).</li>
+        </ul>
+      </section>
+
+      <section class="chapter">
+        <h2>Entstehung der Welle</h2>
+        <ul>
+          <li>Durch die Umkreisung der beiden Teilchen, die eine Art dreidimensionale Bugwelle vor sich her schieben, entsteht eine 3D-Raumzeit-Welle, die sich kreisförmig ausbreitet (Strahlungsgesetz). Dadurch verlieren die Teilchen Energie in Funktion des relativistischen Lorentz-Faktors $\gamma$ bei Annäherung an die Lichtgeschwindigkeit.</li>
+        </ul>
+      </section>
+
+      <section class="chapter">
+        <h2>Eigenschaften der Welle</h2>
+        <h3>1. Wellen-Teilchen-Dualismus und Vektorfeldbeschreibung</h3>
+        <p>Zusätzlich zur <strong>Ausbreitungsrichtung</strong> zeichnet sich eine elektromagnetische Welle durch ihre <strong>transversale Schwingung</strong> im dreidimensionalen Raum aus. Die Schwingung der elektrischen und magnetischen Feldvektoren verläuft stets senkrecht ($90^\circ$) zur Ausbreitungsrichtung.</p>
+        
+        <ul>
+          <li><strong>Impuls- und Energietransport:</strong> Die transversalen Komponenten übertragen sowohl Energie als auch Impuls im Raum.</li>
+          <li><strong>Polarisation &amp; Spin:</strong> Durch die räumliche Orientierung der transversalen Schwingung (horizontal, vertikal oder zirkular) werden <strong>Polarisation</strong> und der <strong>Spin</strong> (Quantenanalogon des Drehimpulses) definiert.</li>
+          <li><strong>Feld- und Vektordarstellung:</strong> Der physikalische Zustand der Welle an jedem beliebigen Punkt im Raum lässt sich mathematisch exakt durch ein <strong>Vektorfeld</strong> (z. B. den Vektor des elektrischen Feldes $\vec{E}$ und des Magnetfeldes $\vec{B}$) beschreiben.</li>
+          <li><strong>Wellen-Teilchen-Verhalten:</strong> Quantenmechanische Effekte wie <strong>Interferenz</strong>, <strong>Verschränkung</strong> und das Erscheinungsbild lokalisierter „Teilchen“ (Photonen) ergeben sich aus der Wechselwirkung und Quantelung dieser elektromagnetischen Feldanregungen.</li>
+        </ul>
+        <hr>
+        <p>Licht ist eine elektromagnetische Wellenerschütterung, deren gequantelte Energie- und Impulspakete (Photonen) die Teilcheneigenschaften und übertragenen Informationen bilden.</p>
+        <blockquote>
+          <p><em><strong>Licht ist somit eine Welle mit Teilcheneigenschaften (Informationen)</strong></em></p>
+        </blockquote>
+      </section>
+
+      <section class="chapter">
+        <h3>1. Die vollständige Energie-Erhaltungs-Gleichung</h3>
+        <p>Die Gesamteigenenergie $E_0$ des schwingenden Systems entspricht der relativistischen kinetischen Energie $E_{\text{kin}}$:</p>
+        <div class="formula">
+          <p>$$E_0 = E_{\text{kin}} = m_e c^2 = \hbar \omega$$</p>
+        </div>
+        <p>Im relativistischen Grenzfall ($v \to c$ bzw. $\gamma \gg 1$) geht die kinetische Energie in die relativistische Gesamtenergie über, die mit der Rotationsfrequenz $\omega(\gamma)$ der Raumzeit verknüpft ist:</p>
+        <div class="formula">
+          <p>$$E_0 = E_{\text{kin}} = (\gamma) m_e c^2 = \hbar \omega(\gamma)$$</p>
+        </div>
+      </section>
+
+      <section class="chapter">
+        <h2>Zentrifugalkraft</h2>
+        <p>Für die Zentrifugalkraft gilt allgemein die Formel:</p>
+        <p>$$F_z = \frac{m \cdot v^2}{r}$$</p>
+        <p>Betrachten wir das Elektron-Positron-Paar mit der Masse $2m$ auf einer Kreisbahn mit dem Umfang $U = 2\pi r$.</p>
+        <p>Bei einer Kreisbewegung zeigt die Zentripetalkraft radial nach innen, während die momentane Bewegung tangential ist. Damit gilt für das infinitesimale Arbeitselement $dW$:</p>
+        <div class="formula">
+          <p>$$dW = \vec{F}_Z \cdot d\vec{s} = F_Z \cdot ds \cdot \cos(90^\circ) = 0$$</p>
+        </div>
+        <p>Die Zentripetalkraft verrichtet also bei einer idealen Kreisbewegung keine Arbeit.</p>
+        <p><strong>Jedoch bei einem Kreisbogen mit dem Bogenmaß von $1\text{ rad } (\text{Radiant})$ gilt $s = r$:</strong></p>
+        <p>$$E = F_z \cdot r = \frac{m \cdot v^2}{r} \cdot r = m \cdot v^2$$</p>
+        <p>Nimmt die Geschwindigkeit ihren maximalen Wert $v = c$ an, folgt:</p>
+        <p>$$E = m \cdot c^2$$</p>
+      </section>
+
+      <section class="chapter">
+        <h2>Herleitung $R_{\text{min}}$</h2>
+        <p>Ausgehend von den Grundannahmen der <strong>Wellenraumzeit-Theorie (WRZT)</strong> lässt sich der minimale Radius $R_{\text{min}}$ über die Kreisfrequenz $\omega$ bei der Maximalgeschwindigkeit $v = c$ für das Elektron-Positron-System (zwei Massen $m_e$) herleiten:</p>
+        
+        <h3>1. Ausgangsgleichung für die Energie</h3>
+        <p>$$E = 2 m_e c^2 = \hbar \cdot \omega$$</p>
+        
+        <h3>2. Verknüpfung von Kreisfrequenz $\omega$ und Lichtgeschwindigkeit $c$</h3>
+        <p>$$\omega = \frac{c}{R_{\text{min}}}$$</p>
+        
+        <h3>3. Ergebnis für $R_{\text{min}}$</h3>
+        <div class="formula">
+          <p>$$R_{\text{min}} = \frac{\hbar}{2 m_e c} = \frac{\bar{\lambda}_c}{2}$$</p>
+        </div>
+        <p>Zahlenwert: $R_{\text{min}} \approx 1{,}930796336 \times 10^{-13} \text{ m}$</p>
+      </section>
+
+      <section class="chapter">
+        <h2>Para-Positronium ($p\text{-}Ps$) & Simulation</h2>
+        <div class="canvas-card">
+          <canvas id="wrztCanvas" width="400" height="400" style="max-width: 100%; height: auto; background: #0d0f12; border-radius: 8px;"></canvas>
+          <figcaption>Dynamische Simulation: Einflug der Teilchen von außen auf $R_{\text{min}}$ mit anschließender Wellenemission</figcaption>
+        </div>
+
+        <h3>Übersicht der Skalen</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Eigenschaft</th>
+                <th>Formel</th>
+                <th>Wert</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Photonen-Wellenlänge ($\lambda$)</strong></td>
+                <td>$\frac{h}{m_e c}$</td>
+                <td>$2{,}42631 \times 10^{-12} \text{ m}$</td>
+              </tr>
+              <tr>
+                <td><strong>Relativer Abstand ($r_{\text{Abstand}}$)</strong></td>
+                <td>$\bar{\lambda}_C = \frac{\hbar}{m_e c}$</td>
+                <td>$3{,}86159 \times 10^{-13} \text{ m}$</td>
+              </tr>
+              <tr>
+                <td><strong>Bahnradius ($R_{\text{Bahn}}$)</strong></td>
+                <td>$\frac{\hbar}{2 m_e c}$</td>
+                <td><strong>$1{,}930796 \times 10^{-13} \text{ m}$</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>WRZT – Wellenraumzeit-Theorie © 2026</p>
+    </footer>
+  </div>
+
+  <script>
+    // Theme Switcher Logic
+    function setTheme(themeName) {
+      document.body.removeClass = '';
+      document.body.classList.remove('theme-light', 'theme-turquoise');
+      if (themeName !== 'default') {
+        document.body.classList.add('theme-' + themeName);
+      }
+    }
+
+    // Dynamic Font Resizing
+    let currentScale = 1.05;
+    function adjustFontSize(delta) {
+      currentScale = Math.min(Math.max(0.85, currentScale + delta), 1.4);
+      document.documentElement.style.setProperty('--current-font-size', currentScale + 'rem');
+    }
+
+    // Fullscreen Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Particle Canvas Simulation
+    (function() {
+      const canvas = document.getElementById('wrztCanvas');
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      const R_MIN = 45;
+      const MAX_SIZE = 10;
+      const PAUSE_DURATION = 80;
+
+      let phase = 'INCOMING';
+      let flyProgress = 0;
+      let currentSize = MAX_SIZE;
+      let angle = 0;
+      let pauseTimer = 0;
+      const waves = [];
+
+      function animate() {
+        ctx.fillStyle = 'rgba(13, 15, 18, 0.25)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, R_MIN, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        if (phase === 'INCOMING') {
+          flyProgress += 0.015;
+          if (flyProgress >= 1) {
+            flyProgress = 1;
+            phase = 'ORBITING';
+          }
+        } else if (phase === 'ORBITING') {
+          if (Math.random() < 0.12) {
+            waves.push({ r: R_MIN, opacity: 0.8 });
+          }
+          angle += 0.05;
+          currentSize -= 0.03;
+          if (currentSize <= 0) {
+            currentSize = 0;
+            phase = 'PAUSED';
+          }
+        } else if (phase === 'PAUSED') {
+          pauseTimer++;
+          if (pauseTimer >= PAUSE_DURATION) {
+            phase = 'INCOMING';
+            flyProgress = 0;
+            currentSize = MAX_SIZE;
+            pauseTimer = 0;
+            waves.length = 0;
+          }
+        }
+
+        for (let i = waves.length - 1; i >= 0; i--) {
+          const wave = waves[i];
+          wave.r += 1.2;
+          wave.opacity -= 0.008;
+          if (wave.opacity <= 0) {
+            waves.splice(i, 1);
+            continue;
+          }
+          ctx.strokeStyle = `rgba(53, 208, 197, ${wave.opacity})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, wave.r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        let x1, y1, x2, y2;
+        if (phase === 'INCOMING') {
+          const easeProgress = 1 - Math.pow(1 - flyProgress, 3);
+          const startDist = 180;
+          const currentDist = startDist - (startDist - R_MIN) * easeProgress;
+          const currentAngle = angle + flyProgress * 1.5;
+
+          x1 = centerX + Math.cos(currentAngle) * currentDist;
+          y1 = centerY + Math.sin(currentAngle) * currentDist;
+          x2 = centerX - Math.cos(currentAngle) * currentDist;
+          y2 = centerY - Math.sin(currentAngle) * currentDist;
+        } else if (phase === 'ORBITING') {
+          x1 = centerX + Math.cos(angle) * R_MIN;
+          y1 = centerY + Math.sin(angle) * R_MIN;
+          x2 = centerX - Math.cos(angle) * R_MIN;
+          y2 = centerY - Math.sin(angle) * R_MIN;
+        }
+
+        if (phase !== 'PAUSED') {
+          ctx.fillStyle = '#35d0c5';
+          ctx.shadowBlur = currentSize * 1.5;
+          ctx.shadowColor = '#35d0c5';
+          ctx.beginPath();
+          ctx.arc(x1, y1, currentSize, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#ff4081';
+          ctx.shadowBlur = currentSize * 1.5;
+          ctx.shadowColor = '#ff4081';
+          ctx.beginPath();
+          ctx.arc(x2, y2, currentSize, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+  </script>
+</body>
+</html>
