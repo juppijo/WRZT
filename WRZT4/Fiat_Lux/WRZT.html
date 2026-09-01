@@ -34,8 +34,15 @@
 
   <style>
     /* Ein bisschen CSS für eine schöne Darstellung */
+    body{
+      text-align: justify;
+    }
     h1{
+      max-width: 100%;
       text-align: center;
+    }
+     h2{
+      max-width: 100%;
     }
     img {
         max-width: 100%;
@@ -65,10 +72,45 @@
     <h3>
       Überlegung.
     </h3>
-    <p>Um das Wesen des Lichts zu verstehen, gehen wir von bekannten Energiezuständen aus.</p>
+    <blockquote>
+      <ul>
+        <li>
+          <p>Um das Wesen des Lichts zu verstehen, gehen wir von bekannten Energiezuständen aus.</p>
+        </li>
+      </ul>
+    </blockquote>
+
     <p>Nach dem Energieerhaltungssatz wird bei der Paarvernichtung (Annihilation) eines Elektron-Positron-Paares ohne zusätzliche kinetische Energie die gesamte Ruheenergie ihrer Massen vollständig in Photonenenergie umgewandelt. Es gilt somit $E_0 = E_{\text{kin}}$.</p>
+
     <p>Beide Gleichungen sind aus der Physik bekannt, wodurch sich die entsprechende Wellenlänge bestimmen lässt. Elektromagnetische Wellen verlaufen sinusoidal – ein klarer Indikator für eine zugrundeliegende Kreisbewegung. Daraus lässt sich eine Kreisfrequenz ableiten. Da die maximale Kreisgeschwindigkeit der Lichtgeschwindigkeit $c$ entspricht, ergibt sich ein minimaler Radius $R_{\text{min}}$, den das Elektron-Positron-Paar nicht unterschreiten kann.</p>
-    <p>Die Teilchen ziehen sich durch die Coulomb- und die Lorentzkraft an, während die Zentrifugalkraft dieser Anziehung entgegenwirkt. Setzt man diese Kräfte ins Gleichgewicht, erhält man erneut einen minimalen Radius $r_{\text{min}}$. Das Verhältnis beider Radien entspricht einem Vielfachen der Feinstrukturkonstante ($k \cdot \alpha$).</p>
+
+    <ul>
+      <li>
+        <p>Die Teilchen ziehen sich durch die Coulomb- und die Lorentzkraft an, während die Zentrifugalkraft dieser Anziehung entgegenwirkt. Setzt man diese Kräfte ins Gleichgewicht, erhält man erneut einen minimalen Radius $r_{\text{min}}$. Das Verhältnis beider Radien entspricht einem Vielfachen der Feinstrukturkonstante ($k \cdot \alpha$).</p>
+      </li>
+    </ul>
+
+
+    <hr>
+    <h2>Entstehung der Welle</h2>
+    <ul>
+      <li>Durch die Umkreisung der beiden Teilchen, die eine Art dreidimensionale Bugwelle vor sich her schieben, entsteht eine 3D-Raumzeit-Welle, die sich kreisförmig ausbreitet (Strahlungsgesetz). Dadurch verlieren die Teilchen Energie in Funktion des relativistischen Lorentz-Faktors $\gamma$ bei Annäherung an die Lichtgeschwindigkeit:</li>
+    </ul>
+    <h3>1. Die vollständige Energie-Erhaltungs-Gleichung</h3>
+    <p>Die Gesamteigenenergie $E_0$ des schwingenden Systems entspricht der relativistischen kinetischen Energie $E_{\text{kin}}$:</p>
+    <div class=formula>
+
+      <p>$$E_0 = E_{\text{kin}} =m_e c^2 = \hbar \omega $$</p>
+
+    </div>
+
+    <p>Im relativistischen Grenzfall ($v \to c$ bzw. $\gamma \gg 1$) geht die kinetische Energie in die relativistische Gesamtenergie über, die mit der Rotationsfrequenz $\omega(\gamma)$ der Raumzeit verknüpft ist:</p>
+    <p>$$E_0 = E_{\text{kin}} =(\gamma) m_e c^2 = \hbar \omega(\gamma) $$</p>
+    <hr>
+
+    <h2>
+      Zentrifugalkraft
+    </h2>
     <p>Für die Zentrifugalkraft gilt allgemein die Formel: </p>
     <p>$$F_z = \frac{m \cdot v^2}{r}$$</p>
     <p>Betrachten wir das Elektron-Positron-Paar mit der Masse $2m$ auf einer Kreisbahn mit dem Umfang $U = 2\pi r$. </p>
@@ -76,13 +118,15 @@
       Die mechanische Arbeit ($W = F \cdot s$) beziehungsweise die Energie einer vollständigen Umdrehung berechnet sich wie folgt: </p>
 
     <p>Bei einer Kreisbewegung zeigt die Zentripetalkraft radial nach innen, während die momentane Bewegung tangential ist.</p>
-    <p>Damit gilt:</p>
+    <p>Damit gilt für das infinitesimale Arbeitselement \( dW \):</p>
 
     <ul>
       <li>
-        <p> dW = F ⋅ ds = 0.</p>
+        <p> $$ dW = \vec{F}_Z \cdot d\vec{s} = F_Z \cdot ds \cdot \cos(90^\circ) = 0 $$ </p>
       </li>
     </ul>
+
+
     <p>Die Zentripetalkraft verrichtet also bei einer idealen Kreisbewegung keine Arbeit.</p>
 
     <p>
@@ -109,7 +153,7 @@
     <hr>
     <h3>1. Ausgangsgleichung für die Energie</h3>
     <p>Die kinetische/rotatorische Energie des Systems aus zwei gleich großen Massen $2m_e$ auf einer Kreisbahn bei Maximalgeschwindigkeit $v = c$ entspricht der doppelten Ruhemasse-Energie:</p>
-    <p>$$E = 2 m_e c^2$$</p>
+    <p>$$E = (2) m_e c^2$$</p>
     <p>Nach den Gesetzmäßigkeiten der quantenmechanischen Wellenbewegung und der WRZT ist diese Energie auch direkt an die Kreisfrequenz $\omega$ gekoppelt:</p>
     <p>$$E = \hbar \cdot \omega$$</p>
     <p>Gleichsetzen beider Ansätze liefert:</p>
@@ -250,6 +294,85 @@
         <p><strong>$\omega$</strong>: Kreisfrequenz ($v / r$)</p>
       </li>
     </ul>
+    
+    <h1>
+       Para-Positronium ($p\text{-}Ps$) im Singulett-Zustand
+    </h1>
+
+    <h2>
+      Bahnradius für das Zwei-Teilchen-System aus Elektron und Positron
+    </h2>
+
+    <p>Hier ist die zusammenfassende Herleitung und Berechnung des Bahnradius für das Zwei-Teilchen-System aus Elektron und Positron im Para-Positronium ($p\text{-}Ps$) im Singulett-Zustand.</p>
+    <hr>
+    <h3>1. Ausgangspunkt: Die Photonen-Wellenlänge ($\lambda$)</h3>
+    <p>Bei der Paarvernichtung im $p\text{-}Ps$-Ruhezustand zerfällt die Gesamtmasse beider Teilchen ($2 m_e$) in zwei identische Photonen.</p>
+    <ul>
+      <li><strong>Gesamtenergie:</strong> $E_{\text{gesamt}} = 2 m_e c^2 \approx 1022 \text{ keV}$</li>
+      <li><strong>Energie pro Photon:</strong> $E_\gamma = m_e c^2 \approx 511 \text{ keV}$</li>
+    </ul>
+    <p>Gemäß der Planck-Einstein-Beziehung $E_\gamma = \frac{h c}{\lambda}$ ergibt sich für die Wellenlänge $\lambda$ jedes Photons die <strong>Compton-Wellenlänge</strong> des Elektrons:</p>
+    <p>$$\lambda = \frac{h}{m_e c} \approx 2{,}42631 \times 10^{-12} \text{ m}$$</p>
+    <hr>
+    <h3>2. Der effektive Ein-Teilchen-Radius ($R_1$)</h3>
+    <p>Betrachtet man hypothetisch ein einzelnes Teilchen, dessen rotierende Wellenlänge der Photonenwellenlänge entspricht ($\lambda = 2 \pi R$), ergibt sich die <strong>reduzierte Compton-Wellenlänge</strong> ($\bar{\lambda}_C$):</p>
+    <p>$$R_1 = \frac{\lambda}{2 \pi} = \frac{h}{2 \pi m_e c} = \frac{\hbar}{m_e c} \approx 3{,}86159 \times 10^{-13} \text{ m}$$</p>
+    <hr>
+    <h3>3. Berücksichtigung des Zwei-Teilchen-Systems (Schwerpunkt)</h3>
+    <p>Da das Positronium aus <strong>zwei gleich schweren Teilchen</strong> ($m_1 = m_2 = m_e$) besteht, kreisen beide nicht um ein festes Zentrum, sondern symmetrisch um ihren <strong>gemeinsamen Schwerpunkt (Massezentrum)</strong>, der genau in der Mitte zwischen ihnen liegt.</p>
+    <h3>A. Reduzierte Masse ($\mu$)</h3>
+    <p>Die Relativbewegung von zwei gleich schweren Massen $m_e$ wird durch die reduzierte Masse beschrieben:</p>
+    <p>$$\mu = \frac{m_e \cdot m_e}{m_e + m_e} = \frac{m_e}{2}$$</p>
+    <p>Durch den Faktor $\frac{1}{2}$ der wirksamen Trägheit halbiert sich der effektive Bahnradius um den Schwerpunkt im Vergleich zum Ein-Teilchen-Fall.</p>
+    <h4>B. Geometrische Halbierung des Bahnradius ($R_{\text{Bahn}}$)</h4>
+    <p>Ist der Gesamtabstand der beiden Teilchen zueinander gleich der Wellenlängenskala ($r_{\text{Abstand}} = R_1 = \bar{\lambda}_C$), so beträgt der <strong>Bahnradius $R_{\text{Bahn}}$</strong> jedes einzelnen Teilchens um den gemeinsamen Schwerpunkt:</p>
+    <p>$$R_{\text{Bahn}} = \frac{r_{\text{Abstand}}}{2} = \frac{\bar{\lambda}_C}{2} = \frac{\hbar}{2 m_e c}$$</p>
+    <hr>
+    <h3>4. Konkrete Berechnung</h3>
+    <p>Setzt man die fundamentale Naturkonstanten ein:</p>
+    <ul>
+      <li>$\hbar = \frac{h}{2\pi} \approx 1{,}05457 \times 10^{-34} \text{ J}\cdot\text{s}$</li>
+      <li>$m_e \approx 9{,}10938 \times 10^{-31} \text{ kg}$</li>
+      <li>$c \approx 2{,}99792 \times 10^8 \text{ m/s}$</li>
+    </ul>
+    <p>$$R_{\text{Bahn}} = \frac{1{,}05457 \times 10^{-34} \text{ J}\cdot\text{s}}{2 \cdot (9{,}10938 \times 10^{-31} \text{ kg}) \cdot (2{,}99792 \times 10^8 \text{ m/s})}$$</p>
+    <p>$$R_{\text{Bahn}} \approx 1{,}930796 \times 10^{-13} \text{ m}$$</p>
+    <hr>
+    <h3>Übersicht der Skalen</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Eigenschaft</th>
+          <th>Formel</th>
+          <th>Wert</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Photonen-Wellenlänge ($\lambda$)</strong></td>
+          <td>$\frac{h}{m_e c}$</td>
+          <td>$2{,}42631 \times 10^{-12} \text{ m}$</td>
+        </tr>
+        <tr>
+          <td><strong>Relativer Abstand der Teilchen ($r_{\text{Abstand}}$)</strong></td>
+          <td>$\bar{\lambda}_C = \frac{\hbar}{m_e c}$</td>
+          <td>$3{,}86159 \times 10^{-13} \text{ m}$</td>
+        </tr>
+        <tr>
+          <td><strong>Bahnradius um Schwerpunkt ($R_{\text{Bahn}}$)</strong></td>
+          <td>$\frac{\hbar}{2 m_e c}$</td>
+          <td><strong>$1{,}930796 \times 10^{-13} \text{ m}$</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <hr>
+    <blockquote>
+      <ul>
+        <li>J &amp; Z © 2026</li>
+      </ul>
+    </blockquote>
 
   </div>
   <!-- JavaScript for Fullscreen Mode -->
