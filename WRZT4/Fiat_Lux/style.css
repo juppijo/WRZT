@@ -7,52 +7,46 @@ Wellenraumzeit-Theorie
 1. Grundvariablen & Design-Tokens
 --------------------------------------------------------- */
 :root {
-/* Farbpalette */
---bg: #07121f;
---bg-secondary: #0b1c2d;
---surface: rgba(16, 40, 61, 0.65);
---surface-solid: #10283d;
---surface-hover: rgba(53, 208, 197, 0.08);
+  /* Farbpalette */
+  --bg: #07121f;
+  --bg-secondary: #0b1c2d;
+  --surface: rgba(16, 40, 61, 0.65);
+  --surface-solid: #10283d;
+  --surface-hover: rgba(53, 208, 197, 0.08);
 
---text: #e8e4da;
---text-soft: #b9c7d2;
---text-muted: #8799a8;
+  --text: #e8e4da;
+  --text-soft: #b9c7d2;
+  --text-muted: #8799a8;
 
---accent: #35d0c5;
---accent-light: #69e7df;
---accent-dark: #199e98;
---accent-glow: rgba(53, 208, 197, 0.25);
+  --accent: #35d0c5;
+  --accent-light: #69e7df;
+  --accent-dark: #199e98;
+  --accent-glow: rgba(53, 208, 197, 0.25);
 
---border: rgba(105, 231, 223, 0.20);
---border-hover: rgba(105, 231, 223, 0.45);
+  --border: rgba(105, 231, 223, 0.20);
+  --border-hover: rgba(105, 231, 223, 0.45);
 
-/* Layout & Spacing - Großzügiger Randabstand (2rem Minimum statt 1.5rem) */
---max-width: 1000px;
---content-padding: clamp(2rem, 6vw, 4.5rem);
---radius: 12px;
+  /* Layout & Spacing */
+  --max-width: 1000px;
+  --content-padding: clamp(2rem, 6vw, 4.5rem);
+  --radius: 12px;
 
-/* Typografie (vergrößert) */
+  /* Typografie (Vergrößert) */
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
 
-  /* Vorher: clamp(0.7rem, 0.25vw + 0.63rem, 0.81rem) */
   --text-size: clamp(1rem, 0.35vw + 0.9rem, 1.15rem);
-  
-  /* Überschriften ebenfalls proportional angepasst */
   --h1-size: clamp(1.6rem, 3vw + 0.8rem, 2.5rem);
   --h2-size: clamp(1.35rem, 2.3vw + 0.5rem, 2.0rem);
   --h3-size: clamp(1.15rem, 1.6vw + 0.3rem, 1.5rem);
   --h4-size: clamp(1.0rem, 1.2vw, 1.2rem);
 
---space-xs: 0.5rem;
---space-sm: 0.8rem;
---space-md: 1.1rem;
---space-lg: 1.8rem;
---space-xl: 3.2rem;
-
-
-
-
+  /* Abstände (Vergrößert) */
+  --space-xs: 0.5rem;
+  --space-sm: 0.8rem;
+  --space-md: 1.1rem;
+  --space-lg: 1.8rem;
+  --space-xl: 3.2rem;
 }
 
 /* ---------------------------------------------------------
