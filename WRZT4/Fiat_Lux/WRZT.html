@@ -294,10 +294,164 @@
         <p><strong>$\omega$</strong>: Kreisfrequenz ($v / r$)</p>
       </li>
     </ul>
-    
+
     <h1>
-       Para-Positronium ($p\text{-}Ps$) im Singulett-Zustand
+      Para-Positronium ($p\text{-}Ps$) im Singulett-Zustand
     </h1>
+
+    <div class="canvas-container" style="width: 100%; max-width: 700px; margin: 2rem auto; text-align: center;">
+      <canvas id="wrztCanvas" style="width: 70%; height: auto; background: #0d0f12; border-radius: 8px; border: 1px solid #1f2937; display: block; margin: 0 auto;"></canvas>
+      <figcaption>Dynamische Simulation: Einflug der Teilchen von außen auf $R_{\text{min}}$ mit anschließender Wellenemission</figcaption>
+    </div>
+
+    <script>
+      (function() {
+        const canvas = document.getElementById('wrztCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const R_MIN = 30; // Fester Bahnradius R_min
+        const MAX_SIZE = 14; // Große Startgröße für beste Sichtbarkeit
+        const PAUSE_DURATION = 90; // Pause nach Auflösung (~1.5 Sekunden)
+
+        // Phasenzustände: 'INCOMING', 'ORBITING', 'PAUSED'
+        let phase = 'INCOMING';
+        let flyProgress = 0; // Fortschritt des Einflugs (0 bis 1)
+
+        let currentSize = MAX_SIZE; // Aktuelle Teilchengröße
+        let angle = 0; // Rotationswinkel
+        let pauseTimer = 0; // Pausentimer
+        const waves = []; // Array für Raumzeit-Wellen
+
+        function animate() {
+          // 1. Hintergrund löschen mit Nachzieheffekt
+          ctx.fillStyle = 'rgba(13, 15, 18, 0.2)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // 2. Fester R_min Bahnkreis (gestrichelt)
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, R_MIN, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // 3. Phasensteuerung & Logik
+          if (phase === 'INCOMING') {
+            // Einflug-Animation (von weit außen nach R_min)
+            flyProgress += 0.015;
+            if (flyProgress >= 1) {
+              flyProgress = 1;
+              phase = 'ORBITING'; // Wechsel zur Kreisbahn
+            }
+          } else if (phase === 'ORBITING') {
+            // Kreisbahn: Raumzeit-Wellen emittieren
+            if (Math.random() < 0.12) {
+              waves.push({
+                r: R_MIN,
+                opacity: 0.8
+              });
+            }
+
+            // Rotation & Schrumpfen
+            angle += 0.05;
+            currentSize -= 0.035;
+
+            if (currentSize <= 0) {
+              currentSize = 0;
+              phase = 'PAUSED'; // Wechsel zur Pause
+            }
+          } else if (phase === 'PAUSED') {
+            // Pause nach Auflösung
+            pauseTimer++;
+            if (pauseTimer >= PAUSE_DURATION) {
+              // Reset für den nächsten Anflug von außen
+              phase = 'INCOMING';
+              flyProgress = 0;
+              currentSize = MAX_SIZE;
+              pauseTimer = 0;
+              waves.length = 0;
+            }
+          }
+
+          // 4. Wellenbreitung nach außen
+          for (let i = waves.length - 1; i >= 0; i--) {
+            const wave = waves[i];
+            wave.r += 1.2;
+            wave.opacity -= 0.006;
+
+            if (wave.opacity <= 0) {
+              waves.splice(i, 1);
+              continue;
+            }
+
+            ctx.strokeStyle = `rgba(0, 229, 255, ${wave.opacity})`;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, wave.r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          // 5. Schwerpunkt
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 6. Berechnung der Teilchenpositionen
+          let x1, y1, x2, y2;
+
+          if (phase === 'INCOMING') {
+            // Einflug-Trajektorie von weit außen (Radius 300) bis R_MIN (80)
+            // Mit Sanftanlauf (Ease-Out) für eine natürliche Bewegung
+            const easeProgress = 1 - Math.pow(1 - flyProgress, 3);
+            const startDist = 320;
+            const currentDist = startDist - (startDist - R_MIN) * easeProgress;
+
+            // Während des Anflugs drehen sich die Teilchen leicht ein
+            const currentAngle = angle + flyProgress * 1.5;
+
+            x1 = centerX + Math.cos(currentAngle) * currentDist;
+            y1 = centerY + Math.sin(currentAngle) * currentDist;
+            x2 = centerX - Math.cos(currentAngle) * currentDist;
+            y2 = centerY - Math.sin(currentAngle) * currentDist;
+          } else if (phase === 'ORBITING') {
+            // Exakte Kreisbahn auf R_MIN
+            x1 = centerX + Math.cos(angle) * R_MIN;
+            y1 = centerY + Math.sin(angle) * R_MIN;
+            x2 = centerX - Math.cos(angle) * R_MIN;
+            y2 = centerY - Math.sin(angle) * R_MIN;
+          }
+
+          // 7. Zeichnen der Teilchen
+          if (phase !== 'PAUSED') {
+            // Teilchen 1: Elektron (Blau-Türkis)
+            ctx.fillStyle = '#00e5ff';
+            ctx.shadowBlur = currentSize * 1.5;
+            ctx.shadowColor = '#00e5ff';
+            ctx.beginPath();
+            ctx.arc(x1, y1, currentSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Teilchen 2: Positron (Rot/Pink)
+            ctx.fillStyle = '#ff4081';
+            ctx.shadowBlur = currentSize * 1.5;
+            ctx.shadowColor = '#ff4081';
+            ctx.beginPath();
+            ctx.arc(x2, y2, currentSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+          }
+
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      })();
+    </script>
 
     <h2>
       Bahnradius für das Zwei-Teilchen-System aus Elektron und Positron
