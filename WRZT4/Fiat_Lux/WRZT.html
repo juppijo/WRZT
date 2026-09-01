@@ -34,8 +34,14 @@
 
   <style>
     /* Ein bisschen CSS für eine schöne Darstellung */
-    body{
+    body {
       text-align: justify;
+      font-size: var(--text-size, 1.05rem);
+      line-height: 1.7;
+    }
+    /* Stellt sicher, dass MathJax-Formeln im Text nicht zu klein sind */
+    mjx-container {
+      font-size: 110% !important;
     }
     h1{
       max-width: 100%;
