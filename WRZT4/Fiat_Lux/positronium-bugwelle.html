@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e⁻ e⁺ — Bugwellen-Simulation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#08070a;
+      --gold:#d4af37;
+      --gold-dim:#8a7124;
+      --electron:#6fd8ff;
+      --positron:#ffcf5c;
+      --panel:#0e0c10;
+      --line:rgba(212,175,55,0.22);
+      --text:#e9e4d8;
+      --text-dim:#8c8578;
+    }
+    *{box-sizing:border-box;}
+    html,body{
+      margin:0; padding:0; width:100%; height:100%; overflow:hidden;
+      background:var(--bg); color:var(--text);
+      font-family:'Barlow', sans-serif;
+    }
+    #scene{ position:fixed; inset:0; }
+    #scene canvas{ display:block; }
+    
+    #vignette{
+      position:fixed; inset:0; pointer-events:none;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.75) 100%);
+      z-index:2;
+    }
+    
+    header{
+      position:fixed; top:0; left:0; right:0; z-index:3;
+      padding:26px 34px 0 34px;
+      pointer-events:none;
+    }
+    h1{
+      font-family:'Bebas Neue', sans-serif;
+      font-size:clamp(28px, 4vw, 44px);
+      letter-spacing:0.06em;
+      margin:0;
+      color:var(--text);
+      line-height:0.95;
+    }
+    h1 span{ color:var(--gold); }
+    header p{
+      font-family:'Barlow Condensed', sans-serif;
+      font-weight:500;
+      font-size:15px;
+      color:var(--text-dim);
+      max-width:520px;
+      margin:6px 0 0 0;
+      line-height:1.4;
+    }
+    
+    #panel{
+      position:fixed; right:0; top:0; bottom:0; z-index:4;
+      width:300px;
+      background:linear-gradient(180deg, rgba(14,12,16,0.92), rgba(14,12,16,0.88));
+      border-left:1px solid var(--line);
+      backdrop-filter: blur(6px);
+      padding:100px 26px 26px 26px;
+      display:flex; flex-direction:column; gap:26px;
+      transition:transform .35s ease;
+    }
+    #panel.collapsed{ transform:translateX(100%); }
+    
+    .field{ display:flex; flex-direction:column; gap:10px; }
+    .field-head{
+      display:flex; justify-content:space-between; align-items:baseline;
+    }
+    .field-head label{
+      font-family:'Barlow Condensed', sans-serif;
+      font-weight:600; font-size:14px; letter-spacing:.03em;
+      color:var(--text);
+    }
+    .field-head .val{
+      font-family:'Barlow', sans-serif;
+      font-size:13px; color:var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    input[type=range]{
+      -webkit-appearance:none; appearance:none;
+      width:100%; height:2px;
+      background:var(--line);
+      outline:none; margin:6px 0;
+    }
+    input[type=range]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:14px; height:14px; border-radius:50%;
+      background:var(--gold);
+      box-shadow:0 0 8px rgba(212,175,55,0.7);
+      cursor:pointer;
+      border:1px solid #1a1a1a;
+    }
+    input[type=range]::-moz-range-thumb{
+      width:14px; height:14px; border-radius:50%;
+      background:var(--gold); border:1px solid #1a1a1a;
+      box-shadow:0 0 8px rgba(212,175,55,0.7);
+      cursor:pointer;
+    }
+    
+    .divider{ height:1px; background:var(--line); }
+    
+    .stats{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;
+      font-family:'Barlow Condensed', sans-serif;
+    }
+    .stat b{
+      display:block; font-size:11px; font-weight:500; color:var(--text-dim);
+      letter-spacing:.03em;
+    }
+    .stat span{
+      display:block; font-size:17px; color:var(--text); margin-top:2px;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat.e span{ color:var(--electron); }
+    .stat.p span{ color:var(--positron); }
+    
+    .legend{ display:flex; flex-direction:column; gap:8px; font-size:13px; color:var(--text-dim); }
+    .legend .row{ display:flex; align-items:center; gap:8px; }
+    .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+    .dot.e{ background:var(--electron); box-shadow:0 0 6px var(--electron); }
+    .dot.p{ background:var(--positron); box-shadow:0 0 6px var(--positron); }
+    
+    .buttons{ display:flex; gap:10px; margin-top:auto; }
+    button{
+      flex:1;
+      font-family:'Barlow Condensed', sans-serif;
+      font-weight:600; letter-spacing:.03em; font-size:14px;
+      background:transparent;
+      border:1px solid var(--gold-dim);
+      color:var(--gold);
+      padding:11px 10px;
+      cursor:pointer;
+      transition:background .2s, color .2s, border-color .2s;
+    }
+    button:hover{ background:rgba(212,175,55,0.12); border-color:var(--gold); }
+    button.active{ background:var(--gold); color:#141118; }
+    
+    #toggleTab{
+      position:fixed; right:300px; top:100px; z-index:5;
+      width:26px; height:52px;
+      background:rgba(14,12,16,0.9);
+      border:1px solid var(--line); border-right:none;
+      color:var(--gold);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; font-size:12px;
+      transition:right .35s ease;
+    }
+    #toggleTab.collapsed{ right:0; }
+    
+    #hint{
+      position:fixed; left:34px; bottom:22px; z-index:3;
+      font-family:'Barlow Condensed', sans-serif;
+      font-size:12.5px; color:var(--text-dim);
+      letter-spacing:.02em;
+      pointer-events:none;
+    }
+    
+    @media (max-width:720px){
+      #panel{ width:82vw; padding-top:90px; }
+      #toggleTab{ right:82vw; }
+      #toggleTab.collapsed{ right:0; }
+      header{ padding:18px 18px 0 18px; }
+      #hint{ left:18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="scene"></div>
+  <div id="vignette"></div>
+
+  <header>
+    <h1>Elektron <span>·</span> Positron</h1>
+    <p>Zwei umeinander kreisende Ladungen erzeugen ein sich ausbreitendes Wellenfeld. Nähert sich ihre Bahngeschwindigkeit c, stauen sich die Wellenfronten vor ihnen zu einer Bugwelle — dahinter bleibt gedehnte Stille.</p>
+  </header>
+
+  <div id="toggleTab">◂</div>
+
+  <div id="panel">
+
+    <div class="field">
+      <div class="field-head"><label>Bahnradius</label><span class="val" id="radiusVal">–</span></div>
+      <input type="range" id="radius" min="-0.3" max="1" step="0.01" value="0.42">
+    </div>
+
+    <div class="field">
+      <div class="field-head"><label>Geschwindigkeit&nbsp;v / c</label><span class="val" id="speedVal">–</span></div>
+      <input type="range" id="speed" min="0" max="1" step="0.005" value="0.9">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stats">
+      <div class="stat e"><b>Bahngeschwindigkeit</b><span id="statV">–</span></div>
+      <div class="stat p"><b>Umlaufdauer</b><span id="statT">–</span></div>
+      <div class="stat e"><b>Radius</b><span id="statR">–</span></div>
+      <div class="stat p"><b>Wellenlänge</b><span id="statLambda">–</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="legend">
+      <div class="row"><span class="dot e"></span>Elektronen-Wellenfeld</div>
+      <div class="row"><span class="dot p"></span>Positronen-Wellenfeld</div>
+    </div>
+
+    <div class="buttons">
+      <button id="playBtn" class="active">⏸ Pause</button>
+      <button id="fsBtn">⛶ Vollbild</button>
+    </div>
+
+  </div>
+
+  <div id="hint">Ziehen zum Drehen · Scrollen zum Zoomen</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    (function() {
+
+      // ---------- basic three.js setup ----------
+      const container = document.getElementById('scene');
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x08070a, 0.055);
+
+      const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.05, 200);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: false
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x08070a, 1);
+      container.appendChild(renderer.domElement);
+
+      // ---------- simple orbit camera (no external addon needed) ----------
+      let camTheta = 0.9,
+        camPhi = 1.05,
+        camDist = 8.5;
+      const camTarget = new THREE.Vector3(0, 0, 0);
+
+      function updateCamera() {
+        const p = Math.min(Math.max(camPhi, 0.15), Math.PI - 0.15);
+        camera.position.set(
+          camTarget.x + camDist * Math.sin(p) * Math.sin(camTheta),
+          camTarget.y + camDist * Math.cos(p),
+          camTarget.z + camDist * Math.sin(p) * Math.cos(camTheta)
+        );
+        camera.lookAt(camTarget);
+      }
+      updateCamera();
+
+      let dragging = false,
+        lastX = 0,
+        lastY = 0;
+      renderer.domElement.addEventListener('pointerdown', e => {
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+      });
+      window.addEventListener('pointerup', () => dragging = false);
+      window.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX,
+          dy = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        camTheta -= dx * 0.006;
+        camPhi -= dy * 0.006;
+        updateCamera();
+      });
+      renderer.domElement.addEventListener('wheel', e => {
+        e.preventDefault();
+        camDist *= (1 + e.deltaY * 0.001);
+        camDist = Math.min(Math.max(camDist, 2.5), 22);
+        updateCamera();
+      }, {
+        passive: false
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // ---------- starfield backdrop ----------
+      (function stars() {
+        const N = 1400;
+        const g = new THREE.BufferGeometry();
+        const pos = new Float32Array(N * 3);
+        for (let i = 0; i < N; i++) {
+          const r = 40 + Math.random() * 60;
+          const th = Math.random() * Math.PI * 2;
+          const ph = Math.acos(2 * Math.random() - 1);
+          pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+          pos[i * 3 + 1] = r * Math.cos(ph) * 0.6;
+          pos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+        }
+        g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const m = new THREE.PointsMaterial({
+          color: 0x8a8370,
+          size: 0.045,
+          transparent: true,
+          opacity: 0.55
+        });
+        scene.add(new THREE.Points(g, m));
+      })();
+
+      // ---------- physics constants ----------
+      const C_SIM = 1.7; // wave propagation speed in scene units / second
+      const R_MIN = 0.5,
+        R_MAX = 3.1;
+      const K_WAVE = 9.0; // spatial frequency of the ripples
+      const SIGMA = 0.10; // wavefront thickness
+      const DECAY = 0.35; // amplitude fade over time since emission
+      const AMPLITUDE = 0.16; // vertical displacement scale
+      const EMIT_INTERVAL = 0.045; // seconds between emitted wave samples
+      const HIST = 64; // history buffer length per particle
+
+      let radiusFrac = parseFloat(document.getElementById('radius').value);
+      let speedFrac = parseFloat(document.getElementById('speed').value);
+      let running = true;
+
+      function currentRadius() {
+        return R_MIN + radiusFrac * (R_MAX - R_MIN);
+      }
+
+      // ---------- wave field plane (shader-based) ----------
+      const PLANE_SIZE = 13;
+      const PLANE_SEG = 170;
+      const planeGeo = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE, PLANE_SEG, PLANE_SEG);
+      planeGeo.rotateX(-Math.PI / 2);
+
+      const histPosE = [];
+      for (let i = 0; i < HIST; i++) histPosE.push(new THREE.Vector3(9999, 0, 9999));
+      const histPosP = [];
+      for (let i = 0; i < HIST; i++) histPosP.push(new THREE.Vector3(9999, 0, 9999));
+      const histTimeE = new Float32Array(HIST).fill(-999);
+      const histTimeP = new Float32Array(HIST).fill(-999);
+
+      const waveUniforms = {
+        uTime: {
+          value: 0
+        },
+        uC: {
+          value: C_SIM
+        },
+        uK: {
+          value: K_WAVE
+        },
+        uSigma: {
+          value: SIGMA
+        },
+        uDecay: {
+          value: DECAY
+        },
+        uAmp: {
+          value: AMPLITUDE
+        },
+        posE: {
+          value: histPosE
+        },
+        timeE: {
+          value: histTimeE
+        },
+        posP: {
+          value: histPosP
+        },
+        timeP: {
+          value: histTimeP
+        },
+        colorE: {
+          value: new THREE.Color(0x6fd8ff)
+        },
+        colorP: {
+          value: new THREE.Color(0xffcf5c)
+        },
+      };
+
+      const waveMat = new THREE.ShaderMaterial({
+        uniforms: waveUniforms,
+        transparent: true,
+        depthWrite: true,
+        side: THREE.DoubleSide,
+        vertexShader: `
+    #define HIST ${HIST}
+    uniform float uTime, uC, uK, uSigma, uDecay, uAmp;
+    uniform vec3 posE[HIST];
+    uniform float timeE[HIST];
+    uniform vec3 posP[HIST];
+    uniform float timeP[HIST];
+    varying float vHeight;
+    varying float vBalance;
+    varying float vEdge;
+
+    float contribution(vec3 src, float tEmit, vec3 here){
+      float dt = uTime - tEmit;
+      if(dt <= 0.0) return 0.0;
+      float r = distance(here.xz, src.xz);
+      float diff = r - uC*dt;
+      float env = exp(-(diff*diff)/(2.0*uSigma*uSigma)) * exp(-uDecay*dt);
+      return cos(uK*diff) * env;
+    }
+
+    void main(){
+      vec3 here = position;
+      float hE = 0.0;
+      float hP = 0.0;
+      for(int i=0;i<HIST;i++){
+        hE += contribution(posE[i], timeE[i], here);
+        hP += contribution(posP[i], timeP[i], here);
+      }
+      float h = (hE + hP) * uAmp;
+      vHeight = h;
+      vBalance = clamp((hE - hP) * 2.5, -1.0, 1.0);
+      vec3 newPos = position + normal * h;
+      vEdge = clamp(1.0 - length(here.xz)/6.2, 0.0, 1.0);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+    }
+  `,
+        fragmentShader: `
+    uniform vec3 colorE;
+    uniform vec3 colorP;
+    varying float vHeight;
+    varying float vBalance;
+    varying float vEdge;
+    void main(){
+      vec3 base = mix(colorE, colorP, (vBalance+1.0)*0.5);
+      float intensity = smoothstep(0.0, 0.85, abs(vHeight)*3.2);
+      vec3 col = base * (0.35 + intensity*1.4);
+      float alpha = (0.10 + intensity*0.85) * vEdge;
+      gl_FragColor = vec4(col, alpha);
+    }
+  `
+      });
+
+      const wavePlane = new THREE.Mesh(planeGeo, waveMat);
+      scene.add(wavePlane);
+
+      // faint base grid disc beneath, for depth reference
+      (function baseDisc() {
+        const g = new THREE.CircleGeometry(6.3, 96);
+        g.rotateX(-Math.PI / 2);
+        const m = new THREE.MeshBasicMaterial({
+          color: 0x0c0a10,
+          transparent: true,
+          opacity: 0.55,
+          side: THREE.DoubleSide
+        });
+        const disc = new THREE.Mesh(g, m);
+        disc.position.y = -0.01;
+        scene.add(disc);
+      })();
+
+      // ---------- particles ----------
+      function makeParticle(color) {
+        const group = new THREE.Group();
+        const core = new THREE.Mesh(
+          new THREE.SphereGeometry(0.11, 24, 24),
+          new THREE.MeshBasicMaterial({
+            color
+          })
+        );
+        group.add(core);
+
+        // glow sprite
+        const glowCanvas = document.createElement('canvas');
+        glowCanvas.width = glowCanvas.height = 128;
+        const ctx = glowCanvas.getContext('2d');
+        const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+        const hex = '#' + color.toString(16).padStart(6, '0');
+        grad.addColorStop(0, hex);
+        grad.addColorStop(0.25, hex);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+        const tex = new THREE.CanvasTexture(glowCanvas);
+        const glowMat = new THREE.SpriteMaterial({
+          map: tex,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          opacity: 0.9
+        });
+        const glow = new THREE.Sprite(glowMat);
+        glow.scale.set(0.9, 0.9, 0.9);
+        group.add(glow);
+
+        return group;
+      }
+      const electron = makeParticle(0x6fd8ff);
+      const positron = makeParticle(0xffcf5c);
+      scene.add(electron, positron);
+
+      // orbit guide circle
+      function makeOrbitLine() {
+        const pts = [];
+        for (let i = 0; i <= 128; i++) {
+          const a = i / 128 * Math.PI * 2;
+          pts.push(new THREE.Vector3(Math.cos(a), 0, Math.sin(a)));
+        }
+        const g = new THREE.BufferGeometry().setFromPoints(pts);
+        const m = new THREE.LineBasicMaterial({
+          color: 0xd4af37,
+          transparent: true,
+          opacity: 0.18
+        });
+        return new THREE.Line(g, m);
+      }
+      const orbitLine = makeOrbitLine();
+      scene.add(orbitLine);
+
+      // trailing motion lines
+      function makeTrail(color) {
+        const N = 90;
+        const g = new THREE.BufferGeometry();
+        const pos = new Float32Array(N * 3);
+        g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const m = new THREE.LineBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.35
+        });
+        const line = new THREE.Line(g, m);
+        line.userData.buffer = [];
+        line.userData.N = N;
+        return line;
+      }
+      const trailE = makeTrail(0x6fd8ff);
+      const trailP = makeTrail(0xffcf5c);
+      scene.add(trailE, trailP);
+
+      function pushTrail(line, p) {
+        const buf = line.userData.buffer;
+        buf.push(p.clone());
+        if (buf.length > line.userData.N) buf.shift();
+        const arr = line.geometry.attributes.position.array;
+        for (let i = 0; i < line.userData.N; i++) {
+          const src = buf[i] || buf[0] || p;
+          arr[i * 3] = src.x;
+          arr[i * 3 + 1] = src.y;
+          arr[i * 3 + 2] = src.z;
+        }
+        line.geometry.attributes.position.needsUpdate = true;
+      }
+
+      // ---------- lighting (subtle, mostly self-lit scene) ----------
+      scene.add(new THREE.AmbientLight(0x201a10, 1.0));
+      const pl = new THREE.PointLight(0xd4af37, 0.6, 20);
+      pl.position.set(0, 3, 0);
+      scene.add(pl);
+
+      // ---------- UI wiring ----------
+      const radiusInput = document.getElementById('radius');
+      const speedInput = document.getElementById('speed');
+      const radiusVal = document.getElementById('radiusVal');
+      const speedVal = document.getElementById('speedVal');
+      const statV = document.getElementById('statV');
+      const statT = document.getElementById('statT');
+      const statR = document.getElementById('statR');
+      const statLambda = document.getElementById('statLambda');
+      const playBtn = document.getElementById('playBtn');
+      const fsBtn = document.getElementById('fsBtn');
+      const toggleTab = document.getElementById('toggleTab');
+      const panel = document.getElementById('panel');
+
+      function refreshStats() {
+        const R = currentRadius();
+        const v = speedFrac * C_SIM;
+        const omega = v > 0 ? v / R : 0;
+        const period = omega > 0 ? (2 * Math.PI / omega) : Infinity;
+        const lambda = v > 0 ? (C_SIM - v) * (2 * Math.PI / omega) : C_SIM * 0.5;
+
+        radiusVal.textContent = R.toFixed(2);
+        speedVal.textContent = speedFrac.toFixed(2) + ' c';
+        statV.textContent = v.toFixed(2) + ' /s';
+        statT.textContent = isFinite(period) ? period.toFixed(2) + ' s' : '∞';
+        statR.textContent = R.toFixed(2);
+        statLambda.textContent = Math.max(lambda, 0).toFixed(2);
+
+        orbitLine.scale.set(R, 1, R);
+      }
+      radiusInput.addEventListener('input', e => {
+        radiusFrac = parseFloat(e.target.value);
+        refreshStats();
+      });
+      speedInput.addEventListener('input', e => {
+        speedFrac = parseFloat(e.target.value);
+        refreshStats();
+      });
+      refreshStats();
+
+      playBtn.addEventListener('click', () => {
+        running = !running;
+        playBtn.textContent = running ? '⏸ Pause' : '▶ Weiter';
+        playBtn.classList.toggle('active', running);
+      });
+
+      fsBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen();
+        }
+      });
+      document.addEventListener('fullscreenchange', () => {
+        fsBtn.textContent = document.fullscreenElement ? '⤢ Beenden' : '⛶ Vollbild';
+      });
+
+      toggleTab.addEventListener('click', () => {
+        panel.classList.toggle('collapsed');
+        toggleTab.classList.toggle('collapsed');
+        toggleTab.textContent = panel.classList.contains('collapsed') ? '▸' : '◂';
+      });
+
+      // ---------- simulation loop ----------
+      let theta = 0;
+      let simTime = 0;
+      let emitAcc = 0;
+      let histIndex = 0;
+      const clock = new THREE.Clock();
+
+      function emitSample(t) {
+        const R = currentRadius();
+        const ex = R * Math.cos(theta),
+          ez = R * Math.sin(theta);
+        const px = R * Math.cos(theta + Math.PI),
+          pz = R * Math.sin(theta + Math.PI);
+        histPosE[histIndex].set(ex, 0, ez);
+        histPosP[histIndex].set(px, 0, pz);
+        histTimeE[histIndex] = t;
+        histTimeP[histIndex] = t;
+        histIndex = (histIndex + 1) % HIST;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+
+        if (running) {
+          const R = currentRadius();
+          const v = speedFrac * C_SIM;
+          const omega = v > 0 ? v / R : 0;
+          theta += omega * dt;
+          simTime += dt;
+
+          emitAcc += dt;
+          while (emitAcc >= EMIT_INTERVAL) {
+            emitAcc -= EMIT_INTERVAL;
+            emitSample(simTime);
+          }
+
+          const R2 = R;
+          const ePos = new THREE.Vector3(R2 * Math.cos(theta), 0, R2 * Math.sin(theta));
+          const pPos = new THREE.Vector3(R2 * Math.cos(theta + Math.PI), 0, R2 * Math.sin(theta + Math.PI));
+          electron.position.copy(ePos);
+          positron.position.copy(pPos);
+          pushTrail(trailE, ePos);
+          pushTrail(trailP, pPos);
+
+          waveUniforms.uTime.value = simTime;
+        }
+
+        // gentle glow pulse
+        const t = performance.now() * 0.001;
+        electron.children[1].material.opacity = 0.75 + Math.sin(t * 3) * 0.1;
+        positron.children[1].material.opacity = 0.75 + Math.sin(t * 3 + 1.5) * 0.1;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+    })();
+  </script>
+</body>
+</html>
