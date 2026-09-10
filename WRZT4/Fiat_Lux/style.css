@@ -64,8 +64,12 @@ color-scheme: dark;
 }
 
 body {
-margin: 0;
-padding: 0;
+ margin-top: 20px;    /* Oben */
+ margin-right: 20px;  /* Rechts */
+ margin-bottom: 20px; /* Unten */
+ margin-left: 20px;    /* Links */
+ padding: 15px;  
+
 background:
 radial-gradient(circle at 50% 0%, rgba(53, 208, 197, 0.08), transparent 45%),
 radial-gradient(circle at 100% 100%, rgba(11, 28, 45, 0.5), transparent 50%),
