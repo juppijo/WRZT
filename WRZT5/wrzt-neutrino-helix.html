@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT – Neutrino Helikal-Torsions-Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --bg: #08090b;
+            --gold: #d4af37;
+            --gold-soft: #f4d47a;
+            --gold-dim: #8a6f2a;
+            --panel: rgba(15, 13, 8, 0.78);
+            --panel-border: rgba(212, 175, 55, 0.35);
+            --text: #f0e6c8;
+            --text-dim: #b8ab84;
+            --nu-e: #38bdf8;
+            --nu-mu: #a855f7;
+            --nu-tau: #22c55e;
+        }
+        *{ box-sizing: border-box; }
+        html, body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 50% 30%, #14110a 0%, #08090b 65%, #030303 100%);
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #canvas-container canvas{ display:block; }
+
+        /* --- Info Panel --- */
+        #info-panel {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 20px 22px;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(212,175,55,0.06) inset;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.35s ease, opacity 0.35s ease;
+        }
+        #info-panel.collapsed{
+            transform: translateX(-110%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.7rem;
+            letter-spacing: 0.04em;
+            margin: 0 0 4px 0;
+            color: var(--gold-soft);
+            text-shadow: 0 0 18px rgba(212,175,55,0.25);
+        }
+        .subtitle{
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--gold-dim);
+            margin: 0 0 12px 0;
+            border-bottom: 1px solid rgba(212,175,55,0.25);
+            padding-bottom: 10px;
+        }
+        p {
+            font-size: 0.86rem;
+            line-height: 1.5;
+            margin: 7px 0;
+            color: var(--text-dim);
+        }
+        p i { color: #8f8567; }
+        .row{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .flavour-tag {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: all 0.4s ease;
+            letter-spacing: 0.02em;
+        }
+        .stat {
+            font-weight: 700;
+            color: var(--gold-soft);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* --- Flavour Legend --- */
+        #legend{
+            display:flex;
+            gap: 14px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(212,175,55,0.2);
+        }
+        .legend-item{
+            display:flex;
+            align-items:center;
+            gap:6px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+        .legend-dot{
+            width: 9px; height: 9px; border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* --- Controls --- */
+        #controls {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .ctrl-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .ctrl-label .val{ color: var(--gold-soft); font-weight: 600; }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--gold-dim), rgba(212,175,55,0.15));
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb{
+            -webkit-appearance: none;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: var(--gold-soft);
+            box-shadow: 0 0 10px rgba(212,175,55,0.7), 0 0 0 3px rgba(212,175,55,0.12);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover{ transform: scale(1.15); }
+        input[type=range]::-moz-range-thumb{
+            width: 15px; height: 15px;
+            border: none;
+            border-radius: 50%;
+            background: var(--gold-soft);
+            box-shadow: 0 0 10px rgba(212,175,55,0.7);
+            cursor: pointer;
+        }
+
+        /* --- Toggle button (collapse panel) --- */
+        #toggle-panel{
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            color: var(--gold-soft);
+            font-size: 1.1rem;
+            display: flex; align-items:center; justify-content:center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #toggle-panel.visible{ opacity: 1; pointer-events: auto; }
+
+        #panel-close{
+            position: absolute;
+            top: 14px; right: 16px;
+            cursor: pointer;
+            color: var(--gold-dim);
+            font-size: 0.9rem;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+        #panel-close:hover{ color: var(--gold-soft); }
+
+        /* --- Footer credit --- */
+        #footer-credit{
+            position: absolute;
+            bottom: 18px;
+            left: 24px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(184,171,132,0.5);
+        }
+
+        @media (max-width: 520px){
+            #info-panel{ max-width: calc(100vw - 48px); }
+        }
+    </style>
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="toggle-panel" title="Panel einblenden">☰</div>
+
+    <div id="info-panel">
+        <div id="panel-close" title="Panel ausblenden">✕ Ausblenden</div>
+        <h1>Neutrino Helikal-Welle</h1>
+        <p class="subtitle">WRZT · Wellenraumzeit-Netz-Theorie</p>
+
+        <p>Ein magerer Torsions-Impuls im Ur-Druckfeld <i>P<sub>Ur</sub></i>:</p>
+
+        <div class="row">
+            <span>Aktueller Flavour</span>
+            <span id="flavour-display" class="flavour-tag">νₑ</span>
+        </div>
+        <p class="row"><span>Chiralität</span> <span class="stat">Strikt Linkshändig</span></p>
+        <p class="row"><span>Phasen-Oszillation</span> <span id="val-phase" class="stat">0.00</span></p>
+
+        <p><i>Geringer Querschnitt → hohe Durchdringung im Raumzeit-Medium.</i></p>
+
+        <div id="legend">
+            <div class="legend-item"><span class="legend-dot" style="color:var(--nu-e); background:var(--nu-e);"></span>ν<sub>e</sub></div>
+            <div class="legend-item"><span class="legend-dot" style="color:var(--nu-mu); background:var(--nu-mu);"></span>ν<sub>μ</sub></div>
+            <div class="legend-item"><span class="legend-dot" style="color:var(--nu-tau); background:var(--nu-tau);"></span>ν<sub>τ</sub></div>
+        </div>
+
+        <div id="controls">
+            <div>
+                <div class="ctrl-label"><span>Fluggeschwindigkeit</span><span class="val" id="speedVal">1.2</span></div>
+                <input type="range" id="speedSlider" min="0.2" max="3" step="0.1" value="1.2">
+            </div>
+            <div>
+                <div class="ctrl-label"><span>Schrauben-Amplitude (r)</span><span class="val" id="ampVal">0.35</span></div>
+                <input type="range" id="ampSlider" min="0.1" max="1.0" step="0.05" value="0.35">
+            </div>
+            <div>
+                <div class="ctrl-label"><span>Oszillations-Frequenz</span><span class="val" id="freqVal">0.8</span></div>
+                <input type="range" id="freqSlider" min="0.1" max="2" step="0.1" value="0.8">
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-credit">WRZT — Fiat Lux</div>
+
+    <script>
+        // --- 1. Scene Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x08090b, 0.018);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 4, 14);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x08090b);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- 2. Beleuchtung ---
+        const ambientLight = new THREE.AmbientLight(0x2a2213, 1.4);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x38bdf8, 2, 40);
+        scene.add(pointLight);
+
+        const goldRim = new THREE.PointLight(0xd4af37, 0.6, 60);
+        goldRim.position.set(-10, 8, -6);
+        scene.add(goldRim);
+
+        // --- 3. Hintergrund: Sternfeld + Gitter (Ur-Druckfeld-Medium) ---
+        const gridHelper = new THREE.GridHelper(30, 40, 0x8a6f2a, 0x151109);
+        gridHelper.position.y = -2;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.35;
+        scene.add(gridHelper);
+
+        function createStarfield(count, spread){
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i=0;i<count;i++){
+                pos[i*3] = (Math.random()-0.5)*spread;
+                pos[i*3+1] = (Math.random()-0.5)*spread*0.6;
+                pos[i*3+2] = (Math.random()-0.5)*spread;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+            const mat = new THREE.PointsMaterial({ color: 0xf4d47a, size: 0.05, transparent:true, opacity:0.45 });
+            return new THREE.Points(geo, mat);
+        }
+        const starfield = createStarfield(600, 80);
+        scene.add(starfield);
+
+        // --- 4. Neutrino Helikal-Geometrie (Schrauben-Torus) ---
+        let helixRadius = 0.35; // Sehr dünner Querschnitt
+        const helixLength = 16.0;
+        const turns = 6;
+        const pathPoints = 300;
+
+        let helixMesh, particleSystem;
+
+        function createHelixGeometry(radius) {
+            const points = [];
+            for (let i = 0; i <= pathPoints; i++) {
+                const t = i / pathPoints;
+                const x = (t - 0.5) * helixLength;
+                const angle = t * turns * Math.PI * 2;
+                const y = radius * Math.cos(angle);
+                const z = radius * Math.sin(angle);
+                points.push(new THREE.Vector3(x, y, z));
+            }
+            const curve = new THREE.CatmullRomCurve3(points);
+            return new THREE.TubeGeometry(curve, 200, 0.06, 12, false);
+        }
+
+        const helixMaterial = new THREE.MeshPhongMaterial({
+            color: 0x38bdf8,
+            emissive: 0x0284c7,
+            shininess: 60,
+            transparent: true,
+            opacity: 0.9,
+            wireframe: false
+        });
+
+        helixMesh = new THREE.Mesh(createHelixGeometry(helixRadius), helixMaterial);
+        scene.add(helixMesh);
+
+        // Feiner Glanz-Kern entlang der Helix (subtiler goldener Unterton)
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: 0xd4af37,
+            transparent: true,
+            opacity: 0.06,
+            wireframe: true
+        });
+        const glowMesh = new THREE.Mesh(createHelixGeometry(helixRadius), glowMaterial);
+        glowMesh.scale.set(1.35, 1.35, 1.0);
+        scene.add(glowMesh);
+
+        // Pulsierende Phasen-Spitze (Front-Kopf)
+        const headGeo = new THREE.SphereGeometry(0.2, 16, 16);
+        const headMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const headMesh = new THREE.Mesh(headGeo, headMat);
+        scene.add(headMesh);
+
+        // Partikel-Trail (Ur-Feld-Spur)
+        const pCount = 90;
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount*3; i++) { pPos[i] = (Math.random() - 0.5) * 10; }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+
+        const pMat = new THREE.PointsMaterial({
+            color: 0x38bdf8,
+            size: 0.08,
+            transparent: true,
+            opacity: 0.55
+        });
+        particleSystem = new THREE.Points(pGeo, pMat);
+        scene.add(particleSystem);
+
+        // --- 5. Animation & Oszillation ---
+        let animTime = 0;
+        const speedInput = document.getElementById('speedSlider');
+        const ampInput = document.getElementById('ampSlider');
+        const freqInput = document.getElementById('freqSlider');
+        const flavourDisplay = document.getElementById('flavour-display');
+        const valPhase = document.getElementById('val-phase');
+        const speedVal = document.getElementById('speedVal');
+        const ampVal = document.getElementById('ampVal');
+        const freqVal = document.getElementById('freqVal');
+
+        function syncLabels(){
+            speedVal.textContent = parseFloat(speedInput.value).toFixed(1);
+            ampVal.textContent = parseFloat(ampInput.value).toFixed(2);
+            freqVal.textContent = parseFloat(freqInput.value).toFixed(1);
+        }
+        syncLabels();
+        [speedInput, ampInput, freqInput].forEach(el => el.addEventListener('input', syncLabels));
+
+        ampInput.addEventListener('input', (e) => {
+            helixRadius = parseFloat(e.target.value);
+            helixMesh.geometry.dispose();
+            helixMesh.geometry = createHelixGeometry(helixRadius);
+            glowMesh.geometry.dispose();
+            glowMesh.geometry = createHelixGeometry(helixRadius);
+        });
+
+        // --- Panel ein-/ausklappen ---
+        const infoPanel = document.getElementById('info-panel');
+        const togglePanel = document.getElementById('toggle-panel');
+        const panelClose = document.getElementById('panel-close');
+        panelClose.addEventListener('click', () => {
+            infoPanel.classList.add('collapsed');
+            togglePanel.classList.add('visible');
+        });
+        togglePanel.addEventListener('click', () => {
+            infoPanel.classList.remove('collapsed');
+            togglePanel.classList.remove('visible');
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const speed = parseFloat(speedInput.value) * 0.05;
+            const oscFreq = parseFloat(freqInput.value) * 0.5;
+
+            animTime += speed;
+
+            // 1. Schrauben-Rotation (Linkshändige Torsion entlang X-Achse)
+            helixMesh.rotation.x = animTime * 2;
+            glowMesh.rotation.x = helixMesh.rotation.x;
+
+            // 2. Bewegung & Oszillation des Farb-Flavours (nu_e -> nu_mu -> nu_tau)
+            const oscPhase = (animTime * oscFreq) % (Math.PI * 2);
+            valPhase.textContent = oscPhase.toFixed(2) + ' rad';
+
+            // Dynamischer Farbwechsel für Oszillation
+            let rColor, gColor, bColor, flavourText, bgColor, borderCol;
+
+            if (oscPhase < (Math.PI * 2 / 3)) {
+                rColor = 0.0; gColor = 0.8; bColor = 1.0;
+                flavourText = "νₑ";
+                bgColor = "rgba(56, 189, 248, 0.18)";
+                borderCol = "#38bdf8";
+            } else if (oscPhase < (Math.PI * 4 / 3)) {
+                rColor = 0.8; gColor = 0.2; bColor = 1.0;
+                flavourText = "ν_μ";
+                bgColor = "rgba(168, 85, 247, 0.18)";
+                borderCol = "#a855f7";
+            } else {
+                rColor = 0.1; gColor = 0.9; bColor = 0.5;
+                flavourText = "ν_τ";
+                bgColor = "rgba(34, 197, 94, 0.18)";
+                borderCol = "#22c55e";
+            }
+
+            helixMaterial.color.setRGB(rColor, gColor, bColor);
+            helixMaterial.emissive.setRGB(rColor * 0.5, gColor * 0.5, bColor * 0.5);
+            pointLight.color.setRGB(rColor, gColor, bColor);
+            particleSystem.material.color.setRGB(rColor, gColor, bColor);
+
+            flavourDisplay.textContent = flavourText;
+            flavourDisplay.style.backgroundColor = bgColor;
+            flavourDisplay.style.border = "1px solid " + borderCol;
+            flavourDisplay.style.color = borderCol;
+
+            // Position des Front-Lichtkopfs
+            const headX = (helixLength / 2);
+            const headAngle = (turns * Math.PI * 2) + (helixMesh.rotation.x);
+            headMesh.position.set(headX, helixRadius * Math.cos(headAngle), helixRadius * Math.sin(headAngle));
+            pointLight.position.copy(headMesh.position);
+
+            // Partikel leicht durchs Bild wandern lassen
+            const positions = particleSystem.geometry.attributes.position.array;
+            for(let i = 0; i < pCount; i++) {
+                positions[i*3] -= speed * 0.5;
+                if(positions[i*3] < -helixLength/2) positions[i*3] = helixLength/2;
+            }
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+
+            starfield.rotation.y += 0.0002;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT – Möbius-Torus Elektron Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0b0f14;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0f2fe;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid #0284c7;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 360px;
+            box-shadow: 0 4px 20px rgba(0, 186, 211, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            color: #38bdf8;
+            border-bottom: 1px solid #0369a1;
+            padding-bottom: 6px;
+        }
+        p {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 6px 0;
+            color: #bae6fd;
+        }
+        .stat {
+            font-weight: bold;
+            color: #00f2fe;
+        }
+        #controls {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        input[type=range] {
+            accent-color: #00f2fe;
+        }
+    </style>
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="info-panel">
+        <h1>WRZT: Elektron als Möbius-Torus</h1>
+        <p>Der helle Drehvektor demonstriert den <b>Spin 1/2</b>:</p>
+        <p>• Pfadumlauf ($u$): <span id="val-u" class="stat">0.0</span> rad</p>
+        <p>• Eigendrehung ($\frac{u}{2}$): <span id="val-spin" class="stat">0.0</span> rad</p>
+        <p><i>Erst nach $4\pi$ (zwei Umläufen) schließt sich die Phase konstruktiv!</i></p>
+
+        <div id="controls">
+            <label>Geschwindigkeit: <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5"></label>
+            <label>Schlauch-Radius ($r$): <input type="range" id="radiusSlider" min="0.2" max="1.5" step="0.1" value="0.6"></label>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Scene Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0b0f14, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 8, 14);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x0b0f14);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- 2. Beleuchtung ---
+        const ambientLight = new THREE.AmbientLight(0x1e293b, 2);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0x00f2fe, 2, 50);
+        pointLight1.position.set(10, 10, 10);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0x3b82f6, 1.5, 50);
+        pointLight2.position.set(-10, -10, -5);
+        scene.add(pointLight2);
+
+        // --- 3. Geometrie des Möbius-Torus ---
+        const R = 4.0; // Mittlerer Radius
+        let r_val = 0.6; // Schlauch-Radius (v-Breite)
+        const uSegs = 200;
+        const vSegs = 30;
+
+        let moebiusMesh;
+
+        function buildMoebiusGeometry(r) {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const uvs = [];
+            const indices = [];
+
+            for (let i = 0; i <= uSegs; i++) {
+                const u = (i / uSegs) * Math.PI * 4; // 0 bis 4*Pi für geschlossenes Band
+                for (let j = 0; j <= vSegs; j++) {
+                    const v = ((j / vSegs) - 0.5) * 2 * r; // -r bis +r
+
+                    // Formel des Möbius-Torus
+                    const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
+                    const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
+                    const z = v * Math.sin(u / 2);
+
+                    positions.push(x, y, z);
+                    uvs.push(i / uSegs, j / vSegs);
+                }
+            }
+
+            for (let i = 0; i < uSegs; i++) {
+                for (let j = 0; j < vSegs; j++) {
+                    const a = i * (vSegs + 1) + j;
+                    const b = (i + 1) * (vSegs + 1) + j;
+                    const c = (i + 1) * (vSegs + 1) + (j + 1);
+                    const d = i * (vSegs + 1) + (j + 1);
+
+                    indices.push(a, b, d);
+                    indices.push(b, c, d);
+                }
+            }
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            return geometry;
+        }
+
+        // Material mit Drahtgitter & Transparenz für Welleneffekt
+        const moebiusMaterial = new THREE.MeshPhongMaterial({
+            color: 0x0284c7,
+            emissive: 0x0369a1,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.4,
+            side: THREE.DoubleSide
+        });
+
+        moebiusMesh = new THREE.Mesh(buildMoebiusGeometry(r_val), moebiusMaterial);
+        scene.add(moebiusMesh);
+
+        // --- 4. Führungskreis & Drehvektor (Spin-Visualisierung) ---
+        // Vektor-Gruppe
+        const vectorGroup = new THREE.Group();
+        scene.add(vectorGroup);
+
+        // Vektorpfeil
+        const arrowHelper = new THREE.ArrowHelper(
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            r_val * 1.8,
+            0xff0055,
+            0.4,
+            0.2
+        );
+        vectorGroup.add(arrowHelper);
+
+        // Kugel an der Vektorspitze
+        const tipSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.15, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0x00f2fe })
+        );
+        vectorGroup.add(tipSphere);
+
+        // --- 5. Animation & Interaktion ---
+        let uAnim = 0;
+        const speedInput = document.getElementById('speedSlider');
+        const radiusInput = document.getElementById('radiusSlider');
+        const valU = document.getElementById('val-u');
+        const valSpin = document.getElementById('val-spin');
+
+        radiusInput.addEventListener('input', (e) => {
+            r_val = parseFloat(e.target.value);
+            moebiusMesh.geometry.dispose();
+            moebiusMesh.geometry = buildMoebiusGeometry(r_val);
+            arrowHelper.setLength(r_val * 1.8, 0.4, 0.2);
+        });
+
+        function getMoebiusPos(u, v) {
+            const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
+            const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
+            const z = v * Math.sin(u / 2);
+            return new THREE.Vector3(x, y, z);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const speed = parseFloat(speedInput.value) * 0.01;
+            uAnim += speed;
+            if (uAnim > Math.PI * 4) uAnim -= Math.PI * 4; // Rücklauf nach 4*Pi
+
+            // Aktuelle Position der Vektorwurzel auf der Mittellinie (v = 0)
+            const centerPos = getMoebiusPos(uAnim, 0);
+            vectorGroup.position.copy(centerPos);
+
+            // Richtungsvektor berechnen (Torsionsrichtung des Möbius-Bandes)
+            const edgePos = getMoebiusPos(uAnim, r_val);
+            const dir = new THREE.Vector3().subVectors(edgePos, centerPos).normalize();
+
+            arrowHelper.setDirection(dir);
+            tipSphere.position.copy(dir.clone().multiplyScalar(r_val));
+
+            // UI Texte aktualisieren
+            valU.innerText = uAnim.toFixed(2);
+            valSpin.innerText = (uAnim / 2).toFixed(2);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

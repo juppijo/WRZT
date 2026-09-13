@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="100%" height="100%">
+  <defs>
+    <!-- Hintergrund-Gradient (Dunkelraumzeit) -->
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="45%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#030508"/>
+    </radialGradient>
+
+    <!-- Ur-Druck-Zentrum Gradient -->
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="20%" stop-color="#38bdf8" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#0284c7" stop-opacity="0.5"/>
+      <stop offset="80%" stop-color="#0369a1" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0369a1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Quark Up 1 (Rot / Rechts-Torsion) -->
+    <linearGradient id="up1Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fca5a5"/>
+      <stop offset="40%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+
+    <!-- Quark Up 2 (Blau-Türkis / Rechts-Torsion) -->
+    <linearGradient id="up2Grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a5f3fc"/>
+      <stop offset="40%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#155e75"/>
+    </linearGradient>
+
+    <!-- Quark Down (Smaragd-Grün / Links-Torsion Anker) -->
+    <linearGradient id="downGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6ee7b7"/>
+      <stop offset="40%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#065f46"/>
+    </linearGradient>
+
+    <!-- Impressionistischer Weichzeichner / Glow -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur1"/>
+      <feGaussianBlur stdDeviation="20" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="url(#bgGlow)"/>
+
+  <!-- Ur-Feld Wellenringe (Impressionistische Phasenwellen) -->
+  <g opacity="0.25" stroke="#38bdf8" fill="none" stroke-width="1.5">
+    <ellipse cx="600" cy="450" rx="480" ry="320" stroke-dasharray="8,12" transform="rotate(-15 600 450)"/>
+    <ellipse cx="600" cy="450" rx="420" ry="280" stroke-dasharray="15,10" transform="rotate(20 600 450)"/>
+    <ellipse cx="600" cy="450" rx="350" ry="230" stroke-dasharray="5,8" transform="rotate(-5 600 450)"/>
+    <ellipse cx="600" cy="450" rx="260" ry="170" opacity="0.5"/>
+  </g>
+
+  <!-- Ur-Druck-Zentrum (P_Ur Verdichtung) -->
+  <circle cx="600" cy="450" r="220" fill="url(#coreGlow)" filter="url(#glow)"/>
+  <circle cx="600" cy="450" r="45" fill="#ffffff" filter="url(#glow)" opacity="0.9"/>
+
+  <!-- Verschlungener Resonanzknoten (Quark-Schleifen) -->
+  <g filter="url(#glow)">
+
+    <!-- DOWN QUARK SCHLEIFE (Grün, Unten / Gegenkopplung) -->
+    <path d="M 420,580 C 300,680 450,800 600,750 C 750,700 800,580 700,500 C 620,430 520,490 420,580 Z" 
+          fill="none" stroke="url(#downGrad)" stroke-width="28" stroke-linecap="round" opacity="0.85"/>
+    
+    <!-- UP QUARK 1 SCHLEIFE (Rot, Links-Oben) -->
+    <path d="M 420,320 C 280,220 320,400 450,520 C 580,640 700,500 620,380 C 540,260 520,400 420,320 Z" 
+          fill="none" stroke="url(#up1Grad)" stroke-width="28" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- UP QUARK 2 SCHLEIFE (Cyan/Blau, Rechts-Oben) -->
+    <path d="M 780,320 C 920,220 880,400 750,520 C 620,640 500,500 580,380 C 660,260 680,400 780,320 Z" 
+          fill="none" stroke="url(#up2Grad)" stroke-width="28" stroke-linecap="round" opacity="0.85"/>
+
+  </g>
+
+  <!-- Feine Lichtpunkte & Phasenvektoren (Impressionistische Tupfer) -->
+  <g filter="url(#softGlow)">
+    <!-- Up 1 Vektor-Knotenpunkt -->
+    <circle cx="380" cy="300" r="14" fill="#ffffff"/>
+    <circle cx="380" cy="300" r="28" fill="#ef4444" opacity="0.4"/>
+    <text x="310" y="270" fill="#fca5a5" font-family="'Segoe UI', sans-serif" font-weight="bold" font-size="22">Quark u₁ (+⅔e)</text>
+    <text x="310" y="295" fill="#f87171" font-family="'Segoe UI', sans-serif" font-size="14">Rechts-Torsion (0°)</text>
+
+    <!-- Up 2 Vektor-Knotenpunkt -->
+    <circle cx="820" cy="300" r="14" fill="#ffffff"/>
+    <circle cx="820" cy="300" r="28" fill="#06b6d4" opacity="0.4"/>
+    <text x="840" y="270" fill="#a5f3fc" font-family="'Segoe UI', sans-serif" font-weight="bold" font-size="22">Quark u₂ (+⅔e)</text>
+    <text x="840" y="295" fill="#22d3ee" font-family="'Segoe UI', sans-serif" font-size="14">Rechts-Torsion (120°)</text>
+
+    <!-- Down Vektor-Knotenpunkt -->
+    <circle cx="600" cy="740" r="14" fill="#ffffff"/>
+    <circle cx="600" cy="740" r="28" fill="#10b981" opacity="0.4"/>
+    <text x="535" y="810" fill="#6ee7b7" font-family="'Segoe UI', sans-serif" font-weight="bold" font-size="22">Quark d (-⅓e)</text>
+    <text x="500" y="835" fill="#34d399" font-family="'Segoe UI', sans-serif" font-size="14">Links-Torsion Anker (240°)</text>
+  </g>
+
+  <!-- Zentrumsbeschriftung WRZT -->
+  <text x="600" y="445" fill="#ffffff" font-family="'Segoe UI', sans-serif" font-weight="bold" font-size="20" text-anchor="middle" filter="url(#softGlow)">P_Ur</text>
+  <text x="600" y="468" fill="#bae6fd" font-family="'Segoe UI', sans-serif" font-size="13" text-anchor="middle">Resonanz-Kern</text>
+
+  <!-- Titel & Legende -->
+  <text x="60" y="80" fill="#38bdf8" font-family="'Segoe UI', sans-serif" font-weight="bold" font-size="30" filter="url(#softGlow)">WRZT – DAS PROTONEN-FELDMODELL</text>
+  <text x="60" y="112" fill="#94a3b8" font-family="'Segoe UI', sans-serif" font-size="16">Topologischer 3-Quark-Resonanzknoten im Ur-Druckfeld (Gesamtladung = +1e, Spin = ½)</text>
+</svg>

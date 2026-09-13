@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT – Protonen 3-Quark-Knoten Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0908;
+            --bg-panel: rgba(18, 16, 13, 0.88);
+            --gold: #d4af37;
+            --gold-bright: #f2c94c;
+            --gold-dim: #8a712a;
+            --gold-glow: rgba(212, 175, 55, 0.25);
+            --text-main: #f0e9d8;
+            --text-dim: #b8ac8e;
+            --q-u1: #e0574a;
+            --q-u1-glow: rgba(224, 87, 74, 0.35);
+            --q-u2: #4a8fe0;
+            --q-u2-glow: rgba(74, 143, 224, 0.35);
+            --q-d: #4ac97a;
+            --q-d-glow: rgba(74, 201, 122, 0.35);
+            --border: rgba(212, 175, 55, 0.35);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg);
+            font-family: 'Barlow', sans-serif;
+            color: var(--text-main);
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #canvas-container canvas {
+            display: block;
+        }
+
+        #vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            box-shadow: inset 0 0 180px rgba(0,0,0,0.75);
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 24px;
+            max-width: 380px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 40px var(--gold-glow);
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.7rem;
+            letter-spacing: 0.04em;
+            margin: 0 0 4px 0;
+            color: var(--gold-bright);
+            text-shadow: 0 0 16px var(--gold-glow);
+        }
+
+        .subtitle {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gold-dim);
+            margin: 0 0 14px 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        p {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin: 8px 0;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .quark-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0 14px 0;
+        }
+
+        .quark-tag {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+        }
+
+        .q-up1 { background: var(--q-u1-glow); color: #ffb3a8; border: 1px solid var(--q-u1); }
+        .q-up2 { background: var(--q-u2-glow); color: #a8cdff; border: 1px solid var(--q-u2); }
+        .q-down { background: var(--q-d-glow); color: #a8f0c0; border: 1px solid var(--q-d); }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 4px 0;
+        }
+
+        .stat-label { color: var(--text-dim); }
+
+        .stat {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            color: var(--gold-bright);
+            text-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .footnote {
+            font-style: italic;
+            font-size: 0.78rem;
+            color: var(--gold-dim);
+            margin-top: 12px;
+        }
+
+        #controls {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .control-group label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+
+        .control-group .slider-value {
+            color: var(--gold-bright);
+            font-weight: 600;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 3px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--gold-bright);
+            box-shadow: 0 0 8px var(--gold-glow), 0 0 2px rgba(0,0,0,0.5);
+            cursor: pointer;
+            border: 1px solid var(--bg);
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--gold-bright);
+            box-shadow: 0 0 8px var(--gold-glow);
+            cursor: pointer;
+            border: 1px solid var(--bg);
+        }
+
+        #toolbar {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .tool-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--gold-bright);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+
+        .tool-btn:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 14px var(--gold-glow);
+            transform: translateY(-1px);
+        }
+
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+
+        #info-panel {
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        #info-panel.collapsed {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            #info-panel {
+                max-width: calc(100vw - 48px);
+                font-size: 0.9em;
+            }
+        }
+    </style>
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <div id="vignette"></div>
+
+    <div id="toolbar">
+        <button class="tool-btn" id="toggle-panel" title="Panel ein-/ausblenden">☰</button>
+        <button class="tool-btn" id="toggle-fullscreen" title="Vollbild">⛶</button>
+    </div>
+
+    <div id="info-panel">
+        <h1>WRZT: Protonen 3-Quark-Resonator</h1>
+        <p class="subtitle">Wellenraumzeit-Netz-Theorie</p>
+        <p>Das Proton als 3-fach phasenverkoppelter Knoten:</p>
+
+        <div class="quark-legend">
+            <span class="quark-tag q-up1">Quark u1 (0°)</span>
+            <span class="quark-tag q-up2">Quark u2 (120°)</span>
+            <span class="quark-tag q-down">Quark d (240°)</span>
+        </div>
+
+        <div class="stat-row">
+            <span class="stat-label">Phasenlauf (u)</span>
+            <span id="val-u" class="stat">0.0 rad</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Dreifach-Torsion (3u/2)</span>
+            <span id="val-spin" class="stat">0.0 rad</span>
+        </div>
+
+        <p class="footnote">Die 3 Wellenschleifen sind topologisch ineinander verwebt.</p>
+
+        <div id="controls">
+            <div class="control-group">
+                <label>Geschwindigkeit <span class="slider-value" id="speedVal">0.5</span></label>
+                <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5">
+            </div>
+            <div class="control-group">
+                <label>Knoten-Radius (r_q) <span class="slider-value" id="radiusVal">0.70</span></label>
+                <input type="range" id="radiusSlider" min="0.3" max="1.2" step="0.05" value="0.7">
+            </div>
+            <div class="control-group">
+                <label>Transparenz <span class="slider-value" id="opacityVal">0.35</span></label>
+                <input type="range" id="opacitySlider" min="0.1" max="0.8" step="0.05" value="0.35">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Scene Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a0908, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 6, 12);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x0a0908);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- 2. Beleuchtung ---
+        const ambientLight = new THREE.AmbientLight(0x2a2318, 2);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0xd4af37, 2.2, 50);
+        pointLight1.position.set(8, 10, 8);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xe0574a, 1.5, 50);
+        pointLight2.position.set(-8, -10, -5);
+        scene.add(pointLight2);
+
+        const pointLight3 = new THREE.PointLight(0x4a8fe0, 1.0, 50);
+        pointLight3.position.set(0, -12, 8);
+        scene.add(pointLight3);
+
+        // Leichtes Sternenfeld für Tiefe
+        function buildStarfield() {
+            const starCount = 800;
+            const positions = new Float32Array(starCount * 3);
+            for (let i = 0; i < starCount; i++) {
+                const r = 60 + Math.random() * 120;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+                positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+                positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+                positions[i * 3 + 2] = r * Math.cos(phi);
+            }
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xd4af37, size: 0.5, transparent: true, opacity: 0.35 });
+            return new THREE.Points(geo, mat);
+        }
+        scene.add(buildStarfield());
+
+        // --- 3. Geometrie des 3-Quark-Knotens ---
+        const R_p = 2.8; // Mittlerer Protonenradius
+        let r_q = 0.7;   // Torsionsradius der Quark-Schleifen
+        const uSegs = 240;
+        const vSegs = 20;
+
+        const quarkColors = [
+            { main: 0xe0574a, emissive: 0x5a1a14 }, // u1 - Rot/Gold
+            { main: 0x4a8fe0, emissive: 0x14284f }, // u2 - Blau
+            { main: 0x4ac97a, emissive: 0x14421f }  // d  - Grün
+        ];
+
+        const quarkMeshes = [];
+        const vectorGroups = [];
+
+        function buildQuarkGeometry(phiOffset, rq) {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const uvs = [];
+            const indices = [];
+
+            for (let i = 0; i <= uSegs; i++) {
+                const u = (i / uSegs) * Math.PI * 4; // 4*Pi für geschlossenen Pfad
+                for (let j = 0; j <= vSegs; j++) {
+                    const v = ((j / vSegs) - 0.5) * 2 * rq;
+
+                    // WRZT Dreifach-Torus Formel mit Phasenversatz phiOffset
+                    const phase = (3 * u / 2) + phiOffset;
+                    const x = (R_p + v * Math.cos(phase)) * Math.cos(u);
+                    const y = (R_p + v * Math.cos(phase)) * Math.sin(u);
+                    const z = v * Math.sin(phase);
+
+                    positions.push(x, y, z);
+                    uvs.push(i / uSegs, j / vSegs);
+                }
+            }
+
+            for (let i = 0; i < uSegs; i++) {
+                for (let j = 0; j < vSegs; j++) {
+                    const a = i * (vSegs + 1) + j;
+                    const b = (i + 1) * (vSegs + 1) + j;
+                    const c = (i + 1) * (vSegs + 1) + (j + 1);
+                    const d = i * (vSegs + 1) + (j + 1);
+
+                    indices.push(a, b, d);
+                    indices.push(b, c, d);
+                }
+            }
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            return geometry;
+        }
+
+        // Erstelle 3 Quark-Möbius-Schleifen mit 120 Grad (2*PI/3) Versatz
+        for (let k = 0; k < 3; k++) {
+            const phiOffset = (k * 2 * Math.PI) / 3;
+
+            const mat = new THREE.MeshPhongMaterial({
+                color: quarkColors[k].main,
+                emissive: quarkColors[k].emissive,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.35,
+                side: THREE.DoubleSide
+            });
+
+            const mesh = new THREE.Mesh(buildQuarkGeometry(phiOffset, r_q), mat);
+            scene.add(mesh);
+            quarkMeshes.push({ mesh: mesh, offset: phiOffset });
+
+            // Laufender Phasenzeiger für jedes Quark
+            const vGroup = new THREE.Group();
+            const arrow = new THREE.ArrowHelper(
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 0),
+                r_q * 1.5,
+                quarkColors[k].main,
+                0.3,
+                0.15
+            );
+            const sphere = new THREE.Mesh(
+                new THREE.SphereGeometry(0.12, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0xf2c94c })
+            );
+            vGroup.add(arrow);
+            vGroup.add(sphere);
+            scene.add(vGroup);
+
+            vectorGroups.push({ group: vGroup, arrow: arrow, sphere: sphere, offset: phiOffset });
+        }
+
+        // Zentrums-Kugel (Ur-Druck-Kern)
+        const coreSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5, 32, 32),
+            new THREE.MeshPhongMaterial({
+                color: 0xf2c94c,
+                emissive: 0xd4af37,
+                transparent: true,
+                opacity: 0.6,
+                wireframe: true
+            })
+        );
+        scene.add(coreSphere);
+
+        // --- 4. Controls & Animation ---
+        let uAnim = 0;
+        const speedInput = document.getElementById('speedSlider');
+        const radiusInput = document.getElementById('radiusSlider');
+        const opacityInput = document.getElementById('opacitySlider');
+        const valU = document.getElementById('val-u');
+        const valSpin = document.getElementById('val-spin');
+        const speedVal = document.getElementById('speedVal');
+        const radiusVal = document.getElementById('radiusVal');
+        const opacityVal = document.getElementById('opacityVal');
+
+        speedInput.addEventListener('input', (e) => {
+            speedVal.textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
+        radiusInput.addEventListener('input', (e) => {
+            r_q = parseFloat(e.target.value);
+            radiusVal.textContent = r_q.toFixed(2);
+            quarkMeshes.forEach(q => {
+                q.mesh.geometry.dispose();
+                q.mesh.geometry = buildQuarkGeometry(q.offset, r_q);
+            });
+            vectorGroups.forEach(vg => {
+                vg.arrow.setLength(r_q * 1.5, 0.3, 0.15);
+            });
+        });
+
+        opacityInput.addEventListener('input', (e) => {
+            const op = parseFloat(e.target.value);
+            opacityVal.textContent = op.toFixed(2);
+            quarkMeshes.forEach(q => {
+                q.mesh.material.opacity = op;
+            });
+        });
+
+        // Panel Toggle
+        const infoPanel = document.getElementById('info-panel');
+        const togglePanel = document.getElementById('toggle-panel');
+        togglePanel.addEventListener('click', () => {
+            infoPanel.classList.toggle('collapsed');
+            togglePanel.textContent = infoPanel.classList.contains('collapsed') ? '☰' : '✕';
+        });
+
+        // Vollbild Toggle
+        const toggleFullscreen = document.getElementById('toggle-fullscreen');
+        toggleFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        document.addEventListener('fullscreenchange', () => {
+            toggleFullscreen.textContent = document.fullscreenElement ? '⤢' : '⛶';
+            toggleFullscreen.title = document.fullscreenElement ? 'Vollbild verlassen' : 'Vollbild';
+        });
+
+        function getQuarkPos(u, v, phiOffset) {
+            const phase = (3 * u / 2) + phiOffset;
+            const x = (R_p + v * Math.cos(phase)) * Math.cos(u);
+            const y = (R_p + v * Math.cos(phase)) * Math.sin(u);
+            const z = v * Math.sin(phase);
+            return new THREE.Vector3(x, y, z);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const speed = parseFloat(speedInput.value) * 0.008;
+            uAnim += speed;
+            if (uAnim > Math.PI * 4) uAnim -= Math.PI * 4;
+
+            // Aktualisiere die 3 Vektoren der Quarks
+            vectorGroups.forEach(vg => {
+                const centerPos = getQuarkPos(uAnim, 0, vg.offset);
+                const edgePos = getQuarkPos(uAnim, r_q, vg.offset);
+                const dir = new THREE.Vector3().subVectors(edgePos, centerPos).normalize();
+
+                vg.group.position.copy(centerPos);
+                vg.arrow.setDirection(dir);
+                vg.sphere.position.copy(dir.clone().multiplyScalar(r_q));
+            });
+
+            // Pulsieren des Ur-Druck-Kerns
+            const pulse = 1 + 0.1 * Math.sin(uAnim * 3);
+            coreSphere.scale.set(pulse, pulse, pulse);
+
+            // UI Texte
+            valU.innerText = uAnim.toFixed(2) + ' rad';
+            valSpin.innerText = ((3 * uAnim) / 2).toFixed(2) + ' rad';
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

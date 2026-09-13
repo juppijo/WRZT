@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WRZT – Möbius-Torus Elektron Simulation</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+
+<script>
+  window.MathJax = { tex: { inlineMath: [['$', '$']] } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+
+<style>
+  :root{
+    --bg:            #0a0906;
+    --bg-vignette:   radial-gradient(ellipse at 50% 40%, #141009 0%, #0a0906 70%);
+    --panel-bg:      rgba(17, 14, 9, 0.86);
+    --panel-border:  rgba(212, 175, 55, 0.32);
+    --gold:          #d4af37;
+    --gold-bright:   #f2ca5c;
+    --gold-dim:      #7d661f;
+    --accent-spin:   #c1443a;
+    --text:          #ece5d2;
+    --text-dim:      #a99d80;
+    --divider:       rgba(212, 175, 55, 0.22);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    overflow:hidden;
+    background: var(--bg-vignette);
+    font-family:'Barlow', sans-serif;
+    color: var(--text);
+  }
+
+  #canvas-container{
+    width:100vw;
+    height:100vh;
+  }
+
+  /* ---------- Info Panel ---------- */
+  #info-panel{
+    position:absolute;
+    top:22px;
+    left:22px;
+    width:320px;
+    background: var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:6px;
+    padding:20px 22px 18px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(212,175,55,0.06) inset;
+    backdrop-filter: blur(6px);
+    transition: transform 0.35s ease, opacity 0.35s ease;
+  }
+
+  #info-panel.collapsed{
+    transform: translateX(calc(-100% - 22px));
+    opacity:0;
+    pointer-events:none;
+  }
+
+  h1{
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.03em;
+    font-size:1.5rem;
+    line-height:1.1;
+    margin:0 0 4px 0;
+    color: var(--gold-bright);
+  }
+
+  .subtitle{
+    font-family:'Barlow Condensed', sans-serif;
+    font-size:0.78rem;
+    color: var(--text-dim);
+    margin:0 0 14px 0;
+    letter-spacing:0.02em;
+  }
+
+  .divider{
+    height:1px;
+    background: var(--divider);
+    margin: 14px 0;
+    border:none;
+  }
+
+  p{
+    font-size:0.86rem;
+    line-height:1.5;
+    margin:6px 0;
+    color: var(--text);
+  }
+
+  .note{
+    font-size:0.78rem;
+    color: var(--text-dim);
+    font-style:italic;
+    line-height:1.5;
+  }
+
+  .stat-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:0.85rem;
+    padding:3px 0;
+  }
+  .stat-label{ color: var(--text-dim); }
+  .stat-value{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:600;
+    color: var(--gold-bright);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Phase progress bar: fills gold as u sweeps 0 -> 4*pi */
+  #phase-track{
+    position:relative;
+    height:6px;
+    border-radius:3px;
+    background: rgba(212,175,55,0.12);
+    margin: 10px 0 4px;
+    overflow:hidden;
+  }
+  #phase-fill{
+    position:absolute;
+    top:0; left:0; height:100%;
+    width:0%;
+    background: linear-gradient(90deg, var(--accent-spin), var(--gold-bright));
+    transition: width 0.05s linear;
+  }
+  #phase-mark{
+    position:absolute;
+    top:-3px;
+    left:50%;
+    width:1px;
+    height:12px;
+    background: rgba(236,229,210,0.4);
+  }
+  .phase-labels{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.68rem;
+    color: var(--text-dim);
+    font-family:'Barlow Condensed', sans-serif;
+  }
+
+  /* ---------- Controls ---------- */
+  #controls{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  label.slider-label{
+    font-size:0.78rem;
+    color: var(--text-dim);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:4px;
+  }
+  label.slider-label span.live{ color: var(--gold-bright); }
+
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:3px;
+    background: rgba(212,175,55,0.25);
+    border-radius:2px;
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px;
+    border-radius:50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 6px rgba(242,202,92,0.7);
+    cursor:pointer;
+    margin-top:-5px;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:13px; height:13px;
+    border:none;
+    border-radius:50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 6px rgba(242,202,92,0.7);
+    cursor:pointer;
+  }
+
+  .btn-row{
+    display:flex;
+    gap:8px;
+    margin-top:2px;
+  }
+  button{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:600;
+    letter-spacing:0.02em;
+    font-size:0.78rem;
+    background: rgba(212,175,55,0.08);
+    color: var(--gold-bright);
+    border:1px solid var(--panel-border);
+    border-radius:4px;
+    padding:8px 10px;
+    cursor:pointer;
+    flex:1;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  button:hover{
+    background: rgba(212,175,55,0.2);
+    color:#fff8e6;
+  }
+  button.active{
+    background: var(--gold);
+    color:#1a1305;
+  }
+
+  /* ---------- Toggle tab (shows when panel collapsed) ---------- */
+  #panel-toggle{
+    position:absolute;
+    top:22px;
+    left:22px;
+    width:36px;
+    height:36px;
+    border-radius:6px;
+    background: var(--panel-bg);
+    border:1px solid var(--panel-border);
+    color: var(--gold-bright);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:1.1rem;
+    z-index:5;
+  }
+
+  /* ---------- Legend (bottom-left) ---------- */
+  #legend{
+    position:absolute;
+    bottom:22px;
+    left:22px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:0.72rem;
+    color: var(--text-dim);
+    font-family:'Barlow Condensed', sans-serif;
+  }
+  .swatch{
+    width:10px; height:10px;
+    border-radius:50%;
+    display:inline-block;
+  }
+
+  /* ---------- Fullscreen button ---------- */
+  #fullscreen-btn{
+    position:absolute;
+    bottom:22px;
+    right:22px;
+    width:38px;
+    height:38px;
+    border-radius:6px;
+    background: var(--panel-bg);
+    border:1px solid var(--panel-border);
+    color: var(--gold-bright);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:1rem;
+  }
+  #fullscreen-btn:hover{ background: rgba(212,175,55,0.2); }
+
+  @media (max-width: 640px){
+    #info-panel{ width: calc(100vw - 44px); top:14px; left:14px; padding:16px 18px; }
+    #panel-toggle{ top:14px; left:14px; }
+    #legend{ bottom:14px; left:14px; }
+    #fullscreen-btn{ bottom:14px; right:14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div id="info-panel">
+  <h1>Elektron als Möbius-Torus</h1>
+  <p class="subtitle">WRZT – Spin-1/2-Visualisierung</p>
+
+  <p>Der Vektor markiert die Bandkante entlang des Pfades und zeigt die Halbierung der Phase:</p>
+
+  <div class="stat-row"><span class="stat-label">Pfadumlauf $u$</span><span class="stat-value" id="val-u">0.00 rad</span></div>
+  <div class="stat-row"><span class="stat-label">Eigendrehung $u/2$</span><span class="stat-value" id="val-spin">0.00 rad</span></div>
+  <div class="stat-row"><span class="stat-label">Umläufe</span><span class="stat-value" id="val-revs">0</span></div>
+
+  <div id="phase-track"><div id="phase-fill"></div><div id="phase-mark"></div></div>
+  <div class="phase-labels"><span>0</span><span>$2\pi$</span><span>$4\pi$</span></div>
+
+  <hr class="divider">
+  <p class="note">Erst nach $4\pi$ – zwei vollen Umläufen – schließt sich die Phase konstruktiv.</p>
+
+  <div id="controls">
+    <div>
+      <label class="slider-label">Geschwindigkeit <span class="live" id="speed-val">0.5</span></label>
+      <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5">
+    </div>
+    <div>
+      <label class="slider-label">Schlauch-Radius $r$ <span class="live" id="radius-val">0.6</span></label>
+      <input type="range" id="radiusSlider" min="0.2" max="1.5" step="0.1" value="0.6">
+    </div>
+    <div class="btn-row">
+      <button id="playPauseBtn">Pause</button>
+      <button id="resetBtn">Reset</button>
+      <button id="wireBtn" class="active">Gitter</button>
+    </div>
+  </div>
+</div>
+
+<div id="panel-toggle" title="Panel öffnen">☰</div>
+
+<div id="legend">
+  <span class="swatch" style="background:#c1443a; box-shadow:0 0 5px #c1443a;"></span> Spinvektor
+  <span class="swatch" style="background:#f2ca5c; box-shadow:0 0 5px #f2ca5c; margin-left:10px;"></span> Bandkante
+</div>
+
+<div id="fullscreen-btn" title="Vollbild">⛶</div>
+
+<!-- Three.js & OrbitControls -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+  // --- 1. Scene Setup ---
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0906, 0.028);
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 8, 14);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x0a0906);
+  container.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.minDistance = 5;
+  controls.maxDistance = 40;
+
+  // --- 2. Beleuchtung (warmes Gold-Schema) ---
+  const ambientLight = new THREE.AmbientLight(0x2a2012, 2.2);
+  scene.add(ambientLight);
+
+  const keyLight = new THREE.PointLight(0xf2ca5c, 2.4, 60);
+  keyLight.position.set(10, 10, 10);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.PointLight(0xd4af37, 1.2, 60);
+  fillLight.position.set(-10, -8, -6);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.PointLight(0xc1443a, 0.8, 40);
+  rimLight.position.set(0, -12, 4);
+  scene.add(rimLight);
+
+  // --- 3. Geometrie des Möbius-Torus ---
+  const R = 4.0;
+  let r_val = 0.6;
+  const uSegs = 220;
+  const vSegs = 28;
+
+  let wireMesh, solidMesh;
+
+  function buildMoebiusGeometry(r){
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    for (let i = 0; i <= uSegs; i++){
+      const u = (i / uSegs) * Math.PI * 4;
+      for (let j = 0; j <= vSegs; j++){
+        const v = ((j / vSegs) - 0.5) * 2 * r;
+        const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
+        const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
+        const z = v * Math.sin(u / 2);
+        positions.push(x, y, z);
+        uvs.push(i / uSegs, j / vSegs);
+      }
+    }
+
+    for (let i = 0; i < uSegs; i++){
+      for (let j = 0; j < vSegs; j++){
+        const a = i * (vSegs + 1) + j;
+        const b = (i + 1) * (vSegs + 1) + j;
+        const c = (i + 1) * (vSegs + 1) + (j + 1);
+        const d = i * (vSegs + 1) + (j + 1);
+        indices.push(a, b, d);
+        indices.push(b, c, d);
+      }
+    }
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return geometry;
+  }
+
+  // Solide, leicht transluzente Grundfläche in Gold
+  const solidMaterial = new THREE.MeshPhongMaterial({
+    color: 0xb8902c,
+    emissive: 0x2a1c06,
+    shininess: 40,
+    transparent: true,
+    opacity: 0.32,
+    side: THREE.DoubleSide
+  });
+
+  // Feines Drahtgitter darüber für Struktur
+  const wireMaterial = new THREE.MeshBasicMaterial({
+    color: 0xf2ca5c,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.35,
+    side: THREE.DoubleSide
+  });
+
+  const baseGeom = buildMoebiusGeometry(r_val);
+  solidMesh = new THREE.Mesh(baseGeom, solidMaterial);
+  wireMesh = new THREE.Mesh(baseGeom.clone(), wireMaterial);
+  scene.add(solidMesh);
+  scene.add(wireMesh);
+
+  // --- 4. Spinvektor ---
+  const vectorGroup = new THREE.Group();
+  scene.add(vectorGroup);
+
+  const arrowHelper = new THREE.ArrowHelper(
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(0, 0, 0),
+    r_val * 1.8,
+    0xc1443a,
+    0.4,
+    0.2
+  );
+  vectorGroup.add(arrowHelper);
+
+  const tipSphere = new THREE.Mesh(
+    new THREE.SphereGeometry(0.14, 20, 20),
+    new THREE.MeshBasicMaterial({ color: 0xf2ca5c })
+  );
+  vectorGroup.add(tipSphere);
+
+  const tipGlow = new THREE.PointLight(0xf2ca5c, 1.2, 4);
+  vectorGroup.add(tipGlow);
+
+  // --- 5. State & UI Referenzen ---
+  let uAnim = 0;
+  let isPlaying = true;
+  let wireVisible = true;
+
+  const speedInput   = document.getElementById('speedSlider');
+  const radiusInput  = document.getElementById('radiusSlider');
+  const speedVal     = document.getElementById('speed-val');
+  const radiusVal    = document.getElementById('radius-val');
+  const valU         = document.getElementById('val-u');
+  const valSpin      = document.getElementById('val-spin');
+  const valRevs      = document.getElementById('val-revs');
+  const phaseFill    = document.getElementById('phase-fill');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const resetBtn     = document.getElementById('resetBtn');
+  const wireBtn      = document.getElementById('wireBtn');
+  const panel        = document.getElementById('info-panel');
+  const panelToggle  = document.getElementById('panel-toggle');
+  const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+  speedVal.textContent = speedInput.value;
+  radiusVal.textContent = radiusInput.value;
+
+  speedInput.addEventListener('input', (e) => { speedVal.textContent = e.target.value; });
+
+  radiusInput.addEventListener('input', (e) => {
+    r_val = parseFloat(e.target.value);
+    radiusVal.textContent = e.target.value;
+    const newGeom = buildMoebiusGeometry(r_val);
+    solidMesh.geometry.dispose();
+    wireMesh.geometry.dispose();
+    solidMesh.geometry = newGeom;
+    wireMesh.geometry = newGeom.clone();
+    arrowHelper.setLength(r_val * 1.8, 0.4, 0.2);
+  });
+
+  playPauseBtn.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    playPauseBtn.textContent = isPlaying ? 'Pause' : 'Weiter';
+  });
+
+  resetBtn.addEventListener('click', () => { uAnim = 0; });
+
+  wireBtn.addEventListener('click', () => {
+    wireVisible = !wireVisible;
+    wireMesh.visible = wireVisible;
+    wireBtn.classList.toggle('active', wireVisible);
+  });
+
+  panelToggle.addEventListener('click', () => { panel.classList.toggle('collapsed'); });
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  });
+
+  function getMoebiusPos(u, v){
+    const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
+    const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
+    const z = v * Math.sin(u / 2);
+    return new THREE.Vector3(x, y, z);
+  }
+
+  // --- 6. Animation Loop ---
+  function animate(){
+    requestAnimationFrame(animate);
+
+    if (isPlaying){
+      const speed = parseFloat(speedInput.value) * 0.01;
+      uAnim += speed;
+      if (uAnim > Math.PI * 4) uAnim -= Math.PI * 4;
+    }
+
+    const centerPos = getMoebiusPos(uAnim, 0);
+    vectorGroup.position.copy(centerPos);
+
+    const edgePos = getMoebiusPos(uAnim, r_val);
+    const dir = new THREE.Vector3().subVectors(edgePos, centerPos).normalize();
+
+    arrowHelper.setDirection(dir);
+    tipSphere.position.copy(dir.clone().multiplyScalar(r_val));
+    tipGlow.position.copy(tipSphere.position);
+
+    // UI aktualisieren
+    valU.textContent = uAnim.toFixed(2) + ' rad';
+    valSpin.textContent = (uAnim / 2).toFixed(2) + ' rad';
+    valRevs.textContent = Math.floor(uAnim / (2 * Math.PI));
+
+    const phasePct = (uAnim / (Math.PI * 4)) * 100;
+    phaseFill.style.width = phasePct + '%';
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  animate();
+</script>
+</body>
+</html>
