@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT – Protonen 3-Quark-Knoten Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0b0f14;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0f2fe;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid #0284c7;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 380px;
+            box-shadow: 0 4px 20px rgba(0, 186, 211, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            color: #38bdf8;
+            border-bottom: 1px solid #0369a1;
+            padding-bottom: 6px;
+        }
+        p {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 6px 0;
+            color: #bae6fd;
+        }
+        .quark-tag {
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .q-up1 { background-color: rgba(239, 68, 68, 0.3); color: #fca5a5; border: 1px solid #ef4444; }
+        .q-up2 { background-color: rgba(59, 130, 246, 0.3); color: #93c5fd; border: 1px solid #3b82f6; }
+        .q-down { background-color: rgba(34, 197, 94, 0.3); color: #86efac; border: 1px solid #22c55e; }
+        
+        .stat {
+            font-weight: bold;
+            color: #00f2fe;
+        }
+        #controls {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        input[type=range] {
+            accent-color: #00f2fe;
+        }
+    </style>
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="info-panel">
+        <h1>WRZT: Protonen 3-Quark-Resonator</h1>
+        <p>Das Proton als 3-fach phasenverkoppelter Knoten:</p>
+        <p>
+            <span class="quark-tag q-up1">Quark u1 (0°)</span>
+            <span class="quark-tag q-up2">Quark u2 (120°)</span>
+            <span class="quark-tag q-down">Quark d (240°)</span>
+        </p>
+        <p>• Phasenlauf ($u$): <span id="val-u" class="stat">0.0</span> rad</p>
+        <p>• Dreifach-Torsion ($\frac{3u}{2}$): <span id="val-spin" class="stat">0.0</span> rad</p>
+        <p><i>Die 3 Wellenschleifen sind topologisch ineinander verwebt.</i></p>
+
+        <div id="controls">
+            <label>Geschwindigkeit: <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5"></label>
+            <label>Knoten-Radius ($r_q$): <input type="range" id="radiusSlider" min="0.3" max="1.2" step="0.05" value="0.7"></label>
+            <label>Transparenz: <input type="range" id="opacitySlider" min="0.1" max="0.8" step="0.05" value="0.35"></label>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Scene Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0b0f14, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 6, 12);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x0b0f14);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- 2. Beleuchtung ---
+        const ambientLight = new THREE.AmbientLight(0x1e293b, 2);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0x00f2fe, 2, 50);
+        pointLight1.position.set(8, 10, 8);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xef4444, 1.5, 50);
+        pointLight2.position.set(-8, -10, -5);
+        scene.add(pointLight2);
+
+        // --- 3. Geometrie des 3-Quark-Knotens ---
+        const R_p = 2.8; // Mittlerer Protonenradius
+        let r_q = 0.7;   // Torsionsradius der Quark-Schleifen
+        const uSegs = 240;
+        const vSegs = 20;
+
+        const quarkColors = [
+            { main: 0xef4444, emissive: 0x7f1d1d }, // u1 - Rot
+            { main: 0x3b82f6, emissive: 0x1e3a8a }, // u2 - Blau
+            { main: 0x22c55e, emissive: 0x14532d }  // d  - Grün
+        ];
+
+        const quarkMeshes = [];
+        const vectorGroups = [];
+
+        function buildQuarkGeometry(phiOffset, rq) {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const uvs = [];
+            const indices = [];
+
+            for (let i = 0; i <= uSegs; i++) {
+                const u = (i / uSegs) * Math.PI * 4; // 4*Pi für geschlossenen Pfad
+                for (let j = 0; j <= vSegs; j++) {
+                    const v = ((j / vSegs) - 0.5) * 2 * rq;
+
+                    // WRZT Dreifach-Torus Formel mit Phasenversatz phiOffset
+                    const phase = (3 * u / 2) + phiOffset;
+                    const x = (R_p + v * Math.cos(phase)) * Math.cos(u);
+                    const y = (R_p + v * Math.cos(phase)) * Math.sin(u);
+                    const z = v * Math.sin(phase);
+
+                    positions.push(x, y, z);
+                    uvs.push(i / uSegs, j / vSegs);
+                }
+            }
+
+            for (let i = 0; i < uSegs; i++) {
+                for (let j = 0; j < vSegs; j++) {
+                    const a = i * (vSegs + 1) + j;
+                    const b = (i + 1) * (vSegs + 1) + j;
+                    const c = (i + 1) * (vSegs + 1) + (j + 1);
+                    const d = i * (vSegs + 1) + (j + 1);
+
+                    indices.push(a, b, d);
+                    indices.push(b, c, d);
+                }
+            }
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            return geometry;
+        }
+
+        // Erstelle 3 Quark-Möbius-Schleifen mit 120 Grad (2*PI/3) Versatz
+        for (let k = 0; k < 3; k++) {
+            const phiOffset = (k * 2 * Math.PI) / 3;
+            
+            const mat = new THREE.MeshPhongMaterial({
+                color: quarkColors[k].main,
+                emissive: quarkColors[k].emissive,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.35,
+                side: THREE.DoubleSide
+            });
+
+            const mesh = new THREE.Mesh(buildQuarkGeometry(phiOffset, r_q), mat);
+            scene.add(mesh);
+            quarkMeshes.push({ mesh: mesh, offset: phiOffset });
+
+            // Laufender Phasenzeiger für jedes Quark
+            const vGroup = new THREE.Group();
+            const arrow = new THREE.ArrowHelper(
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 0),
+                r_q * 1.5,
+                quarkColors[k].main,
+                0.3,
+                0.15
+            );
+            const sphere = new THREE.Mesh(
+                new THREE.SphereGeometry(0.12, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0xffffff })
+            );
+            vGroup.add(arrow);
+            vGroup.add(sphere);
+            scene.add(vGroup);
+
+            vectorGroups.push({ group: vGroup, arrow: arrow, sphere: sphere, offset: phiOffset });
+        }
+
+        // Zentrums-Kugel (Ur-Druck-Kern)
+        const coreSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5, 32, 32),
+            new THREE.MeshPhongMaterial({
+                color: 0x00f2fe,
+                emissive: 0x0284c7,
+                transparent: true,
+                opacity: 0.6,
+                wireframe: true
+            })
+        );
+        scene.add(coreSphere);
+
+        // --- 4. Controls & Animation ---
+        let uAnim = 0;
+        const speedInput = document.getElementById('speedSlider');
+        const radiusInput = document.getElementById('radiusSlider');
+        const opacityInput = document.getElementById('opacitySlider');
+        const valU = document.getElementById('val-u');
+        const valSpin = document.getElementById('val-spin');
+
+        radiusInput.addEventListener('input', (e) => {
+            r_q = parseFloat(e.target.value);
+            quarkMeshes.forEach(q => {
+                q.mesh.geometry.dispose();
+                q.mesh.geometry = buildQuarkGeometry(q.offset, r_q);
+            });
+            vectorGroups.forEach(vg => {
+                vg.arrow.setLength(r_q * 1.5, 0.3, 0.15);
+            });
+        });
+
+        opacityInput.addEventListener('input', (e) => {
+            const op = parseFloat(e.target.value);
+            quarkMeshes.forEach(q => {
+                q.mesh.material.opacity = op;
+            });
+        });
+
+        function getQuarkPos(u, v, phiOffset) {
+            const phase = (3 * u / 2) + phiOffset;
+            const x = (R_p + v * Math.cos(phase)) * Math.cos(u);
+            const y = (R_p + v * Math.cos(phase)) * Math.sin(u);
+            const z = v * Math.sin(phase);
+            return new THREE.Vector3(x, y, z);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const speed = parseFloat(speedInput.value) * 0.008;
+            uAnim += speed;
+            if (uAnim > Math.PI * 4) uAnim -= Math.PI * 4;
+
+            // Aktualisiere die 3 Vektoren der Quarks
+            vectorGroups.forEach(vg => {
+                const centerPos = getQuarkPos(uAnim, 0, vg.offset);
+                const edgePos = getQuarkPos(uAnim, r_q, vg.offset);
+                const dir = new THREE.Vector3().subVectors(edgePos, centerPos).normalize();
+
+                vg.group.position.copy(centerPos);
+                vg.arrow.setDirection(dir);
+                vg.sphere.position.copy(dir.clone().multiplyScalar(r_q));
+            });
+
+            // Pulsieren des Ur-Druck-Kerns
+            const pulse = 1 + 0.1 * Math.sin(uAnim * 3);
+            coreSphere.scale.set(pulse, pulse, pulse);
+
+            // UI Texte
+            valU.innerText = uAnim.toFixed(2);
+            valSpin.innerText = ((3 * uAnim) / 2).toFixed(2);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
