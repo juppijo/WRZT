@@ -1,0 +1,22 @@
+[
+  {
+    "id": "fiat-lux",
+    "title": "💡 Fiat Lux – Licht als Gravitationswelle",
+    "content": "<p>Die <strong>Wellenraumzeit-Theorie (WRZT)</strong> beschreibt das Universum als ein elastisches 3D-Knotennetzwerk.</p>\n                <div class=\"formula-box\">\\[ E = h \\cdot f = m_e c^2 \\]</div>\n                <ul>\n                    <li><strong>Ruhe-Trägheit:</strong> \\(\\eta_0 = m_e^2 \\approx 4{,}554692 \\times 10^{-31} \\text{ kg}\\)</li>\n                    <li><strong>Linienspannung:</strong> \\(\\Xi_0 = \\frac{m_e^2 c}{\\hbar} \\approx 2{,}358826 \\times 10^{-18} \\text{ kg/m}\\)</li>\n                </ul>"
+  },
+  {
+    "id": "architektur",
+    "title": "🌌 Architektur des Kosmos",
+    "content": "<p>Das elastische Raumzeit-Netzwerk verhält sich wie ein hochviskoser Schwamm. Elementarteilchen bilden stehende ringförmige Wirbelwellen (Toroide) im Gitter.</p>\n                <div class=\"formula-box\">\\[ c = \\sqrt{\\frac{P_{\\text{Ur}}}{\\rho_{\\text{Ur}}}} = \\frac{\\Xi_0}{\\eta_0} \\cdot R_{\\text{min},0} = 299.792.458 \\text{ m/s} \\]</div>"
+  },
+  {
+    "id": "bugwelle",
+    "title": "⚡ Relativistischer Bugwellen-Effekt",
+    "content": "<p>Der Lorentz-Faktor \\(\\gamma\\) entspricht der trigonometrischen Projektion des Bugwellen-Winkels \\(\\alpha\\):</p>\n                <div class=\"formula-box\">\\[ \\gamma = \\frac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}} = \\frac{1}{\\cos\\alpha} = \\sec\\alpha \\]</div>"
+  },
+  {
+    "id": "sec-1789463433721",
+    "title": "⚡ Relativistischer Bugwellen-Effekt 2",
+    "content": "<p>Der Lorentz-Faktor \\(\\gamma\\) entspricht der trigonometrischen Projektion des Bugwellen-Winkels \\(\\alpha\\):</p>\n                <div class=\"formula-box\">\\[ \\gamma = \\frac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}} = \\frac{1}{\\cos\\alpha} = \\sec\\alpha \\]</div>"
+  }
+]

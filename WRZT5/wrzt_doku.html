@@ -1,0 +1,477 @@
+<html lang="de"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellenraumzeit-Theorie (WRZT) - Interaktives Portal</title>
+    
+    <!-- MathJax configuration for inline & display math -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [
+            ['$', '$'],
+            ['\\(', '\\)']
+          ],
+          displayMath: [
+            ['$$', '$$'],
+            ['\\[', '\\]']
+          ]
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #c9d1d9;
+            --text-heading: #58a6ff;
+            --accent-cyan: #39c5bb;
+            --accent-blue: #1f6beb;
+            --accent-red: #da3633;
+            --accent-green: #238636;
+            --accent-purple: #8957e5;
+            --border-color: #30363d;
+            --sidebar-width: 280px;
+            --code-bg: #21262d;
+        }
+
+        body.theme-light {
+            --bg-color: #f6f8fa;
+            --card-bg: #ffffff;
+            --text-color: #24292f;
+            --text-heading: #0969da;
+            --accent-cyan: #008080;
+            --accent-blue: #0969da;
+            --border-color: #d0d7de;
+            --code-bg: #f3f4f6;
+        }
+
+        body.theme-paper {
+            --bg-color: #fcf8f2;
+            --card-bg: #f4efe6;
+            --text-color: #3d3b38;
+            --text-heading: #8c4303;
+            --accent-cyan: #2a7b72;
+            --accent-blue: #8c4303;
+            --border-color: #dcd3c5;
+            --code-bg: #e9e1d3;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        #sidebar h2 {
+            font-size: 1.2rem;
+            color: var(--text-heading);
+            border-bottom: 2px solid var(--accent-cyan);
+            padding-bottom: 8px;
+        }
+
+        .nav-links { list-style: none; }
+        .nav-links li { margin-bottom: 6px; }
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 6px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .nav-links a:hover {
+            background-color: var(--border-color);
+            color: var(--text-heading);
+        }
+
+        .controls {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+        .btn:hover { background-color: var(--accent-cyan); color: #fff; }
+        .btn-primary { background-color: var(--accent-blue); color: #fff; border: none; }
+        .btn-green { background-color: var(--accent-green); color: #fff; border: none; }
+        .btn-purple { background-color: var(--accent-purple); color: #fff; border: none; }
+        .btn-danger { background-color: var(--accent-red); color: #fff; border: none; }
+
+        #main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 40px;
+            max-width: 1000px;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        header h1 { font-size: 2.2rem; color: var(--text-heading); }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .section-card h2 {
+            font-size: 1.4rem;
+            color: var(--text-heading);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-cyan);
+            padding-left: 10px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .formula-box {
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .editor-box { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--code-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        textarea { min-height: 120px; resize: vertical; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar { width: 100%; position: relative; }
+            #main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body class="theme-dark">
+
+    <nav id="sidebar">
+        <h2>🌀 WRZT Portal</h2>
+        <div class="nav-group">
+            <ul class="nav-links" id="nav-list"></ul>
+        </div>
+        <div class="controls">
+            <button class="btn btn-primary" onclick="toggleFullscreen()">⛶ Vollbild Mode</button>
+            <button class="btn btn-purple" id="btn-export-html" onclick="exportStandaloneHTML()">🌐 als HTML exportieren</button>
+            <button class="btn btn-green" id="btn-save-json" onclick="saveDataToFile()">💾 JSON Speichern</button>
+            <button class="btn" id="btn-load-json" onclick="document.getElementById('file-input').click()">📂 JSON Laden</button>
+            <input type="file" id="file-input" style="display:none" accept=".json" onchange="loadDataFromFile(event)">
+            
+            <hr style="border-color: var(--border-color); margin: 5px 0;">
+            <button class="btn" onclick="toggleTheme('theme-dark')">🌌 Deep Space</button>
+            <button class="btn" onclick="toggleTheme('theme-light')">☀ Light Mode</button>
+            <button class="btn" onclick="toggleTheme('theme-paper')">📜 Papier Mode</button>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <header>
+            <h1>Wellenraumzeit-Theorie (WRZT)</h1>
+            <p id="header-desc">Interaktives Wissensportal: Kapitel bearbeiten, sortieren, speichern und laden.</p>
+        </header>
+
+        <!-- Dynamischer Bereich für Kapitel -->
+        <div id="dynamic-sections"></div>
+
+        <!-- Kapitel Hinzufügen / Editor Bereich -->
+        <section id="add-section" class="section-card">
+            <h2>➕ Neues Kapitel erstellen</h2>
+            <div class="editor-box">
+                <input type="text" id="new-title" placeholder="Kapitel-Titel (z.B. Quantenverschränkung in der WRZT)">
+                <textarea id="new-content" placeholder="Inhalt eingeben. LaTeX erlaubt: Inline \( E = mc^2 \) oder Block \[ c = \frac{\Xi_0}{\eta_0} R_{min} \]"></textarea>
+                <button class="btn btn-primary" onclick="addNewTopic()">Kapitel Hinzufügen</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // In unveränderbaren HTML-Dateien steht dieser Wert auf true
+        let isReadOnly = false;
+
+        // Initialer Datenbestand der WRZT
+        let topics = [
+          {
+                    "id": "fiat-lux",
+                    "title": "💡 Fiat Lux – Licht als Gravitationswelle",
+                    "content": "<p>Die <strong>Wellenraumzeit-Theorie (WRZT)</strong> beschreibt das Universum als ein elastisches 3D-Knotennetzwerk.</p>\n                <div class=\"formula-box\">\\[ E = h \\cdot f = m_e c^2 \\]</div>\n                <ul>\n                    <li><strong>Ruhe-Trägheit:</strong> \\(\\eta_0 = m_e^2 \\approx 4{,}554692 \\times 10^{-31} \\text{ kg}\\)</li>\n                    <li><strong>Linienspannung:</strong> \\(\\Xi_0 = \\frac{m_e^2 c}{\\hbar} \\approx 2{,}358826 \\times 10^{-18} \\text{ kg/m}\\)</li>\n                </ul>"
+          },
+          {
+                    "id": "architektur",
+                    "title": "🌌 Architektur des Kosmos",
+                    "content": "<p>Das elastische Raumzeit-Netzwerk verhält sich wie ein hochviskoser Schwamm. Elementarteilchen bilden stehende ringförmige Wirbelwellen (Toroide) im Gitter.</p>\n                <div class=\"formula-box\">\\[ c = \\sqrt{\\frac{P_{\\text{Ur}}}{\\rho_{\\text{Ur}}}} = \\frac{\\Xi_0}{\\eta_0} \\cdot R_{\\text{min},0} = 299.792.458 \\text{ m/s} \\]</div>"
+          },
+          {
+                    "id": "bugwelle",
+                    "title": "⚡ Relativistischer Bugwellen-Effekt",
+                    "content": "<p>Der Lorentz-Faktor \\(\\gamma\\) entspricht der trigonometrischen Projektion des Bugwellen-Winkels \\(\\alpha\\):</p>\n                <div class=\"formula-box\">\\[ \\gamma = \\frac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}} = \\frac{1}{\\cos\\alpha} = \\sec\\alpha \\]</div>"
+          }
+        ];
+
+        // Rendering der gesamten Themenliste
+        function renderTopics() {
+            const container = document.getElementById('dynamic-sections');
+            const navList = document.getElementById('nav-list');
+            
+            container.innerHTML = '';
+            navList.innerHTML = '';
+
+            topics.forEach((topic, index) => {
+                // 1. Navigation aufbauen
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#${topic.id}">${topic.title}</a>`;
+                navList.appendChild(li);
+
+                // 2. Kartenbereich aufbauen
+                const sec = document.createElement('section');
+                sec.className = 'section-card';
+                sec.id = topic.id;
+
+                let actionButtons = '';
+                if (!isReadOnly) {
+                    actionButtons = `
+                        <div class="action-bar">
+                            <button class="btn" onclick="moveTopic(${index}, -1)">⬆️ Nach oben</button>
+                            <button class="btn" onclick="moveTopic(${index}, 1)">⬇️ Nach unten</button>
+                            <button class="btn btn-primary" onclick="enableEdit('${topic.id}')">✏️ Bearbeiten</button>
+                            <button class="btn btn-danger" onclick="deleteTopic(${index})">🗑️ Löschen</button>
+                        </div>
+                    `;
+                }
+
+                sec.innerHTML = `
+                    <div id="view-${topic.id}">
+                        <h2>${topic.title}</h2>
+                        <div>${topic.content}</div>
+                        ${actionButtons}
+                    </div>
+
+                    ${!isReadOnly ? `
+                    <div id="edit-${topic.id}" style="display:none;" class="editor-box">
+                        <h3>Kapitel bearbeiten</h3>
+                        <input type="text" id="edit-title-${topic.id}" value="${escapeHtml(topic.title)}">
+                        <textarea id="edit-content-${topic.id}">${escapeHtml(topic.content)}</textarea>
+                        <div class="action-bar">
+                            <button class="btn btn-green" onclick="saveEdit(${index})">💾 Speichern</button>
+                            <button class="btn" onclick="cancelEdit('${topic.id}')">❌ Abbrechen</button>
+                        </div>
+                    </div>` : ''}
+                `;
+
+                container.appendChild(sec);
+            });
+
+            // Wenn ReadOnly, blendet das System das Editor-Formular am Ende aus
+            const addSec = document.getElementById('add-section');
+            if (isReadOnly) {
+                if (addSec) addSec.style.display = 'none';
+                document.getElementById('btn-export-html').style.display = 'none';
+                document.getElementById('btn-save-json').style.display = 'none';
+                document.getElementById('btn-load-json').style.display = 'none';
+                document.getElementById('header-desc').innerText = 'Schreibgeschützte Dokumentation mit LaTeX-Formeln.';
+            } else {
+                const addLi = document.createElement('li');
+                addLi.innerHTML = `<a href="#add-section">➕ Thema Hinzufügen</a>`;
+                navList.appendChild(addLi);
+            }
+
+            // MathJax Rendering ausführen
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([container]);
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        function moveTopic(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= topics.length) return;
+            const temp = topics[index];
+            topics[index] = topics[newIndex];
+            topics[newIndex] = temp;
+            renderTopics();
+        }
+
+        function enableEdit(id) {
+            document.getElementById(`view-${id}`).style.display = 'none';
+            document.getElementById(`edit-${id}`).style.display = 'flex';
+        }
+
+        function cancelEdit(id) {
+            document.getElementById(`view-${id}`).style.display = 'block';
+            document.getElementById(`edit-${id}`).style.display = 'none';
+        }
+
+        function saveEdit(index) {
+            const id = topics[index].id;
+            const newTitle = document.getElementById(`edit-title-${id}`).value.trim();
+            const newContent = document.getElementById(`edit-content-${id}`).value;
+
+            if (!newTitle) return alert('Bitte einen Titel eingeben!');
+
+            topics[index].title = newTitle;
+            topics[index].content = newContent;
+            renderTopics();
+        }
+
+        function deleteTopic(index) {
+            if (confirm(`Möchtest du "${topics[index].title}" wirklich löschen?`)) {
+                topics.splice(index, 1);
+                renderTopics();
+            }
+        }
+
+        function addNewTopic() {
+            const title = document.getElementById('new-title').value.trim();
+            const content = document.getElementById('new-content').value.trim();
+
+            if (!title || !content) return alert('Bitte Titel und Inhalt eingeben.');
+
+            const id = 'sec-' + Date.now();
+            topics.push({ id, title, content });
+            
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-content').value = '';
+
+            renderTopics();
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveDataToFile() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(topics, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "wrzt_dokumentation.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function loadDataFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedTopics = JSON.parse(e.target.result);
+                    if (Array.isArray(loadedTopics)) {
+                        topics = loadedTopics;
+                        renderTopics();
+                        alert('Dokumentation erfolgreich geladen!');
+                    }
+                } catch (err) {
+                    alert('Fehler beim Laden: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Export als reine, unveränderbare Stand-Alone-HTML
+        function exportStandaloneHTML() {
+            let htmlDoc = document.documentElement.outerHTML;
+
+            // 1. Setzt den isReadOnly Flag auf true
+            htmlDoc = htmlDoc.replace('let isReadOnly = false;', 'let isReadOnly = true;');
+
+            // 2. Ersetzt das bestehende topics-Array durch den aktuellen Stand
+            const jsonTopics = JSON.stringify(topics, null, 12);
+            htmlDoc = htmlDoc.replace(/let topics = \[[\s\S]*?\];/m, `let topics = ${jsonTopics};`);
+
+            // 3. Herunterladen der festen HTML-Datei
+            const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.href = URL.createObjectURL(blob);
+            downloadAnchor.download = "wrzt_dokumentation_read_only.html";
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function toggleTheme(theme) { document.body.className = theme; }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Vollbild-Fehler: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderTopics();
+        });
+    </script>
+
+</body></html>
