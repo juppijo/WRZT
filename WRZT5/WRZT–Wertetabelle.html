@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>WRZT Seite</title>
+  
+    <!-- MathJax configuration for inline & display math -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT Fundamentalkonstanten & Relativistische Skalierung</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --header-bg: #1f2937;
+            --accent-cyan: #06b6d4;
+            --accent-turquoise: #14b8a6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --hover-bg: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .table-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 32px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--header-bg);
+            color: var(--accent-turquoise);
+            padding: 14px 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .math {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .unit {
+            color: #a7f3d0;
+            font-family: monospace;
+        }
+
+        .highlight-val {
+            font-weight: 600;
+            color: #f43f5e;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .section-header {
+            background-color: rgba(31, 41, 55, 0.5);
+            font-weight: bold;
+            color: #f3f4f6;
+            letter-spacing: 0.03em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌀 Wellenraumzeit-Theorie (WRZT) – Wertetabelle</h1>
+    <p class="subtitle">Fundamentale Ruhe-Konstanten des 3D-Knotennetzwerks &amp; ihre relativistische Skalierung (&gamma; = sec &theta;)</p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Physikalische Größe</th>
+                    <th>Formel (Ruhe &gamma;=1)</th>
+                    <th>Exakter Zahlenwert (&gamma;=1)</th>
+                    <th>Einheit</th>
+                    <th>Relativistische Skalierung (&gamma;)</th>
+                    <th>Bugwellen-Winkel Form (&theta;)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Ruhe-Knotenträgheit -->
+                <tr>
+                    <td><strong>Knoten-Trägheit</strong></td>
+                    <td><span class="math">&eta;<sub>0</sub> = m<sub>e</sub> / 2</span></td>
+                    <td>4,554 692 &times; 10<sup>&minus;31</sup></td>
+                    <td><span class="unit">kg</span></td>
+                    <td><span class="math">&eta;(&gamma;) = &gamma; &middot; &eta;<sub>0</sub></span></td>
+                    <td><span class="math">&eta;<sub>0</sub> &middot; sec &theta;</span></td>
+                </tr>
+
+                <!-- Minimal-Radius -->
+                <tr>
+                    <td><strong>Minimal-Radius (Maschenweite)</strong></td>
+                    <td><span class="math">R<sub>min,0</sub> = &hbar; / (2 m<sub>e</sub> c)</span></td>
+                    <td>1,930 796 &times; 10<sup>&minus;13</sup></td>
+                    <td><span class="unit">m</span></td>
+                    <td><span class="math">R<sub>min</sub>(&gamma;) = R<sub>min,0</sub> / &gamma;</span></td>
+                    <td><span class="math">R<sub>min,0</sub> &middot; cos &theta;</span></td>
+                </tr>
+
+                <!-- 1D-Urspannung Unkalibriert -->
+                <tr>
+                    <td><strong>1D-Urspannung (Kette, unkalibriert)</strong></td>
+                    <td><span class="math">&Xi;<sub>0</sub> = m<sub>e</sub><sup>2</sup> c / &hbar;</span></td>
+                    <td>2,358 826 &times; 10<sup>&minus;18</sup></td>
+                    <td><span class="unit">kg/m</span></td>
+                    <td><span class="math">&Xi;(&gamma;) = &gamma;<sup>2</sup> &middot; &Xi;<sub>0</sub></span></td>
+                    <td><span class="math">&Xi;<sub>0</sub> &middot; sec<sup>2</sup> &theta;</span></td>
+                </tr>
+
+                <!-- 1D-Urspannung Kalibriert -->
+                <tr>
+                    <td><strong>1D-Urspannung (3D-Netz, kalibriert)</strong></td>
+                    <td><span class="math">&Xi;<sub>0,kal</sub> = m<sub>e</sub><sup>2</sup> c / (4 &hbar;)</span></td>
+                    <td>5,897 427 &times; 10<sup>&minus;19</sup></td>
+                    <td><span class="unit">kg/m</span></td>
+                    <td><span class="math">&Xi;<sub>kal</sub>(&gamma;) = &gamma;<sup>2</sup> &middot; &Xi;<sub>0,kal</sub></span></td>
+                    <td><span class="math">&Xi;<sub>0,kal</sub> &middot; sec<sup>2</sup> &theta;</span></td>
+                </tr>
+
+                <!-- 3D-Ur-Dichte -->
+                <tr>
+                    <td><strong>3D-Ur-Dichte (Massendichte)</strong></td>
+                    <td><span class="math">&rho;<sub>Ur,0</sub> = 4 m<sub>e</sub><sup>4</sup> c<sup>3</sup> / &hbar;<sup>3</sup></span></td>
+                    <td>6,330 062 &times; 10<sup>7</sup></td>
+                    <td><span class="unit">kg/m³</span></td>
+                    <td><span class="math">&rho;<sub>Ur</sub>(&gamma;) = &gamma;<sup>4</sup> &middot; &rho;<sub>Ur,0</sub></span></td>
+                    <td><span class="math">&rho;<sub>Ur,0</sub> &middot; sec<sup>4</sup> &theta;</span></td>
+                </tr>
+
+                <!-- 3D-Ur-Druck -->
+                <tr>
+                    <td><strong>3D-Ur-Druck (Volumenspannung)</strong></td>
+                    <td><span class="math">P<sub>Ur,0</sub> = &rho;<sub>Ur,0</sub> &middot; c<sup>2</sup></span></td>
+                    <td>5,689 104 &times; 10<sup>24</sup></td>
+                    <td><span class="unit">N/m² (Pa)</span></td>
+                    <td><span class="math">P<sub>Ur</sub>(&gamma;) = &gamma;<sup>4</sup> &middot; P<sub>Ur,0</sub></span></td>
+                    <td><span class="math">P<sub>Ur,0</sub> &middot; sec<sup>4</sup> &theta;</span></td>
+                </tr>
+
+                <!-- Invariante Lichtgeschwindigkeit -->
+                <tr class="section-header">
+                    <td><strong>Lichtgeschwindigkeit (Invariante)</strong></td>
+                    <td><span class="math">c = &radic;(P<sub>Ur</sub> / &rho;<sub>Ur</sub>)</span></td>
+                    <td><span class="highlight-val">299.792.458</span></td>
+                    <td><span class="unit">m/s</span></td>
+                    <td><span class="math">c(&gamma;) = c<sub>0</sub></span> <span class="tag">Invariant</span></td>
+                    <td><span class="math">c(&theta;) = c<sub>0</sub></span></td>
+                </tr>
+
+                <!-- Raum-Invarianz -->
+                <tr class="section-header">
+                    <td><strong>Maschen-Invarianz (Normierung)</strong></td>
+                    <td><span class="math">1 = (&Xi;<sub>0</sub> / &eta;<sub>0</sub>) &middot; R<sub>min,0</sub></span></td>
+                    <td><span class="highlight-val">1,000000</span></td>
+                    <td><span class="unit">dim.los</span></td>
+                    <td><span class="math">1(&gamma;) = 1</span> <span class="tag">Invariant</span></td>
+                    <td><span class="math">1(&theta;) = 1</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
