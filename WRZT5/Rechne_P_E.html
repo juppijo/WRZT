@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT - Präzise Formelauswertung</title>
+  
+    <!-- MathJax configuration for inline & display math -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- MathJax End -->
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f4f6f9;
+      color: #1a2b4c;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .card {
+      max-width: 750px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #e1e8ed;
+    }
+    h2 {
+      margin-top: 0;
+      color: #0f2557;
+      border-bottom: 2px solid #00a896;
+      padding-bottom: 8px;
+    }
+    .formula-box {
+      background-color: #eef2f7;
+      border-left: 4px solid #00a896;
+      padding: 12px 16px;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: bold;
+      margin: 16px 0;
+    }
+    .step {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .step-title {
+      font-weight: 600;
+      color: #2563eb;
+    }
+    .value {
+      font-family: "Courier New", Courier, monospace;
+      background-color: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .result-box {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      background-color: #fff1f2;
+      border: 1px solid #fecdd3;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>WRZT - Mathematische Schritt-für-Schritt-Auswertung</h2>
+  
+  <p>Auswertung der geometrischen Formel für das Massenverhältnis:</p>
+  <div class="formula-box">
+    m_p / m_e = (4π · 3²) / (α · √2) = 36π / (α · √2)
+  </div>
+
+  <div id="output"></div>
+</div>
+
+<script>
+  // Exakte CODATA-Referenzwerte
+  const pi = Math.PI;
+  const sqrt2 = Math.SQRT2;
+  const alpha = 0.0072973525693; // CODATA Feinstrukturkonstante [einheitenlos]
+  const mp_me_codata = 1836.15267343; // CODATA Massenverhältnis [einheitenlos]
+
+  // Schritt-für-Schritt-Berechnung
+  const zaehler = 36 * pi; // [einheitenlos]
+  const nenner = alpha * sqrt2; // [einheitenlos]
+  const ergebnis = zaehler / nenner; // [einheitenlos]
+  const abweichung = ((ergebnis - mp_me_codata) / mp_me_codata) * 100;
+
+  // HTML-Ausgabe aufbauen
+  const htmlContent = `
+    <div class="step">
+      <div class="step-title">1. Eingabewerte (CODATA & Mathematik):</div>
+      <ul>
+        <li>Kreiszahl $\\pi$: <span class="value">${pi.toFixed(11)}</span> [einheitenlos]</li>
+        <li>Raumdiagonale $\\sqrt{2}$: <span class="value">${sqrt2.toFixed(11)}</span> [einheitenlos]</li>
+        <li>Feinstrukturkonstante $\\alpha$: <span class="value">${alpha}</span> [einheitenlos]</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <div class="step-title">2. Zählerberechnung (Topologisches Phasenvolumen $36\\pi$):</div>
+      <p>$36 \\times \\pi = $ <span class="value">${zaehler.toFixed(10)}</span> [einheitenlos]</p>
+    </div>
+
+    <div class="step">
+      <div class="step-title">3. Nennerberechnung (Kopplung & Diagonale $\\alpha \\cdot \\sqrt{2}$):</div>
+      <p>$\\alpha \\times \\sqrt{2} = $ <span class="value">${nenner.toFixed(11)}</span> [einheitenlos]</p>
+    </div>
+
+    <div class="step">
+      <div class="step-title">4. Finale Division:</div>
+      <p>$\\frac{36\\pi}{\\alpha \\cdot \\sqrt{2}} = \\frac{${zaehler.toFixed(6)}}{${nenner.toFixed(8)}} = $ <span class="value" style="font-weight:bold; color:#0f2557;">${ergebnis.toFixed(4)}</span> [einheitenlos]</p>
+    </div>
+
+    <div class="result-box">
+      <strong>Vergleich mit dem CODATA-Messwert:</strong><br>
+      • Berechneter Wert aus Formel: <span class="value">${ergebnis.toFixed(4)}</span><br>
+      • Realer CODATA-Messwert ($m_p / m_e$): <span class="value">${mp_me_codata.toFixed(4)}</span><br>
+      • Rechnerische Abweichung: <span class="value">${abweichung.toFixed(2)} %</span>
+    </div>
+  `;
+
+  document.getElementById('output').innerHTML = htmlContent;
+</script>
+
+</body>
+</html>
