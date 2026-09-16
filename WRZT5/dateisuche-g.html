@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datei-Inhaltssuche mit Vorschau</title>
+    <title>Datei-Suche & Live-Editor</title>
     <style>
         :root {
             --bg-color: #f4f6f9;
@@ -13,7 +13,8 @@
             --primary-color: #4a90e2;
             --primary-hover: #357abd;
             --success-color: #2ec4b6;
-            --code-bg: #f8f9fa;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
         }
 
         body.dark-mode {
@@ -24,7 +25,6 @@
             --primary-color: #6c5ce7;
             --primary-hover: #5b4bc4;
             --success-color: #00b894;
-            --code-bg: #181825;
         }
 
         * {
@@ -117,6 +117,14 @@
             font-size: 0.8rem;
         }
 
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
         .actions { margin-top: 1.5rem; }
 
         .status {
@@ -143,7 +151,7 @@
         }
 
         .result-item {
-            background-color: var(--code-bg);
+            background-color: var(--bg-color);
             border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 8px;
@@ -179,13 +187,13 @@
             flex-wrap: wrap;
         }
 
-        .copied { background-color: var(--success-color) !important; }
+        .copied { background-color: var(--success-color) !important; color: white; }
 
-        /* Modal Vorschau Fensters */
+        /* Modal / Editor Stylings */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             display: none;
             justify-content: center;
             align-items: center;
@@ -197,12 +205,20 @@
             color: var(--text-color);
             padding: 1.5rem;
             border-radius: 12px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 80vh;
+            width: 90%;
+            height: 85vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Editor Vollbild-Klasse */
+        .modal-content.editor-fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            padding: 1rem;
         }
 
         .modal-header {
@@ -210,18 +226,33 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
+            gap: 1rem;
         }
 
-        .modal-body {
-            background: var(--code-bg);
-            border: 1px solid var(--border-color);
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-family: monospace;
-            font-size: 0.9rem;
+        .modal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-textarea {
+            width: 100%;
             flex: 1;
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            overflow: auto;
+        }
+
+        .editor-textarea:focus {
+            border-color: var(--primary-color);
         }
     </style>
 </head>
@@ -229,10 +260,10 @@
 
 <div class="container">
     <div class="header">
-        <h1>🔍 Datei-Inhaltssuche</h1>
+        <h1>🔍 Datei-Suche & Editor</h1>
         <div class="top-controls">
             <button class="btn btn-secondary" id="themeBtn">🌙 Theme</button>
-            <button class="btn btn-secondary" id="fullscreenBtn">⛶ Vollbild</button>
+            <button class="btn btn-secondary" id="fullscreenBtn">⛶ App-Vollbild</button>
         </div>
     </div>
 
@@ -261,14 +292,18 @@
     </div>
 </div>
 
-<!-- Modal für Datei-Vorschau -->
-<div class="modal-overlay" id="previewModal">
-    <div class="modal-content">
+<!-- Modal für Datei-Editor -->
+<div class="modal-overlay" id="editorModal">
+    <div class="modal-content" id="modalContent">
         <div class="modal-header">
-            <h3 id="modalTitle">Datei-Vorschau</h3>
-            <button class="btn btn-secondary btn-small" id="closeModalBtn">✖ Schließen</button>
+            <h3 id="modalTitle">Editor</h3>
+            <div class="modal-controls">
+                <button class="btn btn-success btn-small" id="saveFileBtn">💾 Speichern</button>
+                <button class="btn btn-secondary btn-small" id="editorFullscreenBtn" title="Editor Vollbild">⛶ Vollbild</button>
+                <button class="btn btn-secondary btn-small" id="closeModalBtn">✖ Schließen</button>
+            </div>
         </div>
-        <pre class="modal-body" id="modalBody"></pre>
+        <textarea class="editor-textarea" id="editorTextarea" spellcheck="false"></textarea>
     </div>
 </div>
 
@@ -283,15 +318,21 @@
     const countSpan = document.getElementById('count');
     const copyAllBtn = document.getElementById('copyAllBtn');
 
-    const previewModal = document.getElementById('previewModal');
+    // Modal & Editor Referenzen
+    const editorModal = document.getElementById('editorModal');
+    const modalContent = document.getElementById('modalContent');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
+    const editorTextarea = document.getElementById('editorTextarea');
+    const saveFileBtn = document.getElementById('saveFileBtn');
+    const editorFullscreenBtn = document.getElementById('editorFullscreenBtn');
 
     let foundFiles = [];
+    let currentFileHandle = null;
 
     themeBtn.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
 
+    // App Vollbild Umschalter
     fullscreenBtn.addEventListener('click', () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
@@ -300,9 +341,14 @@
         }
     });
 
-    closeModalBtn.addEventListener('click', () => previewModal.style.display = 'none');
-    previewModal.addEventListener('click', (e) => {
-        if (e.target === previewModal) previewModal.style.display = 'none';
+    // Editor Vollbild Umschalter
+    editorFullscreenBtn.addEventListener('click', () => {
+        modalContent.classList.toggle('editor-fullscreen');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        editorModal.style.display = 'none';
+        modalContent.classList.remove('editor-fullscreen');
     });
 
     startBtn.addEventListener('click', async () => {
@@ -351,7 +397,7 @@
                                     const fileData = {
                                         name: entry.name,
                                         path: relativePath,
-                                        fileObj: file
+                                        handle: entry
                                     };
                                     foundFiles.push(fileData);
                                     addResultToUI(fileData);
@@ -405,40 +451,46 @@
             copyToClipboard(`${fileData.name} | ${fileData.path}`, copyBtn);
         });
 
-        // 2. Datei im Browser-Modal ÖFFNEN / ANZEIGEN
-        const openBtn = document.createElement('button');
-        openBtn.className = 'btn btn-small';
-        openBtn.innerHTML = '👁 Vorschau';
-        openBtn.title = 'Datei-Inhalt direkt anzeigen';
-        openBtn.addEventListener('click', async () => {
-            const text = await fileData.fileObj.text();
-            modalTitle.textContent = fileData.name;
-            modalBody.textContent = text;
-            previewModal.style.display = 'flex';
+        // 2. Editor ÖFFNEN
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-small';
+        editBtn.innerHTML = '✏️ Editor';
+        editBtn.title = 'Datei direkt bearbeiten';
+        editBtn.addEventListener('click', async () => {
+            currentFileHandle = fileData.handle;
+            const file = await currentFileHandle.getFile();
+            const text = await file.text();
+            
+            modalTitle.textContent = `Editor: ${fileData.name}`;
+            editorTextarea.value = text;
+            editorModal.style.display = 'flex';
         });
 
-        // 3. Datei HERUNTERLADEN / EXPORTIEREN
-        const downloadBtn = document.createElement('button');
-        downloadBtn.className = 'btn btn-secondary btn-small';
-        downloadBtn.innerHTML = '💾 ÖFFNEN / SPEICHERN';
-        downloadBtn.title = 'Datei lokal zum Öffnen ausgeben';
-        downloadBtn.addEventListener('click', () => {
-            const url = URL.createObjectURL(fileData.fileObj);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileData.name;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        btnGroup.appendChild(openBtn);
-        btnGroup.appendChild(downloadBtn);
+        btnGroup.appendChild(editBtn);
         btnGroup.appendChild(copyBtn);
 
         li.appendChild(infoDiv);
         li.appendChild(btnGroup);
         resultsList.appendChild(li);
     }
+
+    // ÄNDERUNGEN IN DIREKTE DATEI SPEICHERN
+    saveFileBtn.addEventListener('click', async () => {
+        if (!currentFileHandle) return;
+
+        try {
+            // Schreibrechte auf der Datei anfordern
+            const writable = await currentFileHandle.createWritable();
+            await writable.write(editorTextarea.value);
+            await writable.close();
+
+            const origText = saveFileBtn.innerHTML;
+            saveFileBtn.innerHTML = '✓ Gespeichert!';
+            setTimeout(() => saveFileBtn.innerHTML = origText, 1500);
+        } catch (err) {
+            alert('Fehler beim Speichern der Datei: ' + err.message);
+        }
+    });
 
     function copyToClipboard(text, buttonElement) {
         navigator.clipboard.writeText(text).then(() => {
