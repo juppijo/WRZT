@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dateisuche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0b09;
+    --bg-panel:#161410;
+    --bg-row:#1c1a15;
+    --bg-row-hover:#242019;
+    --border:#332d22;
+    --gold:#c9a227;
+    --gold-bright:#e6c34a;
+    --text:#eae5d6;
+    --text-dim:#948c76;
+    --text-faint:#5c5645;
+    --danger:#b5583c;
+    --ok:#7a9b5e;
+    --radius:3px;
+    --mono:'Barlow Condensed',monospace;
+  }
+  [data-theme="bernstein"]{
+    --bg:#150c05;
+    --bg-panel:#20140a;
+    --bg-row:#271808;
+    --bg-row-hover:#30200e;
+    --border:#432b12;
+    --gold:#e08a2e;
+    --gold-bright:#f5a94a;
+    --text:#f2e2ce;
+    --text-dim:#a9825e;
+    --text-faint:#6b4f36;
+  }
+  [data-theme="mono"]{
+    --bg:#0a0a0a;
+    --bg-panel:#161616;
+    --bg-row:#1c1c1c;
+    --bg-row-hover:#242424;
+    --border:#333333;
+    --gold:#d8d3c4;
+    --gold-bright:#ffffff;
+    --text:#e8e6e0;
+    --text-dim:#8f8c84;
+    --text-faint:#565349;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Barlow',sans-serif;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+
+  header{
+    border-bottom:1px solid var(--border);
+    padding:22px clamp(16px,4vw,40px) 18px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(28px,5vw,40px);
+    letter-spacing:1.5px;
+    color:var(--gold-bright);
+    margin:0 0 2px;
+    line-height:1;
+  }
+  .brand p{
+    margin:0;
+    color:var(--text-dim);
+    font-size:14px;
+    font-style:italic;
+  }
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap;}
+  .icon-btn{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    width:40px;height:40px;
+    border-radius:var(--radius);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .icon-btn:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .icon-btn:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--gold-bright); outline-offset:2px;
+  }
+  .theme-dot{width:16px;height:16px;border-radius:50%; border:1px solid var(--border);}
+  .theme-dot.gold{background:linear-gradient(135deg,#c9a227,#0c0b09);}
+  .theme-dot.bernstein{background:linear-gradient(135deg,#e08a2e,#150c05);}
+  .theme-dot.mono{background:linear-gradient(135deg,#d8d3c4,#0a0a0a);}
+  .theme-btn.active{border-color:var(--gold-bright);}
+
+  main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    max-width:900px;
+    width:100%;
+    margin:0 auto;
+    padding:24px clamp(16px,4vw,40px) 40px;
+    gap:20px;
+  }
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+  }
+  .panel h2{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:.5px;
+    color:var(--text-dim);
+    margin:0 0 14px;
+  }
+
+  .folder-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Barlow',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    background:var(--gold);
+    color:#151004;
+    border:none;
+    padding:11px 20px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+  }
+  .btn:hover{background:var(--gold-bright);}
+  .btn:active{transform:scale(.98);}
+  .btn.secondary{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btn.secondary:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+  #folderInput{display:none;}
+  .folder-label{color:var(--text-dim); font-size:13.5px;}
+  .folder-label strong{color:var(--text);}
+
+  .search-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  input[type="text"]{
+    flex:1;
+    min-width:200px;
+    background:var(--bg-row);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:11px 13px;
+    border-radius:var(--radius);
+    font-size:15px;
+    font-family:'Barlow',sans-serif;
+  }
+  input[type="text"]::placeholder{color:var(--text-faint);}
+  input[type="text"]:focus{border-color:var(--gold);}
+  .options{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-top:14px;
+    font-size:13.5px;
+    color:var(--text-dim);
+  }
+  .options label{display:flex; align-items:center; gap:7px; cursor:pointer;}
+  .options input[type="checkbox"]{accent-color:var(--gold);}
+  .options input[type="text"].ext{
+    width:150px;
+    padding:6px 9px;
+    font-size:13px;
+    min-width:0;
+  }
+
+  .status{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:13px;
+    color:var(--text-dim);
+    padding:2px 2px 0;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .status .count strong{color:var(--gold-bright); font-weight:600;}
+  .progress-track{
+    height:2px;
+    background:var(--border);
+    border-radius:2px;
+    overflow:hidden;
+    margin-top:8px;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:var(--gold);
+    transition:width .12s linear;
+  }
+
+  .results{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .result-row{
+    background:var(--bg-row);
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .result-row:hover{background:var(--bg-row-hover);}
+  .result-info{min-width:0;}
+  .result-name{
+    color:var(--text);
+    font-weight:600;
+    font-size:14.5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .result-path{
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:13px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-top:2px;
+  }
+  .row-actions{display:flex; gap:8px; flex-shrink:0;}
+  .copy-btn{
+    flex-shrink:0;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-family:'Barlow',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 12px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+    white-space:nowrap;
+  }
+  .copy-btn:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .copy-btn.copied{border-color:var(--ok); color:var(--ok);}
+  .open-btn{
+    flex-shrink:0;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-family:'Barlow',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 12px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+    white-space:nowrap;
+  }
+  .open-btn:hover{border-color:var(--gold); color:var(--gold-bright);}
+
+  .empty-state{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--text-faint);
+    font-size:14px;
+  }
+  .empty-state strong{display:block; color:var(--text-dim); font-size:16px; margin-bottom:6px;}
+
+  .results-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  .warn{
+    font-size:12.5px;
+    color:var(--danger);
+    margin-top:10px;
+    display:none;
+  }
+
+  ::-webkit-scrollbar{width:9px; height:9px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+
+  :fullscreen{background:var(--bg);}
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.65);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    width:100%;
+    max-width:820px;
+    max-height:85vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-title{min-width:0;}
+  .modal-title .name{
+    color:var(--gold-bright);
+    font-weight:600;
+    font-size:15px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .modal-title .path{
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:12.5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .modal-box:fullscreen{
+    max-width:none;
+    max-height:none;
+    width:100vw;
+    height:100vh;
+    border-radius:0;
+  }
+  .modal-header-actions{display:flex; gap:8px; flex-shrink:0;}
+  .modal-close{
+    flex-shrink:0;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    width:32px;height:32px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .modal-close:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .modal-editor{
+    flex:1;
+    width:100%;
+    resize:none;
+    border:none;
+    background:var(--bg-row);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:13.5px;
+    line-height:1.6;
+    padding:16px;
+    outline:none;
+  }
+  .modal-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border-top:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  .modal-footer .hint{font-size:12px; color:var(--text-faint);}
+  .modal-footer .actions{display:flex; gap:10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Dateisuche</h1>
+    <p>Ordner durchsuchen &middot; Inhalt finden &middot; Pfad kopieren</p>
+  </div>
+  <div class="toolbar">
+    <button class="icon-btn theme-btn active" data-theme="gold" title="Thema: Gold" aria-label="Thema Gold"><span class="theme-dot gold"></span></button>
+    <button class="icon-btn theme-btn" data-theme="bernstein" title="Thema: Bernstein" aria-label="Thema Bernstein"><span class="theme-dot bernstein"></span></button>
+    <button class="icon-btn theme-btn" data-theme="mono" title="Thema: Mono" aria-label="Thema Mono"><span class="theme-dot mono"></span></button>
+    <button class="icon-btn" id="fullscreenBtn" title="Vollbild" aria-label="Vollbild umschalten">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path id="fsIcon" d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m11 0h3a2 2 0 0 0 2-2v-3"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="panel">
+    <h2>Ordner</h2>
+    <div class="folder-row">
+      <input type="file" id="folderInput" webkitdirectory directory multiple>
+      <button class="btn" id="pickFolderBtn">Ordner wählen</button>
+      <span class="folder-label" id="folderLabel">Noch kein Ordner ausgewählt.</span>
+    </div>
+    <p class="warn" id="unsupportedWarn">Dein Browser unterstützt das Durchsuchen ganzer Ordner nicht (z.&nbsp;B. aktuelles Safari auf iOS). Bitte in Chrome, Edge oder Firefox am Desktop öffnen.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Suche</h2>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Text, nach dem in Dateien gesucht werden soll …" disabled>
+      <button class="btn" id="searchBtn" disabled>Suchen</button>
+    </div>
+    <div class="options">
+      <label><input type="checkbox" id="caseSensitive"> Groß-/Kleinschreibung beachten</label>
+      <label>Dateiendungen (optional): <input type="text" class="ext" id="extFilter" placeholder="z.B. .txt,.js,.md"></label>
+    </div>
+  </section>
+
+  <section class="panel" id="resultsPanel" style="display:none;">
+    <div class="status">
+      <span class="count" id="statusText">Bereit.</span>
+      <span id="timeText"></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </section>
+
+  <section id="resultsSection" style="display:none;">
+    <div class="results-footer" style="margin-bottom:10px;">
+      <span class="folder-label" id="resultsHeading"></span>
+      <button class="btn secondary" id="copyAllBtn">Alle Pfade kopieren</button>
+    </div>
+    <div class="results" id="resultsList"></div>
+  </section>
+
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="name" id="modalName"></div>
+        <div class="path" id="modalPath"></div>
+      </div>
+      <div class="modal-header-actions">
+        <button class="modal-close" id="modalFullscreenBtn" aria-label="Editor Vollbild umschalten">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m11 0h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Editor schließen">✕</button>
+      </div>
+    </div>
+    <textarea class="modal-editor" id="modalEditor" spellcheck="false"></textarea>
+    <div class="modal-footer">
+      <span class="hint" id="modalHint">Änderungen werden nicht automatisch gespeichert.</span>
+      <div class="actions">
+        <button class="btn secondary" id="modalCopyBtn">Inhalt kopieren</button>
+        <button class="btn" id="modalSaveBtn">Als Datei speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const folderInput = document.getElementById('folderInput');
+  const pickFolderBtn = document.getElementById('pickFolderBtn');
+  const folderLabel = document.getElementById('folderLabel');
+  const unsupportedWarn = document.getElementById('unsupportedWarn');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const caseSensitive = document.getElementById('caseSensitive');
+  const extFilter = document.getElementById('extFilter');
+  const resultsPanel = document.getElementById('resultsPanel');
+  const statusText = document.getElementById('statusText');
+  const timeText = document.getElementById('timeText');
+  const progressFill = document.getElementById('progressFill');
+  const resultsSection = document.getElementById('resultsSection');
+  const resultsHeading = document.getElementById('resultsHeading');
+  const resultsList = document.getElementById('resultsList');
+  const copyAllBtn = document.getElementById('copyAllBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  const SKIP_EXTENSIONS = new Set(['png','jpg','jpeg','gif','webp','bmp','ico','svg','pdf','zip','rar','7z','tar','gz','mp3','mp4','mov','avi','mkv','wav','flac','woff','woff2','ttf','eot','exe','dll','so','dylib','class','pyc','bin','db','sqlite','wasm']);
+  const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB Textdateien-Grenze
+
+  let fileEntries = [];
+  let lastResults = [];
+
+  // Feature-Erkennung
+  const supportsDirectory = 'webkitdirectory' in document.createElement('input');
+  if(!supportsDirectory){
+    unsupportedWarn.style.display = 'block';
+    pickFolderBtn.disabled = true;
+  }
+
+  // --- Theme ---
+  const themeBtns = document.querySelectorAll('.theme-btn');
+  function applyTheme(name){
+    if(name === 'gold'){
+      document.body.removeAttribute('data-theme');
+    } else {
+      document.body.setAttribute('data-theme', name);
+    }
+    themeBtns.forEach(b => b.classList.toggle('active', b.dataset.theme === name));
+    try{ localStorage.setItem('dateisuche_theme', name); }catch(e){}
+  }
+  themeBtns.forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.theme)));
+  try{
+    const saved = localStorage.getItem('dateisuche_theme');
+    if(saved) applyTheme(saved);
+  }catch(e){}
+
+  // --- Vollbild ---
+  fullscreenBtn.addEventListener('click', () => {
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen().catch(()=>{});
+    }
+  });
+
+  // --- Ordnerauswahl ---
+  pickFolderBtn.addEventListener('click', () => folderInput.click());
+
+  folderInput.addEventListener('change', () => {
+    const files = Array.from(folderInput.files || []);
+    fileEntries = files.map(f => ({
+      file: f,
+      path: f.webkitRelativePath || f.name,
+      name: f.name,
+      ext: (f.name.split('.').pop() || '').toLowerCase()
+    }));
+
+    const rootName = fileEntries.length ? fileEntries[0].path.split('/')[0] : '';
+    folderLabel.innerHTML = fileEntries.length
+      ? `<strong>${escapeHtml(rootName)}</strong> &middot; ${fileEntries.length} Dateien gefunden`
+      : 'Keine Dateien im gewählten Ordner.';
+
+    searchInput.disabled = fileEntries.length === 0;
+    searchBtn.disabled = fileEntries.length === 0;
+    resultsSection.style.display = 'none';
+    resultsPanel.style.display = 'none';
+    if(fileEntries.length) searchInput.focus();
+  });
+
+  // --- Suche ---
+  searchBtn.addEventListener('click', runSearch);
+  searchInput.addEventListener('keydown', e => { if(e.key === 'Enter') runSearch(); });
+
+  function parseExtFilter(){
+    const raw = extFilter.value.trim();
+    if(!raw) return null;
+    return raw.split(',')
+      .map(s => s.trim().replace(/^\./,'').toLowerCase())
+      .filter(Boolean);
+  }
+
+  async function runSearch(){
+    const term = searchInput.value;
+    if(!term){ searchInput.focus(); return; }
+
+    const extList = parseExtFilter();
+    const cs = caseSensitive.checked;
+    const needle = cs ? term : term.toLowerCase();
+
+    let candidates = fileEntries.filter(e => !SKIP_EXTENSIONS.has(e.ext));
+    if(extList) candidates = candidates.filter(e => extList.includes(e.ext));
+
+    searchBtn.disabled = true;
+    resultsPanel.style.display = 'block';
+    resultsSection.style.display = 'none';
+    progressFill.style.width = '0%';
+
+    const start = performance.now();
+    const matches = [];
+    let scanned = 0;
+    let skippedLarge = 0;
+
+    for(const entry of candidates){
+      if(entry.file.size > MAX_FILE_SIZE){
+        skippedLarge++;
+      } else {
+        try{
+          const text = await entry.file.text();
+          const hay = cs ? text : text.toLowerCase();
+          if(hay.indexOf(needle) !== -1){
+            matches.push(entry);
+          }
+        }catch(err){ /* nicht lesbare Datei ignorieren */ }
+      }
+      scanned++;
+      if(scanned % 5 === 0 || scanned === candidates.length){
+        const pct = candidates.length ? Math.round((scanned/candidates.length)*100) : 100;
+        progressFill.style.width = pct + '%';
+        statusText.innerHTML = `<strong>${matches.length}</strong> Treffer &middot; ${scanned} / ${candidates.length} Dateien durchsucht`;
+        await new Promise(r => setTimeout(r, 0)); // UI atmen lassen
+      }
+    }
+
+    const elapsed = ((performance.now() - start) / 1000).toFixed(2);
+    timeText.textContent = `${elapsed}s`;
+    statusText.innerHTML = `<strong>${matches.length}</strong> Treffer in ${candidates.length} durchsuchten Dateien` +
+      (skippedLarge ? ` &middot; ${skippedLarge} zu große Dateien übersprungen` : '');
+
+    lastResults = matches;
+    renderResults(matches, term);
+    searchBtn.disabled = false;
+  }
+
+  function renderResults(matches, term){
+    resultsSection.style.display = 'block';
+    resultsHeading.innerHTML = matches.length
+      ? `Treffer für &bdquo;${escapeHtml(term)}&ldquo;`
+      : '';
+    resultsList.innerHTML = '';
+
+    if(matches.length === 0){
+      resultsList.innerHTML = `<div class="empty-state"><strong>Keine Treffer</strong>Kein Text gefunden. Versuch einen anderen Suchbegriff oder Endungsfilter.</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    matches.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'result-row';
+
+      const info = document.createElement('div');
+      info.className = 'result-info';
+      const name = document.createElement('div');
+      name.className = 'result-name';
+      name.textContent = m.name;
+      const path = document.createElement('div');
+      path.className = 'result-path';
+      path.textContent = m.path;
+      info.appendChild(name);
+      info.appendChild(path);
+
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'open-btn';
+      editBtn.textContent = 'In Editor öffnen';
+      editBtn.addEventListener('click', () => openInEditor(m));
+
+      const openBtn = document.createElement('button');
+      openBtn.className = 'open-btn';
+      openBtn.textContent = 'Datei öffnen';
+      openBtn.addEventListener('click', () => openFile(m, openBtn));
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.textContent = 'Pfad kopieren';
+      copyBtn.addEventListener('click', () => copyText(m.path, copyBtn));
+
+      actions.appendChild(editBtn);
+      actions.appendChild(openBtn);
+      actions.appendChild(copyBtn);
+
+      row.appendChild(info);
+      row.appendChild(actions);
+      frag.appendChild(row);
+    });
+    resultsList.appendChild(frag);
+  }
+
+  // --- Editor-Modal ---
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalName = document.getElementById('modalName');
+  const modalPath = document.getElementById('modalPath');
+  const modalEditor = document.getElementById('modalEditor');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const modalFullscreenBtn = document.getElementById('modalFullscreenBtn');
+  const modalBox = document.querySelector('.modal-box');
+  const modalCopyBtn = document.getElementById('modalCopyBtn');
+  const modalSaveBtn = document.getElementById('modalSaveBtn');
+  const modalHint = document.getElementById('modalHint');
+  let modalEntry = null;
+
+  async function openInEditor(entry){
+    modalEntry = entry;
+    modalName.textContent = entry.name;
+    modalPath.textContent = entry.path;
+    modalEditor.value = 'Wird geladen …';
+    modalHint.textContent = 'Änderungen werden nicht automatisch gespeichert.';
+    modalOverlay.classList.add('open');
+    try{
+      const text = await entry.file.text();
+      modalEditor.value = text;
+    }catch(e){
+      modalEditor.value = '';
+      modalHint.textContent = 'Datei konnte nicht als Text gelesen werden.';
+    }
+    modalEditor.focus();
+  }
+
+  function closeEditor(){
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    modalOverlay.classList.remove('open');
+    modalEntry = null;
+  }
+  modalCloseBtn.addEventListener('click', closeEditor);
+  modalFullscreenBtn.addEventListener('click', () => {
+    if(!document.fullscreenElement){
+      modalBox.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen().catch(()=>{});
+    }
+  });
+  modalOverlay.addEventListener('click', e => { if(e.target === modalOverlay) closeEditor(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && modalOverlay.classList.contains('open')) closeEditor(); });
+
+  modalCopyBtn.addEventListener('click', () => copyText(modalEditor.value, modalCopyBtn, 'Inhalt kopieren'));
+
+  modalSaveBtn.addEventListener('click', () => {
+    if(!modalEntry) return;
+    const blob = new Blob([modalEditor.value], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = modalEntry.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    const prev = modalSaveBtn.textContent;
+    modalSaveBtn.textContent = 'Gespeichert ✓';
+    setTimeout(() => { modalSaveBtn.textContent = prev; }, 1200);
+  });
+
+  function openFile(entry, btn){
+    try{
+      const url = URL.createObjectURL(entry.file);
+      const win = window.open(url, '_blank');
+      if(!win){
+        // Popup blockiert: Fallback als Download anbieten
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = entry.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    }catch(e){
+      const prev = btn.textContent;
+      btn.textContent = 'Fehler';
+      setTimeout(() => { btn.textContent = prev; }, 1200);
+    }
+  }
+
+  copyAllBtn.addEventListener('click', () => {
+    const text = lastResults.map(m => `${m.name} — ${m.path}`).join('\n');
+    copyText(text, copyAllBtn, 'Alle Pfade kopieren');
+  });
+
+  function copyText(text, btn, originalLabel){
+    const reset = originalLabel || btn.textContent;
+    const doFeedback = () => {
+      const prev = btn.textContent;
+      btn.textContent = 'Kopiert ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = reset;
+        btn.classList.remove('copied');
+      }, 1200);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(doFeedback).catch(() => fallbackCopy(text, doFeedback));
+    } else {
+      fallbackCopy(text, doFeedback);
+    }
+  }
+
+  function fallbackCopy(text, cb){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    cb();
+  }
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+})();
+</script>
+
+</body>
+</html>
