@@ -22,7 +22,7 @@
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <style>
+<style>
     :root {
         --zami-red: #c0392b;
         --space-blue: #2c3e50;
@@ -32,144 +32,220 @@
         --primary: #2c3e50;
         --accent: #38bdf8;
         --gold: #d4af37;
-        --text: #e2e8f0;
+        --text: #333333;
         --dim: #94a3b8;
         --card-bg: rgba(30, 41, 59, 0.7);
         --bg-dark: #0f172a;
         --glass: rgba(255, 255, 255, 0.9);
     }
+    
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        line-height: 1.8;
-        color: #333;
+        line-height: 1.6;
+        color: var(--text);
+        width: 100%;
         max-width: 1100px;
         margin: 0 auto;
-        padding: 40px;
+        padding: 15px;
         background-color: #f4f4f9;
+        -webkit-text-size-adjust: 100%;
     }
+
     .manifest {
         background: white;
-        padding: 60px;
-        border-radius: 4px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        border-top: 10px solid var(--zami-red);
+        width: 100%;
+        max-width: 100%;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border-top: 8px solid var(--zami-red);
         position: relative;
     }
+
     h1 {
         color: var(--space-blue);
         text-align: center;
-        font-size: 2.8em;
-        margin-bottom: 10px;
+        font-size: 2.4em;
+        margin-bottom: 8px;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
     }
+
     .author-line {
         text-align: center;
         font-style: italic;
         color: #7f8c8d;
-        margin-bottom: 50px;
-        font-size: 1.2em;
+        margin-bottom: 25px;
+        font-size: 1em;
     }
+
     h2 {
         color: var(--zami-red);
         border-bottom: 2px solid #eee;
-        padding-bottom: 10px;
-        margin-top: 50px;
+        padding-bottom: 6px;
+        margin-top: 35px;
+        font-size: 1.6em;
     }
+
+    h3 {
+        font-size: 1.2em;
+        color: var(--space-blue);
+    }
+
+    p, li {
+        font-size: 1rem;
+        word-break: break-word;
+    }
+
     .formula-card {
         background: #fdfcfb;
         border: 1px solid #f1e9da;
-        padding: 30px;
-        margin: 25px 0;
+        padding: 15px;
+        margin: 20px 0;
         text-align: center;
-        border-radius: 12px;
+        border-radius: 8px;
         box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        width: 100%;
+        overflow-x: auto;
     }
+
     .math-display {
-        font-size: 1.4em;
+        font-size: 1.1em;
         color: #000;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 5px 0;
+        max-width: 100%;
     }
+
+    /* Tabellen-Container für horizontales Scrollen auf Smartphones */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        margin: 20px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
     table {
         width: 100%;
+        min-width: 450px;
         border-collapse: collapse;
-        margin: 30px 0;
+        font-size: 0.9rem;
     }
+
     th {
         background-color: var(--space-blue);
         color: white;
-        padding: 15px;
+        padding: 10px;
         text-transform: uppercase;
-        font-size: 0.9em;
+        font-size: 0.8em;
     }
+
     td {
-        padding: 15px;
+        padding: 10px;
         border-bottom: 1px solid #eee;
         text-align: center;
     }
+
     .highlight-box {
         background-color: #fff9e6;
         border-left: 5px solid var(--accent-gold);
-        padding: 20px;
-        margin: 30px 0;
+        padding: 12px 15px;
+        margin: 20px 0;
         font-style: italic;
+        font-size: 0.95rem;
     }
+
     .footer-note {
-        margin-top: 60px;
-        padding-top: 20px;
+        margin-top: 35px;
+        padding-top: 15px;
         border-top: 1px solid #eee;
         text-align: center;
-        font-size: 0.9em;
+        font-size: 0.8em;
         color: #95a5a6;
     }
-          /* Top Controls Bar */
+
+    /* Top Controls Bar */
     .controls-bar {
         position: sticky;
         top: 10px;
         z-index: 1000;
         display: flex;
         gap: 10px;
-    				background: rgba(192, 57, 43, 0.2);
+        background: rgba(192, 57, 43, 0.2);
         border: 1px solid var(--space-blue);
-        padding: 8px 16px;
+        padding: 6px 12px;
         border-radius: 30px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(1px);
-        margin-bottom: 25px;
+        backdrop-filter: blur(4px);
+        margin-bottom: 15px;
         flex-wrap: wrap;
-        justify-content: right;
-     }
-    /*  Interaktive Elemente & Buttons ------------ */
+        justify-content: flex-end;
+    }
+
+    /* Interaktive Elemente & Buttons */
     button, .button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.65rem 1.3rem;
+        padding: 0.4rem 0.8rem;
         border: 1px solid var(--space-blue);
-        border-radius: 12px;
-        background: rgba(53, 208, 197, 0.1);
-        color: var(--accent-light);
+        border-radius: 10px;
+        background: rgba(53, 208, 197, 0.15);
+        color: var(--space-blue);
         font-family: inherit;
-        font-size: 0.95rem;
-        font-weight: 500;
+        font-size: 0.85rem;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
     }
+
     button:hover, .button:hover {
         background: var(--bg-dark);
-        color: var(--accent);
-        box-shadow: 0 0 15px var((--space-blue);
+        color: #fff;
         transform: translateY(-2px);
         text-decoration: none;
     }
-    @media (max-width: 600px) {
-        body, main, .manifest {
-        		/* Auch auf Smartphones spürbarer Abstand zum Rand */
-       			padding 1px !important;
-        	  margin 1px !important; 
-    		}
+
+    /* Flex-Container für Zitat-Boxen responsiv machen */
+    .quote-flex {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-style: italic;
+        margin-top: 15px;
+        flex-wrap: wrap;
     }
-}
+    
+    .quote-flex > div {
+        flex: 1;
+        min-width: 220px;
+        font-size: 0.95rem;
+    }
+
+    /* Zusätzliche Optimierungen für sehr kleine Bildschirme */
+    @media (max-width: 600px) {
+        body {
+            padding: 5px;
+        }
+        .manifest {
+            padding: 12px;
+        }
+        h1 {
+            font-size: 1.4em;
+        }
+        h2 {
+            font-size: 1.15em;
+        }
+    }
   </style>
+  
 </head>
 <body>
   <div class="controls-bar">
@@ -181,7 +257,7 @@
     <div class="author-line">Initiiert von Jup & Zaminia | Wissenschaftliches Protokoll 2026</div>
 
     <section id="wrzt-wrznt-ausfuehrlich">
-      <div style="font-family: 'Georgia', serif; max-width: 900px; margin: auto; line-height: 1.8; color: #2c3e50; background: #ffffff; padding: 40px; border: 1px solid #e0e0e0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+      <div style="font-family: 'Georgia', serif; width: 95%; border-radius: 12px; margin: auto; line-height: 1.8; color: #2c3e50; background: #ffffff; padding: 40px; border: 1px solid #e0e0e0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
 
         <h1 style="text-align: center; color: #c0392b; border-bottom: 3px double #c0392b; padding-bottom: 15px; margin-bottom: 40px;">Das Einheitsmodell der Wellenraumzeit</h1>
 
