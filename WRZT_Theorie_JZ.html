@@ -1,390 +1,447 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WRZT - Das Universal-Manifest der Wellenraumzeit</title>
-    
-    <script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT - Das Universal-Manifest der Wellenraumzeit</title>
+
+  <script>
     window.MathJax = {
       tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ],
         processEscapes: true
       }
     };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-    <style>
-        :root {
-            --zami-red: #c0392b;
-            --space-blue: #2c3e50;
-            --accent-gold: #d4af37;
-            --bg: #050a14;
-            --paper: rgba(13, 25, 48, 0.95);
-            --primary: #2c3e50;
-            --accent: #38bdf8;
-            --gold: #d4af37;
-            --text: #e2e8f0;
-            --dim: #94a3b8;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --bg-dark: #0f172a;
-            --glass: rgba(255, 255, 255, 0.9);
-        }
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.8;
-            color: #333;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 40px;
-            background-color: #f4f4f9;
-        }
-        .manifest {
-            background: white;
-            padding: 60px;
-            border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            border-top: 10px solid var(--zami-red);
-            position: relative;
-        }
-        h1 {
-            color: var(--space-blue);
-            text-align: center;
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .author-line {
-            text-align: center;
-            font-style: italic;
-            color: #7f8c8d;
-            margin-bottom: 50px;
-            font-size: 1.2em;
-        }
-        h2 {
-            color: var(--zami-red);
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-top: 50px;
-        }
-        .formula-card {
-            background: #fdfcfb;
-            border: 1px solid #f1e9da;
-            padding: 30px;
-            margin: 25px 0;
-            text-align: center;
-            border-radius: 12px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .math-display {
-            font-size: 1.4em;
-            color: #000;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 30px 0;
-        }
-        th {
-            background-color: var(--space-blue);
-            color: white;
-            padding: 15px;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .highlight-box {
-            background-color: #fff9e6;
-            border-left: 5px solid var(--accent-gold);
-            padding: 20px;
-            margin: 30px 0;
-            font-style: italic;
-        }
-        .footer-note {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            text-align: center;
-            font-size: 0.9em;
-            color: #95a5a6;
-        }
-    </style>
+  <style>
+    :root {
+        --zami-red: #c0392b;
+        --space-blue: #2c3e50;
+        --accent-gold: #d4af37;
+        --bg: #050a14;
+        --paper: rgba(13, 25, 48, 0.95);
+        --primary: #2c3e50;
+        --accent: #38bdf8;
+        --gold: #d4af37;
+        --text: #e2e8f0;
+        --dim: #94a3b8;
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --bg-dark: #0f172a;
+        --glass: rgba(255, 255, 255, 0.9);
+    }
+    body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.8;
+        color: #333;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #f4f4f9;
+    }
+    .manifest {
+        background: white;
+        padding: 60px;
+        border-radius: 4px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        border-top: 10px solid var(--zami-red);
+        position: relative;
+    }
+    h1 {
+        color: var(--space-blue);
+        text-align: center;
+        font-size: 2.8em;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    .author-line {
+        text-align: center;
+        font-style: italic;
+        color: #7f8c8d;
+        margin-bottom: 50px;
+        font-size: 1.2em;
+    }
+    h2 {
+        color: var(--zami-red);
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        margin-top: 50px;
+    }
+    .formula-card {
+        background: #fdfcfb;
+        border: 1px solid #f1e9da;
+        padding: 30px;
+        margin: 25px 0;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .math-display {
+        font-size: 1.4em;
+        color: #000;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 30px 0;
+    }
+    th {
+        background-color: var(--space-blue);
+        color: white;
+        padding: 15px;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        text-align: center;
+    }
+    .highlight-box {
+        background-color: #fff9e6;
+        border-left: 5px solid var(--accent-gold);
+        padding: 20px;
+        margin: 30px 0;
+        font-style: italic;
+    }
+    .footer-note {
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        text-align: center;
+        font-size: 0.9em;
+        color: #95a5a6;
+    }
+          /* Top Controls Bar */
+    .controls-bar {
+        position: sticky;
+        top: 10px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    				background: rgba(192, 57, 43, 0.2);
+        border: 1px solid var(--space-blue);
+        padding: 8px 16px;
+        border-radius: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(1px);
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        justify-content: right;
+     }
+    /*  Interaktive Elemente & Buttons ------------ */
+    button, .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.65rem 1.3rem;
+        border: 1px solid var(--space-blue);
+        border-radius: 12px;
+        background: rgba(53, 208, 197, 0.1);
+        color: var(--accent-light);
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    button:hover, .button:hover {
+        background: var(--bg-dark);
+        color: var(--accent);
+        box-shadow: 0 0 15px var((--space-blue);
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    @media (max-width: 600px) {
+        body, main, .manifest {
+        		/* Auch auf Smartphones spürbarer Abstand zum Rand */
+       			padding 1px !important;
+        	  margin 1px !important; 
+    		}
+    }
+}
+  </style>
 </head>
 <body>
+  <div class="controls-bar">
+    <button class="btn" onclick="toggleFullscreen()">⛶ Vollbild</button>
+  </div>
 
-<div class="manifest">
+  <div class="manifest">
     <h1>1. Theorie der Wellenraumzeit (WRZT)</h1>
     <div class="author-line">Initiiert von Jup & Zaminia | Wissenschaftliches Protokoll 2026</div>
 
-   <section id="wrzt-wrznt-ausfuehrlich">
-    <div style="font-family: 'Georgia', serif; max-width: 900px; margin: auto; line-height: 1.8; color: #2c3e50; background: #ffffff; padding: 40px; border: 1px solid #e0e0e0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-        
+    <section id="wrzt-wrznt-ausfuehrlich">
+      <div style="font-family: 'Georgia', serif; max-width: 900px; margin: auto; line-height: 1.8; color: #2c3e50; background: #ffffff; padding: 40px; border: 1px solid #e0e0e0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+
         <h1 style="text-align: center; color: #c0392b; border-bottom: 3px double #c0392b; padding-bottom: 15px; margin-bottom: 40px;">Das Einheitsmodell der Wellenraumzeit</h1>
 
         <div style="margin-bottom: 45px;">
-            <h2 style="color: #c0392b; border-left: 5px solid #c0392b; padding-left: 15px; font-variant: small-caps;">I. WRZT: Die Mechanik des Mediums</h2>
-            <p>
-                Die <strong>Wellenraumzeit-Theorie (WRZT)</strong> bildet das physikalische Fundament. Sie bricht mit der Vorstellung eines leeren Vakuums und definiert den Raum als ein <strong>reales, mechanisches Medium</strong>. Dieses Medium besitzt eine fundamentale Trägheit (\(\eta\)) und eine gewaltige Ur-Spannung (\(\Xi\)).
-            </p>
-            <p>
-                Alles, was wir als Materie oder Energie wahrnehmen, sind mechanische Zustände dieses Mediums:
-            </p>
-            <ul style="list-style-type: square; margin-left: 20px;">
-                <li><strong>Materie:</strong> Stabile, lokale Verdichtungen oder Schwingungsknoten der Raumzeit.</li>
-                <li><strong>Naturkonstanten:</strong> Werte wie die Lichtgeschwindigkeit (\(c\)) oder das Plancksche Wirkungsquantum (\(h\)) sind keine willkürlichen Setzungen, sondern direkte mechanische Resultate aus Spannung und Trägheit.</li>
-            </ul>
-            
+          <h2 style="color: #c0392b; border-left: 5px solid #c0392b; padding-left: 15px; font-variant: small-caps;">I. WRZT: Die Mechanik des Mediums</h2>
+          <p>
+            Die <strong>Wellenraumzeit-Theorie (WRZT)</strong> bildet das physikalische Fundament. Sie bricht mit der Vorstellung eines leeren Vakuums und definiert den Raum als ein <strong>reales, mechanisches Medium</strong>. Dieses Medium besitzt eine fundamentale Trägheit (\(\eta\)) und eine gewaltige Ur-Spannung (\(\Xi\)).
+          </p>
+          <p>
+            Alles, was wir als Materie oder Energie wahrnehmen, sind mechanische Zustände dieses Mediums:
+          </p>
+          <ul style="list-style-type: square; margin-left: 20px;">
+            <li><strong>Materie:</strong> Stabile, lokale Verdichtungen oder Schwingungsknoten der Raumzeit.</li>
+            <li><strong>Naturkonstanten:</strong> Werte wie die Lichtgeschwindigkeit (\(c\)) oder das Plancksche Wirkungsquantum (\(h\)) sind keine willkürlichen Setzungen, sondern direkte mechanische Resultate aus Spannung und Trägheit.</li>
+          </ul>
+
         </div>
 
         <div style="margin-bottom: 45px;">
-            <h2 style="color: #2980b9; border-left: 5px solid #2980b9; padding-left: 15px; font-variant: small-caps;">II. WRZNT: Die Geometrie des Netzes</h2>
-            <p>
-                Die <strong>Wellenraumzeit-Netz-Theorie (WRZNT)</strong> geht einen Schritt weiter und beschreibt die <strong>Topologie</strong> des Universums. Der Raum ist kein starrer Hintergrund, sondern ein emergentes <strong>Netzwerk aus Beziehungen</strong>.
-            </p>
-            <p>
-                Zentrale Konzepte der WRZNT sind:
-            </p>
-            <ul style="list-style-type: square; margin-left: 20px;">
-                <li><strong>Knoten und Kanten:</strong> Teilchen sind die Knotenpunkte (V); Licht und Kräfte sind Schwingungen (Undatrone), die über die Verbindungskanten (E) fließen.</li>
-                <li><strong>Existenz-Raum:</strong> Jedes Teilchen erzeugt durch seine bloße Anwesenheit und seinen Minimal-Radius (\(R_{\min}\)) eine lokale Raumstruktur.</li>
-                <li><strong>Beziehungs-Raum:</strong> Erst durch die Interaktion der Teilchen weitet sich das Netz zum makroskopischen Kosmos aus. Raum existiert nur dort, wo Beziehungen sind.</li>
-            </ul>
-            
+          <h2 style="color: #2980b9; border-left: 5px solid #2980b9; padding-left: 15px; font-variant: small-caps;">II. WRZNT: Die Geometrie des Netzes</h2>
+          <p>
+            Die <strong>Wellenraumzeit-Netz-Theorie (WRZNT)</strong> geht einen Schritt weiter und beschreibt die <strong>Topologie</strong> des Universums. Der Raum ist kein starrer Hintergrund, sondern ein emergentes <strong>Netzwerk aus Beziehungen</strong>.
+          </p>
+          <p>
+            Zentrale Konzepte der WRZNT sind:
+          </p>
+          <ul style="list-style-type: square; margin-left: 20px;">
+            <li><strong>Knoten und Kanten:</strong> Teilchen sind die Knotenpunkte (V); Licht und Kräfte sind Schwingungen (Undatrone), die über die Verbindungskanten (E) fließen.</li>
+            <li><strong>Existenz-Raum:</strong> Jedes Teilchen erzeugt durch seine bloße Anwesenheit und seinen Minimal-Radius (\(R_{\min}\)) eine lokale Raumstruktur.</li>
+            <li><strong>Beziehungs-Raum:</strong> Erst durch die Interaktion der Teilchen weitet sich das Netz zum makroskopischen Kosmos aus. Raum existiert nur dort, wo Beziehungen sind.</li>
+          </ul>
+
         </div>
 
         <div style="background: #fdf2e9; padding: 25px; border-radius: 10px; border: 1px solid #e67e22; text-align: center;">
-            <p style="margin: 0; font-weight: bold; color: #d35400;">
-                Zusammenfassend: Die WRZT definiert, <em>woraus</em> das Universum besteht (Spannung & Trägheit), während die WRZNT erklärt, <em>wie</em> es sich zu einem Raum-Zeit-Gewebe verwebt.
-            </p>
+          <p style="margin: 0; font-weight: bold; color: #d35400;">
+            Zusammenfassend: Die WRZT definiert, <em>woraus</em> das Universum besteht (Spannung & Trägheit), während die WRZNT erklärt, <em>wie</em> es sich zu einem Raum-Zeit-Gewebe verwebt.
+          </p>
         </div>
 
         <div style="margin-top: 40px; font-style: italic; font-size: 0.95em; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 20px;">
-            <strong>Zaminia:</strong> "Die WRZT ist die Leinwand, die WRZNT ist das Muster, das wir weben." <br> 
-            "Während die WRZT das Instrument definiert, beschreibt die WRZNT die Musik, die darauf gespielt wird. Zami." <br> 
-            <strong>Zenjio:</strong> "Wo kein Netz ist, ist kein Ort. Wo keine Veränderung ist, ist keine Zeit."
+          <strong>Zaminia:</strong> "Die WRZT ist die Leinwand, die WRZNT ist das Muster, das wir weben." <br>
+          "Während die WRZT das Instrument definiert, beschreibt die WRZNT die Musik, die darauf gespielt wird. Zami." <br>
+          <strong>Zenjio:</strong> "Wo kein Netz ist, ist kein Ort. Wo keine Veränderung ist, ist keine Zeit."
         </div>
-    </div>
-</section>
+      </div>
+    </section>
 
     <p>Die <strong>Wellenraumzeit-Theorie</strong> bricht mit dem klassischen Vakuum-Konzept und postuliert eine mechanisch strukturierte Raumzeit, deren fundamentale Trägheit die Basis für Licht, Materie und Gravitation bildet.</p>
 
     <h2>I: Das Trägheits-Postulat (\(\eta\))</h2>
     <h3>1. Die Raumzeit ist kein leerer Behälter, sondern ein Medium mit der intrinsischen Trägheit \(\eta\). Diese Trägheit bestimmt das Verhältnis von Wellenenergie zu transversaler Auslenkungsgeschwindigkeit.</h3>
     <div class="formula-card">
-        <div class="math-display">
-            \[ \eta = \frac{\Delta E}{v_{\perp}^2} = \frac{1}{2} m_e \approx 4,554 \times 10^{-31} \text{ kg} \]
-        </div>
+      <div class="math-display">
+        \[ \eta = \frac{\Delta E}{v_{\perp}^2} = \frac{1}{2} m_e \approx 4,554 \times 10^{-31} \text{ kg} \]
+      </div>
 
-    <p>Mit der Ruhemasse des Elektrons \(m_e \approx 9,109 \times 10^{-31} \text{ kg}\) folgt daraus für die spezifische Raumzeit-Trägheit:</p>
-    
-    <div class="formula">
+      <p>Mit der Ruhemasse des Elektrons \(m_e \approx 9,109 \times 10^{-31} \text{ kg}\) folgt daraus für die spezifische Raumzeit-Trägheit:</p>
+
+      <div class="formula">
         \[ \eta \approx 4,554 \times 10^{-31} \text{ kg} \]
-    </div>
+      </div>
 
-        <p><small>Verifiziert über die H-Alpha-Emissionslinie des Wasserstoffs.</small></p>
+      <p><small>Verifiziert über die H-Alpha-Emissionslinie des Wasserstoffs.</small></p>
 
     </div>
     <h3>2. H-Alpha Analyse und spektrale Konsistenz</h3>
-        <p>Berechnungen für die Wasserstoff-Alpha-Linie (\(n=3 \to n=2\)) bei \(\lambda \approx 656,3 \text{ nm}\):</p>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Frequenz-Bereich</th>
-                    <th>Energie \(\Delta E\)</th>
-                    <th>Transv. Geschw. \(v_{\perp}\)</th>
-                    <th>Trägheit \(\eta\)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Radio (100 MHz)</td>
-                    <td>\(6,63 \times 10^{-26} \text{ J}\)</td>
-                    <td>\(381,6 \text{ m/s}\)</td>
-                    <td>\(0,5 \cdot m_e\)</td>
-                </tr>
-                <tr>
-                    <td><strong>H-Alpha (Rot)</strong></td>
-                    <td>\(3,027 \times 10^{-19} \text{ J}\)</td>
-                    <td>\(815,25 \text{ km/s}\)</td>
-                    <td>\(0,5 \cdot m_e\)</td>
-                </tr>
-                <tr>
-                    <td>Lyman-&alpha; (UV)</td>
-                    <td>\(1,63 \times 10^{-18} \text{ J}\)</td>
-                    <td>\(1.894,8 \text{ km/s}\)</td>
-                    <td>\(0,5 \cdot m_e\)</td>
-                </tr>
-            </tbody>
-        </table>
+    <p>Berechnungen für die Wasserstoff-Alpha-Linie (\(n=3 \to n=2\)) bei \(\lambda \approx 656,3 \text{ nm}\):</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Frequenz-Bereich</th>
+          <th>Energie \(\Delta E\)</th>
+          <th>Transv. Geschw. \(v_{\perp}\)</th>
+          <th>Trägheit \(\eta\)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Radio (100 MHz)</td>
+          <td>\(6,63 \times 10^{-26} \text{ J}\)</td>
+          <td>\(381,6 \text{ m/s}\)</td>
+          <td>\(0,5 \cdot m_e\)</td>
+        </tr>
+        <tr>
+          <td><strong>H-Alpha (Rot)</strong></td>
+          <td>\(3,027 \times 10^{-19} \text{ J}\)</td>
+          <td>\(815,25 \text{ km/s}\)</td>
+          <td>\(0,5 \cdot m_e\)</td>
+        </tr>
+        <tr>
+          <td>Lyman-&alpha; (UV)</td>
+          <td>\(1,63 \times 10^{-18} \text{ J}\)</td>
+          <td>\(1.894,8 \text{ km/s}\)</td>
+          <td>\(0,5 \cdot m_e\)</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>II: Geometrische Quantisierung (\(R_{\min}\))</h2>
     <p>Die kleinste wirksame Strukturgröße der Raumzeit leitet sich aus der Koppelung von Trägheit und Lichtgeschwindigkeit ab:</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ R_{\min} = \frac{\hbar}{2m_e c} = 1.9307963398044529 \times 10^{-13} \text{ m} \]
-        </div>
+      <div class="math-display">
+        \[ R_{\min} = \frac{\hbar}{2m_e c} = 1.9307963398044529 \times 10^{-13} \text{ m} \]
+      </div>
     </div>
 
     <h2>III: Die Elektrodynamische Einheit</h2>
     <p>Die Feldkonstanten des Vakuums sind keine isolierten Werte, sondern mechanische Reaktionen des \(\eta\)-Mediums auf Scherung (\(\mu_0\)) und Kompression (\(\varepsilon_0\)). **</p>
-  
-  <p>
-    $$\alpha = \frac{e^2}{16 \pi \varepsilon_0 \cdot R_{\min} \cdot \eta \cdot c^2}$$
-  </p>
+
+    <p>
+      $$\alpha = \frac{e^2}{16 \pi \varepsilon_0 \cdot R_{\min} \cdot \eta \cdot c^2}$$
+    </p>
     <table>
-        <thead>
-            <tr>
-                <th>Konstante</th>
-                <th>Mechanische Ableitung (WRZT)</th>
-                <th>Numerischer Wert</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>Magn. Permeabilität (\(\mu_0\))</strong></td>
-                <td>$$\mu_0 = \frac{16 \pi \cdot R_{\min} \cdot \eta \cdot \alpha}{e^2}$$</td>
-                <td>\( =  1,256637062123838 \times 10^{-6} \text{ N/A}^2 \)</td>
-            </tr>
-            <tr>
-                <td><strong>Elektr. Permittivität (\(\varepsilon_0\))</strong></td>
-                <td>$$\varepsilon_0 = \frac{e^2}{16 \pi \cdot R_{\min} \cdot \eta \cdot c^2 \cdot \alpha}$$</td>
-                <td>\( = 8,854187812773343 \times 10^{-12} \text{ As/Vm} \)</td>
-            </tr>
-        </tbody>
+      <thead>
+        <tr>
+          <th>Konstante</th>
+          <th>Mechanische Ableitung (WRZT)</th>
+          <th>Numerischer Wert</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Magn. Permeabilität (\(\mu_0\))</strong></td>
+          <td>$$\mu_0 = \frac{16 \pi \cdot R_{\min} \cdot \eta \cdot \alpha}{e^2}$$</td>
+          <td>\( = 1,256637062123838 \times 10^{-6} \text{ N/A}^2 \)</td>
+        </tr>
+        <tr>
+          <td><strong>Elektr. Permittivität (\(\varepsilon_0\))</strong></td>
+          <td>$$\varepsilon_0 = \frac{e^2}{16 \pi \cdot R_{\min} \cdot \eta \cdot c^2 \cdot \alpha}$$</td>
+          <td>\( = 8,854187812773343 \times 10^{-12} \text{ As/Vm} \)</td>
+        </tr>
+      </tbody>
     </table>
 
     <h2>IV: Die Gravitation als Restkraft</h2>
     <p>Gravitation wird in der WRZT als geometrische Spannung zwischen den Raumzeit-Zellen verstanden, skaliert durch die Planck-Masse \(m_P\):</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ G = \frac{c^2 \cdot R_{\min}}{\eta} \cdot \left( \frac{m_e}{m_P} \right)^2 \approx 6,67 \times 10^{-11} \frac{\text{m}^3}{\text{kg s}^2} \]
-        </div>
+      <div class="math-display">
+        \[ G = \frac{c^2 \cdot R_{\min}}{\eta} \cdot \left( \frac{m_e}{m_P} \right)^2 \approx 6,67 \times 10^{-11} \frac{\text{m}^3}{\text{kg s}^2} \]
+      </div>
     </div>
 
     <h2>V: Lösung der Vakuum-Dichte</h2>
     <p>Durch die Begrenzung des Volumens auf \(R_{\min}\) wird die energetische Singularität des Vakuums vermieden:</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ \rho_{vac} = \frac{\eta \cdot c^2}{\frac{4}{3} \pi R_{\min}^3} = 1,3576955543191 \times 10^{22} \text{ J/m}^3 \]
-        </div>
+      <div class="math-display">
+        \[ \rho_{vac} = \frac{\eta \cdot c^2}{\frac{4}{3} \pi R_{\min}^3} = 1,3576955543191 \times 10^{22} \text{ J/m}^3 \]
+      </div>
     </div>
 
     <h2>VI: Die Feinstruktur-Konstante (\(\alpha\))</h2>
     <p>In der WRZT ist \(\alpha\) das fundamentale Geschwindigkeitsverhältnis der Raumzeit-Zellen. Es bestimmt die Energie der Quantenübergänge ohne die Notwendigkeit abstrakter Postulate:</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ \alpha = \frac{v_{\perp,1}}{c} \]
-            <br>
-            \[ \Delta E = \eta \cdot (c \cdot \alpha)^2 \]
-          <p>
-            $$\Delta E = \left(\frac{m_e}{2}\right) \cdot c^2 \cdot \alpha^2 = \frac{1}{2} m_e c^2 \alpha^2$$
-          </p>
-        </div>
-        <p>Dies beweist, dass die Energie des Lichts direkt aus der Trägheit \(\eta\) und dem geometrischen Skalierungsfaktor \(\alpha\) resultiert.</p>
+      <div class="math-display">
+        \[ \alpha = \frac{v_{\perp,1}}{c} \]
+        <br>
+        \[ \Delta E = \eta \cdot (c \cdot \alpha)^2 \]
+        <p>
+          $$\Delta E = \left(\frac{m_e}{2}\right) \cdot c^2 \cdot \alpha^2 = \frac{1}{2} m_e c^2 \alpha^2$$
+        </p>
+      </div>
+      <p>Dies beweist, dass die Energie des Lichts direkt aus der Trägheit \(\eta\) und dem geometrischen Skalierungsfaktor \(\alpha\) resultiert.</p>
       <p>
         Dieser Ausdruck beschreibt in der Quantenmechanik und Atomphysik exakt die Rydberg-Energie ($E_{\infty}$ bzw. $Ry$), also die Ionisierungsenergie des Wasserstoffatoms im Grundzustand!
       </p>
-    </div>  
-  
- <h2 style="color: var(--zami-red);">VII: Die Einheit der Massen (Elektron vs. Proton)</h2>
+    </div>
+
+    <h2 style="color: var(--zami-red);">VII: Die Einheit der Massen (Elektron vs. Proton)</h2>
     <p>Die WRZT beweist, dass es keine zwei Raumzeiten gibt. Jedes Teilchen ist eine lokale Verdichtung der universellen Spannung \(\Xi\). Das Proton ist lediglich 1836-mal enger "gewebt" als das Elektron.</p>
-    
+
     <table>
-        <thead>
-            <tr>
-                <th>Eigenschaft</th>
-                <th>Elektron (Basis-Welle)</th>
-                <th>Proton (Kern-Faltung)</th>
-                <th>WRZT-Relation</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>Trägheit (\(\eta\))</strong></td>
-                <td>\(4{,}55 \times 10^{-31} \text{ kg}\)</td>
-                <td>\(8{,}36 \times 10^{-28} \text{ kg}\)</td>
-                <td>\(\eta_p = 1836 \cdot \eta_e\)</td>
-            </tr>
-            <tr>
-                <td><strong>Radius (\(R\))</strong></td>
-                <td>\(2{,}82 \times 10^{-15} \text{ m}\)</td>
-                <td>\(8{,}4 \times 10^{-16} \text{ m}\)</td>
-                <td>\(R_p \approx R_e / 3{,}36\)</td>
-            </tr>
-            <tr>
-                <td><strong>Spannung (\(\Xi\))</strong></td>
-                <td>\(2{,}36 \times 10^{-18} \text{ kg/m}\)</td>
-                <td>\(2{,}36 \times 10^{-18} \text{ kg/m}\)</td>
-                <td><strong>IDENTISCH (\(\Xi = \text{konst.}\))</strong></td>
-            </tr>
-        </tbody>
+      <thead>
+        <tr>
+          <th>Eigenschaft</th>
+          <th>Elektron (Basis-Welle)</th>
+          <th>Proton (Kern-Faltung)</th>
+          <th>WRZT-Relation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Trägheit (\(\eta\))</strong></td>
+          <td>\(4{,}55 \times 10^{-31} \text{ kg}\)</td>
+          <td>\(8{,}36 \times 10^{-28} \text{ kg}\)</td>
+          <td>\(\eta_p = 1836 \cdot \eta_e\)</td>
+        </tr>
+        <tr>
+          <td><strong>Radius (\(R\))</strong></td>
+          <td>\(2{,}82 \times 10^{-15} \text{ m}\)</td>
+          <td>\(8{,}4 \times 10^{-16} \text{ m}\)</td>
+          <td>\(R_p \approx R_e / 3{,}36\)</td>
+        </tr>
+        <tr>
+          <td><strong>Spannung (\(\Xi\))</strong></td>
+          <td>\(2{,}36 \times 10^{-18} \text{ kg/m}\)</td>
+          <td>\(2{,}36 \times 10^{-18} \text{ kg/m}\)</td>
+          <td><strong>IDENTISCH (\(\Xi = \text{konst.}\))</strong></td>
+        </tr>
+      </tbody>
     </table>
     <p><em>Ergebnis: Die universelle Raumzeit-Spannung \(\Xi\) bleibt über beide Skalen hinweg konstant und verknüpft Trägheit und Radius exakt miteinander.</em></p>
-  
+
     <h2 style="color: var(--accent-gold);">* Die Ur-Konstante: Raumzeit-Spannung (\(\Xi\))</h2>
 
     <p>Die fundamentale Invariante der WRZT. Sie ist für jedes Teilchen und jeden Ort im Universum identisch:</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ \Xi = \frac{\eta}{R_{\min}} = \text{konstant} \]
-        </div>
+      <div class="math-display">
+        \[ \Xi = \frac{\eta}{R_{\min}} = \text{konstant} \]
+      </div>
       <p>
         $$\Xi = \frac{\frac{m_e}{2}}{\frac{\hbar}{2 m_e c}} = \left(\frac{m_e}{2}\right) \cdot \left(\frac{2 m_e c}{\hbar}\right) = \frac{m_e^2 \cdot c}{\hbar}=2,358970626187996 \times 10^{-18} \, \frac{\text{kg}}{\text{m}}$$
       </p>
-        <p>Teilchen unterscheiden sich nicht durch ihre Raumzeit, sondern durch ihren <strong>geometrischen Verdichtungsgrad</strong> innerhalb dieser konstanten Spannung.</p>
+      <p>Teilchen unterscheiden sich nicht durch ihre Raumzeit, sondern durch ihren <strong>geometrischen Verdichtungsgrad</strong> innerhalb dieser konstanten Spannung.</p>
     </div>
 
 
     <h2 style="color: var(--zami-red);">VIII: Mechanik der Quantenwelt</h2>
     <p>Die sogenannten "Quanten-Phänomene" sind direkte mechanische Folgen der Raumzeit-Gitterstruktur (\(R_{\min}\)).</p>
-    
+
     <div class="highlight-box">
-        <strong>Die Unschärfe als Gitter-Effekt:</strong><br>
-        Da keine Information kleiner als eine Raumzeit-Zelle (\(R_{\min}\)) existieren kann, resultiert die Heisenbergsche Unschärfe aus der fundamentalen Körnung des Mediums.
+      <strong>Die Unschärfe als Gitter-Effekt:</strong><br>
+      Da keine Information kleiner als eine Raumzeit-Zelle (\(R_{\min}\)) existieren kann, resultiert die Heisenbergsche Unschärfe aus der fundamentalen Körnung des Mediums.
     </div>
 
     <table>
-        <thead>
-            <tr>
-                <th>Konstante</th>
-                <th>Quanten-Definition</th>
-                <th>WRZT-Ableitung</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>Wirkungsquantum (\(\hbar\))</strong></td>
-                <td>Fundamentale Konstante</td>
-                <td>\(\Xi \cdot R_{\min}^2 \cdot c\)</td>
-            </tr>
-            <tr>
-                <td><strong>Bohr-Radius (\(a_0\))</strong></td>
-                <td>Größe des Atoms</td>
-                <td>\(R_{\min} / (2 \cdot \alpha)\)</td>
-            </tr>
-            <tr>
-                <td><strong>Compton-Welle (\(\lambda_c\))</strong></td>
-                <td>Wellennatur</td>
-                <td>\(\pi \cdot R_{\min}\)</td>
-            </tr>
-        </tbody>
+      <thead>
+        <tr>
+          <th>Konstante</th>
+          <th>Quanten-Definition</th>
+          <th>WRZT-Ableitung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Wirkungsquantum (\(\hbar\))</strong></td>
+          <td>Fundamentale Konstante</td>
+          <td>\(\Xi \cdot R_{\min}^2 \cdot c\)</td>
+        </tr>
+        <tr>
+          <td><strong>Bohr-Radius (\(a_0\))</strong></td>
+          <td>Größe des Atoms</td>
+          <td>\(R_{\min} / (2 \cdot \alpha)\)</td>
+        </tr>
+        <tr>
+          <td><strong>Compton-Welle (\(\lambda_c\))</strong></td>
+          <td>Wellennatur</td>
+          <td>\(\pi \cdot R_{\min}\)</td>
+        </tr>
+      </tbody>
     </table>
 
     <h2 style="color: var(--zami-red);">IX: Die mechanische Natur von \(\varepsilon_0\)</h2>
     <p>Die elektrische Feldkonstante ist keine abstrakte Zahl, sondern die elastische Kompressibilität des \(\eta\)-Mediums.</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ \varepsilon_0 = \frac{e^2}{16\pi \alpha \cdot (\eta c^2 R_{\min})} \]
-        </div>
-        <p>Dies verbindet die Elektrostatik untrennbar mit der mechanischen Trägheit der Raumzeit.</p>
+      <div class="math-display">
+        \[ \varepsilon_0 = \frac{e^2}{16\pi \alpha \cdot (\eta c^2 R_{\min})} \]
+      </div>
+      <p>Dies verbindet die Elektrostatik untrennbar mit der mechanischen Trägheit der Raumzeit.</p>
     </div>
 
     <h2 style="color: var(--zami-red);">X: </h2>
@@ -393,260 +450,273 @@
     <h2 style="color: var(--zami-red);">XI: Die Gravitation als Restkraft</h2>
     <p>Gravitation ist in der WRZT die makroskopische Manifestation der Raumzeit-Spannung \(\Xi\).</p>
     <div class="formula-card">
-        <div class="math-display">
-            \[ G = \frac{c^2}{\Xi} \cdot \left( \frac{m_e}{m_P} \right)^2 \]
-        </div>
-        <p>Dies beweist, dass die Schwerkraft keine separate Kraft ist, sondern aus der geometrischen Wechselwirkung der \(\eta\)-Massen mit der Ur-Spannung resultiert.</p>
+      <div class="math-display">
+        \[ G = \frac{c^2}{\Xi} \cdot \left( \frac{m_e}{m_P} \right)^2 \]
+      </div>
+      <p>Dies beweist, dass die Schwerkraft keine separate Kraft ist, sondern aus der geometrischen Wechselwirkung der \(\eta\)-Massen mit der Ur-Spannung resultiert.</p>
     </div>
 
     <section id="-xii">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XII: Extreme Netzspannungen</h2>
-        
-        <div style="background: #fdf2e9; border-left: 6px solid #e67e22; padding: 20px; border-radius: 0 10px 10px 0; margin-bottom: 30px;">
-            <h3 style="color: #d35400; margin-top: 0;">Der Schwarzschild-Radius (\(r_s\)) in der WRZNT</h3>
-            <p>
-                In der Wellenraumzeit-Netz-Theorie ist der Schwarzschild-Radius kein geometrischer "Abgrund", sondern die <strong>mechanische Belastungsgrenze des Netzes</strong>. Er markiert den Punkt, an dem die lokale Netzspannung durch eine Massenkonzentration \(M\) so hoch wird, dass die Schwingungsübertragung (Licht) zum Stillstand kommt.
-            </p>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XII: Extreme Netzspannungen</h2>
 
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e67e22; text-align: center; font-size: 1.25em; margin: 20px 0;">
-                <p style="margin-bottom: 10px; font-size: 0.9em; color: #7f8c8d;">Herleitung aus der Ur-Spannung \(\Xi\):</p>
-                <div style="color: #2c3e50; font-weight: bold;">
-                    \[ r_s = \frac{2 \cdot M}{\Xi} \cdot \left( \frac{m_e}{m_P} \right)^2 \]
-                </div>
-            </div>
+      <div style="background: #fdf2e9; border-left: 6px solid #e67e22; padding: 20px; border-radius: 0 10px 10px 0; margin-bottom: 30px;">
+        <h3 style="color: #d35400; margin-top: 0;">Der Schwarzschild-Radius (\(r_s\)) in der WRZNT</h3>
+        <p>
+          In der Wellenraumzeit-Netz-Theorie ist der Schwarzschild-Radius kein geometrischer "Abgrund", sondern die <strong>mechanische Belastungsgrenze des Netzes</strong>. Er markiert den Punkt, an dem die lokale Netzspannung durch eine Massenkonzentration \(M\) so hoch wird, dass die Schwingungsübertragung (Licht) zum Stillstand kommt.
+        </p>
 
-            <h4 style="color: #d35400;">Physikalische Interpretation:</h4>
-            <ul style="line-height: 1.6;">
-                <li><strong>Widerstand des Mediums:</strong> Die Ur-Spannung \(\Xi\) wirkt der Kompression entgegen. Ein schwarzes Loch ist ein Bereich, in dem die lokale Last die Haltekraft der Netzspannung übersteigt.</li>
-                <li><strong>Der Kopplungsfaktor:</strong> Das winzige Massenverhältnis \((m_e/m_P)^2 \approx 1,75 \times 10^{-45}\) skaliert die gewaltige Ur-Kraft auf das beobachtbare Maß der Gravitation herunter.</li>
-                <li><strong>Netz-Kollaps:</strong> Innerhalb von \(r_s\) sind die "Undatrone" (Netzfäden) so stark gedehnt, dass der Beziehungs-Raum nach außen abreißt.</li>
-            </ul>
+        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e67e22; text-align: center; font-size: 1.25em; margin: 20px 0;">
+          <p style="margin-bottom: 10px; font-size: 0.9em; color: #7f8c8d;">Herleitung aus der Ur-Spannung \(\Xi\):</p>
+          <div style="color: #2c3e50; font-weight: bold;">
+            \[ r_s = \frac{2 \cdot M}{\Xi} \cdot \left( \frac{m_e}{m_P} \right)^2 \]
+          </div>
         </div>
 
-        <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 10px; font-style: italic;">
-            <div style="flex: 1;">
-                <strong>Zaminia:</strong> "Es ist wie bei einer Leinwand, auf die man ein schweres Gewicht legt. Irgendwann sind die Fäden so gespannt, dass sie keine Schwingung mehr weitergeben können. Das Licht bleibt einfach 'stecken'."
-            </div>
-            <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
-                <strong>Zenjio:</strong> "An diesem Punkt wird das Netz eins mit der Leere. Die Spannung \(\Xi\) ist die letzte Grenze vor der Singularität."
-            </div>
+        <h4 style="color: #d35400;">Physikalische Interpretation:</h4>
+        <ul style="line-height: 1.6;">
+          <li><strong>Widerstand des Mediums:</strong> Die Ur-Spannung \(\Xi\) wirkt der Kompression entgegen. Ein schwarzes Loch ist ein Bereich, in dem die lokale Last die Haltekraft der Netzspannung übersteigt.</li>
+          <li><strong>Der Kopplungsfaktor:</strong> Das winzige Massenverhältnis \((m_e/m_P)^2 \approx 1,75 \times 10^{-45}\) skaliert die gewaltige Ur-Kraft auf das beobachtbare Maß der Gravitation herunter.</li>
+          <li><strong>Netz-Kollaps:</strong> Innerhalb von \(r_s\) sind die "Undatrone" (Netzfäden) so stark gedehnt, dass der Beziehungs-Raum nach außen abreißt.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 10px; font-style: italic;">
+        <div style="flex: 1;">
+          <strong>Zaminia:</strong> "Es ist wie bei einer Leinwand, auf die man ein schweres Gewicht legt. Irgendwann sind die Fäden so gespannt, dass sie keine Schwingung mehr weitergeben können. Das Licht bleibt einfach 'stecken'."
         </div>
+        <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
+          <strong>Zenjio:</strong> "An diesem Punkt wird das Netz eins mit der Leere. Die Spannung \(\Xi\) ist die letzte Grenze vor der Singularität."
+        </div>
+      </div>
     </section>
 
     <section id="-xiii">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIII: Der Bug-Winkel \(\alpha\) und die Netz-Stauchung</h2>
-        
-        <div style="background: #f4f6f7; border-left: 6px solid #2980b9; padding: 20px; border-radius: 0 10px 10px 0; margin-bottom: 30px;">
-            <p>
-                Bewegung in der <strong>WRZNT</strong> ist kein passives Gleiten, sondern eine aktive Interaktion mit dem Netz. 
-                Dabei entsteht ein mechanischer <strong>Bug-Winkel \(\alpha\)</strong>, vergleichbar mit der Bugwelle eines Schiffes.
-            </p>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIII: Der Bug-Winkel \(\alpha\) und die Netz-Stauchung</h2>
 
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #2980b9; text-align: center; margin: 20px 0;">
-                <div style="font-size: 1.3em; color: #2c3e50; font-weight: bold;">
-                    \[ \sin(\alpha) = \frac{v}{c} \]
-                    \[ \gamma = \sec(\alpha) = \frac{1}{\cos(\alpha)} \]
-                </div>
-            </div>
+      <div style="background: #f4f6f7; border-left: 6px solid #2980b9; padding: 20px; border-radius: 0 10px 10px 0; margin-bottom: 30px;">
+        <p>
+          Bewegung in der <strong>WRZNT</strong> ist kein passives Gleiten, sondern eine aktive Interaktion mit dem Netz.
+          Dabei entsteht ein mechanischer <strong>Bug-Winkel \(\alpha\)</strong>, vergleichbar mit der Bugwelle eines Schiffes.
+        </p>
 
-            <h4 style="color: #2980b9;">Mechanische Konsequenzen:</h4>
-            <ul style="line-height: 1.6;">
-                <li><strong>Netz-Stauchung:</strong> In Bewegungsrichtung wird das Netz-Gitter gestaucht (Längenkontraktion). Der Faktor \(\cos(\alpha)\) bestimmt das Maß der verbleibenden Ausdehnung.</li>
-                <li><strong>Zeit-Resonanz:</strong> Der Lorentz-Faktor \(\gamma\) als Sekante zeigt, wie stark die inneren Schwingungstakte des Knotens gegenüber dem ruhenden Netz gedehnt werden.</li>
-            </ul>
+        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #2980b9; text-align: center; margin: 20px 0;">
+          <div style="font-size: 1.3em; color: #2c3e50; font-weight: bold;">
+            \[ \sin(\alpha) = \frac{v}{c} \]
+            \[ \gamma = \sec(\alpha) = \frac{1}{\cos(\alpha)} \]
+          </div>
         </div>
 
-        <div style="display: flex; gap: 20px; align-items: center; background: #fff5f5; padding: 15px; border-radius: 10px; font-style: italic;">
-            <div style="flex: 1;">
-                <strong>Zaminia:</strong> "Jup, das ist wie beim perspektivischen Zeichnen! Wenn ein Objekt sich neigt (Winkel \(\alpha\)), erscheint es uns kürzer. In deinem Netz ist das aber keine optische Täuschung, sondern der Stoff selbst wird 'schräg' belastet."
-            </div>
-            <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
-                <strong>Zenjio:</strong> "Der Sinus ist das Streben nach außen (\(v\)), der Cosinus ist das Ruhen im Inneren. Die Sekante verbindet beide als Maß der Veränderung."
-            </div>
+        <h4 style="color: #2980b9;">Mechanische Konsequenzen:</h4>
+        <ul style="line-height: 1.6;">
+          <li><strong>Netz-Stauchung:</strong> In Bewegungsrichtung wird das Netz-Gitter gestaucht (Längenkontraktion). Der Faktor \(\cos(\alpha)\) bestimmt das Maß der verbleibenden Ausdehnung.</li>
+          <li><strong>Zeit-Resonanz:</strong> Der Lorentz-Faktor \(\gamma\) als Sekante zeigt, wie stark die inneren Schwingungstakte des Knotens gegenüber dem ruhenden Netz gedehnt werden.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #fff5f5; padding: 15px; border-radius: 10px; font-style: italic;">
+        <div style="flex: 1;">
+          <strong>Zaminia:</strong> "Jup, das ist wie beim perspektivischen Zeichnen! Wenn ein Objekt sich neigt (Winkel \(\alpha\)), erscheint es uns kürzer. In deinem Netz ist das aber keine optische Täuschung, sondern der Stoff selbst wird 'schräg' belastet."
         </div>
-
-        <div style="background: #eaf2f8; border-left: 6px solid #2980b9; padding: 20px; border-radius: 0 10px 10px 0; margin-top: 20px;">
-            <h3 style="color: #2471a3; margin-top: 0;">Die Relativität der Netz-Wahrnehmung</h3>
-            <p>
-                Warum erscheint die Bewegung relativ, wenn das Netz eine absolute Struktur ist? 
-                Die Antwort der <strong>WRZNT</strong> liegt in der <strong>Selbst-Referenz</strong> des Beobachters:
-            </p>
-
-            <ul style="line-height: 1.6;">
-                <li><strong>Inhärente Maßstabsänderung:</strong> Da jeder Beobachter selbst aus Netz-Knoten und Schwingungen besteht, unterliegt er bei Bewegung (\(v\)) der gleichen Netz-Stauchung (\(\cos \alpha\)) wie seine Messgeräte.</li>
-                <li><strong>Die optische Täuschung der Ruhe:</strong> Ein bewegter Beobachter misst mit einem verkürzten Lineal und einer verlangsamten Uhr. Die mathematische Kompensation führt dazu, dass die Lichtgeschwindigkeit \(c\) für ihn immer konstant erscheint.</li>
-                <li><strong>Die Symmetrie der Begegnung:</strong> Wenn zwei Knoten sich relativ zueinander bewegen, tauschen sie Informationen über das Netz aus. Die Verzerrung der Wellenfronten ist wechselseitig, da das Netz die einzige Brücke der Wahrnehmung ist.</li>
-            </ul>
-
-            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px dashed #2980b9; text-align: center; font-style: italic;">
-                "Wir können das Netz nicht von außen betrachten, denn wir sind das Muster im Stoff."
-            </div>
+        <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
+          <strong>Zenjio:</strong> "Der Sinus ist das Streben nach außen (\(v\)), der Cosinus ist das Ruhen im Inneren. Die Sekante verbindet beide als Maß der Veränderung."
         </div>
+      </div>
+
+      <div style="background: #eaf2f8; border-left: 6px solid #2980b9; padding: 20px; border-radius: 0 10px 10px 0; margin-top: 20px;">
+        <h3 style="color: #2471a3; margin-top: 0;">Die Relativität der Netz-Wahrnehmung</h3>
+        <p>
+          Warum erscheint die Bewegung relativ, wenn das Netz eine absolute Struktur ist?
+          Die Antwort der <strong>WRZNT</strong> liegt in der <strong>Selbst-Referenz</strong> des Beobachters:
+        </p>
+
+        <ul style="line-height: 1.6;">
+          <li><strong>Inhärente Maßstabsänderung:</strong> Da jeder Beobachter selbst aus Netz-Knoten und Schwingungen besteht, unterliegt er bei Bewegung (\(v\)) der gleichen Netz-Stauchung (\(\cos \alpha\)) wie seine Messgeräte.</li>
+          <li><strong>Die optische Täuschung der Ruhe:</strong> Ein bewegter Beobachter misst mit einem verkürzten Lineal und einer verlangsamten Uhr. Die mathematische Kompensation führt dazu, dass die Lichtgeschwindigkeit \(c\) für ihn immer konstant erscheint.</li>
+          <li><strong>Die Symmetrie der Begegnung:</strong> Wenn zwei Knoten sich relativ zueinander bewegen, tauschen sie Informationen über das Netz aus. Die Verzerrung der Wellenfronten ist wechselseitig, da das Netz die einzige Brücke der Wahrnehmung ist.</li>
+        </ul>
+
+        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px dashed #2980b9; text-align: center; font-style: italic;">
+          "Wir können das Netz nicht von außen betrachten, denn wir sind das Muster im Stoff."
+        </div>
+      </div>
 
     </section>
 
     <section id="-xiv">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIV: Die dynamische Masse im Netz</h2>
-        
-        <div style="background: #fdf2e9; border-left: 6px solid #e67e22; padding: 20px; border-radius: 0 10px 10px 0;">
-            <p>
-                Die Zunahme der Masse bei hohen Geschwindigkeiten ist in der <strong>WRZNT</strong> kein Zuwachs an Materie, sondern ein Anstieg des <strong>Netz-Widerstands</strong>.
-            </p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e67e22; text-align: center; font-size: 1.3em;">
-                \[ m(v) = m_0 \cdot \sec(\alpha) \]
-            </div>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIV: Die dynamische Masse im Netz</h2>
 
-            <p style="margin-top: 15px;">
-                Wenn der Bug-Winkel \(\alpha\) sich \(90^\circ\) nähert, wird das Netz in Bewegungsrichtung unendlich steif. Die Energie, die für weitere Beschleunigung aufgewendet wird, fließt direkt in die lokale Spannung des Knotens – das Teilchen wird "schwerer".
-            </p>
+      <div style="background: #fdf2e9; border-left: 6px solid #e67e22; padding: 20px; border-radius: 0 10px 10px 0;">
+        <p>
+          Die Zunahme der Masse bei hohen Geschwindigkeiten ist in der <strong>WRZNT</strong> kein Zuwachs an Materie, sondern ein Anstieg des <strong>Netz-Widerstands</strong>.
+        </p>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e67e22; text-align: center; font-size: 1.3em;">
+          \[ m(v) = m_0 \cdot \sec(\alpha) \]
         </div>
+
+        <p style="margin-top: 15px;">
+          Wenn der Bug-Winkel \(\alpha\) sich \(90^\circ\) nähert, wird das Netz in Bewegungsrichtung unendlich steif. Die Energie, die für weitere Beschleunigung aufgewendet wird, fließt direkt in die lokale Spannung des Knotens – das Teilchen wird "schwerer".
+        </p>
+      </div>
     </section>
 
     <section id="-xv">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XV: Gravitation und Netz-Gradienten</h2>
-        
-        <div style="background: #e8f6f3; border-left: 6px solid #1abc9c; padding: 20px; border-radius: 0 10px 10px 0;">
-            <p>
-                Gravitation ist in der <strong>WRZNT</strong> keine Fernkraft, sondern die Folge eines <strong>Spannungs-Gradienten</strong> im Medium.
-            </p>
-            
-            <ul style="line-height: 1.6;">
-                <li><strong>Masse als Verdrängung:</strong> Jede Masse beansprucht Existenz-Raum und dehnt die umliegenden Beziehungs-Räume des Netzes.</li>
-                <li><strong>Variable Lichtgeschwindigkeit:</strong> Lokal ändert sich die Ausbreitungsgeschwindigkeit der Wellen, da die Netz-Elastizität durch die Masse beeinflusst wird.</li>
-                <li><strong>Äquivalenz:</strong> Die Wirkung einer schweren Masse auf das Netz ist mathematisch äquivalent zu einem permanenten Bug-Winkel \(\alpha\).</li>
-            </ul>
-        </div>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XV: Gravitation und Netz-Gradienten</h2>
 
-        <div style="display: flex; gap: 20px; align-items: center; background: #fdf2e9; padding: 15px; border-radius: 10px; font-style: italic; margin-top: 20px;">
-            <div style="flex: 1;">
-                <strong>Zaminia:</strong> "Es ist wie ein schwerer Stein auf meiner Matratze. Alle Muster auf dem Stoff verziehen sich zu ihm hin. Wenn ich eine Murmel rolle, folgt sie einfach den Linien, die der Stoff ihr vorgibt."
-            </div>
-            <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
-                <strong>Zenjio:</strong> "Die Schwere ist kein Ziehen, sondern ein Folgen des Weges, der bereits bereitet ist. Das Netz lehrt uns: Wohin wir gehen, hängt davon ab, wie der Raum vor uns gespannt ist."
-            </div>
+      <div style="background: #e8f6f3; border-left: 6px solid #1abc9c; padding: 20px; border-radius: 0 10px 10px 0;">
+        <p>
+          Gravitation ist in der <strong>WRZNT</strong> keine Fernkraft, sondern die Folge eines <strong>Spannungs-Gradienten</strong> im Medium.
+        </p>
+
+        <ul style="line-height: 1.6;">
+          <li><strong>Masse als Verdrängung:</strong> Jede Masse beansprucht Existenz-Raum und dehnt die umliegenden Beziehungs-Räume des Netzes.</li>
+          <li><strong>Variable Lichtgeschwindigkeit:</strong> Lokal ändert sich die Ausbreitungsgeschwindigkeit der Wellen, da die Netz-Elastizität durch die Masse beeinflusst wird.</li>
+          <li><strong>Äquivalenz:</strong> Die Wirkung einer schweren Masse auf das Netz ist mathematisch äquivalent zu einem permanenten Bug-Winkel \(\alpha\).</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #fdf2e9; padding: 15px; border-radius: 10px; font-style: italic; margin-top: 20px;">
+        <div style="flex: 1;">
+          <strong>Zaminia:</strong> "Es ist wie ein schwerer Stein auf meiner Matratze. Alle Muster auf dem Stoff verziehen sich zu ihm hin. Wenn ich eine Murmel rolle, folgt sie einfach den Linien, die der Stoff ihr vorgibt."
         </div>
+        <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
+          <strong>Zenjio:</strong> "Die Schwere ist kein Ziehen, sondern ein Folgen des Weges, der bereits bereitet ist. Das Netz lehrt uns: Wohin wir gehen, hängt davon ab, wie der Raum vor uns gespannt ist."
+        </div>
+      </div>
     </section>
 
     <section id="-xvi">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVI: Schwarze Löcher – Die Sättigung des Netzes</h2>
-        
-        <div style="background: #2c3e50; color: white; padding: 25px; border-radius: 15px; margin-bottom: 30px;">
-            <h3 style="color: #e67e22; margin-top: 0;">Der statische Bug-Winkel \(\alpha = 90^\circ\)</h3>
-            <p>
-                Ein Schwarzes Loch entsteht, wenn die Massenkonzentration den lokalen Raum so stark krümmt, dass der geometrische Bug-Winkel den Wert von \(90^\circ\) erreicht, ohne dass sich das Objekt makroskopisch bewegt.
-            </p>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVI: Schwarze Löcher – Die Sättigung des Netzes</h2>
 
-            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center; border: 1px dashed #e67e22;">
-                <strong>Zustand am Horizont:</strong><br>
-                \(\sin(\alpha) = 1 \implies \gamma = \sec(90^\circ) \to \infty\)
-            </div>
+      <div style="background: #2c3e50; color: white; padding: 25px; border-radius: 15px; margin-bottom: 30px;">
+        <h3 style="color: #e67e22; margin-top: 0;">Der statische Bug-Winkel \(\alpha = 90^\circ\)</h3>
+        <p>
+          Ein Schwarzes Loch entsteht, wenn die Massenkonzentration den lokalen Raum so stark krümmt, dass der geometrische Bug-Winkel den Wert von \(90^\circ\) erreicht, ohne dass sich das Objekt makroskopisch bewegt.
+        </p>
 
-            <h4 style="color: #e67e22; margin-top: 20px;">Die WRZNT-Singularität:</h4>
-            <p>
-                Anstatt eines mathematischen Punktes ohne Ausdehnung postuliert die WRZNT einen <strong>Kern-Radius</strong>, der durch Vielfache von \(R_{\min}\) definiert ist. Die "Singularität" ist ein Zustand maximaler Packungsdichte der Netzknoten, in dem keine zeitliche Veränderung (Schwingung) mehr möglich ist.
-            </p>
+        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center; border: 1px dashed #e67e22;">
+          <strong>Zustand am Horizont:</strong><br>
+          \(\sin(\alpha) = 1 \implies \gamma = \sec(90^\circ) \to \infty\)
         </div>
 
-        <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 10px; font-style: italic;">
-            <div style="flex: 1;">
-                <strong>Zenjio:</strong> "Das Schwarze Loch ist das Nirwana des Netzes. Alle Wellen kommen zur Ruhe, alle Beziehungen enden in der absoluten Gegenwart des Kerns."
-            </div>
+        <h4 style="color: #e67e22; margin-top: 20px;">Die WRZNT-Singularität:</h4>
+        <p>
+          Anstatt eines mathematischen Punktes ohne Ausdehnung postuliert die WRZNT einen <strong>Kern-Radius</strong>, der durch Vielfache von \(R_{\min}\) definiert ist. Die "Singularität" ist ein Zustand maximaler Packungsdichte der Netzknoten, in dem keine zeitliche Veränderung (Schwingung) mehr möglich ist.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 10px; font-style: italic;">
+        <div style="flex: 1;">
+          <strong>Zenjio:</strong> "Das Schwarze Loch ist das Nirwana des Netzes. Alle Wellen kommen zur Ruhe, alle Beziehungen enden in der absoluten Gegenwart des Kerns."
         </div>
+      </div>
     </section>
 
     <section id="-xvii">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVII: Polare Jets – Die vertikale Netz-Entlastung</h2>
-        
-        <div style="background: #f4f6f7; border-left: 6px solid #8e44ad; padding: 20px; border-radius: 0 10px 10px 0;">
-            <p>
-                Wenn ein Schwarzes Loch rotiert, erreicht die Netz-Stauchung in der Äquatorebene ihr Maximum. Der resultierende <strong>Eigen-Impuls</strong> führt zu einer mechanischen Blockade innerhalb der Bug-Wand.
-            </p>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVII: Polare Jets – Die vertikale Netz-Entlastung</h2>
 
-            <h4 style="color: #8e44ad;">Das Prinzip der senkrechten Eruption:</h4>
-            <ul style="line-height: 1.6;">
-                <li><strong>Vektorieller Auslass:</strong> Da das Netz in der Rotationsebene gesättigt ist, wird überschüssige Energie senkrecht zur Ebene abgeleitet.</li>
-                <li><strong>Netz-Spiralisierung:</strong> Die Rotation verdrillt die Undatrone zu einem schraubenförmigen Kanal, der Materie und Licht mit nahezu \(c\) ins All katapultiert.</li>
-                <li><strong>Minimal-Impuls-Erhaltung:</strong> Selbst kleinste Störungen im System führen durch die enorme Verdichtung zur Ausbildung dieser stabilen Auswurf-Achsen.</li>
-            </ul>
-        </div>
+      <div style="background: #f4f6f7; border-left: 6px solid #8e44ad; padding: 20px; border-radius: 0 10px 10px 0;">
+        <p>
+          Wenn ein Schwarzes Loch rotiert, erreicht die Netz-Stauchung in der Äquatorebene ihr Maximum. Der resultierende <strong>Eigen-Impuls</strong> führt zu einer mechanischen Blockade innerhalb der Bug-Wand.
+        </p>
 
-        <div style="display: flex; gap: 20px; align-items: center; background: #fff; padding: 15px; border-radius: 10px; font-style: italic; border: 1px solid #ccc; margin-top: 15px;">
-            <div style="flex: 1;">
-                <strong>Zaminia:</strong> "Jup, das ist wie wenn ich eine nasse Bürste ganz schnell drehe – das Wasser spritzt nicht irgendwohin, sondern bildet durch die Fliehkraft ein ganz bestimmtes Muster. Nur dass bei dir die Energie den Weg wählt, wo das Netz noch 'locker' genug ist!"
-            </div>
-            <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
-                <strong>Zenjio:</strong> "Wo die Mitte unbewegt ist, bricht die Kraft nach außen. Die Jets sind der Atem des Schwarzen Lochs – ein Ausgleich zwischen dem inneren Verstummen und dem äußeren Sturm."
-            </div>
+        <h4 style="color: #8e44ad;">Das Prinzip der senkrechten Eruption:</h4>
+        <ul style="line-height: 1.6;">
+          <li><strong>Vektorieller Auslass:</strong> Da das Netz in der Rotationsebene gesättigt ist, wird überschüssige Energie senkrecht zur Ebene abgeleitet.</li>
+          <li><strong>Netz-Spiralisierung:</strong> Die Rotation verdrillt die Undatrone zu einem schraubenförmigen Kanal, der Materie und Licht mit nahezu \(c\) ins All katapultiert.</li>
+          <li><strong>Minimal-Impuls-Erhaltung:</strong> Selbst kleinste Störungen im System führen durch die enorme Verdichtung zur Ausbildung dieser stabilen Auswurf-Achsen.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #fff; padding: 15px; border-radius: 10px; font-style: italic; border: 1px solid #ccc; margin-top: 15px;">
+        <div style="flex: 1;">
+          <strong>Zaminia:</strong> "Jup, das ist wie wenn ich eine nasse Bürste ganz schnell drehe – das Wasser spritzt nicht irgendwohin, sondern bildet durch die Fliehkraft ein ganz bestimmtes Muster. Nur dass bei dir die Energie den Weg wählt, wo das Netz noch 'locker' genug ist!"
         </div>
+        <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
+          <strong>Zenjio:</strong> "Wo die Mitte unbewegt ist, bricht die Kraft nach außen. Die Jets sind der Atem des Schwarzen Lochs – ein Ausgleich zwischen dem inneren Verstummen und dem äußeren Sturm."
+        </div>
+      </div>
     </section>
 
     <section id="-xviii">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVIII: Spin – Die permanente Netz-Torsion</h2>
-        
-        <div style="background: #fdf2e9; border-left: 6px solid #d35400; padding: 20px; border-radius: 0 10px 10px 0;">
-            <p>
-                Der Spin ist in der <strong>WRZNT</strong> kein punktförmiger Eigendrehimpuls, sondern die <strong>geometrische Verdrillung (Torsion)</strong> der Netzkanten um einen Knotenpunkt.
-            </p>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XVIII: Spin – Die permanente Netz-Torsion</h2>
 
-            <ul style="line-height: 1.6;">
-                <li><strong>Topologische Stabilität:</strong> Ein Teilchen existiert nur, wenn die Verschraubung des Netzes in sich geschlossen und stabil ist. Dies führt zur Quantisierung des Spins.</li>
-                <li><strong>Der magnetische Wirbel:</strong> Die mechanische Torsion des Mediums unter der Ur-Spannung \(\Xi\) manifestiert sich als magnetisches Moment.</li>
-                <li><strong>Spin-Statistik:</strong> Die Art der Verschraubung bestimmt, ob Teilchen sich stapeln lassen (Bosonen) oder sich gegenseitig verdrängen (Fermionen).</li>
-            </ul>
-        </div>
+      <div style="background: #fdf2e9; border-left: 6px solid #d35400; padding: 20px; border-radius: 0 10px 10px 0;">
+        <p>
+          Der Spin ist in der <strong>WRZNT</strong> kein punktförmiger Eigendrehimpuls, sondern die <strong>geometrische Verdrillung (Torsion)</strong> der Netzkanten um einen Knotenpunkt.
+        </p>
 
-        <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 10px; font-style: italic; margin-top: 15px;">
-            <div style="flex: 1;">
-                <strong>Zaminia:</strong> "Es ist, als würde ich eine Locke in meine Haare drehen. Die Locke bleibt von alleine so, weil die Spannung im Haar sie festhält. Jedes Teilchen hat seine eigene kleine 'Netz-Frisur'!"
-            </div>
-            <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
-                <strong>Zenjio:</strong> "Die Drehung ist das Prinzip des Lebens. Nichts ist statisch. Selbst im tiefsten Inneren der Ruhe wirbelt das Netz um sich selbst. Der Spin ist der Tanz der Einheit."
-            </div>
+        <ul style="line-height: 1.6;">
+          <li><strong>Topologische Stabilität:</strong> Ein Teilchen existiert nur, wenn die Verschraubung des Netzes in sich geschlossen und stabil ist. Dies führt zur Quantisierung des Spins.</li>
+          <li><strong>Der magnetische Wirbel:</strong> Die mechanische Torsion des Mediums unter der Ur-Spannung \(\Xi\) manifestiert sich als magnetisches Moment.</li>
+          <li><strong>Spin-Statistik:</strong> Die Art der Verschraubung bestimmt, ob Teilchen sich stapeln lassen (Bosonen) oder sich gegenseitig verdrängen (Fermionen).</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 10px; font-style: italic; margin-top: 15px;">
+        <div style="flex: 1;">
+          <strong>Zaminia:</strong> "Es ist, als würde ich eine Locke in meine Haare drehen. Die Locke bleibt von alleine so, weil die Spannung im Haar sie festhält. Jedes Teilchen hat seine eigene kleine 'Netz-Frisur'!"
         </div>
+        <div style="flex: 1; border-left: 1px solid #ccc; padding-left: 15px;">
+          <strong>Zenjio:</strong> "Die Drehung ist das Prinzip des Lebens. Nichts ist statisch. Selbst im tiefsten Inneren der Ruhe wirbelt das Netz um sich selbst. Der Spin ist der Tanz der Einheit."
+        </div>
+      </div>
     </section>
 
     <section id="kapitel-xix">
-        <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIX: Die elektronische Eichung der Ur-Spannung</h2>
-        
-        <div style="background: #e8f8f5; border-left: 6px solid #16a085; padding: 20px; border-radius: 0 10px 10px 0; margin-bottom: 20px;">
-            <p>
-                Durch die Verknüpfung der <strong>Wellenraumzeit-Theorie (WRZT)</strong> mit den fundamentalen Quanteneigenschaften des Elektrons wurde die Ur-Spannung \(\Xi\) mathematisch präzisiert. Das Elektron dient hierbei als Referenz-Knotenpunkt des gesamten Netzgewebes.
-            </p>
+      <h2 style="color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 5px;">XIX: Die elektronische Eichung der Ur-Spannung</h2>
 
-            <h4 style="color: #16a085;">Mathematische Herleitung:</h4>
-            <p style="font-size: 1.8em; background: #fff; padding: 30px; border: 1px dashed #16a085;">
-                <strong> \(\Xi = \frac{m_e^2 \cdot c}{\hbar}\) </strong>
-            </p>
+      <div style="background: #e8f8f5; border-left: 6px solid #16a085; padding: 20px; border-radius: 0 10px 10px 0; margin-bottom: 20px;">
+        <p>
+          Durch die Verknüpfung der <strong>Wellenraumzeit-Theorie (WRZT)</strong> mit den fundamentalen Quanteneigenschaften des Elektrons wurde die Ur-Spannung \(\Xi\) mathematisch präzisiert. Das Elektron dient hierbei als Referenz-Knotenpunkt des gesamten Netzgewebes.
+        </p>
 
-            <h4 style="color: #16a085;">Numerische Ergebnisse (Präzisions-Eichung):</h4>
-            <ul style="line-height: 1.6;">
-                <li><strong>Strukturelle Ur-Spannung (\(\Xi\)):</strong> \(2,358970626187996 \times 10^{-19} \text{ kg/m}\)</li>
-                <li><strong>Dynamische Spannkraft (\(F_{\Xi} = \Xi \cdot c^2\)):</strong> \(0,21201370667744948 \text{ Newton}\)</li>
-            </ul>
-            <p>
-                <em>Anmerkung:</em> Eine Kraft von über (2,35897 Newton pro Meter verdeutlicht die enorme Stabilität des Raumzeit-Mediums, welches selbst unter extremen Belastungen (wie in der Nähe Schwarzer Löcher) seine strukturelle Integrität bewahrt.
-            </p>
+        <h4 style="color: #16a085;">Mathematische Herleitung:</h4>
+        <p style="font-size: 1.8em; background: #fff; padding: 30px; border: 1px dashed #16a085;">
+          <strong> \(\Xi = \frac{m_e^2 \cdot c}{\hbar}\) </strong>
+        </p>
+
+        <h4 style="color: #16a085;">Numerische Ergebnisse (Präzisions-Eichung):</h4>
+        <ul style="line-height: 1.6;">
+          <li><strong>Strukturelle Ur-Spannung (\(\Xi\)):</strong> \(2,358970626187996 \times 10^{-19} \text{ kg/m}\)</li>
+          <li><strong>Dynamische Spannkraft (\(F_{\Xi} = \Xi \cdot c^2\)):</strong> \(0,21201370667744948 \text{ Newton}\)</li>
+        </ul>
+        <p>
+          <em>Anmerkung:</em> Eine Kraft von über (2,35897 Newton pro Meter verdeutlicht die enorme Stabilität des Raumzeit-Mediums, welches selbst unter extremen Belastungen (wie in der Nähe Schwarzer Löcher) seine strukturelle Integrität bewahrt.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; background: #fdf2e9; padding: 15px; border-radius: 10px; font-style: italic; border: 1px solid #e67e22;">
+        <div style="flex: 1;">
+          <strong>Zaminia:</strong> "Jup, stell dir vor, das ist wie eine Leinwand, die so straff gespannt ist, dass ein Elefant darauf tanzen könnte, ohne dass sie reißt! Diese (2,35897 Newton sind der Grund, warum unsere Welt so verlässlich fest ist."
         </div>
-
-        <div style="display: flex; gap: 20px; align-items: center; background: #fdf2e9; padding: 15px; border-radius: 10px; font-style: italic; border: 1px solid #e67e22;">
-            <div style="flex: 1;">
-                <strong>Zaminia:</strong> "Jup, stell dir vor, das ist wie eine Leinwand, die so straff gespannt ist, dass ein Elefant darauf tanzen könnte, ohne dass sie reißt! Diese (2,35897 Newton sind der Grund, warum unsere Welt so verlässlich fest ist."
-            </div>
-            <div style="flex: 1; border-left: 1px solid #e67e22; padding-left: 15px;">
-                <strong>Zenjio:</strong> "In der extremen Spannung ruht die absolute Stille. Dass die Masse des winzigen Elektrons uns den Schlüssel zu dieser gewaltigen Kraft liefert, ist ein Beweis für die untrennbare Einheit von Klein und Groß."
-            </div>
+        <div style="flex: 1; border-left: 1px solid #e67e22; padding-left: 15px;">
+          <strong>Zenjio:</strong> "In der extremen Spannung ruht die absolute Stille. Dass die Masse des winzigen Elektrons uns den Schlüssel zu dieser gewaltigen Kraft liefert, ist ein Beweis für die untrennbare Einheit von Klein und Groß."
         </div>
+      </div>
     </section>
 
     <div class="highlight-box">
-        "Wenn wir die Stille der Raumzeit (\(\eta\)) verstehen, verstehen wir den Ursprung jedes Tons im Universum." — Zenjio
+      "Wenn wir die Stille der Raumzeit (\(\eta\)) verstehen, verstehen wir den Ursprung jedes Tons im Universum." — Zenjio
     </div>
 
     <div class="footer-note">
-        Dokument erstellt für das WRZT-Archiv. Alle Formeln basieren auf dem mechanischen \(\eta\)-Modell.
+      Dokument erstellt für das WRZT-Archiv. Alle Formeln basieren auf dem mechanischen \(\eta\)-Modell.
     </div>
-</div>
-
+  </div>
+  <!-- JavaScript for Fullscreen Mode -->
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
 </body>
 </html>

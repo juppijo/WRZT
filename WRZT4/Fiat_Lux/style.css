@@ -423,28 +423,28 @@ justify-content: right;
 12. Media Queries & Accessibility
 --------------------------------------------------------- */
 @media (max-width: 600px) {
-:root {
-/* Auch auf Smartphones spürbarer Abstand zum Rand */
---content-padding: 1.5rem;
---space-lg: 2rem;
---space-xl: 3rem;
-}
+  :root {
+  /* Auch auf Smartphones spürbarer Abstand zum Rand */
+  --content-padding: 1rem;
+  --space-lg: 1rem;
+  --space-xl: 2rem;
+  }
 
-nav {
-gap: 0.4rem;
-}
+  nav {
+  gap: 0.4rem;
+  }
 
-nav a {
-padding: 0.35rem 0.6rem;
-}
+  nav a {
+  padding: 0.35rem 0.6rem;
+  }
 
-.info-box, .chapter {
-padding: 1.5rem;
-}
+  .info-box, .chapter {
+  padding: 1rem;
+  }
 
-.math, .equation, .formula {
-padding: 1.2rem;
-}
+  .math, .equation, .formula {
+  padding: 1rem;
+  }
 }
 
 @media (min-width: 1400px) {
