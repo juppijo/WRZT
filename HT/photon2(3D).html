@@ -2,175 +2,202 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>WRZNT - 3D Heatmap-Netz</title>
+    <title>WRZNT - Labor-Konsole</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
         #ui { 
             position: absolute; top: 20px; left: 20px; 
-            background: rgba(0,0,30,0.95); padding: 20px; 
-            border-radius: 12px; border: 2px solid #4a9eff; width: 300px; z-index: 100;
+            background: rgba(10, 10, 30, 0.95); padding: 20px; 
+            border: 1px solid #4a9eff; border-radius: 12px; color: #fff; width: 300px; z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 158, 255, 0.3);
         }
-        input[type=range] { width: 100%; cursor: pointer; margin: 10px 0; }
+        .ctrl { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; color: #4a9eff; text-transform: uppercase; margin-bottom: 4px; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00f2ff; }
         .val { float: right; color: #ffcc00; font-weight: bold; }
-        #status { font-size: 14px; margin-top: 10px; color: #00ffcc; text-align: center; border: 1px dashed #4a9eff; padding: 5px; }
+        #status { text-align: center; padding: 10px; color: #00ffcc; font-weight: bold; border-top: 1px solid #333; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div id="ui">
-        <h2 style="margin:0; font-size: 18px; color: #4a9eff;">WRZNT Energiedichte</h2>
+        <h2 style="margin:0 0 15px 0; font-size: 18px;">WRZNT-Labor</h2>
         
-        <div>Radius (r): <span class="val" id="radVal">120</span></div>
-        <input type="range" id="radiusSlide" min="20" max="200" value="100">
-        
-        <div>Intensität (Amp): <span class="val" id="ampVal">50</span></div>
-        <input type="range" id="ampSlide" min="0" max="100" value="50">
+        <div class="ctrl">
+            <label>Radius (r): <span class="val" id="radVal">100</span></label>
+            <input type="range" id="radiusSlide" min="30" max="300" value="100">
+        </div>
+        <div class="ctrl">
+            <label>Amplitude: <span class="val" id="ampVal">50</span></label>
+            <input type="range" id="ampSlide" min="1" max="100" value="50">
+        </div>
+        <div class="ctrl">
+            <label>Zeit-Fluss: <span class="val" id="speedVal">1.0</span></label>
+            <input type="range" id="speedSlide" min="0.1" max="5.0" step="0.1" value="1.0">
+        </div>
+        <div class="ctrl">
+            <label>Helix-Frequenz: <span class="val" id="freqVal">0.15</span></label>
+            <input type="range" id="freqSlide" min="0.05" max="0.5" step="0.01" value="0.15">
+        </div>
 
-        <div id="status">MATERIE AKTIV</div>
+        <div id="status">MATERIE-GITTER</div>
     </div>
 
     <script>
-        let scene, camera, renderer, controls, gridLines, nodes;
+        let scene, camera, renderer, controls, lineSegments, nodes;
         let electron, positron;
-        let time = 0;
-        let params = { radius: 100, amplitude: 100 };
-        let pulses = [];
-        let isAnnihilated = false;
+        let globalTime = 0, pulses = [], isAnnihilated = false;
+        let params = { radius: 160, amplitude: 120, timeScale: 1.0, frequency: 0.15 };
 
-        const size = 20; 
-        const spacing = 80;
-        let initialPos = [];
+        const gridSize = 12, spacing = 50;
+        let basePositions = [];
 
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
-            camera.position.set(500, 500, 700);
+            camera.position.set(700, 600, 800);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
             controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-            // Gitter-Linien
+            // Gitter-Skelett
             const lineGeo = new THREE.BufferGeometry();
             const points = [];
-            for (let i = -size/2; i <= size/2; i++) {
-                for (let j = -size/2; j <= size/2; j++) {
-                    points.push(-size/2*spacing, i*spacing, j*spacing, size/2*spacing, i*spacing, j*spacing);
-                    points.push(i*spacing, -size/2*spacing, j*spacing, i*spacing, size/2*spacing, j*spacing);
-                    points.push(i*spacing, j*spacing, -size/2*spacing, i*spacing, j*spacing, size/2*spacing);
+            for (let i = -gridSize/2; i <= gridSize/2; i++) {
+                for (let j = -gridSize/2; j <= gridSize/2; j++) {
+                    points.push(-gridSize/2*spacing, i*spacing, j*spacing, gridSize/2*spacing, i*spacing, j*spacing);
+                    points.push(i*spacing, -gridSize/2*spacing, j*spacing, i*spacing, gridSize/2*spacing, j*spacing);
+                    points.push(i*spacing, j*spacing, -gridSize/2*spacing, i*spacing, j*spacing, gridSize/2*spacing);
                 }
             }
-            initialPos = new Float32Array(points);
+            basePositions = new Float32Array(points);
             lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(points), 3));
-            gridLines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0x000088, transparent: true, opacity: 0.3 }));
-            scene.add(gridLines);
+            lineSegments = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0x004488, transparent: true, opacity: 0.3 }));
+            scene.add(lineSegments);
 
-            // Knotenpunkte mit Farbattribut
+            // Heatmap-Knoten
             const nodeGeo = new THREE.BufferGeometry();
-            const nodePos = [];
-            const nodeColors = [];
-            for (let x = -size/2; x <= size/2; x++) {
-                for (let y = -size/2; y <= size/2; y++) {
-                    for (let z = -size/2; z <= size/2; z++) {
-                        nodePos.push(x * spacing, y * spacing, z * spacing);
-                        nodeColors.push(0, 0.5, 1); // Startfarbe Blau
+            const nPos = [], nCol = [];
+            for (let x = -gridSize/2; x <= gridSize/2; x++) {
+                for (let y = -gridSize/2; y <= gridSize/2; y++) {
+                    for (let z = -gridSize/2; z <= gridSize/2; z++) {
+                        nPos.push(x*spacing, y*spacing, z*spacing);
+                        nCol.push(0, 0.2, 0.5);
                     }
                 }
             }
-            nodeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nodePos), 3));
-            nodeGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nodeColors), 3));
-            
-            const nodeMat = new THREE.PointsMaterial({ size: 3, vertexColors: true });
-            nodes = new THREE.Points(nodeGeo, nodeMat);
+            nodeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nPos), 3));
+            nodeGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nCol), 3));
+            nodes = new THREE.Points(nodeGeo, new THREE.PointsMaterial({ size: 4, vertexColors: true }));
             scene.add(nodes);
 
-            // Teilchen
-            electron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-            positron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+            electron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0xff3333 }));
+            positron = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({ color: 0x3388ff }));
             scene.add(electron, positron);
 
-            // Events
-            document.getElementById('radiusSlide').addEventListener('input', (e) => {
-                let oldR = params.radius;
-                params.radius = parseFloat(e.target.value);
+            // UI Listeners
+            document.getElementById('radiusSlide').oninput = (e) => {
+                params.radius = +e.target.value;
                 document.getElementById('radVal').innerText = params.radius;
-                if(params.radius <= 40 && !isAnnihilated) {
+                if(params.radius <= 44 && !isAnnihilated) {
                     isAnnihilated = true;
-                    pulses.push({ startTime: time, velocity: 7, amp: params.amplitude });
-                    document.getElementById('status').innerText = "UNDATRON-EMISSION";
-                    document.getElementById('status').style.color = "#ffff00";
-                } else if(params.radius > 45) isAnnihilated = false;
-            });
-            document.getElementById('ampSlide').addEventListener('input', (e) => {
-                params.amplitude = parseFloat(e.target.value);
+                    pulses.push({ t0: globalTime, amp: params.amplitude, shift: globalTime });
+                    document.getElementById('status').innerText = "UNDATRON-HELIX";
+                } else if(params.radius > 45) {
+                    isAnnihilated = false;
+                    document.getElementById('status').innerText = "MATERIE-GITTER";
+                }
+            };
+            document.getElementById('ampSlide').oninput = (e) => {
+                params.amplitude = +e.target.value;
                 document.getElementById('ampVal').innerText = params.amplitude;
-            });
+            };
+            document.getElementById('speedSlide').oninput = (e) => {
+                params.timeScale = +e.target.value;
+                document.getElementById('speedVal').innerText = params.timeScale.toFixed(1);
+            };
+            document.getElementById('freqSlide').oninput = (e) => {
+                params.frequency = +e.target.value;
+                document.getElementById('freqVal').innerText = params.frequency.toFixed(2);
+            };
 
             animate();
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.1;
-            controls.update();
+        function getDeformation(x, y, z, px, pz) {
+            let dx = x, dy = y, dz = z;
+            let intensity = 0, radialShift = 0;
 
-            let px = Math.cos(time*2) * params.radius;
-            let pz = Math.sin(time*2) * params.radius;
-            electron.visible = positron.visible = !isAnnihilated;
-            if(!isAnnihilated) { electron.position.set(px, 0, pz); positron.position.set(-px, 0, -pz); }
-
-            const nodePosArr = nodes.geometry.attributes.position.array;
-            const nodeColArr = nodes.geometry.attributes.color.array;
-            pulses = pulses.filter(p => (time - p.startTime) < 180);
-
-            for (let i = 0; i < nodePosArr.length; i += 3) {
-                // Initialkoordinaten basierend auf Index i
-                let ix = (Math.floor(i/3 / ((size+1)*(size+1))) - size/2) * spacing;
-                let iy = (Math.floor((i/3 / (size+1)) % (size+1)) - size/2) * spacing;
-                let iz = ((i/3 % (size+1)) - size/2) * spacing;
-
-                let dx = ix, dy = iy, dz = iz;
-                let intensity = 0;
-
-                // 1. Materie-Verzerrung
-                if(!isAnnihilated) {
-                    let d1 = Math.sqrt((ix-px)**2 + iy**2 + (iz-pz)**2);
-                    let d2 = Math.sqrt((ix+px)**2 + iy**2 + (iz+pz)**2);
-                    let f1 = -160 / (d1/10 + 5);
-                    let f2 = 160 / (d2/10 + 5);
-                    dy += (f1 + f2);
-                    intensity = (Math.abs(f1) + Math.abs(f2)) * 0.02;
-                }
-
-                // 2. Undatron-Welle
-                let distC = Math.sqrt(ix*ix + iy*iy + iz*iz);
-                pulses.forEach(p => {
-                    let age = time - p.startTime;
-                    let waveR = age * p.velocity;
-                    let dist = distC - waveR;
-                    let envelope = Math.exp(-(dist**2) / 1800);
-                    let waveVal = Math.sin(dist * 0.15) * p.amp * Math.exp(-age * 0.01);
-                    
-                    let factor = 1 + (envelope * waveVal) / 100;
-                    dx *= factor; dy *= factor; dz *= factor;
-                    intensity += Math.abs(envelope * waveVal) * 0.015;
-                });
-
-                nodePosArr[i] = dx; nodePosArr[i+1] = dy; nodePosArr[i+2] = dz;
-
-                // 3. Farbe basierend auf Intensität (Blau -> Türkis -> Gelb -> Weiß)
-                nodeColArr[i] = Math.min(1, 0.1 + intensity * 2);     // R
-                nodeColArr[i+1] = Math.min(1, 0.4 + intensity * 4);   // G
-                nodeColArr[i+2] = Math.min(1, 1.0);                   // B
+            if(!isAnnihilated) {
+                let d1 = Math.sqrt((x-px)**2 + y**2 + (z-pz)**2);
+                let d2 = Math.sqrt((x+px)**2 + y**2 + (z+pz)**2);
+                dy += (-220 / (d2/8 + 5)) + (220 / (d1/8 + 5));
+                intensity += (Math.abs(dy-y) * 0.04);
             }
 
+            let distC = Math.sqrt(x*x + y*y + z*z);
+            let angle = Math.atan2(z, x);
+            pulses.forEach(p => {
+                let age = globalTime - p.t0;
+                let waveR = age * 10;
+                let d = distC - waveR;
+                let env = Math.exp(-(d*d) / 3000);
+                if (env > 0.01) {
+                    // Hier wird die neue Frequenz angewendet
+                    let phase = angle - (distC * 0.06) + (age * 0.6) + p.shift;
+                    let wave = Math.sin(phase) * Math.sin(d * params.frequency) * p.amp;
+                    radialShift += (wave * env);
+                    intensity += Math.abs(wave * env) * 0.03;
+                }
+            });
+
+            if (distC > 1) {
+                let scale = 1 + (radialShift / (distC + 60));
+                dx *= scale; dy *= scale; dz *= scale;
+            }
+            return { x: dx, y: dy, z: dz, intensity };
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            let rotSpeed = 180 / (params.radius + 60);
+            globalTime += 0.02 * rotSpeed * params.timeScale;
+            controls.update();
+
+            let px = Math.cos(globalTime) * params.radius;
+            let pz = Math.sin(globalTime) * params.radius;
+            electron.visible = positron.visible = !isAnnihilated;
+            if(!isAnnihilated) { electron.position.set(px, -10, pz); positron.position.set(-px, 10, -pz); }
+
+            const lPos = lineSegments.geometry.attributes.position.array;
+            const nPos = nodes.geometry.attributes.position.array;
+            const nCol = nodes.geometry.attributes.color.array;
+
+            for (let i = 0; i < lPos.length; i += 3) {
+                let res = getDeformation(basePositions[i], basePositions[i+1], basePositions[i+2], px, pz);
+                lPos[i] = res.x; lPos[i+1] = res.y; lPos[i+2] = res.z;
+            }
+            lineSegments.geometry.attributes.position.needsUpdate = true;
+
+            for (let i = 0; i < nPos.length; i += 3) {
+                let idx = i/3;
+                let ix = (Math.floor(idx / ((gridSize+1)*(gridSize+1))) - gridSize/2) * spacing;
+                let iy = (Math.floor((idx / (gridSize+1)) % (gridSize+1)) - gridSize/2) * spacing;
+                let iz = ((idx % (gridSize+1)) - gridSize/2) * spacing;
+
+                let res = getDeformation(ix, iy, iz, px, pz);
+                nPos[i] = res.x; nPos[i+1] = res.y; nPos[i+2] = res.z;
+                nCol[i] = Math.min(1, 0.05 + res.intensity * 2.5);
+                nCol[i+1] = Math.min(1, 0.3 + res.intensity * 4);
+                nCol[i+2] = Math.max(0.2, 0.9 - res.intensity);
+            }
             nodes.geometry.attributes.position.needsUpdate = true;
             nodes.geometry.attributes.color.needsUpdate = true;
             renderer.render(scene, camera);
         }
-
         init();
     </script>
 </body>

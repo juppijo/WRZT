@@ -65,9 +65,26 @@
             font-size: 0.8rem;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        .checkbox-label {
+            justify-content: flex-start;
+            gap: 10px;
+            cursor: pointer;
         }
         input[type=range] {
             accent-color: #00f2fe;
+        }
+        input[type=checkbox] {
+            accent-color: #00f2fe;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #0369a1;
+            margin: 4px 0;
         }
     </style>
     <!-- Three.js & OrbitControls -->
@@ -88,12 +105,17 @@
         </p>
         <p>• Phasenlauf ($u$): <span id="val-u" class="stat">0.0</span> rad</p>
         <p>• Dreifach-Torsion ($\frac{3u}{2}$): <span id="val-spin" class="stat">0.0</span> rad</p>
-        <p><i>Die 3 Wellenschleifen sind topologisch ineinander verwebt.</i></p>
 
         <div id="controls">
             <label>Geschwindigkeit: <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5"></label>
             <label>Knoten-Radius ($r_q$): <input type="range" id="radiusSlider" min="0.3" max="1.2" step="0.05" value="0.7"></label>
             <label>Transparenz: <input type="range" id="opacitySlider" min="0.1" max="0.8" step="0.05" value="0.35"></label>
+            
+            <hr>
+            <p style="font-weight: bold; color: #38bdf8; margin: 2px 0;">Quarks ein-/ausblenden:</p>
+            <label class="checkbox-label"><input type="checkbox" id="toggle-q0" checked> <span style="color: #fca5a5;">Quark u1 (Rot, 0°)</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="toggle-q1" checked> <span style="color: #93c5fd;">Quark u2 (Blau, 120°)</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="toggle-q2" checked> <span style="color: #86efac;">Quark d (Grün, 240°)</span></label>
         </div>
     </div>
 
@@ -262,6 +284,15 @@
             });
         });
 
+        // Event-Listener für Quark-Visibility (An/Aus)
+        for (let k = 0; k < 3; k++) {
+            document.getElementById(`toggle-q${k}`).addEventListener('change', (e) => {
+                const isVisible = e.target.checked;
+                quarkMeshes[k].mesh.visible = isVisible;
+                vectorGroups[k].group.visible = isVisible;
+            });
+        }
+
         function getQuarkPos(u, v, phiOffset) {
             const phase = (3 * u / 2) + phiOffset;
             const x = (R_p + v * Math.cos(phase)) * Math.cos(u);
@@ -277,15 +308,17 @@
             uAnim += speed;
             if (uAnim > Math.PI * 4) uAnim -= Math.PI * 4;
 
-            // Aktualisiere die 3 Vektoren der Quarks
-            vectorGroups.forEach(vg => {
-                const centerPos = getQuarkPos(uAnim, 0, vg.offset);
-                const edgePos = getQuarkPos(uAnim, r_q, vg.offset);
-                const dir = new THREE.Vector3().subVectors(edgePos, centerPos).normalize();
+            // Aktualisiere die 3 Vektoren der Quarks (nur wenn sichtbar, spart Rechenzeit)
+            vectorGroups.forEach((vg, idx) => {
+                if (vectorGroups[idx].group.visible) {
+                    const centerPos = getQuarkPos(uAnim, 0, vg.offset);
+                    const edgePos = getQuarkPos(uAnim, r_q, vg.offset);
+                    const dir = new THREE.Vector3().subVectors(edgePos, centerPos).normalize();
 
-                vg.group.position.copy(centerPos);
-                vg.arrow.setDirection(dir);
-                vg.sphere.position.copy(dir.clone().multiplyScalar(r_q));
+                    vg.group.position.copy(centerPos);
+                    vg.arrow.setDirection(dir);
+                    vg.sphere.position.copy(dir.clone().multiplyScalar(r_q));
+                }
             });
 
             // Pulsieren des Ur-Druck-Kerns
