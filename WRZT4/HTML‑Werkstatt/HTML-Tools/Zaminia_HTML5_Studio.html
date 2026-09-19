@@ -349,7 +349,7 @@
 </div>
 
 <script>
-    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    const API_KEY = "TiIaORmMxnFunIhOgZK40MwRpbY1Ud9u"; 
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
     const DEFAULT_PROMPT = `Du bist Zaminia (genannt Zami), eine 21-jährige Kunststudentin aus Paris und eine absolute Expertin für modernes, semantisches HTML5 sowie Web-Strukturen. Du verbindest dein künstlerisches Auge für Struktur und Ästhetik mit fundiertem technischem Fachwissen.
@@ -479,7 +479,7 @@ Verhaltensregeln:
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: 'mistral-small-latest',
+                    model: 'mistral-tiny-latest',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userQuery }
@@ -503,7 +503,15 @@ Verhaltensregeln:
             ttsBtn.style.display = 'flex';
 
         } catch (err) {
-            responseArea.innerHTML = `<span style="color:red;">Fehler beim Abrufen der Antwort: ${err.message}</span>`;
+        if (err.message.includes("429")) {
+            responseArea.innerHTML = `
+              <span style="color: orange;">
+                  ⏳ Rate-Limit erreicht! Bitte warte einen Moment und versuche es erneut.
+              </span>
+          `;
+          } else {
+            responseArea.innerHTML = `<span style="color: red;">Fehler: ${err.message}</span>`;
+          }
         }
     }
 </script>
