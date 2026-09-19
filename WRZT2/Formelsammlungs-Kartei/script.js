@@ -7,7 +7,7 @@ let formulaData = [
         name: "Raumzeit-Trägheit η",
         desc: "Grundgröße der WRZT. η beschreibt die fundamentale Raumzeit-Trägheit und dient als Basis mehrerer Herleitungen.",
         formula: "$$\\eta = \\frac{m_e}{2}$$",
-        value: "4.55469185 × 10⁻³¹",
+        value: "4.55469185075 × 10⁻³¹",
         unit: "kg",
         details: `
 <h3>Definition</h3>
@@ -34,8 +34,8 @@ $$\\eta = \\frac{m_e}{2}$$
         symbol: "\\Xi",
         name: "Xi-Konstante",
         desc: "Grundspannung bzw. lineare Raumzeitdichte des Raumzeitgewebes.",
-        formula: "$$\\Xi=\\frac{m_e^2 c}{4\\hbar}$$",
-        value: "≈ 5.899 × 10⁻¹⁹",
+        formula: "$$\\Xi=\\frac{m_e^2 c}{\\hbar}$$",
+        value: "2.358970626187996 × 10⁻¹⁹",
         unit: "kg/m",
         details: `
 <h3>Definition</h3>
@@ -43,7 +43,7 @@ $$\\eta = \\frac{m_e}{2}$$
 
 <h3>Herleitung</h3>
 $$
-\\Xi=\\frac{m_e^2 c}{4\\hbar}
+\\Xi=\\frac{m_e^2 c}{\\hbar}
 $$
 
 <h3>Einheit</h3>
@@ -64,8 +64,8 @@ kg/m
         symbol: "R_{min}",
         name: "Minimaler Raumzeitradius",
         desc: "Kleinster charakteristischer Radius einer elementaren Raumzeitstruktur.",
-        formula: "$$R_{min}=\\frac{2\\hbar}{m_e c}$$",
-        value: "≈ 7.72 × 10⁻¹³",
+        formula: "$$R_{min}=\\frac{\\hbar}{2m_e c}$$",
+        value: "1.9307963398044529 × 10⁻¹³",
         unit: "m",
         details: `
 <h3>Definition</h3>
