@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>WRZT Energie</title>
+   <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\(', '\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\[', '\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+  body {
+    font-family: sans-serif;
+    margin: 40px;
+    color: #112255;
+    background: #ededfd;
+    }
+    h1 {
+      color: #112299;
+    }
+    .button-container {
+      display: flex;
+      justify-content: flex-end; 
+      padding: 10px 15px; 
+      gap: 10px; 
+    }
+    .link-box-button {
+      justify-content: flex-end;
+      padding: 10px 18px;
+      background: #112299;
+      color: #eeddff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+      cursor: pointer; 
+    }
+    .link-box-button:hover {
+      background: #666688;
+      padding: 10px 19px;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+  <h1>WRZT Energie</h1>
+
+  <p>Die Energie auf der Skala $R_{\text{min}} = \frac{\hbar}{2 m_e c}$ lässt sich auf verschiedene elegante Arten über fundamentale Konzepte der Quantenmechanik wie <strong>Impuls $p$</strong>, <strong>Wellenlänge $\lambda$</strong> und <strong>Wellenzahl $k$</strong> herleiten bzw. ausdrücken.</p>
+<p>Hier sind die drei wichtigsten Sichtweisen:</p>
+<hr>
+<h3>1. Über den Impuls $p$ und die Unschärfe</h3>
+<p>In der Quantenmechanik ist eine räumliche Ausdehnung oder Lokalisierung der Skala $R_{\text{min}}$ über die Heisenbergschen Unschärferelationen direkt mit einem charakteristischen Impuls verknüpft:</p>
+<ul>
+<li><strong>Ansatz:</strong> $p \sim \frac{\hbar}{R_{\text{min}}}$  oder genauer als charakteristischer Impulsmaßstab.</li>
+<li><strong>Einsetzen von $R_{\text{min}}$:</strong></li>
+</ul>
+<p>$$p = \frac{\hbar}{\frac{\hbar}{2 m_e c}} = 2 m_e c$$</p>
+<ul>
+<li><strong>Energie-Bezug:</strong>
+Betrachtet man die Energie, die zu diesem charakteristischen Impuls über die Relativitätsrelation oder den Wellencharakter $E = c \cdot p$ gehört, erhält man:</li>
+</ul>
+<p>$$E = c \cdot (2 m_e c) = 2 m_e c^2$$</p>
+<p>Alternativ führt die klassische kinetische Energie eines Teilchens mit diesem Impuls $E_{\text{kin}} = \frac{p^2}{2 m_e}$ auf:</p>
+<p>$$E_{\text{kin}} = \frac{(2 m_e c)^2}{2 m_e} = \frac{4 m_e^2 c^2}{2 m_e} = 2 m_e c^2$$</p>
+<hr>
+<h3>2. Über die Wellenlänge $\lambda$ und $\bar{\lambda}$</h3>
+<p>Der Radius $R_{\text{min}}$ steht in direktem Verhältnis zur reduzierten Compton-Wellenlänge $\bar{\lambda}_c$ des Elektrons:</p>
+<ul>
+<li><strong>Zusammenhang:</strong></li>
+</ul>
+<p>$$\bar{\lambda}c = 2 R{\text{min}} \quad \text{bzw. die volle Compton-Wellenlänge } \lambda_c = 4\pi R_{\text{min}}$$</p>
+<ul>
+<li><strong>Wellen-Energie ($E = \frac{hc}{\lambda}$ oder $E = \frac{\hbar c}{\bar{\lambda}}$):</strong>
+Wenn man die Energie einer Welle (oder eines Photons) betrachtet, deren Wellenlänge direkt durch diesen räumlichen Maßstab $\bar{\lambda} = R_{\text{min}}$ oder $\bar{\lambda} = 2 R_{\text{min}}$ bestimmt wird:</li>
+</ul>
+<p>$$E = \frac{\hbar c}{R_{\text{min}}}$$</p>
+<ul>
+<li><strong>Einsetzen von $R_{\text{min}}$:</strong></li>
+</ul>
+<p>$$E = \frac{\hbar c}{\frac{\hbar}{2 m_e c}} = \hbar c \cdot \frac{2 m_e c}{\hbar} = 2 m_e c^2$$</p>
+<hr>
+<h3>3. Über die Wellenzahl $k$ und Kreisfrequenz $\omega$</h3>
+<p>In der Wellenmechanik beschreibt die Wellenzahl $k$  räumliche Frequenz , wie schnell sich eine Welle im Raum ausbreitet $k = \frac{2\pi}{\lambda}$ bzw. als reduzierte Wellenzahl $\frac{1}{R_{\text{min}}}$:</p>
+<ul>
+<li><strong>Ansatz:</strong> $k = \frac{1}{R_{\text{min}}} = \frac{2 m_e c}{\hbar}$</li>
+<li><strong>Dispersionsrelation:</strong>
+Die Energie einer relativistischen Welle / eines massiven Quantenfeldes ist über die Kreisfrequenz $\omega = c k$ verknüpft mit $E = \hbar \omega$:</li>
+</ul>
+<p>$$E = \hbar \cdot (c k) = \hbar c \left(\frac{2 m_e c}{\hbar}\right) = 2 m_e c^2$$</p>
+<hr>
+<h3>Zusammenfassung</h3>
+<p>Alle Wege führen über die fundamentale Wellen-Teilchen-Dualität zu demselben Ergebnis: Da $R_{\text{min}}$ umgekehrt proportional zum Impuls und zur Masse des Elektrons ist, skaliert die Energie an diesem Punkt universell als <strong>das Doppelte der Ruheenergie $2 m_e c^2$</strong>, unabhängig davon, ob man über die Wellenlänge, die Wellenzahl oder den Impuls herangeht.</p>
+
+
+  
+  <script>
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        alert("Fehler beim Aktivieren des Vollbildmodus!");
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+  </script>
+</body>
+</html>
