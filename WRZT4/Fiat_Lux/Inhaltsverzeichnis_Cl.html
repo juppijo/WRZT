@@ -205,6 +205,144 @@
     a.card.compact .card-desc{
       font-size:0.9rem;
     }
+    .link-box-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      color: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #818cf8;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-sizing: border-box;
+    }
+    
+    .link-box-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0,0,0,0.15);
+    }
+    
+    .link-box-icon {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    
+    .link-box-content {
+      flex-grow: 1;
+    }
+    
+    .link-box-title {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    
+    .link-box-description {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.85;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+    
+    .link-box-button {
+      padding: 10px 18px;
+      background: #6366f1;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .link-box-container:hover .link-box-button {
+      opacity: 0.9;
+    }
+    
+    @media (max-width: 520px) {
+      .link-box-container {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+      }
+    }
+    .link-box-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #18181b, #27272a);
+      color: #fef08a;
+      border-radius: 8px;
+      border: 1px solid #fde047;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      text-decoration: none;
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-sizing: border-box;
+    }
+    
+    .link-box-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 12px 20px rgba(0,0,0,0.15);
+    }
+    
+    .link-box-icon {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    
+    .link-box-content {
+      flex-grow: 1;
+    }
+    
+    .link-box-title {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fef08a;
+    }
+    
+    .link-box-description {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.85;
+      color: #fef08a;
+      line-height: 1.4;
+    }
+    
+    .link-box-button {
+      padding: 10px 18px;
+      background: #eab308;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .link-box-container:hover .link-box-button {
+      opacity: 0.9;
+    }
+    
+    @media (max-width: 520px) {
+      .link-box-container {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -457,6 +595,16 @@
     <p></p>
     <hr>
     <p></p>
+
+    <a href="https://juppijo.github.io/WRZT/WRZT-Energie.html" class="link-box-container" target="_blank" rel="noopener noreferrer">
+      <div class="link-box-icon">🚀</div>
+      <div class="link-box-content">
+        <h3 class="link-box-title">Energie bei Rmin</h3>
+        <p class="link-box-description">Überprüfen der Energie bei Rmin</p>
+      </div>
+      <div class="link-box-button">In neuen Tab öffnen →</div>
+    </a>
+
 
     <!-- Ein Link, der sich sanft in einem neuen Tab öffnet -->
     <a href="https://juppijo.github.io/WRZT/WRZT4/Fiat_Lux/WRZT-Quellenangaben.html" target="_blank" rel="noopener noreferrer" aria-label="Öffnet die WRZT-Quellenangaben in einem neuen Tab (öffnet extern)">
