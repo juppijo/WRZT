@@ -195,7 +195,7 @@
       gap: 8px;
     }
 
-    .add-box textarea {
+    .add-box textarea, .edit-textarea {
       width: 100%;
       height: 130px;
       background-color: var(--input-bg);
@@ -209,7 +209,7 @@
       margin-bottom: 1rem;
     }
 
-    .add-box textarea:focus {
+    .add-box textarea:focus, .edit-textarea:focus {
       outline: none;
       border-color: var(--accent-color);
     }
@@ -264,8 +264,21 @@
       background-color: var(--input-bg);
     }
 
-    /* Content Typography inside Sections */
+    /* Inline Editor Container inside Card */
+    .card-edit-mode {
+      display: none;
+      margin-top: 1rem;
+    }
 
+    .card-edit-mode.active {
+      display: block;
+    }
+
+    .card-content.hidden {
+      display: none;
+    }
+
+    /* Content Typography inside Sections */
     .wrzt-section h1 {
       font-size: 2.1rem;
       color: var(--accent-color);
@@ -378,7 +391,8 @@
 
       <!-- Render LaTeX Button -->
       <button class="btn btn-secondary" onclick="renderLaTeX()">
-        $$\sqrt{x}$$ LaTeX Rendern
+        $$\sqrt{x}$$
+LaTeX Rendern
       </button>
 
       <!-- Fullscreen Toggle Button -->
@@ -425,7 +439,6 @@
   </footer>
 
   <script>
-    // Korrigierter LaTeX-Quellcode (Gescapte Backslashes für JavaScript Strings)
     const initialSectionContent = `<section id="wrzt-test" class="wrzt-section">
     <h1>Test Wellenraumzeit (WRZT)</h1>
     <h2>Test Wellenraumzeit (WRZT)</h2></section>`;
@@ -450,22 +463,79 @@
       const card = document.createElement('div');
       card.className = 'wrzt-section-card';
       
-      // Control Buttons (Up, Down, Delete)
+      // Control Buttons (Edit, Up, Down, Delete)
       const controls = document.createElement('div');
       controls.className = 'card-controls';
       controls.innerHTML = `
+        <button class="btn-icon" onclick="toggleEditSection(this)" title="Sektion bearbeiten">✏️</button>
         <button class="btn-icon" onclick="moveSection(this, -1)" title="Nach oben verschieben">▲</button>
         <button class="btn-icon" onclick="moveSection(this, 1)" title="Nach unten verschieben">▼</button>
         <button class="btn-icon" onclick="deleteSection(this)" title="Sektion löschen" style="color:#ef4444;">✕</button>
       `;
 
+      // Rendered HTML View Container
       const contentDiv = document.createElement('div');
       contentDiv.className = 'card-content';
       contentDiv.innerHTML = htmlContent;
 
+      // Inline Edit Mode Container
+      const editDiv = document.createElement('div');
+      editDiv.className = 'card-edit-mode';
+      editDiv.innerHTML = `
+        <textarea class="edit-textarea">${htmlContent.trim()}</textarea>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="cancelEditSection(this)">Abbrechen</button>
+          <button class="btn" onclick="saveEditSection(this)">Änderungen Speichern</button>
+        </div>
+      `;
+
       card.appendChild(controls);
       card.appendChild(contentDiv);
+      card.appendChild(editDiv);
       container.appendChild(card);
+
+      renderLaTeX();
+    }
+
+    // Toggle Section Edit Mode
+    function toggleEditSection(button) {
+      const card = button.closest('.wrzt-section-card');
+      const contentDiv = card.querySelector('.card-content');
+      const editDiv = card.querySelector('.card-edit-mode');
+      const textarea = editDiv.querySelector('.edit-textarea');
+
+      if (!editDiv.classList.contains('active')) {
+        // Sync current innerHTML back into textarea before opening
+        textarea.value = contentDiv.innerHTML.trim();
+        contentDiv.classList.add('hidden');
+        editDiv.classList.add('active');
+      } else {
+        cancelEditSection(button);
+      }
+    }
+
+    // Cancel Edit Mode
+    function cancelEditSection(button) {
+      const card = button.closest('.wrzt-section-card');
+      const contentDiv = card.querySelector('.card-content');
+      const editDiv = card.querySelector('.card-edit-mode');
+      
+      editDiv.classList.remove('active');
+      contentDiv.classList.remove('hidden');
+    }
+
+    // Save Edited Section Content
+    function saveEditSection(button) {
+      const card = button.closest('.wrzt-section-card');
+      const contentDiv = card.querySelector('.card-content');
+      const editDiv = card.querySelector('.card-edit-mode');
+      const textarea = editDiv.querySelector('.edit-textarea');
+
+      const newContent = textarea.value.trim();
+      contentDiv.innerHTML = newContent;
+
+      editDiv.classList.remove('active');
+      contentDiv.classList.remove('hidden');
 
       renderLaTeX();
     }
@@ -480,7 +550,6 @@
         reader.onload = function(e) {
           const fileText = e.target.result;
           
-          // Check if file contains full HTML or just <section>
           const parser = new DOMParser();
           const doc = parser.parseFromString(fileText, 'text/html');
           const sections = doc.querySelectorAll('section');
@@ -496,7 +565,6 @@
         reader.readAsText(file);
       });
 
-      // Reset file input value so same file can be reloaded if needed
       event.target.value = '';
     }
 
@@ -579,23 +647,19 @@
       
       let fullHtml = '';
       cards.forEach(card => {
-        // Clone card content to avoid modifying live DOM
         const clone = card.cloneNode(true);
-        // Clean up any MathJax rendered elements back to plain text if needed, or get raw html
         const mathJaxElements = clone.querySelectorAll('.MathJax, .mjx-chtml, script[type="math/tex"]');
         mathJaxElements.forEach(el => el.remove());
         
         fullHtml += clone.innerHTML + '\n\n';
       });
 
-      // Initialize Turndown service for HTML to Markdown conversion
       if (typeof TurndownService !== 'undefined') {
         const turndownService = new TurndownService({
           headingStyle: 'atx',
           codeBlockStyle: 'fenced'
         });
 
-        // Custom rule to keep raw LaTeX blocks intact
         turndownService.addRule('keepMath', {
           filter: function (node) {
             return node.classList && (node.classList.contains('equation') || node.classList.contains('formula-block'));
