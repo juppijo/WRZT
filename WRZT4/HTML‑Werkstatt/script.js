@@ -8,21 +8,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 <title>WRZT Seite</title>
-<style>
-body {
-  font-family: sans-serif;
-  margin: 40px;
-  color: #112255;
-  background: #ededfd;
-}
-h1 {
-  color: #112299;
-}
-</style>
+   <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <style>
+  body {
+    font-family: sans-serif;
+    margin: 40px;
+    color: #112255;
+    background: #ededfd;
+    }
+    h1 {
+      color: #112299;
+    }
+    .button-container {
+      display: flex;
+      justify-content: flex-end; 
+      padding: 10px 15px; 
+      gap: 10px; 
+    }
+    .link-box-button {
+      justify-content: flex-end;
+      padding: 10px 18px;
+      background: #112299;
+      color: #eeddff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+      cursor: pointer; 
+    }
+    .link-box-button:hover {
+      background: #666688;
+      padding: 10px 19px;
+    }
+  </style>
 </head>
 <body>
-<h1>Willkommen</h1>
-<p>Lade eine eigene HTML-Datei über „Laden" oder bearbeite diese Seite direkt im Editor.</p>
+  <div class="button-container">
+    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+  <h1>Willkommen</h1>
+  <p>Lade eine eigene HTML-Datei über „Laden" oder bearbeite diese Seite direkt im Editor.</p>
+  <p>Test: $$ E = m c² $$</p>
+  <script>
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        alert("Fehler beim Aktivieren des Vollbildmodus!");
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+  </script>
 </body>
 </html>`;
 
