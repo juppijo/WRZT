@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Positronium 3D — Interferenz &amp; Bugwellen Field</title>
+  
+  <!-- Fonts & Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Three.js & OrbitControls via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #020612;
+      --bg-radial: #081126;
+      --panel-bg: rgba(7, 16, 38, 0.78);
+      --panel-border: rgba(0, 210, 255, 0.28);
+      
+      --cyan: #00f0ff;
+      --electron: #00e1ff;
+      --positron: #ff2a6d;
+      --gold: #ffc800;
+      --green: #00ff88;
+      --purple: #b055ff;
+      
+      --text: #e2f1ff;
+      --text-dim: #7f9bbd;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      overflow: hidden; background: var(--bg-base);
+      font-family: 'Barlow', sans-serif; color: var(--text);
+    }
+
+    #canvas-container {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 50%, var(--bg-radial) 0%, var(--bg-base) 88%);
+      z-index: 1;
+    }
+
+    .hud { position: fixed; z-index: 10; pointer-events: none; }
+    .hud * { pointer-events: auto; }
+
+    .glass-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(0, 240, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 12px;
+    }
+
+    .title-panel { top: 20px; left: 24px; padding: 14px 20px; }
+    .title-panel h1 {
+      margin: 0; font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+      letter-spacing: 1.5px; color: #fff; font-weight: 400; text-shadow: 0 0 14px var(--cyan);
+    }
+    .title-panel h1 span { color: var(--cyan); }
+    .title-panel p { margin: 2px 0 0; font-size: 12px; color: var(--text-dim); letter-spacing: 0.3px; }
+
+    .toolbar { top: 20px; right: 24px; display: flex; gap: 10px; }
+    .btn {
+      background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text);
+      padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s ease; backdrop-filter: blur(8px);
+    }
+    .btn:hover { border-color: var(--cyan); box-shadow: 0 0 14px rgba(0, 240, 255, 0.35); color: #fff; }
+    .btn svg { width: 16px; height: 16px; stroke: var(--cyan); fill: none; stroke-width: 2; }
+
+    .controls-panel {
+      left: 24px; bottom: 24px; width: 370px;
+      padding: 16px 20px; max-height: calc(100vh - 120px); overflow-y: auto;
+    }
+    .controls-panel::-webkit-scrollbar { width: 4px; }
+    .controls-panel::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 2px; }
+
+    .panel-title {
+      margin: 0 0 12px; font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+      letter-spacing: 1px; color: var(--cyan); display: flex; justify-content: space-between; align-items: center;
+    }
+    .panel-subtitle {
+      font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.8px;
+      color: var(--gold); margin: 14px 0 8px; padding-top: 10px; border-top: 1px solid var(--panel-border);
+    }
+
+    .ctrl-row { margin-bottom: 12px; }
+    .ctrl-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+    .ctrl-label b { color: var(--text); }
+    .ctrl-label .val { color: var(--cyan); font-family: var(--mono); font-size: 12.5px; font-weight: 600; }
+
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px;
+      background: rgba(0, 200, 255, 0.2); outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+      background: var(--cyan); border: 2px solid var(--bg-base); cursor: pointer;
+      box-shadow: 0 0 8px var(--cyan); transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+    .presets { display: flex; gap: 6px; margin: 12px 0; }
+    .preset-btn {
+      flex: 1; background: rgba(0, 119, 255, 0.12); border: 1px solid var(--panel-border);
+      color: var(--text-dim); padding: 6px 4px; border-radius: 6px; font-size: 11px;
+      font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .preset-btn:hover { border-color: var(--cyan); color: #fff; background: rgba(0, 240, 255, 0.18); }
+
+    .toggles { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border); padding-top: 12px; }
+    .toggle-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-dim); cursor: pointer; user-select: none; }
+    .toggle-row input { accent-color: var(--cyan); width: 15px; height: 15px; cursor: pointer; }
+    .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    .data-panel {
+      top: 80px; right: 24px; width: 330px;
+      max-height: calc(100vh - 110px); overflow-y: auto; padding: 6px 0;
+    }
+    .data-panel::-webkit-scrollbar { width: 4px; }
+    .data-panel::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 2px; }
+
+    .dp-group { padding: 12px 18px; border-bottom: 1px solid var(--panel-border); }
+    .dp-group:last-child { border-bottom: none; }
+    .dp-group h3 { margin: 0 0 8px; font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--cyan); }
+    .dp-row { display: flex; justify-content: space-between; align-items: baseline; padding: 3px 0; gap: 10px; }
+    .dp-row .k { font-size: 12px; color: var(--text-dim); }
+    .dp-row .v { font-family: var(--mono); font-size: 13px; color: #fff; font-weight: 600; text-align: right; }
+    .dp-row .v em { color: var(--text-dim); font-style: normal; font-size: 10px; margin-left: 2px; }
+
+    .stability { margin-top: 8px; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center; font-weight: 600; }
+    .stability.ok { background: rgba(0, 255, 136, 0.15); color: var(--green); border: 1px solid rgba(0, 255, 136, 0.4); }
+    .stability.no { background: rgba(255, 42, 109, 0.15); color: var(--positron); border: 1px solid rgba(255, 42, 109, 0.4); }
+
+    .legend-panel { top: 80px; left: 24px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .leg-item { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-dim); }
+    .leg-swatch { width: 16px; height: 3px; border-radius: 2px; }
+
+    .timescale-bar {
+      bottom: 24px; left: 50%; transform: translateX(-50%);
+      padding: 8px 20px; border-radius: 20px; font-size: 11px; color: var(--text-dim); white-space: nowrap;
+    }
+    .timescale-bar b { color: var(--cyan); font-family: var(--mono); }
+
+    @media (max-width: 920px) {
+      .legend-panel { display: none; }
+      .data-panel { top: auto; bottom: 220px; right: 24px; left: 24px; width: auto; max-height: 28vh; }
+      .controls-panel { width: auto; right: 24px; max-height: 40vh; }
+      .timescale-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <div class="hud title-panel glass-panel">
+    <h1>Positron<span>ium</span> 3D Wave Interference</h1>
+    <p>Interaktive Wellenfeld-Superposition &amp; Bugwellen-Dopplereffekt</p>
+  </div>
+
+  <div class="hud toolbar">
+    <button class="btn" id="resetCamBtn">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Kamera Reset
+    </button>
+    <button class="btn" id="fsBtn">
+      <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      Vollbild
+    </button>
+  </div>
+
+  <div class="hud legend-panel glass-panel">
+    <div class="leg-item"><span class="leg-swatch" style="background:var(--cyan)"></span>Elektron e⁻</div>
+    <div class="leg-item"><span class="leg-swatch" style="background:var(--positron)"></span>Positron e⁺</div>
+    <div class="leg-item"><span class="leg-swatch" style="background:var(--gold)"></span>Interferenz-Knoten (Konstruktiv)</div>
+    <div class="leg-item"><span class="leg-swatch" style="background:#020b22"></span>Knotenlinien (Destruktiv)</div>
+    <div class="leg-item"><span class="leg-swatch" style="background:var(--green)"></span>Zentripetalkraft F_zp</div>
+    <div class="leg-item"><span class="leg-swatch" style="background:var(--purple)"></span>Bahngeschwindigkeit v</div>
+  </div>
+
+  <div class="hud controls-panel glass-panel">
+    <div class="panel-title">Physik &amp; Wellen-Steuerung</div>
+    
+    <!-- Physics parameters -->
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Radius r (Abstand e⁻–e⁺)</b><span class="val" id="rVal">–</span></div>
+      <input type="range" id="rSlider" min="0" max="1000" step="1">
+    </div>
+    
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Bahngeschwindigkeit v</b><span class="val" id="vVal">–</span></div>
+      <input type="range" id="vSlider" min="0" max="1000" step="1">
+    </div>
+    
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Simulations-Zeitraffer</b><span class="val" id="speedVal">1.0×</span></div>
+      <input type="range" id="speedSlider" min="1" max="500" step="1" value="100">
+    </div>
+
+    <div class="presets">
+      <button class="preset-btn" data-preset="ps">Grundzustand</button>
+      <button class="preset-btn" data-preset="wide">Weite Bahn</button>
+      <button class="preset-btn" data-preset="fast">Relativistisch</button>
+    </div>
+
+    <!-- Wave Field Shader Controls -->
+    <div class="panel-subtitle">🌊 Interferenz &amp; Bugwellen (Shader)</div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Wellen-Frequenz (k)</b><span class="val" id="waveFreqVal">4.0</span></div>
+      <input type="range" id="waveFreqSlider" min="10" max="100" step="1" value="40">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Ausbreitungsgeschwindigkeit (c_wave)</b><span class="val" id="waveSpeedVal">3.5</span></div>
+      <input type="range" id="waveSpeedSlider" min="10" max="100" step="1" value="35">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Wellen-Amplitude / Intensität</b><span class="val" id="waveAmpVal">1.0</span></div>
+      <input type="range" id="waveAmpSlider" min="1" max="30" step="1" value="10">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>Dämpfung / Reichweite</b><span class="val" id="waveDampVal">0.12</span></div>
+      <input type="range" id="waveDampSlider" min="1" max="50" step="1" value="12">
+    </div>
+
+    <div class="ctrl-row">
+      <div class="ctrl-label"><b>3D Mesh Höhe (Displacement)</b><span class="val" id="waveHeightVal">0.8</span></div>
+      <input type="range" id="waveHeightSlider" min="0" max="30" step="1" value="8">
+    </div>
+
+    <div class="toggles">
+      <label class="toggle-row"><input type="checkbox" id="toggleInterference" checked><span class="swatch" style="background:var(--cyan)"></span>Interferenzfeld (Shader Plane) anzeigen</label>
+      <label class="toggle-row"><input type="checkbox" id="toggleVectors" checked><span class="swatch" style="background:var(--gold)"></span>3D Kraftvektoren anzeigen</label>
+      <label class="toggle-row"><input type="checkbox" id="toggleSync" checked><span class="swatch" style="background:#fff"></span>3D Synchrotron-Keule</label>
+      <label class="toggle-row"><input type="checkbox" id="toggleGrid" checked><span class="swatch" style="background:var(--text-dim)"></span>Orbit-Koordinaten-Grid</label>
+    </div>
+  </div>
+
+  <div class="hud data-panel glass-panel" id="dataPanel"></div>
+  <div class="hud timescale-bar glass-panel" id="timescaleLabel"></div>
+
+  <script>
+    (function() {
+      "use strict";
+
+      // SI Physical Constants
+      const k_e = 8.9875517923e9;
+      const e_c = 1.602176634e-19;
+      const m_e = 9.1093837015e-31;
+      const h_pl = 6.62607015e-34;
+      const c_l = 2.99792458e8;
+      const eps0 = 8.8541878128e-12;
+
+      const R_MIN = 1e-23, R_MAX = 5e-9;
+      const V_MIN = 1e4, V_MAX = 2.9979e8;
+
+      function sliderToLog(pos, min, max) { return min * Math.pow(max / min, pos / 1000); }
+      function logToSlider(val, min, max) { return 1000 * Math.log(val / min) / Math.log(max / min); }
+
+      // UI References
+      const rSlider = document.getElementById('rSlider');
+      const vSlider = document.getElementById('vSlider');
+      const speedSlider = document.getElementById('speedSlider');
+      const rValEl = document.getElementById('rVal');
+      const vValEl = document.getElementById('vVal');
+      const speedValEl = document.getElementById('speedVal');
+
+      const waveFreqSlider = document.getElementById('waveFreqSlider');
+      const waveSpeedSlider = document.getElementById('waveSpeedSlider');
+      const waveAmpSlider = document.getElementById('waveAmpSlider');
+      const waveDampSlider = document.getElementById('waveDampSlider');
+      const waveHeightSlider = document.getElementById('waveHeightSlider');
+
+      const waveFreqVal = document.getElementById('waveFreqVal');
+      const waveSpeedVal = document.getElementById('waveSpeedVal');
+      const waveAmpVal = document.getElementById('waveAmpVal');
+      const waveDampVal = document.getElementById('waveDampVal');
+      const waveHeightVal = document.getElementById('waveHeightVal');
+
+      const dataPanel = document.getElementById('dataPanel');
+      const timescaleLabel = document.getElementById('timescaleLabel');
+
+      // State variables
+      let simSpeedMultiplier = 1.0;
+      let r_sep = 1.0585e-10;
+      let v_orb = 1.094e6;
+
+      rSlider.value = logToSlider(r_sep, R_MIN, R_MAX);
+      vSlider.value = logToSlider(v_orb, V_MIN, V_MAX);
+
+      function fmt(val, unit, digits = 3) {
+        if (!isFinite(val)) return '—';
+        const exp = val.toExponential(digits);
+        const [mant, e] = exp.split('e');
+        const eNum = parseInt(e, 10);
+        return `${mant}×10<em>${eNum>=0?'+':''}${eNum}</em> ${unit}`;
+      }
+
+      function fmtPlain(val, unit, digits = 3) {
+        if (!isFinite(val)) return '—';
+        const exp = val.toExponential(digits);
+        const [mant, e] = exp.split('e');
+        const eNum = parseInt(e, 10);
+        return `${mant}e${eNum} ${unit}`;
+      }
+
+      function computePhysics(r, v) {
+        const r_p = r / 2;
+        const F_coulomb = k_e * e_c * e_c / (r * r);
+        const F_zp = m_e * v * v / r_p;
+        const F_lorentz = F_coulomb * (v * v) / (c_l * c_l);
+        const omega = v / r_p;
+        const T = 2 * Math.PI / omega;
+        const lambda_dB = h_pl / (m_e * v);
+        const L = m_e * v * r_p;
+        const E_kin = 0.5 * m_e * v * v;
+        const E_pot = -k_e * e_c * e_c / r;
+        const E_tot = 2 * E_kin + E_pot;
+        const beta = Math.min(v / c_l, 0.99999);
+        const ratio = F_coulomb / F_zp;
+        const E_tot_eV = E_tot / e_c;
+
+        const gamma = 1 / Math.sqrt(1 - beta * beta);
+        const a_zp = v * v / r_p;
+        const P_larmor = (e_c * e_c * Math.pow(gamma, 4) * a_zp * a_zp) / (6 * Math.PI * eps0 * c_l * c_l * c_l);
+        const P_total = 2 * P_larmor;
+        const theta_beam = 1 / gamma;
+
+        return {
+          r_p, F_coulomb, F_zp, F_lorentz, omega, T, lambda_dB, L,
+          E_kin, E_pot, E_tot, beta, ratio, E_tot_eV, gamma, a_zp,
+          P_total, theta_beam
+        };
+      }
+
+      function renderDataPanel(p, r, v) {
+        const stable = Math.abs(p.ratio - 1) < 0.03;
+        dataPanel.innerHTML = `
+          <div class="dp-group">
+            <h3>Kinematik</h3>
+            <div class="dp-row"><span class="k">Bahnradius r_p</span><span class="v">${fmt(p.r_p,'m')}</span></div>
+            <div class="dp-row"><span class="k">Winkelgeschw. ω</span><span class="v">${fmt(p.omega,'rad/s')}</span></div>
+            <div class="dp-row"><span class="k">Umlaufzeit T</span><span class="v">${fmt(p.T,'s')}</span></div>
+            <div class="dp-row"><span class="k">v / c (β)</span><span class="v">${fmt(p.beta,'')}</span></div>
+          </div>
+          <div class="dp-group">
+            <h3>3D Kräfte &amp; Vektoren</h3>
+            <div class="dp-row"><span class="k">Coulombkraft F_C</span><span class="v">${fmt(p.F_coulomb,'N')}</span></div>
+            <div class="dp-row"><span class="k">Zentripetalkraft F_zp</span><span class="v">${fmt(p.F_zp,'N')}</span></div>
+            <div class="dp-row"><span class="k">Lorentzkraft F_L</span><span class="v">${fmt(p.F_lorentz,'N')}</span></div>
+            <div class="stability ${stable?'ok':'no'}">${stable ? '✓ Stabile Kreisbahn (F_C ≈ F_zp)' : '✕ Instabil — F_C/F_zp = '+p.ratio.toFixed(2)}</div>
+          </div>
+          <div class="dp-group">
+            <h3>Energie &amp; Quanten</h3>
+            <div class="dp-row"><span class="k">Kin. Energie (e⁻)</span><span class="v">${fmt(p.E_kin,'J')}</span></div>
+            <div class="dp-row"><span class="k">Gesamtenergie E_tot</span><span class="v">${p.E_tot_eV.toFixed(2)} <em>eV</em></span></div>
+            <div class="dp-row"><span class="k">Drehimpuls L</span><span class="v">${fmt(p.L,'J·s')}</span></div>
+            <div class="dp-row"><span class="k">de-Broglie-Länge λ</span><span class="v">${fmt(p.lambda_dB,'m')}</span></div>
+          </div>
+          <div class="dp-group">
+            <h3>Synchrotronstrahlung</h3>
+            <div class="dp-row"><span class="k">Lorentzfaktor γ</span><span class="v">${p.gamma.toFixed(4)}</span></div>
+            <div class="dp-row"><span class="k">Strahlungsleistung P</span><span class="v">${fmt(p.P_total,'W')}</span></div>
+            <div class="dp-row"><span class="k">Keulenöffnung θ</span><span class="v">${(p.theta_beam*180/Math.PI).toFixed(2)}°</span></div>
+          </div>
+        `;
+      }
+
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x020612, 0.012);
+
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 22, 32);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxDistance = 180;
+      controls.minDistance = 2;
+
+      const ambientLight = new THREE.AmbientLight(0x0a1329, 1.5);
+      scene.add(ambientLight);
+
+      // --- GLSL Wave Interference Field Shader ---
+      const waveShaderUniforms = {
+        uTime: { value: 0 },
+        uPosElectron: { value: new THREE.Vector2(0, 0) },
+        uPosPositron: { value: new THREE.Vector2(0, 0) },
+        uWaveK: { value: 4.0 },
+        uWaveSpeed: { value: 3.5 },
+        uAmplitude: { value: 1.0 },
+        uDamping: { value: 0.12 },
+        uHeightScale: { value: 0.8 }
+      };
+
+      const waveVertexShader = `
+        uniform vec2 uPosElectron;
+        uniform vec2 uPosPositron;
+        uniform float uTime;
+        uniform float uWaveK;
+        uniform float uWaveSpeed;
+        uniform float uAmplitude;
+        uniform float uDamping;
+        uniform float uHeightScale;
+
+        varying float vPsi;
+        varying vec2 vUv;
+        varying vec3 vWorldPos;
+
+        void main() {
+          vUv = uv;
+          vec3 pos = position;
+
+          // Distance from vertex to electron and positron in 2D orbital plane
+          float d_e = distance(pos.xz, uPosElectron);
+          float d_p = distance(pos.xz, uPosPositron);
+
+          // Wave equation superposition: Psi_total = Psi_e- + Psi_e+
+          // Spherical expanding waves from retarded positions with attenuation
+          float wave_e = sin(uWaveK * d_e - uTime * uWaveSpeed) / (1.0 + uDamping * d_e);
+          float wave_p = -sin(uWaveK * d_p - uTime * uWaveSpeed) / (1.0 + uDamping * d_p);
+
+          float psi = (wave_e + wave_p) * uAmplitude;
+          vPsi = psi;
+
+          // Displace mesh vertex height based on wave interference amplitude
+          pos.y += psi * uHeightScale;
+
+          vec4 worldPosition = modelMatrix * vec4(pos, 1.0);
+          vWorldPos = worldPosition.xyz;
+          gl_Position = projectionMatrix * viewMatrix * worldPosition;
+        }
+      `;
+
+      const waveFragmentShader = `
+        uniform float uTime;
+        varying float vPsi;
+        varying vec2 vUv;
+        varying vec3 vWorldPos;
+
+        void main() {
+          float absPsi = abs(vPsi);
+
+          // Deep cosmic color palette
+          vec3 colorDark = vec3(0.01, 0.04, 0.12);      // Destructive interference (Nodal lines)
+          vec3 colorCyan = vec3(0.0, 0.9, 1.0);        // Electron wave field
+          vec3 colorPositron = vec3(1.0, 0.16, 0.45);   // Positron wave field
+          vec3 colorConstructive = vec3(1.0, 0.82, 0.0); // Constructive interference peaks (Gold)
+
+          vec3 finalColor = colorDark;
+
+          if (vPsi > 0.0) {
+            finalColor = mix(colorDark, colorCyan, clamp(vPsi * 1.2, 0.0, 1.0));
+            finalColor = mix(finalColor, colorConstructive, clamp((vPsi - 0.7) * 2.0, 0.0, 1.0));
+          } else {
+            finalColor = mix(colorDark, colorPositron, clamp(-vPsi * 1.2, 0.0, 1.0));
+            finalColor = mix(finalColor, colorConstructive, clamp((-vPsi - 0.7) * 2.0, 0.0, 1.0));
+          }
+
+          // Edge glow fade
+          float distFromCenter = length(vWorldPos.xz);
+          float alpha = smoothstep(38.0, 5.0, distFromCenter) * 0.85;
+
+          gl_FragColor = vec4(finalColor, alpha);
+        }
+      `;
+
+      // 3D Wave Plane Mesh
+      const wavePlaneGeo = new THREE.PlaneGeometry(80, 80, 220, 220);
+      wavePlaneGeo.rotateX(-Math.PI / 2);
+
+      const wavePlaneMat = new THREE.ShaderMaterial({
+        vertexShader: waveVertexShader,
+        fragmentShader: waveFragmentShader,
+        uniforms: waveShaderUniforms,
+        transparent: true,
+        side: THREE.DoubleSide,
+        wireframe: false
+      });
+
+      const wavePlaneMesh = new THREE.Mesh(wavePlaneGeo, wavePlaneMat);
+      scene.add(wavePlaneMesh);
+
+      // Orbital Grid Helper
+      const gridHelper = new THREE.GridHelper(50, 50, 0x00f0ff, 0x002244);
+      gridHelper.position.y = -0.05;
+      scene.add(gridHelper);
+
+      // Particle Creation Helper
+      function createParticle(colorHex, coreRadius = 0.4) {
+        const group = new THREE.Group();
+        const coreGeo = new THREE.SphereGeometry(coreRadius, 32, 32);
+        const coreMat = new THREE.MeshStandardMaterial({
+          color: colorHex, emissive: colorHex, emissiveIntensity: 0.9, roughness: 0.1
+        });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        group.add(core);
+
+        const pLight = new THREE.PointLight(colorHex, 2.5, 10);
+        group.add(pLight);
+
+        return group;
+      }
+
+      const electronMesh = createParticle('#00e1ff', 0.4);
+      const positronMesh = createParticle('#ff2a6d', 0.4);
+      scene.add(electronMesh);
+      scene.add(positronMesh);
+
+      // 3D Force Vector Helpers
+      const vectorsGroup = new THREE.Group();
+      scene.add(vectorsGroup);
+
+      function createVectorArrow(colorHex) {
+        return new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0), 1, colorHex, 0.4, 0.25);
+      }
+
+      const F_coulomb_e_Arrow = createVectorArrow(0xffc800);
+      const F_coulomb_p_Arrow = createVectorArrow(0xffc800);
+      const F_zp_e_Arrow = createVectorArrow(0x00ff88);
+      const F_zp_p_Arrow = createVectorArrow(0x00ff88);
+      const V_e_Arrow = createVectorArrow(0xb055ff);
+      const V_p_Arrow = createVectorArrow(0xb055ff);
+
+      vectorsGroup.add(F_coulomb_e_Arrow);
+      vectorsGroup.add(F_coulomb_p_Arrow);
+      vectorsGroup.add(F_zp_e_Arrow);
+      vectorsGroup.add(F_zp_p_Arrow);
+      vectorsGroup.add(V_e_Arrow);
+      vectorsGroup.add(V_p_Arrow);
+
+      // Synchrotron Cones
+      function createSynchrotronCone() {
+        const group = new THREE.Group();
+        const coneGeo = new THREE.ConeGeometry(1, 4, 32, 1, true);
+        coneGeo.translate(0, 2, 0);
+        coneGeo.rotateX(Math.PI / 2);
+
+        const coneMat = new THREE.MeshBasicMaterial({
+          color: 0xffffff, transparent: true, opacity: 0.3, side: THREE.DoubleSide, blending: THREE.AdditiveBlending
+        });
+        const mesh = new THREE.Mesh(coneGeo, coneMat);
+        group.add(mesh);
+        return { group, mesh };
+      }
+
+      const eSyncCone = createSynchrotronCone();
+      const pSyncCone = createSynchrotronCone();
+      scene.add(eSyncCone.group);
+      scene.add(pSyncCone.group);
+
+      // Animation & Render Loop
+      let theta = 0;
+      let lastTime = performance.now();
+
+      const toggleInterference = document.getElementById('toggleInterference');
+      const toggleVectors = document.getElementById('toggleVectors');
+      const toggleSync = document.getElementById('toggleSync');
+      const toggleGrid = document.getElementById('toggleGrid');
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+
+        const dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+
+        const p = computePhysics(r_sep, v_orb);
+
+        const targetVisualOmega = 1.4 * simSpeedMultiplier;
+        const timeScaleFactor = p.omega > 0 ? targetVisualOmega / p.omega : 0;
+        theta += p.omega * timeScaleFactor * dt;
+
+        timescaleLabel.innerHTML = `Reale Winkelgeschw. ω = <b>${fmtPlain(p.omega,'rad/s',2)}</b> · Umlauf zeitskaliert (Faktor ${fmtPlain(timeScaleFactor,'',2)})`;
+
+        const visualRadius = 2.5 + (Math.log(r_sep / R_MIN) / Math.log(R_MAX / R_MIN)) * 10;
+
+        const ex = Math.cos(theta) * visualRadius;
+        const ez = Math.sin(theta) * visualRadius;
+        const px = -ex;
+        const pz = -ez;
+
+        electronMesh.position.set(ex, 0, ez);
+        positronMesh.position.set(px, 0, pz);
+
+        // Update Shader Uniforms
+        waveShaderUniforms.uTime.value += dt * simSpeedMultiplier * 2.5;
+        waveShaderUniforms.uPosElectron.value.set(ex, ez);
+        waveShaderUniforms.uPosPositron.value.set(px, pz);
+        wavePlaneMesh.visible = toggleInterference.checked;
+
+        // Tangential velocity vectors
+        const tv = new THREE.Vector3(-Math.sin(theta), 0, Math.cos(theta)).normalize();
+        const tv_p = tv.clone().negate();
+
+        // Vectors
+        vectorsGroup.visible = toggleVectors.checked;
+        if (toggleVectors.checked) {
+          const ePos = electronMesh.position;
+          const pPos = positronMesh.position;
+          const center = new THREE.Vector3(0, 0, 0);
+
+          const dirE_coulomb = center.clone().sub(ePos).normalize();
+          F_coulomb_e_Arrow.position.copy(ePos);
+          F_coulomb_e_Arrow.setDirection(dirE_coulomb);
+          F_coulomb_e_Arrow.setLength(2.2, 0.4, 0.2);
+
+          const dirP_coulomb = center.clone().sub(pPos).normalize();
+          F_coulomb_p_Arrow.position.copy(pPos);
+          F_coulomb_p_Arrow.setDirection(dirP_coulomb);
+          F_coulomb_p_Arrow.setLength(2.2, 0.4, 0.2);
+
+          F_zp_e_Arrow.position.copy(ePos);
+          F_zp_e_Arrow.setDirection(dirE_coulomb);
+          F_zp_e_Arrow.setLength(1.5, 0.3, 0.15);
+
+          F_zp_p_Arrow.position.copy(pPos);
+          F_zp_p_Arrow.setDirection(dirP_coulomb);
+          F_zp_p_Arrow.setLength(1.5, 0.3, 0.15);
+
+          V_e_Arrow.position.copy(ePos);
+          V_e_Arrow.setDirection(tv);
+          V_e_Arrow.setLength(2.5, 0.4, 0.2);
+
+          V_p_Arrow.position.copy(pPos);
+          V_p_Arrow.setDirection(tv_p);
+          V_p_Arrow.setLength(2.5, 0.4, 0.2);
+        }
+
+        // Synchrotron
+        eSyncCone.group.visible = toggleSync.checked;
+        pSyncCone.group.visible = toggleSync.checked;
+        if (toggleSync.checked) {
+          const coneRadius = Math.max(Math.tan(p.theta_beam) * 4, 0.25);
+          eSyncCone.mesh.scale.set(coneRadius, coneRadius, 1);
+          pSyncCone.mesh.scale.set(coneRadius, coneRadius, 1);
+
+          eSyncCone.group.position.copy(electronMesh.position);
+          eSyncCone.group.lookAt(electronMesh.position.clone().add(tv));
+
+          pSyncCone.group.position.copy(positronMesh.position);
+          pSyncCone.group.lookAt(positronMesh.position.clone().add(tv_p));
+        }
+
+        gridHelper.visible = toggleGrid.checked;
+
+        controls.update();
+        renderer.render(scene, camera);
+
+        renderDataPanel(p, r_sep, v_orb);
+      }
+
+      function syncLabels() {
+        rValEl.innerHTML = fmt(r_sep, 'm', 3);
+        vValEl.innerHTML = fmt(v_orb, 'm/s', 3);
+      }
+
+      rSlider.addEventListener('input', e => {
+        r_sep = sliderToLog(+e.target.value, R_MIN, R_MAX);
+        syncLabels();
+      });
+      vSlider.addEventListener('input', e => {
+        v_orb = sliderToLog(+e.target.value, V_MIN, V_MAX);
+        syncLabels();
+      });
+      speedSlider.addEventListener('input', e => {
+        simSpeedMultiplier = +e.target.value / 100;
+        speedValEl.textContent = simSpeedMultiplier.toFixed(2) + '×';
+      });
+
+      // Shader Controls Events
+      waveFreqSlider.addEventListener('input', e => {
+        const val = +e.target.value / 10;
+        waveShaderUniforms.uWaveK.value = val;
+        waveFreqVal.textContent = val.toFixed(1);
+      });
+
+      waveSpeedSlider.addEventListener('input', e => {
+        const val = +e.target.value / 10;
+        waveShaderUniforms.uWaveSpeed.value = val;
+        waveSpeedVal.textContent = val.toFixed(1);
+      });
+
+      waveAmpSlider.addEventListener('input', e => {
+        const val = +e.target.value / 10;
+        waveShaderUniforms.uAmplitude.value = val;
+        waveAmpVal.textContent = val.toFixed(1);
+      });
+
+      waveDampSlider.addEventListener('input', e => {
+        const val = +e.target.value / 100;
+        waveShaderUniforms.uDamping.value = val;
+        waveDampVal.textContent = val.toFixed(2);
+      });
+
+      waveHeightSlider.addEventListener('input', e => {
+        const val = +e.target.value / 10;
+        waveShaderUniforms.uHeightScale.value = val;
+        waveHeightVal.textContent = val.toFixed(1);
+      });
+
+      syncLabels();
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const preset = btn.dataset.preset;
+          if (preset === 'ps') { r_sep = 1.0585e-10; v_orb = 1.094e6; }
+          if (preset === 'wide') { r_sep = 1.5e-9; v_orb = 2.9e5; }
+          if (preset === 'fast') { r_sep = 3e-11; v_orb = 2.7e8; }
+
+          rSlider.value = logToSlider(r_sep, R_MIN, R_MAX);
+          vSlider.value = logToSlider(v_orb, V_MIN, V_MAX);
+          syncLabels();
+        });
+      });
+
+      document.getElementById('resetCamBtn').addEventListener('click', () => {
+        camera.position.set(0, 22, 32);
+        controls.target.set(0, 0, 0);
+      });
+
+      document.getElementById('fsBtn').addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      requestAnimationFrame(animate);
+
+    })();
+  </script>
+</body>
+</html>
