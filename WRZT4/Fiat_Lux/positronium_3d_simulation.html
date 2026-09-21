@@ -541,7 +541,7 @@
       function spawnWave(pos, colorHex) {
         // Tube-Radius berechnen: 1px = ~0.025 Einheiten im 3D-Raum
         const tubeRadius = waveThicknessPx * 0.025;
-        const waveGeo = new THREE.TorusGeometry(1, tubeRadius, 12, 36);
+        const waveGeo = new THREE.TorusGeometry(1, tubeRadius/10, 12, 36);
 
         const mat = new THREE.MeshBasicMaterial({
           color: colorHex,
