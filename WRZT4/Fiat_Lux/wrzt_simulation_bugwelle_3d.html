@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full bg-black text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - 3D Wellenraumzeit Simulation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Inter:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #000000;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Custom Scrollbar for Controls panel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.4);
+            border-radius: 3px;
+        }
+
+        /* Glassmorphic Panel Styles */
+        .glass-panel {
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #090d16;
+            border-radius: 3px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 0 12px #38bdf8;
+            transition: transform 0.1s ease, background-color 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            background: #7dd3fc;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between select-none bg-black text-slate-100 relative">
+
+    <div id="app-container" class="relative w-full h-full flex flex-col justify-between overflow-hidden">
+        
+        <!-- 3D Render Canvas Container -->
+        <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+        <!-- Top Header Bar -->
+        <header class="relative z-10 p-4 flex flex-wrap justify-between items-center gap-4 glass-panel m-4 rounded-xl pointer-events-auto">
+            <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_15px_rgba(6,182,212,1)]"></div>
+                <div>
+                    <h1 class="font-orbitron font-extrabold text-lg sm:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-300">
+                        WRZT LAB // 3D QUANTEN-GITTER
+                    </h1>
+                    <p class="text-xs text-slate-400">Raumzeit-Bugwelle mit Höhendynamik & Dreidimensionaler Phase</p>
+                </div>
+            </div>
+
+            <!-- Live HUD Telemetry -->
+            <div class="flex flex-wrap items-center gap-4 text-xs font-mono bg-black/90 px-4 py-2 rounded-lg border border-slate-800/80">
+                <div class="flex flex-col">
+                    <span class="text-slate-400">GESCHW. (v)</span>
+                    <span id="hud-velocity" class="text-cyan-400 font-bold text-sm">1.30 c</span>
+                </div>
+                <div class="w-px h-6 bg-slate-800"></div>
+                <div class="flex flex-col">
+                    <span class="text-slate-400">BUG-WINKEL (&alpha;)</span>
+                    <span id="hud-alpha" class="text-fuchsia-400 font-bold text-sm">50.3°</span>
+                </div>
+                <div class="w-px h-6 bg-slate-800"></div>
+                <div class="flex flex-col">
+                    <span class="text-slate-400">STAUCHUNG</span>
+                    <span id="hud-compression" class="text-rose-400 font-bold text-sm">1.5 x</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Lower Section: Controls Panel -->
+        <div class="relative z-10 p-4 flex flex-col md:flex-row justify-between items-end gap-4 pointer-events-none mb-2">
+            
+            <!-- Navigation Hint -->
+            <div class="glass-panel p-4 rounded-xl max-w-xs pointer-events-auto text-xs text-slate-300 space-y-1 hidden sm:block">
+                <div class="font-orbitron text-cyan-400 font-semibold mb-1">Steuerung</div>
+                <p>• <b>Linksklick + Ziehen:</b> Kamera drehen</p>
+                <p>• <b>Rechtsklick + Ziehen:</b> Kamera verschieben</p>
+                <p>• <b>Mausrad:</b> Zoom (Rein/Raus)</p>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="glass-panel p-5 rounded-xl w-full md:w-auto md:min-w-[420px] pointer-events-auto space-y-4">
+                
+                <!-- Slider 1: Geschwindigkeit v/c -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-velocity" class="text-cyan-400">Objekt-Geschwindigkeit (v / c)</label>
+                        <span id="val-velocity" class="font-mono text-cyan-300">1.30</span>
+                    </div>
+                    <input type="range" id="slider-velocity" min="0.2" max="3.0" value="1.3" step="0.05" class="w-full">
+                </div>
+
+                <!-- Slider 2: Stauchung / Dehnung (Bugwelle) -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-compression" class="text-rose-400">Stauchung / Dehnung (Doppler-Bugwelle)</label>
+                        <span id="val-compression" class="font-mono text-rose-300">1.5</span>
+                    </div>
+                    <input type="range" id="slider-compression" min="0.0" max="3.0" value="1.5" step="0.1" class="w-full">
+                </div>
+
+                <!-- Slider 3: Wellen-Höhe (Amplitude) -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-amplitude" class="text-amber-400">3D-Amplitude (Wellenhöhe Z)</label>
+                        <span id="val-amplitude" class="font-mono text-amber-300">12.0</span>
+                    </div>
+                    <input type="range" id="slider-amplitude" min="2.0" max="30.0" value="12.0" step="0.5" class="w-full">
+                </div>
+
+                <!-- Action Control Buttons -->
+                <div class="pt-2 flex items-center justify-between gap-2 border-t border-slate-800/80">
+                    <button id="btn-toggle" class="px-4 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded-lg font-orbitron text-xs font-semibold transition-all">
+                        <span id="text-toggle">Pause</span>
+                    </button>
+
+                    <button id="btn-reset" class="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700/80 rounded-lg text-xs font-semibold transition-all">
+                        Reset Position
+                    </button>
+
+                    <button id="btn-reset-cam" class="px-4 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded-lg text-xs font-semibold transition-all">
+                        Reset Kamera
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Setup Three.js Scene, Camera, Renderer
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        // Nebel an tiefes Schwarz angepasst
+        scene.fog = new THREE.FogExp2(0x000000, 0.0025);
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 120, 220);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000); // Reines Schwarz
+        container.appendChild(renderer.domElement);
+
+        // Orbit Controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 + 0.1;
+
+        // Grid Parameter & Mesh
+        const gridSizeX = 200;
+        const gridSizeY = 120;
+        const gridSpacing = 2.5;
+
+        const geometry = new THREE.PlaneGeometry(
+            gridSizeX * gridSpacing, 
+            gridSizeY * gridSpacing, 
+            gridSizeX - 1, 
+            gridSizeY - 1
+        );
+        geometry.rotateX(-Math.PI / 2); // Ebene auf XZ ausrichten
+
+        const material = new THREE.MeshBasicMaterial({
+            wireframe: true,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Particle Object Sphere (Das durchfahrende Objekt)
+        const particleGeo = new THREE.SphereGeometry(3.5, 32, 32);
+        const particleMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+        const particleMesh = new THREE.Mesh(particleGeo, particleMat);
+        scene.add(particleMesh);
+
+        // Point Light on Particle
+        const particleLight = new THREE.PointLight(0x38bdf8, 5, 120);
+        scene.add(particleLight);
+
+        // State Variables
+        let isRunning = true;
+        let time = 0;
+        let velocityRatio = 1.30;
+        let compressionFactor = 1.5;
+        let amplitudeHeight = 12.0;
+
+        let particlePosX = -gridSizeX * gridSpacing * 0.4;
+
+        // UI Controls
+        const sliderVelocity = document.getElementById('slider-velocity');
+        const sliderCompression = document.getElementById('slider-compression');
+        const sliderAmplitude = document.getElementById('slider-amplitude');
+
+        const valVelocity = document.getElementById('val-velocity');
+        const valCompression = document.getElementById('val-compression');
+        const valAmplitude = document.getElementById('val-amplitude');
+
+        const hudVelocity = document.getElementById('hud-velocity');
+        const hudAlpha = document.getElementById('hud-alpha');
+        const hudCompression = document.getElementById('hud-compression');
+
+        const btnToggle = document.getElementById('btn-toggle');
+        const btnReset = document.getElementById('btn-reset');
+        const btnResetCam = document.getElementById('btn-reset-cam');
+
+        sliderVelocity.addEventListener('input', (e) => {
+            velocityRatio = parseFloat(e.target.value);
+            valVelocity.textContent = velocityRatio.toFixed(2);
+            hudVelocity.textContent = `${velocityRatio.toFixed(2)} c`;
+            updateHUD();
+        });
+
+        sliderCompression.addEventListener('input', (e) => {
+            compressionFactor = parseFloat(e.target.value);
+            valCompression.textContent = compressionFactor.toFixed(1);
+            hudCompression.textContent = `${compressionFactor.toFixed(1)} x`;
+        });
+
+        sliderAmplitude.addEventListener('input', (e) => {
+            amplitudeHeight = parseFloat(e.target.value);
+            valAmplitude.textContent = amplitudeHeight.toFixed(1);
+        });
+
+        btnToggle.addEventListener('click', () => {
+            isRunning = !isRunning;
+            document.getElementById('text-toggle').textContent = isRunning ? "Pause" : "Start";
+        });
+
+        btnReset.addEventListener('click', () => {
+            particlePosX = -gridSizeX * gridSpacing * 0.4;
+            time = 0;
+        });
+
+        btnResetCam.addEventListener('click', () => {
+            camera.position.set(0, 120, 220);
+            controls.target.set(0, 0, 0);
+        });
+
+        function updateHUD() {
+            if (velocityRatio > 1.0) {
+                const alphaRad = Math.asin(1.0 / velocityRatio);
+                hudAlpha.textContent = `${(alphaRad * 180 / Math.PI).toFixed(1)}°`;
+            } else {
+                hudAlpha.textContent = "N/A (< c)";
+            }
+        }
+        updateHUD();
+
+        // Farbkonfiguration für hohe Kontraste im Dunkeln
+        const colorPeak = new THREE.Color(0xe02424);  // Leuchtendes Pink/Rot für Wellenberge (Konstruktiv)
+        const colorTrough = new THREE.Color(0x06b6d4); // Strahlendes Cyan für Wellentäler (Destruktiv)
+        const colorBase = new THREE.Color(0x1e1b4b);   // Dunkles Tiefblau für Ruhezustand
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isRunning) {
+                time += 0.04;
+                particlePosX += velocityRatio * 1.2;
+
+                const maxX = (gridSizeX * gridSpacing) / 2;
+                if (particlePosX > maxX) {
+                    particlePosX = -maxX;
+                }
+            }
+
+            // Update Particle Mesh Position
+            particleMesh.position.set(particlePosX, 0, 0);
+            particleLight.position.set(particlePosX, 5, 0);
+
+            // Update Grid Geometry Vertices (3D Deformation)
+            const positionAttribute = geometry.attributes.position;
+            const colors = [];
+
+            const count = positionAttribute.count;
+            for (let i = 0; i < count; i++) {
+                const x = positionAttribute.getX(i);
+                const z = positionAttribute.getZ(i);
+
+                // Base Standing Wave Oscillation
+                let zHeight = Math.sin(x * 0.1) * Math.cos(z * 0.1) * Math.cos(time * 2.0) * 1.5;
+
+                // Bow Wave & Compression Dynamics
+                let dx = x - particlePosX;
+                let dz = z;
+                let dist = Math.sqrt(dx * dx + dz * dz);
+
+                if (dist < 120) {
+                    let cosTheta = dx / (dist + 0.001); // -1 (hinten) bis +1 (vorne)
+                    
+                    // Stauchungs-Faktor für Frequenz
+                    let shift = 1.0 + cosTheta * 0.5 * compressionFactor;
+                    if (shift < 0.1) shift = 0.1;
+
+                    let phase = dist * (0.2 * shift) - time * 3.5;
+                    let decay = Math.exp(-dist * 0.025);
+
+                    zHeight += Math.cos(phase) * decay * amplitudeHeight;
+                }
+
+                // Apply Z Height to Vertex Y position in 3D
+                positionAttribute.setY(i, zHeight);
+
+                // Dynamic Color Interpolation based on Wave Height
+                let vertexColor = colorBase.clone();
+                if (zHeight > 0.5) {
+                    let t = Math.min(zHeight / amplitudeHeight, 1.0);
+                    vertexColor.lerp(colorPeak, t);
+                } else if (zHeight < -0.5) {
+                    let t = Math.min(-zHeight / amplitudeHeight, 1.0);
+                    vertexColor.lerp(colorTrough, t);
+                }
+                colors.push(vertexColor.r, vertexColor.g, vertexColor.b);
+            }
+
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            positionAttribute.needsUpdate = true;
+            geometry.attributes.color.needsUpdate = true;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Window Resize Korrektur
+        window.addEventListener('resize', windowResize);
+        function windowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

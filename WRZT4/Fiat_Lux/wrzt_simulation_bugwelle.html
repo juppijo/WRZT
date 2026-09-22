@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Wellenraumzeit Quanten-Gitter Simulation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Inter:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Custom Scrollbar for Controls panel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.6);
+        }
+
+        /* Glassmorphic Panel Styles */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #0f172a;
+            border-radius: 3px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 0 10px #38bdf8;
+            transition: transform 0.1s ease, background-color 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            background: #7dd3fc;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between select-none bg-slate-950 text-slate-100 relative">
+
+    <div id="app-container" class="relative w-full h-full flex flex-col justify-between overflow-hidden">
+        
+        <!-- Interactive 2D Simulation Canvas -->
+        <canvas id="simulationCanvas" class="absolute inset-0 w-full h-full z-0 cursor-crosshair"></canvas>
+
+        <!-- Top Header / Telemetry HUD Bar -->
+        <header class="relative z-10 p-4 flex flex-wrap justify-between items-center gap-4 glass-panel m-4 rounded-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full bg-cyan-400 animate-pulse glow-cyan"></div>
+                <div>
+                    <h1 class="font-orbitron font-extrabold text-lg sm:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-amber-400">
+                        WRZT LAB // QUANTEN-GITTER
+                    </h1>
+                    <p class="text-xs text-slate-400">Stehendes Energienetz &amp; Raumzeit-Bugwelle</p>
+                </div>
+            </div>
+
+            <!-- Live HUD Telemetry -->
+            <div class="flex flex-wrap items-center gap-4 text-xs font-mono bg-slate-950/80 px-4 py-2 rounded-lg border border-slate-800">
+                <div class="flex flex-col">
+                    <span class="text-slate-400">GESCHW. (v)</span>
+                    <span id="hud-velocity" class="text-cyan-400 font-bold text-sm">1.30 c</span>
+                </div>
+                <div class="w-px h-6 bg-slate-800"></div>
+                <div class="flex flex-col">
+                    <span class="text-slate-400">MASCHENWEITE (&lambda;)</span>
+                    <span id="hud-lambda" class="text-amber-400 font-bold text-sm">28 px</span>
+                </div>
+                <div class="w-px h-6 bg-slate-800"></div>
+                <div class="flex flex-col">
+                    <span class="text-slate-400">BUG-WINKEL (&alpha;)</span>
+                    <span id="hud-alpha" class="text-purple-400 font-bold text-sm">50.3°</span>
+                </div>
+                <div class="w-px h-6 bg-slate-800"></div>
+                <div class="flex flex-col">
+                    <span class="text-slate-400">REGIME</span>
+                    <span id="hud-regime" class="text-emerald-400 font-bold text-sm">SUPER-PHASE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Lower Section: Information & Controls Panel -->
+        <div class="relative z-10 p-4 flex flex-col md:flex-row justify-between items-end gap-4 pointer-events-none mb-2">
+            
+            <!-- Information Box -->
+            <div class="glass-panel p-4 rounded-xl max-w-sm pointer-events-auto text-xs text-slate-300 space-y-2 hidden sm:block">
+                <div class="font-orbitron text-cyan-400 font-semibold mb-1 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Diskrete Wellenraumzeit
+                </div>
+                <p>
+                    Das Raumzeit-Quantennetz besteht aus einem stetigen Raster stehender Wellen-Knotenpunkte (Oszillatoren).
+                </p>
+                <p class="text-slate-400">
+                    Ein Teilchen regt die lokalen Netzknoten an. Die Wellen werden in Bewegungsrichtung gestaucht und dahinter gedehnt.
+                </p>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="glass-panel p-5 rounded-xl w-full md:w-auto md:min-w-[440px] pointer-events-auto space-y-4">
+                
+                <!-- Slider 1: Gitter-Maschenweite (Wellenlänge λ) -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-lambda" class="text-amber-400 flex items-center gap-1">
+                            <span>Maschenweite / Quantengröße (&lambda;)</span>
+                        </label>
+                        <span id="val-lambda" class="font-mono text-amber-300">28 px</span>
+                    </div>
+                    <input type="range" id="slider-lambda" min="16" max="60" value="28" step="2" class="w-full">
+                </div>
+
+                <!-- Slider 2: Geschwindigkeit v/c -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-velocity" class="text-cyan-400 flex items-center gap-1">
+                            <span>Objekt-Geschwindigkeit (v / c)</span>
+                        </label>
+                        <span id="val-velocity" class="font-mono text-cyan-300">1.30</span>
+                    </div>
+                    <input type="range" id="slider-velocity" min="0.2" max="3.0" value="1.3" step="0.05" class="w-full">
+                </div>
+
+                <!-- Slider 3: Stauchung / Dehnung (Doppler / Bugwelle) -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-compression" class="text-rose-400 flex items-center gap-1">
+                            <span>Stauchung / Dehnung (Bugwellen-Dynamik)</span>
+                        </label>
+                        <span id="val-compression" class="font-mono text-rose-300">1.5</span>
+                    </div>
+                    <input type="range" id="slider-compression" min="0.0" max="3.0" value="1.5" step="0.1" class="w-full">
+                </div>
+
+                <!-- Slider 4: Kopplungsstärke -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <label for="slider-coupling" class="text-purple-400 flex items-center gap-1">
+                            <span>Feld-Kopplung / Anregungsstärke</span>
+                        </label>
+                        <span id="val-coupling" class="font-mono text-purple-300">1.2</span>
+                    </div>
+                    <input type="range" id="slider-coupling" min="0.3" max="2.5" value="1.2" step="0.1" class="w-full">
+                </div>
+
+                <!-- Mode Select & Buttons -->
+                <div class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/80">
+                    
+                    <!-- Visualization Mode Buttons -->
+                    <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800 text-xs">
+                        <button id="mode-grid" class="px-2.5 py-1 rounded bg-cyan-500/30 text-cyan-300 font-semibold transition-all">Gitter + Knoten</button>
+                        <button id="mode-dots" class="px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 transition-all">Punkte-Raster</button>
+                        <button id="mode-field" class="px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 transition-all">Wellenfeld</button>
+                    </div>
+
+                    <!-- Action Control Buttons -->
+                    <div class="flex items-center gap-2">
+                        <button id="btn-toggle" class="px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded-lg font-orbitron text-xs font-semibold transition-all flex items-center gap-1 active:scale-95">
+                            <span id="text-toggle">Pause</span>
+                        </button>
+
+                        <button id="btn-reset" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold transition-all active:scale-95">
+                            Reset
+                        </button>
+
+                        <button id="btn-fullscreen" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 active:scale-95">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas & Setup Context
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('app-container');
+
+        // Slider Elements
+        const sliderLambda = document.getElementById('slider-lambda');
+        const sliderVelocity = document.getElementById('slider-velocity');
+        const sliderCompression = document.getElementById('slider-compression');
+        const sliderCoupling = document.getElementById('slider-coupling');
+
+        // Value Displays
+        const valLambda = document.getElementById('val-lambda');
+        const valVelocity = document.getElementById('val-velocity');
+        const valCompression = document.getElementById('val-compression');
+        const valCoupling = document.getElementById('val-coupling');
+
+        // HUD Telemetry Displays
+        const hudVelocity = document.getElementById('hud-velocity');
+        const hudLambda = document.getElementById('hud-lambda');
+        const hudAlpha = document.getElementById('hud-alpha');
+        const hudRegime = document.getElementById('hud-regime');
+
+        // Interactive Buttons
+        const btnToggle = document.getElementById('btn-toggle');
+        const btnReset = document.getElementById('btn-reset');
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        const textToggle = document.getElementById('text-toggle');
+
+        // Mode Selectors
+        const modeGridBtn = document.getElementById('mode-grid');
+        const modeDotsBtn = document.getElementById('mode-dots');
+        const modeFieldBtn = document.getElementById('mode-field');
+
+        // Simulation State Engine
+        let isRunning = true;
+        let time = 0;
+        let visMode = 'grid'; // 'grid', 'dots', 'field'
+
+        // Physical Parameters
+        let gridSpacing = parseInt(sliderLambda.value); // Maschenweite (px)
+        let velocityRatio = parseFloat(sliderVelocity.value); // v / c Ratio
+        let compressionFactor = parseFloat(sliderCompression.value); // Stauchung/Dehnung Regler
+        let couplingStrength = parseFloat(sliderCoupling.value); // Anregungsstärke
+
+        const c = 1.0; // Basisseitige Ausbreitungsgeschwindigkeit
+        let particleSpeed = velocityRatio * c * 4.0; 
+
+        // Particle Core Definition
+        const particle = {
+            x: 100,
+            y: 0,
+            radius: 14,
+            history: []
+        };
+
+        // Resize Canvas dynamically
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particle.y = canvas.height / 2;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Event Handlers for Controls
+        sliderLambda.addEventListener('input', (e) => {
+            gridSpacing = parseInt(e.target.value);
+            valLambda.textContent = `${gridSpacing} px`;
+            hudLambda.textContent = `${gridSpacing} px`;
+            updateCalculations();
+        });
+
+        sliderVelocity.addEventListener('input', (e) => {
+            velocityRatio = parseFloat(e.target.value);
+            particleSpeed = velocityRatio * c * 4.0;
+            valVelocity.textContent = velocityRatio.toFixed(2);
+            hudVelocity.textContent = `${velocityRatio.toFixed(2)} c`;
+            updateCalculations();
+        });
+
+        sliderCompression.addEventListener('input', (e) => {
+            compressionFactor = parseFloat(e.target.value);
+            valCompression.textContent = compressionFactor.toFixed(1);
+        });
+
+        sliderCoupling.addEventListener('input', (e) => {
+            couplingStrength = parseFloat(e.target.value);
+            valCoupling.textContent = couplingStrength.toFixed(1);
+        });
+
+        btnToggle.addEventListener('click', () => {
+            isRunning = !isRunning;
+            textToggle.textContent = isRunning ? "Pause" : "Start";
+        });
+
+        btnReset.addEventListener('click', () => {
+            particle.x = 60;
+            particle.history = [];
+            time = 0;
+        });
+
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => console.error(err));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Mode Switching
+        function setVisMode(mode) {
+            visMode = mode;
+            [modeGridBtn, modeDotsBtn, modeFieldBtn].forEach(btn => {
+                btn.className = "px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 transition-all";
+            });
+            if (mode === 'grid') modeGridBtn.className = "px-2.5 py-1 rounded bg-cyan-500/30 text-cyan-300 font-semibold transition-all";
+            if (mode === 'dots') modeDotsBtn.className = "px-2.5 py-1 rounded bg-amber-500/30 text-amber-300 font-semibold transition-all";
+            if (mode === 'field') modeFieldBtn.className = "px-2.5 py-1 rounded bg-purple-500/30 text-purple-300 font-semibold transition-all";
+        }
+        modeGridBtn.addEventListener('click', () => setVisMode('grid'));
+        modeDotsBtn.addEventListener('click', () => setVisMode('dots'));
+        modeFieldBtn.addEventListener('click', () => setVisMode('field'));
+
+        // Recalculate Mach / Bow angle
+        function updateCalculations() {
+            if (velocityRatio > 1.0) {
+                const alphaRad = Math.asin(1.0 / velocityRatio);
+                const alphaDeg = (alphaRad * 180 / Math.PI).toFixed(1);
+                hudAlpha.textContent = `${alphaDeg}°`;
+                hudRegime.textContent = "SUPER-PHASE";
+                hudRegime.className = "text-amber-400 font-bold text-sm animate-pulse";
+            } else if (Math.abs(velocityRatio - 1.0) <= 0.05) {
+                hudAlpha.textContent = "90.0°";
+                hudRegime.textContent = "RESONANZ";
+                hudRegime.className = "text-purple-400 font-bold text-sm animate-pulse";
+            } else {
+                hudAlpha.textContent = "N/A (< c)";
+                hudRegime.textContent = "SUB-PHASE";
+                hudRegime.className = "text-cyan-400 font-bold text-sm";
+            }
+        }
+        updateCalculations();
+
+        // Main Render & Physics Calculation Loop
+        function render() {
+            if (isRunning) {
+                time += 0.05;
+                particle.x += particleSpeed;
+
+                if (particle.x > canvas.width + 120) {
+                    particle.x = -60;
+                    particle.history = [];
+                }
+
+                particle.history.push({ x: particle.x, y: particle.y, t: time });
+                if (particle.history.length > 100) particle.history.shift();
+            }
+
+            // Clear Background
+            ctx.fillStyle = '#030712';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cols = Math.floor(canvas.width / gridSpacing) + 2;
+            const rows = Math.floor(canvas.height / gridSpacing) + 2;
+            const k = (2 * Math.PI) / (gridSpacing * 2.0); // Spatial frequency
+
+            // Matrix to store calculated node positions & amplitudes
+            const nodes = [];
+
+            for (let i = 0; i < cols; i++) {
+                nodes[i] = [];
+                const gx = i * gridSpacing;
+
+                for (let j = 0; j < rows; j++) {
+                    const gy = j * gridSpacing;
+
+                    // 1. Standing Wave Base Amplitude (Lokaler Quanten-Oszillator im Netz)
+                    let baseOscillation = Math.sin(gx * k) * Math.cos(gy * k) * Math.cos(time * 2.2);
+
+                    // 2. Dynamic Wave Stacking / Compression & Expansion (Doppler + Bugwelle)
+                    let disturbance = 0;
+                    let dx = gx - particle.x;
+                    let dy = gy - particle.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 320) {
+                        // Vektor in Richtung Bewegung (dx > 0 = vor dem Objekt, dx < 0 = hinter dem Objekt)
+                        let cosTheta = dx / (dist + 0.001); // Richtungsfaktor (-1 bis +1)
+                        
+                        // Richtungsabhängige Modifikation der Wellenlänge / Phase
+                        // cosTheta > 0 (Vorne) -> höhere Phasenänderung / Stauchung
+                        // cosTheta < 0 (Hinten) -> geringere Phasenänderung / Dehnung
+                        let shift = 1.0 + cosTheta * 0.5 * compressionFactor;
+                        
+                        // Verhindere negative/instabile Frequenzen
+                        if (shift < 0.1) shift = 0.1;
+
+                        let phase = dist * (0.08 * shift) - time * 3.0;
+                        let decay = Math.exp(-dist * 0.010);
+                        disturbance = Math.cos(phase) * decay * couplingStrength * 2.2;
+                    }
+
+                    // Combined Node Energy / Displacement
+                    let amp = baseOscillation * 0.35 + disturbance;
+
+                    // Physical node position displacement (visual 3D/Wiggle effect)
+                    let xOffset = Math.sin(amp * 1.5) * (gridSpacing * 0.15);
+                    let yOffset = Math.cos(amp * 1.5) * (gridSpacing * 0.15);
+
+                    nodes[i][j] = {
+                        x: gx + xOffset,
+                        y: gy + yOffset,
+                        amp: amp,
+                        gx: gx,
+                        gy: gy
+                    };
+                }
+            }
+
+            // Visual Mode 1 & 3: Render Grid Lines (The Energy Mesh)
+            if (visMode === 'grid' || visMode === 'field') {
+                ctx.lineWidth = visMode === 'field' ? 0.8 : 1.2;
+
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        const node = nodes[i][j];
+
+                        // Connect Horizontal Line
+                        if (i < cols - 1) {
+                            const rightNode = nodes[i + 1][j];
+                            let avgAmp = (node.amp + rightNode.amp) * 0.5;
+                            let alpha = Math.min(Math.abs(avgAmp) * 0.6 + 0.1, 0.85);
+
+                            ctx.beginPath();
+                            ctx.moveTo(node.x, node.y);
+                            ctx.lineTo(rightNode.x, rightNode.y);
+
+                            if (avgAmp > 0.15) {
+                                ctx.strokeStyle = `rgba(245, 158, 11, ${alpha})`; // Amber constructive phase
+                            } else if (avgAmp < -0.15) {
+                                ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`; // Cyan destructive phase
+                            } else {
+                                ctx.strokeStyle = `rgba(30, 41, 59, 0.5)`; // Resting grid line
+                            }
+                            ctx.stroke();
+                        }
+
+                        // Connect Vertical Line
+                        if (j < rows - 1) {
+                            const bottomNode = nodes[i][j + 1];
+                            let avgAmp = (node.amp + bottomNode.amp) * 0.5;
+                            let alpha = Math.min(Math.abs(avgAmp) * 0.6 + 0.1, 0.85);
+
+                            ctx.beginPath();
+                            ctx.moveTo(node.x, node.y);
+                            ctx.lineTo(bottomNode.x, bottomNode.y);
+
+                            if (avgAmp > 0.15) {
+                                ctx.strokeStyle = `rgba(245, 158, 11, ${alpha})`;
+                            } else if (avgAmp < -0.15) {
+                                ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`;
+                            } else {
+                                ctx.strokeStyle = `rgba(30, 41, 59, 0.5)`;
+                            }
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            // Visual Mode 1 & 2: Render Nodes (Stehende Wellen-Knoten)
+            if (visMode === 'grid' || visMode === 'dots') {
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        const node = nodes[i][j];
+                        let absAmp = Math.abs(node.amp);
+
+                        let nodeRadius = visMode === 'dots' 
+                            ? Math.max(2, absAmp * (gridSpacing * 0.25))
+                            : Math.max(1.5, absAmp * 4.0);
+
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
+
+                        if (node.amp > 0.2) {
+                            ctx.fillStyle = `rgba(245, 158, 11, ${Math.min(absAmp, 1)})`; // Amber node
+                        } else if (node.amp < -0.2) {
+                            ctx.fillStyle = `rgba(56, 189, 248, ${Math.min(absAmp, 1)})`; // Cyan node
+                        } else {
+                            ctx.fillStyle = 'rgba(71, 85, 105, 0.4)'; // Neutral quiet node
+                        }
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // Render Bow Wave Vector Lines (Mach-Kegel Front)
+            if (velocityRatio > 1.0) {
+                const alphaRad = Math.asin(1.0 / velocityRatio);
+                const coneLength = 400;
+
+                ctx.save();
+                ctx.translate(particle.x, particle.y);
+
+                // Shock V-Lines
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-Math.cos(alphaRad) * coneLength, -Math.sin(alphaRad) * coneLength);
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-Math.cos(alphaRad) * coneLength, Math.sin(alphaRad) * coneLength);
+
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.85)'; // Neon Pink Bow Wave Front
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 4]);
+                ctx.stroke();
+
+                // Trajectory Axis Line
+                ctx.beginPath();
+                ctx.moveTo(-coneLength, 0);
+                ctx.lineTo(80, 0);
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 2]);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            // Render Particle Core (Das durchfahrende Objekt)
+            ctx.save();
+            ctx.translate(particle.x, particle.y);
+
+            // Glowing Outer Energy Shield
+            let gradient = ctx.createRadialGradient(0, 0, 2, 0, 0, particle.radius * 2.8);
+            gradient.addColorStop(0, 'rgba(56, 189, 248, 1)');
+            gradient.addColorStop(0.4, 'rgba(6, 182, 212, 0.5)');
+            gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, particle.radius * 2.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Core Solid Object
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, particle.radius * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // Loop Frame
+            requestAnimationFrame(render);
+        }
+
+        // Start engine on window load
+        window.onload = function() {
+            render();
+        };
+    </script>
+</body>
+</html>
