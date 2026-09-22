@@ -126,6 +126,10 @@ input[type=range]::-moz-range-thumb{
 </div>
 
 <div class="hud toolbar">
+  <button class="btn" id="pauseBtn">
+    <svg viewBox="0 0 24 24" id="pauseIcon"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    Pause
+  </button>
   <button class="btn" id="resetViewBtn">
     <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
     Ansicht
@@ -168,7 +172,7 @@ input[type=range]::-moz-range-thumb{
 <div class="hud legend">
   <div class="leg-item"><span class="leg-swatch" style="background:var(--electron)"></span>Elektron e⁻</div>
   <div class="leg-item"><span class="leg-swatch" style="background:var(--positron)"></span>Positron e⁺</div>
-  <div class="leg-item"><span class="leg-swatch" style="background:var(--coulomb)"></span>Coulombkraft F_C</div>
+  <div class="leg-item"><span class="leg-swatch" style="background:var(--coulomb)"></span>Coulombkraft F_C / Alpha</div>
   <div class="leg-item"><span class="leg-swatch" style="background:var(--centripetal)"></span>Zentripetalkraft F_zp</div>
   <div class="leg-item"><span class="leg-swatch" style="background:var(--lorentz)"></span>Bahngeschwindigkeit v</div>
   <div class="leg-item"><span class="leg-swatch" style="background:var(--bugwelle)"></span>Bugwelle (Feldkompression)</div>
@@ -210,7 +214,7 @@ const labelE = document.getElementById('labelE');
 const labelP = document.getElementById('labelP');
 
 let simSpeedMultiplier = 1.0;
-let r_sep = 1.3955e-15;
+let r_sep = 1.930796e-13;
 let v_orb = 2.99792e8;
 rSlider.value = logToSlider(r_sep, R_MIN, R_MAX);
 vSlider.value = logToSlider(v_orb, V_MIN, V_MAX);
@@ -232,8 +236,9 @@ function fmtPlain(val, unit, digits=3){
 
 /* ================= Physik-Berechnung — unverändert übernommen ================= */
 function computePhysics(r, v){
+  const alpha = 7.2973525643e-3;
   const r_p = r/2;
-  const F_coulomb = k_e * e_c * e_c / (r*r);
+  const F_coulomb = (k_e * e_c * e_c / (r*r)) / alpha;
   const F_zp = m_e * v * v / r_p;
   const F_lorentz = F_coulomb * (v*v) / (c_l*c_l);
   const omega = v / r_p;
@@ -269,10 +274,10 @@ function renderDataPanel(p, r, v){
   <div class="dp-row"><span class="k">v / c (β)</span><span class="v">${fmt(p.beta,'')}</span></div>
 </div>
 <div class="dp-group"><h3>Kräfte (Vektoren, radial/tangential)</h3>
-  <div class="dp-row"><span class="k">Coulombkraft F_C</span><span class="v">${fmt(p.F_coulomb,'N')}</span></div>
+  <div class="dp-row"><span class="k">Coulombkraft F_C / Alpha</span><span class="v">${fmt(p.F_coulomb,'N')}</span></div>
   <div class="dp-row"><span class="k">Zentripetalkraft F_zp</span><span class="v">${fmt(p.F_zp,'N')}</span></div>
   <div class="dp-row"><span class="k">Lorentzkraft F_L ≈ F_C·β²</span><span class="v">${fmt(p.F_lorentz,'N')}</span></div>
-  <div class="stability ${stable?'ok':'no'}">${stable ? '✓ stabile Kreisbahn (F_C ≈ F_zp)' : '✕ keine stabile Bahn — F_C/F_zp = '+p.ratio.toFixed(2)}</div>
+  <div class="stability ${stable?'ok':'no'}">${stable ? '✓ stabile Kreisbahn (F_C / ą ≈ F_zp)' : '✕ keine stabile Bahn — (F_C/ą)/F_zp = '+p.ratio.toFixed(2)}</div>
 </div>
 <div class="dp-group"><h3>Energie &amp; Drehimpuls</h3>
   <div class="dp-row"><span class="k">Kin. Energie E_kin (je Teilchen)</span><span class="v">${fmt(p.E_kin,'J')}</span></div>
@@ -459,7 +464,7 @@ let syncPhase = 0;
 
 /* ================= Kamera-Steuerung (eigenes Orbit) ================= */
 let azimuth = Math.PI*0.28, polar = Math.PI*0.36, camDist = 2000;
-const CAM_MIN = 88, CAM_MAX = 1900;
+const CAM_MIN = 44, CAM_MAX = 1900;
 const DEF = { azimuth, polar, camDist };
 function updateCamera(){
   const p = Math.min(Math.max(polar, 0.12), Math.PI-0.12);
@@ -497,6 +502,7 @@ document.getElementById('resetViewBtn').addEventListener('click', ()=>{
 let theta = 0;
 let lastT = performance.now();
 let simTimeSec = 0;
+let isPaused = false;
 const worldRMin = 55, worldRMax = 260; // Weltkoordinaten-Bahnradius
 
 function projectToScreen(vec3){
@@ -515,7 +521,7 @@ function tmpTriPositions(mesh, ax,ay,az, bx,by,bz, cx,cy,cz){
 
 function draw(now){
   requestAnimationFrame(draw);
-  const dt = Math.min((now-lastT)/1000, 0.05);
+  const dt = isPaused ? 0 : Math.min((now-lastT)/1000, 0.05);
   lastT = now;
   simTimeSec += dt;
 
@@ -665,13 +671,25 @@ syncLabels();
 document.querySelectorAll('.preset-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const pr = btn.dataset.preset;
-    if(pr==='ps'){ r_sep=1.0585e-10; v_orb=1.094e6; }
-    if(pr==='wide'){ r_sep=1.5e-9; v_orb=2.9e5; }
-    if(pr==='fast'){ r_sep=3e-11; v_orb=2.7e8; }
+    /*Rmin = 1.930796e-13  */
+    if(pr==='ps'){ r_sep=1.930796e-13; v_orb=2.99792e8; }
+    if(pr==='wide'){ r_sep=5.635e-15; v_orb=2.99792e8; }
+    if(pr==='fast'){ r_sep=1.733e-15; v_orb=2.7e8; }
     rSlider.value = logToSlider(r_sep, R_MIN, R_MAX);
     vSlider.value = logToSlider(v_orb, V_MIN, V_MAX);
     syncLabels();
   });
+});
+
+/* ================= Pause ================= */
+const pauseBtn = document.getElementById('pauseBtn');
+const pauseIcon = document.getElementById('pauseIcon');
+pauseBtn.addEventListener('click', ()=>{
+  isPaused = !isPaused;
+  pauseBtn.lastChild.textContent = isPaused ? ' Fortsetzen' : ' Pause';
+  pauseIcon.innerHTML = isPaused
+    ? '<path d="M7 4l13 8-13 8V4z"/>'
+    : '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
 });
 
 /* ================= Vollbild ================= */
