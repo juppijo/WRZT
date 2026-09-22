@@ -142,15 +142,15 @@ input[type=range]::-moz-range-thumb{
   <h2>Parameter</h2>
   <div class="ctrl-row">
     <div class="ctrl-label"><b>Radius r (Abstand e⁻–e⁺)</b><span class="val" id="rVal">–</span></div>
-    <input type="range" id="rSlider" min="0" max="1000" step="1">
+    <input type="range" id="rSlider" min="0" max="1000" step="0.1">
   </div>
   <div class="ctrl-row">
     <div class="ctrl-label"><b>Bahngeschwindigkeit v</b><span class="val" id="vVal">–</span></div>
-    <input type="range" id="vSlider" min="0" max="1000" step="1">
+    <input type="range" id="vSlider" min="0" max="1000" step="0.1">
   </div>
   <div class="ctrl-row">
     <div class="ctrl-label"><b>Simulationsgeschwindigkeit</b><span class="val" id="speedVal">1.0×</span></div>
-    <input type="range" id="speedSlider" min="1" max="500" step="1" value="100">
+    <input type="range" id="speedSlider" min="1" max="500" step="0.1" value="100">
   </div>
   <div class="presets">
     <button class="preset-btn" data-preset="ps">Positronium-Grundzustand</button>
@@ -210,8 +210,8 @@ const labelE = document.getElementById('labelE');
 const labelP = document.getElementById('labelP');
 
 let simSpeedMultiplier = 1.0;
-let r_sep = 1.0585e-10;
-let v_orb = 1.094e6;
+let r_sep = 1.3955e-15;
+let v_orb = 2.99792e8;
 rSlider.value = logToSlider(r_sep, R_MIN, R_MAX);
 vSlider.value = logToSlider(v_orb, V_MIN, V_MAX);
 
@@ -423,14 +423,9 @@ function pushTrail(store, pointsObj, x,y,z){
   pointsObj.geometry.attributes.position.needsUpdate = true;
 }
 
-/* ---- Bugwellen (expandierende Ringe) ---- */
+/* ---- Bugwellen (expandierende Kugelschalen — echte 3D-Wellenfronten) ---- */
 const wavelets = [];
-const wavelineGeo = new THREE.BufferGeometry();
-{
-  const pts = [];
-  for(let i=0;i<=48;i++){ const a=i/48*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a),0,Math.sin(a))); }
-  wavelineGeo.setFromPoints(pts);
-}
+const waveSphereGeo = new THREE.SphereGeometry(1, 20, 14);
 let lastEmit = 0;
 const EMIT_INTERVAL = 0.11;
 const WAVE_MAX_RADIUS_FRAC = 1.0; // relativ zu worldRMax*3.2
@@ -463,8 +458,8 @@ const beamWaves = [makeBeamWave(), makeBeamWave(), makeBeamWave(), makeBeamWave(
 let syncPhase = 0;
 
 /* ================= Kamera-Steuerung (eigenes Orbit) ================= */
-let azimuth = Math.PI*0.28, polar = Math.PI*0.36, camDist = 640;
-const CAM_MIN = 220, CAM_MAX = 1900;
+let azimuth = Math.PI*0.28, polar = Math.PI*0.36, camDist = 2000;
+const CAM_MIN = 88, CAM_MAX = 1900;
 const DEF = { azimuth, polar, camDist };
 function updateCamera(){
   const p = Math.min(Math.max(polar, 0.12), Math.PI-0.12);
@@ -577,20 +572,21 @@ function draw(now){
     if(lastEmit >= EMIT_INTERVAL){
       lastEmit = 0;
       [['e',ex,ez],['p',px,pz]].forEach(([who,wx,wz])=>{
-        const line = new THREE.Line(wavelineGeo, new THREE.LineBasicMaterial({
-          color: who==='e'?0x5ad4ff:0xff7a5c, transparent:true, opacity:0.42
+        const mesh = new THREE.Mesh(waveSphereGeo, new THREE.MeshBasicMaterial({
+          color: who==='e'?0x5ad4ff:0xff7a5c, transparent:true, opacity:0.4,
+          wireframe:true, blending:THREE.AdditiveBlending, depthWrite:false
         }));
-        line.position.set(wx,0,wz);
-        scene.add(line);
-        wavelets.push({ mesh:line, x:wx, z:wz, born:simTimeSec, speed:waveSpeedVisual });
+        mesh.position.set(wx,0,wz);
+        scene.add(mesh);
+        wavelets.push({ mesh, x:wx, z:wz, born:simTimeSec, speed:waveSpeedVisual });
       });
     }
     for(let i=wavelets.length-1;i>=0;i--){
       const w = wavelets[i];
       const rad = (simTimeSec-w.born)*w.speed;
-      if(rad >= maxRadius){ scene.remove(w.mesh); w.mesh.geometry===wavelineGeo || w.mesh.geometry.dispose(); w.mesh.material.dispose(); wavelets.splice(i,1); continue; }
-      w.mesh.scale.set(Math.max(rad,0.001), 1, Math.max(rad,0.001));
-      w.mesh.material.opacity = Math.max(0, 0.42*(1-rad/maxRadius));
+      if(rad >= maxRadius){ scene.remove(w.mesh); w.mesh.material.dispose(); wavelets.splice(i,1); continue; }
+      w.mesh.scale.set(Math.max(rad,0.001), Math.max(rad,0.001), Math.max(rad,0.001));
+      w.mesh.material.opacity = Math.max(0, 0.4*(1-rad/maxRadius));
     }
 
     // Bugbogen: kleine gebogene Linie vor jedem Teilchen
