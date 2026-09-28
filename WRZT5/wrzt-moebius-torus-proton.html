@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WRZT – Protonen 3-Quark-Knoten Simulation</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body {
             margin: 0;
@@ -27,13 +45,43 @@
             max-width: 380px;
             box-shadow: 0 4px 20px rgba(0, 186, 211, 0.2);
             backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0369a1;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
         }
         h1 {
             font-size: 1.2rem;
-            margin: 0 0 10px 0;
+            margin: 0;
             color: #38bdf8;
-            border-bottom: 1px solid #0369a1;
-            padding-bottom: 6px;
+        }
+        #toggle-panel-btn {
+            background: rgba(2, 132, 199, 0.2);
+            border: 1px solid #0284c7;
+            color: #38bdf8;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        #toggle-panel-btn:hover {
+            background: rgba(2, 132, 199, 0.5);
+        }
+        #panel-content {
+            display: block;
+        }
+        /* Wenn das Panel eingeklappt ist */
+        #info-panel.collapsed #panel-content {
+            display: none;
+        }
+        #info-panel.collapsed {
+            padding-bottom: 10px;
         }
         p {
             font-size: 0.85rem;
@@ -96,30 +144,49 @@
     <div id="canvas-container"></div>
 
     <div id="info-panel">
-        <h1>WRZT: Protonen 3-Quark-Resonator</h1>
-        <p>Das Proton als 3-fach phasenverkoppelter Knoten:</p>
-        <p>
-            <span class="quark-tag q-up1">Quark u1 (0°)</span>
-            <span class="quark-tag q-up2">Quark u2 (120°)</span>
-            <span class="quark-tag q-down">Quark d (240°)</span>
-        </p>
-        <p>• Phasenlauf ($u$): <span id="val-u" class="stat">0.0</span> rad</p>
-        <p>• Dreifach-Torsion ($\frac{3u}{2}$): <span id="val-spin" class="stat">0.0</span> rad</p>
+        <div class="panel-header">
+            <h1>WRZT: Protonen Resonator</h1>
+            <button id="toggle-panel-btn">Ausblenden</button>
+        </div>
+        
+        <div id="panel-content">
+            <p>Das Proton als 3-fach phasenverkoppelter Knoten:</p>
+            <p>
+                <span class="quark-tag q-up1">Quark u1 (0°)</span>
+                <span class="quark-tag q-up2">Quark u2 (120°)</span>
+                <span class="quark-tag q-down">Quark d (240°)</span>
+            </p>
+            <p>• Phasenlauf ($u$): <span id="val-u" class="stat">0.0</span> rad</p>
+            <p>• Dreifach-Torsion ($\frac{3u}{2}$): <span id="val-spin" class="stat">0.0</span> rad</p>
 
-        <div id="controls">
-            <label>Geschwindigkeit: <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5"></label>
-            <label>Knoten-Radius ($r_q$): <input type="range" id="radiusSlider" min="0.3" max="1.2" step="0.05" value="0.7"></label>
-            <label>Transparenz: <input type="range" id="opacitySlider" min="0.1" max="0.8" step="0.05" value="0.35"></label>
-            
-            <hr>
-            <p style="font-weight: bold; color: #38bdf8; margin: 2px 0;">Quarks ein-/ausblenden:</p>
-            <label class="checkbox-label"><input type="checkbox" id="toggle-q0" checked> <span style="color: #fca5a5;">Quark u1 (Rot, 0°)</span></label>
-            <label class="checkbox-label"><input type="checkbox" id="toggle-q1" checked> <span style="color: #93c5fd;">Quark u2 (Blau, 120°)</span></label>
-            <label class="checkbox-label"><input type="checkbox" id="toggle-q2" checked> <span style="color: #86efac;">Quark d (Grün, 240°)</span></label>
+            <div id="controls">
+                <label>Geschwindigkeit: <input type="range" id="speedSlider" min="0.1" max="2" step="0.1" value="0.5"></label>
+                <label>Knoten-Radius ($r_q$): <input type="range" id="radiusSlider" min="0.3" max="1.2" step="0.05" value="0.7"></label>
+                <label>Transparenz: <input type="range" id="opacitySlider" min="0.1" max="0.8" step="0.05" value="0.35"></label>
+                
+                <hr>
+                <p style="font-weight: bold; color: #38bdf8; margin: 2px 0;">Quarks ein-/ausblenden:</p>
+                <label class="checkbox-label"><input type="checkbox" id="toggle-q0" checked> <span style="color: #fca5a5;">Quark u1 (Rot, 0°)</span></label>
+                <label class="checkbox-label"><input type="checkbox" id="toggle-q1" checked> <span style="color: #93c5fd;">Quark u2 (Blau, 120°)</span></label>
+                <label class="checkbox-label"><input type="checkbox" id="toggle-q2" checked> <span style="color: #86efac;">Quark d (Grün, 240°)</span></label>
+            </div>
         </div>
     </div>
 
     <script>
+        // --- Ein-/Ausblenden des Steuerungs-Panels ---
+        const infoPanel = document.getElementById('info-panel');
+        const toggleBtn = document.getElementById('toggle-panel-btn');
+
+        toggleBtn.addEventListener('click', () => {
+            infoPanel.classList.toggle('collapsed');
+            if (infoPanel.classList.contains('collapsed')) {
+                toggleBtn.innerText = 'Einblenden';
+            } else {
+                toggleBtn.innerText = 'Ausblenden';
+            }
+        });
+
         // --- 1. Scene Setup ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
@@ -308,7 +375,7 @@
             uAnim += speed;
             if (uAnim > Math.PI * 4) uAnim -= Math.PI * 4;
 
-            // Aktualisiere die 3 Vektoren der Quarks (nur wenn sichtbar, spart Rechenzeit)
+            // Aktualisiere die 3 Vektoren der Quarks (nur wenn sichtbar)
             vectorGroups.forEach((vg, idx) => {
                 if (vectorGroups[idx].group.visible) {
                     const centerPos = getQuarkPos(uAnim, 0, vg.offset);
