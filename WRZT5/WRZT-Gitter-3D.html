@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - 3D Wellenraumzeit Gitter-Simulation</title>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Three.js, OrbitControls und DragControls via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DragControls.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030305;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            z-index: 10;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        h1 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #ff7b00;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        h2 {
+            font-size: 0.85rem;
+            margin: 10px 0 6px 0;
+            color: #ff7b00;
+            border-bottom: 1px solid rgba(255, 123, 0, 0.3);
+            padding-bottom: 2px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+            color: #aaa;
+        }
+        input[type=range] {
+            width: 100%;
+            accent-color: #ff7b00;
+            cursor: pointer;
+        }
+        .btn-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        button {
+            background: rgba(255, 123, 0, 0.2);
+            border: 1px solid #ff7b00;
+            color: #ff7b00;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        button:hover {
+            background: #ff7b00;
+            color: #000;
+            box-shadow: 0 0 12px rgba(255, 123, 0, 0.5);
+        }
+        .legend {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 10px;
+            line-height: 1.4;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <!-- Steuerungspanel -->
+        <div class="ui-panel">
+            <h1>WRZT 3D-Gitter Dynamik</h1>
+            
+            <h2>Physik-Parameter</h2>
+            <div class="control-group">
+                <label>Gravitation (3D-Sog / Senke): <span id="val-grav">1.0</span></label>
+                <input type="range" id="slider-grav" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Elektrizität (Volumendehnung): <span id="val-elec">1.0</span></label>
+                <input type="range" id="slider-elec" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Magnetismus (3D-Torsion): <span id="val-mag">1.0</span></label>
+                <input type="range" id="slider-mag" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Bug-Winkel $\alpha$ (Phasentempo): <span id="val-alpha">45</span>°</label>
+                <input type="range" id="slider-alpha" min="10" max="80" step="1" value="45">
+            </div>
+
+            <h2>Kern-Position (Frei beweglich)</h2>
+            <div class="control-group">
+                <label>Position X: <span id="val-posx">0.0</span></label>
+                <input type="range" id="slider-posx" min="-15" max="15" step="0.2" value="0">
+            </div>
+            <div class="control-group">
+                <label>Position Y: <span id="val-posy">0.0</span></label>
+                <input type="range" id="slider-posy" min="-15" max="15" step="0.2" value="0">
+            </div>
+            <div class="control-group">
+                <label>Position Z: <span id="val-posz">0.0</span></label>
+                <input type="range" id="slider-posz" min="-15" max="15" step="0.2" value="0">
+            </div>
+
+            <div class="legend">
+                • <b>Punkt ziehen:</b> Punkt anklicken &amp; im Raum bewegen<br>
+                • <b>Doppelklick:</b> Punkt an geklickte Position setzen<br>
+                • <b>Maus-Ziehen (Hintergrund):</b> 3D-Kamera drehen<br>
+                • <b>Mausrad:</b> Zoom
+            </div>
+        </div>
+
+        <!-- Vollbild & Reset Button -->
+        <div class="btn-container">
+            <button id="fullscreenBtn">⛶ Vollbild</button>
+            <button id="resetBtn">↻ Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Sliders & UI Elements
+        const sliderGrav = document.getElementById('slider-grav');
+        const sliderElec = document.getElementById('slider-elec');
+        const sliderMag = document.getElementById('slider-mag');
+        const sliderAlpha = document.getElementById('slider-alpha');
+        
+        const sliderPosX = document.getElementById('slider-posx');
+        const sliderPosY = document.getElementById('slider-posy');
+        const sliderPosZ = document.getElementById('slider-posz');
+
+        const valGrav = document.getElementById('val-grav');
+        const valElec = document.getElementById('val-elec');
+        const valMag = document.getElementById('val-mag');
+        const valAlpha = document.getElementById('val-alpha');
+
+        const valPosX = document.getElementById('val-posx');
+        const valPosY = document.getElementById('val-posy');
+        const valPosZ = document.getElementById('val-posz');
+
+        sliderGrav.addEventListener('input', (e) => valGrav.textContent = e.target.value);
+        sliderElec.addEventListener('input', (e) => valElec.textContent = e.target.value);
+        sliderMag.addEventListener('input', (e) => valMag.textContent = e.target.value);
+        sliderAlpha.addEventListener('input', (e) => valAlpha.textContent = e.target.value);
+
+        // Three.js Setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030305, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(25, 20, 35);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Energy Center Indicator (Interaktiver Punkt)
+        const coreGeo = new THREE.SphereGeometry(1.0, 32, 32);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0xff7b00, wireframe: true });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        coreMesh.position.set(0, 0, 0);
+        scene.add(coreMesh);
+
+        // DragControls für das Verschieben des Punkts per Maus
+        const dragControls = new THREE.DragControls([coreMesh], camera, renderer.domElement);
+
+        dragControls.addEventListener('dragstart', function () {
+            controls.enabled = false; // OrbitControls pausieren, wenn Punkt gezogen wird
+        });
+
+        dragControls.addEventListener('drag', function () {
+            // Slider an die neue Position anpassen
+            sliderPosX.value = coreMesh.position.x.toFixed(1);
+            sliderPosY.value = coreMesh.position.y.toFixed(1);
+            sliderPosZ.value = coreMesh.position.z.toFixed(1);
+            
+            valPosX.textContent = sliderPosX.value;
+            valPosY.textContent = sliderPosY.value;
+            valPosZ.textContent = sliderPosZ.value;
+        });
+
+        dragControls.addEventListener('dragend', function () {
+            controls.enabled = true; // OrbitControls wieder aktivieren
+        });
+
+        // Event-Listener für Postions-Slider
+        function updateCoreFromSliders() {
+            coreMesh.position.x = parseFloat(sliderPosX.value);
+            coreMesh.position.y = parseFloat(sliderPosY.value);
+            coreMesh.position.z = parseFloat(sliderPosZ.value);
+            valPosX.textContent = sliderPosX.value;
+            valPosY.textContent = sliderPosY.value;
+            valPosZ.textContent = sliderPosZ.value;
+        }
+
+        sliderPosX.addEventListener('input', updateCoreFromSliders);
+        sliderPosY.addEventListener('input', updateCoreFromSliders);
+        sliderPosZ.addEventListener('input', updateCoreFromSliders);
+
+        // Doppelklick zum Platzieren des Punktes im 3D-Raum
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('dblclick', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            // Projektion auf eine virtuelle Ebene durch die Kamera
+            const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+            plane.normal.copy(camera.getWorldDirection(plane.normal)).negate();
+            const targetPos = new THREE.Vector3();
+            raycaster.ray.intersectPlane(plane, targetPos);
+
+            if (targetPos) {
+                coreMesh.position.copy(targetPos);
+                sliderPosX.value = coreMesh.position.x.toFixed(1);
+                sliderPosY.value = coreMesh.position.y.toFixed(1);
+                sliderPosZ.value = coreMesh.position.z.toFixed(1);
+                valPosX.textContent = sliderPosX.value;
+                valPosY.textContent = sliderPosY.value;
+                valPosZ.textContent = sliderPosZ.value;
+            }
+        });
+
+        // 3D Grid Parameters
+        const NX = 18, NY = 18, NZ = 18;
+        const SPACING = 2.0;
+        const totalPoints = NX * NY * NZ;
+
+        // Base positions storage
+        const basePos = new Float32Array(totalPoints * 3);
+        let idx = 0;
+        const offsetX = (NX - 1) * SPACING * 0.5;
+        const offsetY = (NY - 1) * SPACING * 0.5;
+        const offsetZ = (NZ - 1) * SPACING * 0.5;
+
+        for (let x = 0; x < NX; x++) {
+            for (let y = 0; y < NY; y++) {
+                for (let z = 0; z < NZ; z++) {
+                    basePos[idx * 3]     = x * SPACING - offsetX;
+                    basePos[idx * 3 + 1] = y * SPACING - offsetY;
+                    basePos[idx * 3 + 2] = z * SPACING - offsetZ;
+                    idx++;
+                }
+            }
+        }
+
+        function getIndex(x, y, z) {
+            return x * (NY * NZ) + y * NZ + z;
+        }
+
+        // Create line segments for 3D grid connections
+        const lineIndices = [];
+        for (let x = 0; x < NX; x++) {
+            for (let y = 0; y < NY; y++) {
+                for (let z = 0; z < NZ; z++) {
+                    const current = getIndex(x, y, z);
+                    if (x < NX - 1) lineIndices.push(current, getIndex(x + 1, y, z));
+                    if (y < NY - 1) lineIndices.push(current, getIndex(x, y + 1, z));
+                    if (z < NZ - 1) lineIndices.push(current, getIndex(x, y, z + 1));
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        const dynamicPositions = new Float32Array(totalPoints * 3);
+        const dynamicColors = new Float32Array(totalPoints * 3);
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(dynamicPositions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(dynamicColors, 3));
+        geometry.setIndex(lineIndices);
+
+        const material = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6
+        });
+
+        const gridLines = new THREE.LineSegments(geometry, material);
+        scene.add(gridLines);
+
+        // Simulation Variables
+        let time = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            time += 0.025;
+            controls.update();
+
+            const kGrav = parseFloat(sliderGrav.value) * 3.5;
+            const kElec = parseFloat(sliderElec.value) * 2.5;
+            const kMag = parseFloat(sliderMag.value) * 0.8;
+            const alphaRad = (parseFloat(sliderAlpha.value) * Math.PI) / 180;
+
+            const posAttr = geometry.attributes.position;
+            const colAttr = geometry.attributes.color;
+
+            // Core Rotation/Pulsieren
+            coreMesh.rotation.y += 0.01;
+            coreMesh.rotation.x += 0.005;
+
+            const cx = coreMesh.position.x;
+            const cy = coreMesh.position.y;
+            const cz = coreMesh.position.z;
+
+            for (let i = 0; i < totalPoints; i++) {
+                const bx = basePos[i * 3];
+                const by = basePos[i * 3 + 1];
+                const bz = basePos[i * 3 + 2];
+
+                // Relativer Abstand zum freibeweglichen Energiezentrum (cx, cy, cz)
+                const dx = bx - cx;
+                const dy = by - cy;
+                const dz = bz - cz;
+                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) + 0.001;
+
+                // 1. Bug-Winkel Alpha Einfluss
+                const wavePhase = (dist * Math.tan(alphaRad) * 0.2) - time * 2.5;
+                const wave = Math.sin(wavePhase) * Math.exp(-dist * 0.08);
+
+                // 2. Gravitation (Radiale 3D-Kontraktion / Sog zum beweglichen Zentrum)
+                const gravForce = (kGrav * Math.exp(-dist * 0.12)) + (wave * 0.5);
+                const gravScale = Math.max(0.05, 1.0 - (gravForce / dist));
+
+                let x = cx + dx * gravScale;
+                let y = cy + dy * gravScale;
+                let z = cz + dz * gravScale;
+
+                // 3. Elektrizität (Radiale Volumendehnung / Wellendruck)
+                const elecForce = (Math.sin(dist * 0.8 - time * 2) / dist) * kElec * Math.exp(-dist * 0.1);
+                x += (dx / dist) * elecForce;
+                y += (dy / dist) * elecForce;
+                z += (dz / dist) * elecForce;
+
+                // 4. Magnetismus (Torsion um Y-Achse des Energiezentrums)
+                const twistAngle = kMag * Math.exp(-dist * 0.1) * Math.cos(time + dist * 0.2);
+                const cosT = Math.cos(twistAngle);
+                const sinT = Math.sin(twistAngle);
+
+                const relX = x - cx;
+                const relZ = z - cz;
+
+                const rx = relX * cosT - relZ * sinT;
+                const rz = relX * sinT + relZ * cosT;
+
+                x = cx + rx;
+                z = cz + rz;
+
+                // Positionen schreiben
+                dynamicPositions[i * 3]     = x;
+                dynamicPositions[i * 3 + 1] = y;
+                dynamicPositions[i * 3 + 2] = z;
+
+                // Farbberechnung basierend auf Raumverzerrung relativ zum Ruhegitter
+                const deformation = Math.abs(dist - Math.sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy) + (z-cz)*(z-cz)));
+                const intensity = Math.min(1.0, deformation * 0.5 + Math.exp(-dist * 0.15));
+
+                dynamicColors[i * 3]     = 0.2 + intensity * 0.8; // R
+                dynamicColors[i * 3 + 1] = 0.4 + intensity * 0.3; // G
+                dynamicColors[i * 3 + 2] = 0.9 - intensity * 0.6; // B
+            }
+
+            posAttr.needsUpdate = true;
+            colAttr.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        // Resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Controls Reset & Fullscreen
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            sliderGrav.value = 1; valGrav.textContent = '1.0';
+            sliderElec.value = 1; valElec.textContent = '1.0';
+            sliderMag.value = 1; valMag.textContent = '1.0';
+            sliderAlpha.value = 45; valAlpha.textContent = '45';
+
+            sliderPosX.value = 0; valPosX.textContent = '0.0';
+            sliderPosY.value = 0; valPosY.textContent = '0.0';
+            sliderPosZ.value = 0; valPosZ.textContent = '0.0';
+            coreMesh.position.set(0, 0, 0);
+
+            controls.reset();
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        });
+
+        animate();
+    </script>
+</body>
+</html>

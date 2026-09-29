@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Wellenraumzeit Simulation</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050508;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+        }
+        h1 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #ff7b00;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .control-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+        input[type=range] {
+            width: 100%;
+            accent-color: #ff7b00;
+            cursor: pointer;
+        }
+        .btn-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background: rgba(255, 123, 0, 0.2);
+            border: 1px solid #ff7b00;
+            color: #ff7b00;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        button:hover {
+            background: #ff7b00;
+            color: #000;
+            box-shadow: 0 0 12px rgba(255, 123, 0, 0.5);
+        }
+        .legend {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 10px;
+            line-height: 1.4;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="gridCanvas"></canvas>
+
+        <!-- Steuerungspanel -->
+        <div class="ui-panel">
+            <h1>WRZT Gitter-Dynamik</h1>
+            
+            <div class="control-group">
+                <label>Gravitation ($Z$-Achse Tiefe): <span id="val-grav">1.0</span></label>
+                <input type="range" id="slider-grav" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Elektrizität (Zug/Radiale Dehnung): <span id="val-elec">1.0</span></label>
+                <input type="range" id="slider-elec" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Magnetismus (Torsion/Scherung): <span id="val-mag">1.0</span></label>
+                <input type="range" id="slider-mag" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Bug-Winkel $\alpha$ (Phasengeschwindigkeit): <span id="val-alpha">45</span>°</label>
+                <input type="range" id="slider-alpha" min="10" max="80" step="1" value="45">
+            </div>
+
+            <div class="legend">
+                • <b>Maus bewegen:</b> Energiezentrum steuern<br>
+                • <b>Gitterabsenkung (Z):</b> Gravitationspotential<br>
+                • <b>Gitterstauchung (XY):</b> Elektrische Ladung<br>
+                • <b>Wirbel/Torsion:</b> Magnetisches Feld
+            </div>
+        </div>
+
+        <!-- Vollbild-Button -->
+        <div class="btn-container">
+            <button id="fullscreenBtn">⛶ Vollbild</button>
+            <button id="resetBtn">↻ Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Parameter & Controls
+        const sliderGrav = document.getElementById('slider-grav');
+        const sliderElec = document.getElementById('slider-elec');
+        const sliderMag = document.getElementById('slider-mag');
+        const sliderAlpha = document.getElementById('slider-alpha');
+
+        const valGrav = document.getElementById('val-grav');
+        const valElec = document.getElementById('val-elec');
+        const valMag = document.getElementById('val-mag');
+        const valAlpha = document.getElementById('val-alpha');
+
+        let width, height;
+        let mouseX = 0, mouseY = 0;
+        let targetMouseX = 0, targetMouseY = 0;
+        let time = 0;
+
+        // Gitter-Einstellungen
+        const COLS = 45;
+        const ROWS = 35;
+        let grid = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initGrid();
+        }
+
+        function initGrid() {
+            grid = [];
+            for (let i = 0; i <= COLS; i++) {
+                grid[i] = [];
+                for (let j = 0; j <= ROWS; j++) {
+                    grid[i][j] = {
+                        baseX: (i / COLS) * width,
+                        baseY: (j / ROWS) * height,
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    };
+                }
+            }
+            mouseX = targetMouseX = width / 2;
+            mouseY = targetMouseY = height / 2;
+        }
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        // Event-Listener für Sliders
+        sliderGrav.addEventListener('input', (e) => valGrav.textContent = e.target.value);
+        sliderElec.addEventListener('input', (e) => valElec.textContent = e.target.value);
+        sliderMag.addEventListener('input', (e) => valMag.textContent = e.target.value);
+        sliderAlpha.addEventListener('input', (e) => valAlpha.textContent = e.target.value);
+
+        // Vollbild Logik
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            sliderGrav.value = 1; valGrav.textContent = '1.0';
+            sliderElec.value = 1; valElec.textContent = '1.0';
+            sliderMag.value = 1; valMag.textContent = '1.0';
+            sliderAlpha.value = 45; valAlpha.textContent = '45';
+        });
+
+        // Simulations-Loop
+        function animate() {
+            time += 0.03;
+
+            // Sanfte Mausverfolgung
+            mouseX += (targetMouseX - mouseX) * 0.08;
+            mouseY += (targetMouseY - mouseY) * 0.08;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const kGrav = parseFloat(sliderGrav.value) * 80;
+            const kElec = parseFloat(sliderElec.value) * 60;
+            const kMag = parseFloat(sliderMag.value) * 0.8;
+            const alphaRad = (parseFloat(sliderAlpha.value) * Math.PI) / 180;
+
+            // Transformatierte Punkte berechnen
+            for (let i = 0; i <= COLS; i++) {
+                for (let j = 0; j <= ROWS; j++) {
+                    const pt = grid[i][j];
+                    const dx = pt.baseX - mouseX;
+                    const dy = pt.baseY - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy) + 1;
+
+                    // Bug-Winkel Alpha Einfluss auf die Wellenfront
+                    const wavePhase = (dist * Math.tan(alphaRad) * 0.02) - time * 2;
+                    const wave = Math.sin(wavePhase) * Math.exp(-dist * 0.003);
+
+                    // 1. GRAVITATION (Z-Achse: Verschiebung nach unten)
+                    const zDeform = (Math.exp(-dist * 0.005) * kGrav) + (wave * 10);
+                    pt.z = zDeform;
+
+                    // 2. ELEKTRIZITÄT (Radialer Zug/Druck in XY)
+                    const elecForce = (Math.sin(dist * 0.03 - time) / dist) * kElec * Math.exp(-dist * 0.004);
+                    const shiftX = (dx / dist) * elecForce;
+                    const shiftY = (dy / dist) * elecForce;
+
+                    // 3. MAGNETISMUS (Torsion / Scherung um das Zentrum)
+                    const angle = Math.atan2(dy, dx) + (kMag * Math.exp(-dist * 0.006) * Math.cos(time * 0.5));
+                    const magDist = dist + shiftX;
+                    
+                    // Finale Positionsberechnung (3D-Perspektivprojektion simulieren)
+                    const projScale = 1 + (pt.z * 0.0015); // Iso-Projektionseffekt durch Z
+                    pt.x = mouseX + Math.cos(angle) * magDist * projScale;
+                    pt.y = mouseY + Math.sin(angle) * magDist * projScale + (pt.z * 0.4); // Z senkt Gitter optisch ab
+                }
+            }
+
+            // Gitter zeichnen
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i <= COLS; i++) {
+                for (let j = 0; j <= ROWS; j++) {
+                    const pt = grid[i][j];
+
+                    // Farbgebung basierend auf der Z-Auslenkung (Gravitation) und Spannung
+                    const intensity = Math.min(255, Math.max(40, Math.floor(pt.z * 2.5)));
+                    const r = Math.floor(intensity * 1.2);
+                    const g = Math.floor(100 + intensity * 0.5);
+                    const b = Math.floor(255 - intensity * 0.5);
+
+                    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.45)`;
+
+                    // Horizontale Linien
+                    if (i < COLS) {
+                        const nextPt = grid[i + 1][j];
+                        ctx.beginPath();
+                        ctx.moveTo(pt.x, pt.y);
+                        ctx.lineTo(nextPt.x, nextPt.y);
+                        ctx.stroke();
+                    }
+
+                    // Vertikale Linien
+                    if (j < ROWS) {
+                        const nextPt = grid[i][j + 1];
+                        ctx.beginPath();
+                        ctx.moveTo(pt.x, pt.y);
+                        ctx.lineTo(nextPt.x, nextPt.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Zentrum (Masse-/Ladungskern)
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY + (grid[Math.floor(COLS/2)][Math.floor(ROWS/2)].z * 0.4), 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff7b00';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#ff7b00';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            requestAnimationFrame(animate);
+        }
+
+        // Animation starten
+        resize();
+        animate();
+    </script>
+</body>
+</html>
