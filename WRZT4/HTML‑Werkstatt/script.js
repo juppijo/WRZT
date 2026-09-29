@@ -32,6 +32,10 @@
     margin: 40px;
     color: #112255;
     background: #ededfd;
+    max-width : 1000px;
+    text-align: justify;
+    padding : auto;
+    margin  : auto;
     }
     h1 {
       color: #112299;
