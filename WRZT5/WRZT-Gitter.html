@@ -58,6 +58,8 @@
             width: 320px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             pointer-events: auto;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
         }
         h1 {
             font-size: 1.1rem;
@@ -124,6 +126,11 @@
             <h1>WRZT Gitter-Dynamik</h1>
             
             <div class="control-group">
+                <label>Gitter-Größe (Auflösung): <span id="val-grid">45x35</span></label>
+                <input type="range" id="slider-grid" min="15" max="90" step="5" value="45">
+            </div>
+
+            <div class="control-group">
                 <label>Gravitation ($Z$-Achse Tiefe): <span id="val-grav">1.0</span></label>
                 <input type="range" id="slider-grav" min="0" max="3" step="0.1" value="1">
             </div>
@@ -163,11 +170,13 @@
         const ctx = canvas.getContext('2d');
 
         // Parameter & Controls
+        const sliderGrid = document.getElementById('slider-grid');
         const sliderGrav = document.getElementById('slider-grav');
         const sliderElec = document.getElementById('slider-elec');
         const sliderMag = document.getElementById('slider-mag');
         const sliderAlpha = document.getElementById('slider-alpha');
 
+        const valGrid = document.getElementById('val-grid');
         const valGrav = document.getElementById('val-grav');
         const valElec = document.getElementById('val-elec');
         const valMag = document.getElementById('val-mag');
@@ -178,9 +187,9 @@
         let targetMouseX = 0, targetMouseY = 0;
         let time = 0;
 
-        // Gitter-Einstellungen
-        const COLS = 45;
-        const ROWS = 35;
+        // Dynamic Gitter-Dimensionen
+        let cols = parseInt(sliderGrid.value);
+        let rows = Math.round(cols * 0.778); // Proportionales Verhältnis
         let grid = [];
 
         function resize() {
@@ -190,21 +199,26 @@
         }
 
         function initGrid() {
+            cols = parseInt(sliderGrid.value);
+            rows = Math.round(cols * (height / width)); // Dynamisch an Bildschirm-Seitenverhältnis anpassen
+            
             grid = [];
-            for (let i = 0; i <= COLS; i++) {
+            for (let i = 0; i <= cols; i++) {
                 grid[i] = [];
-                for (let j = 0; j <= ROWS; j++) {
+                for (let j = 0; j <= rows; j++) {
                     grid[i][j] = {
-                        baseX: (i / COLS) * width,
-                        baseY: (j / ROWS) * height,
+                        baseX: (i / cols) * width,
+                        baseY: (j / rows) * height,
                         x: 0,
                         y: 0,
                         z: 0
                     };
                 }
             }
-            mouseX = targetMouseX = width / 2;
-            mouseY = targetMouseY = height / 2;
+            if (mouseX === 0 && mouseY === 0) {
+                mouseX = targetMouseX = width / 2;
+                mouseY = targetMouseY = height / 2;
+            }
         }
 
         window.addEventListener('resize', resize);
@@ -214,6 +228,12 @@
         });
 
         // Event-Listener für Sliders
+        sliderGrid.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            const calculatedRows = Math.round(val * (height / width));
+            valGrid.textContent = `${val}x${calculatedRows}`;
+            initGrid();
+        });
         sliderGrav.addEventListener('input', (e) => valGrav.textContent = e.target.value);
         sliderElec.addEventListener('input', (e) => valElec.textContent = e.target.value);
         sliderMag.addEventListener('input', (e) => valMag.textContent = e.target.value);
@@ -234,10 +254,13 @@
         });
 
         document.getElementById('resetBtn').addEventListener('click', () => {
+            sliderGrid.value = 45; 
             sliderGrav.value = 1; valGrav.textContent = '1.0';
             sliderElec.value = 1; valElec.textContent = '1.0';
             sliderMag.value = 1; valMag.textContent = '1.0';
             sliderAlpha.value = 45; valAlpha.textContent = '45';
+            initGrid();
+            valGrid.textContent = `${cols}x${rows}`;
         });
 
         // Simulations-Loop
@@ -255,9 +278,9 @@
             const kMag = parseFloat(sliderMag.value) * 0.8;
             const alphaRad = (parseFloat(sliderAlpha.value) * Math.PI) / 180;
 
-            // Transformatierte Punkte berechnen
-            for (let i = 0; i <= COLS; i++) {
-                for (let j = 0; j <= ROWS; j++) {
+            // Transformierte Punkte berechnen
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
                     const pt = grid[i][j];
                     const dx = pt.baseX - mouseX;
                     const dy = pt.baseY - mouseY;
@@ -290,8 +313,8 @@
             // Gitter zeichnen
             ctx.lineWidth = 1;
 
-            for (let i = 0; i <= COLS; i++) {
-                for (let j = 0; j <= ROWS; j++) {
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
                     const pt = grid[i][j];
 
                     // Farbgebung basierend auf der Z-Auslenkung (Gravitation) und Spannung
@@ -303,7 +326,7 @@
                     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.45)`;
 
                     // Horizontale Linien
-                    if (i < COLS) {
+                    if (i < cols) {
                         const nextPt = grid[i + 1][j];
                         ctx.beginPath();
                         ctx.moveTo(pt.x, pt.y);
@@ -312,7 +335,7 @@
                     }
 
                     // Vertikale Linien
-                    if (j < ROWS) {
+                    if (j < rows) {
                         const nextPt = grid[i][j + 1];
                         ctx.beginPath();
                         ctx.moveTo(pt.x, pt.y);
@@ -323,13 +346,15 @@
             }
 
             // Zentrum (Masse-/Ladungskern)
-            ctx.beginPath();
-            ctx.arc(mouseX, mouseY + (grid[Math.floor(COLS/2)][Math.floor(ROWS/2)].z * 0.4), 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff7b00';
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = '#ff7b00';
-            ctx.fill();
-            ctx.shadowBlur = 0;
+            if (grid[Math.floor(cols/2)] && grid[Math.floor(cols/2)][Math.floor(rows/2)]) {
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY + (grid[Math.floor(cols/2)][Math.floor(rows/2)].z * 0.4), 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#ff7b00';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#ff7b00';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
 
             requestAnimationFrame(animate);
         }
