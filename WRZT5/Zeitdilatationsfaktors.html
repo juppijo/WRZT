@@ -115,7 +115,7 @@
   <ol>
     <li><strong>Zeitdilatation im Gravitationsfeld:</strong> Ein Beobachter im Abstand $r$ misst eine Eigenzeit $d\tau$, die über diesen Faktor mit der Koordinatenzeit $dt$ eines weit entfernten Beobachters verknüpft ist:</li>
   </ol>
-  <p>$$d\tau = \sqrt{1 - \frac{R_S}{r}}  dt$$</p>
+  <p>$$d\tau = \sqrt{1 - \frac{R_S}{r}} dt$$</p>
   <ol start="2">
     <li><strong>Ereignishorizont ($r = R_S$):</strong> Nähert man sich dem Schwarzschild-Radius $r \to R_S$, strebt der Ausdruck unter der Wurzel gegen 0. Aus Sicht eines entfernten Beobachters scheint die Zeit am Ereignishorizont eines Schwarzen Lochs völlig stillezustehen.</li>
   </ol>
@@ -132,7 +132,7 @@
   <p>Für eine punktförmige oder kugelsymmetrische Masse $M$ (wie einen Planeten, Stern oder ein Schwarzes Loch) ist das Potential $\Phi$ im Abstand $r$ definiert als:</p>
   <p>$$\Phi(r) = -\frac{G \cdot M}{r}$$</p>
   <ul>
-    <li><strong>$G$:</strong> Die Newtonsche Gravitationskonstante ($G \approx 6{,}674 \times 10^{-11}  \text{ m}^3 / (\text{kg} \cdot \text{s}^2)$).</li>
+    <li><strong>$G$:</strong> Die Newtonsche Gravitationskonstante ($G \approx 6{,}674 \times 10^{-11} \text{ m}^3 / (\text{kg} \cdot \text{s}^2)$).</li>
     <li><strong>$M$:</strong> Die Masse, die das Gravitationsfeld erzeugt (z. B. die Masse der Erde).</li>
     <li><strong>$r$:</strong> Der Abstand vom Mittelpunkt dieser Masse zum betrachteten Punkt im Raum.</li>
   </ul>
@@ -166,6 +166,23 @@
   <p>In der klassischen Physik nach Newton ist $\Phi$ schlicht ein Maß für die Stärke des Schwerefelds.</p>
   <p>In Einsteins Allgemeine Relativitätstheorie fließt $\Phi$ als Näherung für schwache Felder direkt in die Verzerrung der Raumzeit ein:
     Der Faktor $1 + \frac{2\Phi}{c^2}$ bestimmt, wie stark die Zeit an diesem Ort im Vergleich zum raumzeitlich flachen Unendlichen ($\Phi = 0$) langsamer vergeht. Da $\Phi$ negativ ist, ist dieser Faktor kleiner als 1 – die Zeit vergeht im Potentialtopf spürbar langsamer.</p>
+
+  <hr>
+
+  <h2>📐 2. Brücke zur trigonometrischen Lorentz-Deutung (WRZT)</h2>
+  <p>Verbindet man die Fluchtgeschwindigkeit $v_{\text{esc}}$ im Abstand $r$:</p>
+  <p>$$v_{\text{esc}}^2 = \frac{2GM}{r} = c^2 \frac{R_S}{r}$$</p>
+  <p>mit dem gravitativen Zeitdilatationsfaktor, zeigt sich eine exakte trigonometrische Entsprechung zur Speziellen Relativitätstheorie:</p>
+
+  <p>$$\sqrt{1 - \frac{R_S}{r}} = \sqrt{1 - \frac{v_{\text{esc}}^2}{c^2}} = \cos\theta, \quad \text{mit } \sin\theta = \frac{v_{\text{esc}}}{c}$$</p>
+
+  <ul>
+    <li><strong>Geometrische Identität:</strong> Der gravitative Zeitdilatationsfaktor entspricht formal genau dem relativistischen Lorentz-Faktor $\gamma^{-1} = \cos\theta$, wobei lediglich die Relativgeschwindigkeit $v$ durch die lokale Fluchtgeschwindigkeit $v_{\text{esc}}$ ersetzt wird.</li>
+    <li><strong>Einheitlicher Ursprung:</strong> Bewegung durch den Raum und Verweilen im Gravitationsfeld beschreiben in der WRZT somit dieselbe projektive geometrische Drehung (Winkel $\theta$) im Wellenraum.</li>
+  </ul>
+
+
+  <hr>
 
   <script>
     function toggleFullscreen() {
