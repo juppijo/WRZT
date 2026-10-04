@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT – Zeitdilatations-Kurve</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #ededfd;
+      color: #112255;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      max-width: 900px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #112299;
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+    .formula-box {
+      background: #f4f4ff;
+      padding: 12px 20px;
+      border-left: 4px solid #112299;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+      background: #f8f9fe;
+      padding: 16px;
+      border-radius: 8px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    .value-display {
+      font-size: 0.85rem;
+      color: #445588;
+      text-align: right;
+    }
+    svg {
+      width: 100%;
+      height: 400px;
+      background: #fafaff;
+      border: 1px solid #d0d5f0;
+      border-radius: 8px;
+    }
+    .legend {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-box {
+      width: 16px;
+      height: 4px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🌀 WRZT Zeitdilatations-Kurve</h1>
+
+    <div class="formula-box">
+      $$\cos\Theta = \sqrt{1 - \frac{R_S}{r + R_{\min}} - \frac{v^2}{c^2}}$$
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="vRatio">Relativgeschwindigkeit $v / c$:</label>
+        <input type="range" id="vRatio" min="0" max="0.999" step="0.001" value="0">
+        <div class="value-display" id="vVal">v = 0.00 c</div>
+      </div>
+
+      <div class="control-group">
+        <label for="rmin">WRZT-Minimalabstand $R_{\min} / R_S$:</label>
+        <input type="range" id="rmin" min="0.01" max="10" step="0.01" value="0.1">
+        <div class="value-display" id="rminVal">R_min = 0.10 R_S</div>
+      </div>
+    </div>
+
+    <svg id="plot" viewBox="0 0 800 400"></svg>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="color-box" style="background: #dd2222; border-top: 2px dashed #dd2222;"></div>
+        <span>Standard-ART (Singularität bei $r = R_S$)</span>
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #112299;"></div>
+        <span>WRZT (Gekappt durch $R_{\min}$)</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const svg = document.getElementById('plot');
+    const vInput = document.getElementById('vRatio');
+    const rminInput = document.getElementById('rmin');
+    const vVal = document.getElementById('vVal');
+    const rminVal = document.getElementById('rminVal');
+
+    const padding = {
+      top: 30,
+      right: 30,
+      bottom: 50,
+      left: 60
+    };
+    const width = 800;
+    const height = 400;
+    const plotW = width - padding.left - padding.right;
+    const plotH = height - padding.top - padding.bottom;
+
+    // Skalenbereich: r von 0 bis 5 R_S, y (cosTheta) von 0 bis 1
+    const rMax = 20.0;
+
+    function toSvgX(r) {
+      return padding.left + (r / rMax) * plotW;
+    }
+
+    function toSvgY(y) {
+      return padding.top + (1 - y) * plotH;
+    }
+
+    function drawGrid() {
+      let html = '';
+
+      // X-Achse Raster & Beschriftung (in Einheiten von R_S)
+      for (let r = 0; r <= rMax; r += 1) {
+        const x = toSvgX(r);
+        html += `<line x1="${x}" y1="${padding.top}" x2="${x}" y2="${height - padding.bottom}" stroke="#e0e4f7" stroke-width="1"/>`;
+        html += `<text x="${x}" y="${height - padding.bottom + 20}" font-size="12" fill="#556699" text-anchor="middle">${r === 0 ? '0' : r + ' R_S'}</text>`;
+      }
+
+      // Y-Achse Raster & Beschriftung (cosTheta)
+      for (let y = 0; y <= 1.0; y += 0.2) {
+        const svgY = toSvgY(y);
+        html += `<line x1="${padding.left}" y1="${svgY}" x2="${width - padding.right}" y2="${svgY}" stroke="#e0e4f7" stroke-width="1"/>`;
+        html += `<text x="${padding.left - 10}" y="${svgY + 4}" font-size="12" fill="#556699" text-anchor="end">${y.toFixed(1)}</text>`;
+      }
+
+      // Ereignishorizont-Linie (r = 1 R_S)
+      const xHorizon = toSvgX(1.0);
+      html += `<line x1="${xHorizon}" y1="${padding.top}" x2="${xHorizon}" y2="${height - padding.bottom}" stroke="#ffa4a4" stroke-width="1.5" stroke-dasharray="4,4"/>`;
+      html += `<text x="${xHorizon + 5}" y="${padding.top + 15}" font-size="11" fill="#cc0000">Ereignishorizont (r = R_S)</text>`;
+
+      // Achsenbeschriftungen
+      html += `<text x="${width / 2}" y="${height - 10}" font-size="13" font-weight="bold" fill="#112299" text-anchor="middle">Abstand r</text>`;
+      html += `<text x="20" y="${height / 2}" font-size="13" font-weight="bold" fill="#112299" text-anchor="middle" transform="rotate(-90 20 ${height/2})">Zeitdilatation cos(Θ)</text>`;
+
+      return html;
+    }
+
+    function updatePlot() {
+      const v = parseFloat(vInput.value);
+      const rmin = parseFloat(rminInput.value);
+
+      vVal.textContent = `v = ${v.toFixed(2)} c`;
+      rminVal.textContent = `R_min = ${rmin.toFixed(2)} R_S`;
+
+      let svgContent = drawGrid();
+
+      let pathArt = '';
+      let pathWrzt = '';
+      const steps = 300;
+
+      for (let i = 0; i <= steps; i++) {
+        const r = (i / steps) * rMax;
+        const x = toSvgX(r);
+
+        // --- Standard ART ---
+        let yArt = 0;
+        const argArt = 1 - (1 / r) - Math.pow(v, 2);
+        if (r > 1 && argArt > 0) {
+          yArt = Math.sqrt(argArt);
+        } else {
+          yArt = 0;
+        }
+        const svgYArt = toSvgY(yArt);
+        pathArt += (i === 0 ? 'M' : 'L') + ` ${x} ${svgYArt}`;
+
+        // --- WRZT (Modifiziert durch R_min) ---
+        const argWrzt = 1 - (1 / (r + rmin)) - Math.pow(v, 2);
+        const yWrzt = argWrzt > 0 ? Math.sqrt(argWrzt) : 0;
+        const svgYWrzt = toSvgY(yWrzt);
+        pathWrzt += (i === 0 ? 'M' : 'L') + ` ${x} ${svgYWrzt}`;
+      }
+
+      // Zeichne Kurven
+      svgContent += `<path d="${pathArt}" fill="none" stroke="#dd2222" stroke-width="2" stroke-dasharray="6,4" opacity="0.7"/>`;
+      svgContent += `<path d="${pathWrzt}" fill="none" stroke="#112299" stroke-width="3"/>`;
+
+      svg.innerHTML = svgContent;
+    }
+
+    vInput.addEventListener('input', updatePlot);
+    rminInput.addEventListener('input', updatePlot);
+
+    updatePlot();
+  </script>
+
+</body>
+</html>
