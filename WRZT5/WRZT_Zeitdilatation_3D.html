@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRZT Zeitdilatation – 3D-Gitter</title>
+<style>
+:root{--ink:#112255;--acc:#112299;--bg:#ededfd;--pn:rgba(255,255,255,.92)}
+*{box-sizing:border-box}
+body{margin:0;font-family:sans-serif;color:var(--ink);background:var(--bg)}
+#app{display:flex;flex-direction:column;height:100vh;padding:10px;gap:8px;background:var(--bg)}
+header{display:flex;align-items:center;gap:10px}
+h1{font-size:1.15rem;margin:0;color:var(--acc);flex:1}
+button{background:var(--acc);color:#eeddff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+button:hover{background:#666688}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #c9a227;outline-offset:2px}
+.stage{position:relative;flex:1;min-height:320px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px #1122994d;background:#f4f4ff}
+#cv{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#cv:active{cursor:grabbing}
+.panel{position:absolute;top:10px;background:var(--pn);border-radius:10px;padding:8px 12px;font-size:13px;max-height:calc(100% - 20px);overflow:auto;box-shadow:0 1px 8px #11229933}
+#set{left:10px;width:280px;max-width:46%}
+#calc{right:10px;width:340px;max-width:50%}
+summary{cursor:pointer;font-weight:700;color:var(--acc)}
+label{display:block;margin-top:8px}
+label b{float:right;font-weight:600}
+label.c{display:inline-block;margin:8px 12px 0 0}
+input[type=range],select{width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.row button{padding:4px 8px;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+td{padding:2px 0;vertical-align:top}
+td:last-child{text-align:right;font-family:monospace;padding-left:8px}
+tr.big td{font-size:1.05rem;font-weight:700;color:var(--acc);border-top:1px solid #11229933;border-bottom:1px solid #11229933}
+.note{margin-top:6px;color:#666688}
+.clocks{display:flex;justify-content:space-around;margin-top:8px;text-align:center;font-size:12px}
+.clocks canvas{width:84px;height:84px}
+.hint{position:absolute;left:12px;bottom:8px;font-size:12px;pointer-events:none;background:var(--pn);padding:3px 8px;border-radius:6px}
+@media(max-width:700px){
+  #set,#calc{left:10px;right:10px;width:auto;max-width:none}
+  #calc{top:auto;bottom:34px;max-height:42%}
+  #set{max-height:48%}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🌀 WRZT – Zeitdilatation im 3D-Gitter</h1>
+    <button id="fs" title="Vollbild umschalten">⛶ Vollbild</button>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+
+    <details class="panel" id="set" open>
+      <summary>⚙ Einstellungen</summary>
+      <div class="row" id="presets"></div>
+      <label>Höhe zeigt
+        <select id="hm">
+          <option value="t">Zeitdilatation (f − 1)</option>
+          <option value="s">Raumkrümmung (Flamm-Paraboloid)</option>
+        </select>
+      </label>
+      <label>Masse M <b id="vM"></b><input type="range" id="lm" min="-6.5" max="7" step="0.01" value="1"></label>
+      <label>Gittergröße (Linien) <b id="vN"></b><input type="range" id="gn" min="8" max="60" step="1" value="24"></label>
+      <label>Anzeigebereich r<sub>max</sub> <b id="vR"></b><input type="range" id="rm" min="1.5" max="30" step="0.1" value="8"></label>
+      <label>Höhen-Skalierung <b id="vS"></b><input type="range" id="ws" min="0.2" max="3" step="0.05" value="1"></label>
+      <label>Probe-Abstand ρ = r/R<sub>S</sub> <b id="vP"></b><input type="range" id="pr" min="0.5" max="30" step="0.01" value="3"></label>
+      <label>Probe-Winkel <b id="vW"></b><input type="range" id="pw" min="0" max="360" step="1" value="40"></label>
+      <label>Zeitraffer <b id="vT"></b><input type="range" id="tp" min="0.1" max="5" step="0.1" value="1"></label>
+      <div>
+        <label class="c"><input type="checkbox" id="cG" checked> Gitter</label>
+        <label class="c"><input type="checkbox" id="cI" checked> Isolinien</label>
+        <label class="c"><input type="checkbox" id="cC" checked> Uhren</label>
+        <label class="c"><input type="checkbox" id="cA"> Auto-Rotation</label>
+      </div>
+      <div class="row"><button id="rv">Ansicht zurücksetzen</button></div>
+    </details>
+
+    <details class="panel" id="calc" open>
+      <summary>∑ Rechnung an der Probe</summary>
+      <table id="out"></table>
+      <div class="note">f = √(1 + 2Φ/c²) = √(1 − R<sub>S</sub>/r) = cos θ, mit sin θ = v<sub>esc</sub>/c</div>
+      <div class="clocks" id="clk">
+        <div><canvas id="c1"></canvas><div>Fernbeobachter<br><span id="t1">0,0</span> s</div></div>
+        <div><canvas id="c2"></canvas><div>Probe<br><span id="t2">0,0</span> s</div></div>
+      </div>
+    </details>
+
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+
+<script>
+const G=6.6743e-11, C=299792458, MS=1.98847e30;
+const $=id=>document.getElementById(id);
+const cv=$('cv'), ctx=cv.getContext('2d');
+let W=0,H=0,dpr=1,geoDirty=true;
+const st={lm:1,N:24,rm:8,hs:1,tp:1,rho:3,ang:.7,f:1,hm:'t',yaw:.8,pit:.62,dist:22};
+const opt={grid:true,iso:true,clk:true,auto:false};
+
+/* ---------- Physik ---------- */
+const f=r=>r<=1?0:Math.sqrt(1-1/r);          // r in Einheiten von R_S
+const zf=r=>st.hm==='t'
+  ? (f(r)-1)*st.hs*st.rm*.7
+  : st.hs*.8*(2*Math.sqrt(Math.max(r-1,0))-2*Math.sqrt(Math.max(st.rm-1,0)));
+
+/* ---------- Format ---------- */
+function fm(x){
+  if(x===0)return'0';
+  const a=Math.abs(x);
+  return((a>=1e-3&&a<1e5)?x.toPrecision(6):x.toExponential(4)).replace('.',',');
+}
+function len(m){return m<1?fm(m*1000)+' mm':m<1000?fm(m)+' m':fm(m/1000)+' km'}
+
+/* ---------- Farbe: f=1 blau, f=0 gold ---------- */
+const stops=[[0,[230,150,10]],[.5,[150,60,170]],[1,[40,70,200]]];
+function col(v){
+  for(let i=1;i<stops.length;i++){
+    if(v<=stops[i][0]){const a=stops[i-1],b=stops[i],t=(v-a[0])/(b[0]-a[0]);return a[1].map((x,k)=>Math.round(x+(b[1][k]-x)*t))}
+  }
+  return stops[2][1];
+}
+const NB=16, bcol=[...Array(NB)].map((_,i)=>'rgb('+col((i+.5)/NB).join(',')+')');
+
+/* ---------- Geometrie (nur bei Parameteränderung neu) ---------- */
+let lines=[], isoRings=[], horizon=null;
+function ring(r,n=120){
+  const p=new Float32Array(n*3), z=zf(r);
+  for(let i=0;i<n;i++){const a=i/n*2*Math.PI;p[i*3]=r*Math.cos(a);p[i*3+1]=r*Math.sin(a);p[i*3+2]=z}
+  return p;
+}
+function buildGeo(){
+  lines=[]; isoRings=[];
+  const K=Math.floor(st.N/2), dx=2*st.rm/st.N, n=Math.min(220,Math.max(60,Math.ceil(2*st.rm/.12)));
+  for(let dir=0;dir<2;dir++)for(let k=-K;k<=K;k++){
+    const c=k*dx, p=new Float32Array((n+1)*4);
+    for(let i=0;i<=n;i++){
+      const t=-st.rm+2*st.rm*i/n, x=dir?t:c, y=dir?c:t, r=Math.hypot(x,y);
+      p[i*4]=x;p[i*4+1]=y;p[i*4+2]=zf(r);p[i*4+3]=f(r);
+    }
+    lines.push(p);
+  }
+  for(const v of[.9,.75,.5,.25]){
+    const r=1/(1-v*v);
+    if(r<st.rm)isoRings.push({v,p:ring(r)});
+  }
+  horizon=ring(1,72);
+  geoDirty=false;
+}
+
+/* ---------- Kamera ---------- */
+let cam,fw,rt,up,tz,fl;
+function setCam(){
+  tz=zf(0)*.45;
+  const cp=Math.cos(st.pit),sp=Math.sin(st.pit);
+  cam=[st.dist*cp*Math.cos(st.yaw),st.dist*cp*Math.sin(st.yaw),st.dist*sp+tz];
+  fw=[-cp*Math.cos(st.yaw),-cp*Math.sin(st.yaw),-sp];
+  let rx=fw[1],ry=-fw[0];const rl=Math.hypot(rx,ry);rx/=rl;ry/=rl;
+  rt=[rx,ry,0];
+  up=[ry*fw[2],-rx*fw[2],rx*fw[1]-ry*fw[0]];
+  fl=Math.min(W,H)*1.1;
+}
+const out=[0,0,0];
+function proj(x,y,z){
+  const dx=x-cam[0],dy=y-cam[1],dz=z-cam[2];
+  const zc=dx*fw[0]+dy*fw[1]+dz*fw[2];
+  if(zc<.05)return false;
+  out[0]=W/2+fl*(dx*rt[0]+dy*rt[1])/zc;
+  out[1]=H/2-fl*(dx*up[0]+dy*up[1]+dz*up[2])/zc;
+  out[2]=zc;
+  return true;
+}
+
+/* ---------- Zeichnen ---------- */
+function polyPath(p,close){
+  const path=new Path2D(); let first=true;
+  for(let i=0;i<p.length;i+=3){
+    if(!proj(p[i],p[i+1],p[i+2])){first=true;continue}
+    first?path.moveTo(out[0],out[1]):path.lineTo(out[0],out[1]); first=false;
+  }
+  if(close)path.closePath();
+  return path;
+}
+function draw(){
+  if(geoDirty)buildGeo();
+  setCam();
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#fbfbff'); g.addColorStop(1,'#d9d9f5');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // Horizont-Scheibe
+  const hp=polyPath(horizon,true);
+  ctx.fillStyle='#0b0820'; ctx.fill(hp);
+
+  if(opt.grid){
+    const bk=[...Array(NB)].map(()=>new Path2D());
+    for(const L of lines){
+      let ok=false,px=0,py=0,pf=0;
+      for(let i=0;i<L.length;i+=4){
+        if(!proj(L[i],L[i+1],L[i+2])){ok=false;continue}
+        if(ok){const b=Math.min(NB-1,Math.floor((pf+L[i+3])/2*NB));bk[b].moveTo(px,py);bk[b].lineTo(out[0],out[1])}
+        px=out[0];py=out[1];pf=L[i+3];ok=true;
+      }
+    }
+    ctx.lineWidth=1.3;
+    for(let b=0;b<NB;b++){ctx.strokeStyle=bcol[b];ctx.stroke(bk[b])}
+  }
+  if(opt.iso){
+    ctx.save(); ctx.setLineDash([5,5]); ctx.lineWidth=1.4; ctx.font='12px sans-serif'; ctx.textAlign='center';
+    for(const r of isoRings){
+      ctx.strokeStyle=ctx.fillStyle='rgb('+col(r.v).join(',')+')';
+      ctx.stroke(polyPath(r.p,true));
+      if(proj(r.p[0],r.p[1],r.p[2]))ctx.fillText('f = '+String(r.v).replace('.',','),out[0],out[1]-6);
+    }
+    ctx.restore();
+  }
+  ctx.lineWidth=2.5; ctx.strokeStyle='#e0b840'; ctx.stroke(hp);
+
+  // Probe auf der Fläche
+  const x=st.rho*Math.cos(st.ang), y=st.rho*Math.sin(st.ang);
+  if(proj(x,y,zf(st.rho))){
+    ctx.beginPath(); ctx.arc(out[0],out[1],8,0,7); ctx.fillStyle='#e0b840'; ctx.fill();
+    ctx.lineWidth=2.5; ctx.strokeStyle='#112299'; ctx.stroke();
+    ctx.fillStyle='#112299'; ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
+    ctx.fillText('Probe',out[0]+12,out[1]-10);
+  }
+}
+
+function clk(c,ang,color){
+  const x=c.getContext('2d');
+  x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,84,84); x.translate(42,42);
+  x.beginPath(); x.arc(0,0,38,0,7); x.fillStyle='#fff'; x.fill();
+  x.lineWidth=3; x.strokeStyle=color; x.stroke(); x.fillStyle=color;
+  for(let i=0;i<12;i++){x.save();x.rotate(i*Math.PI/6);x.fillRect(-1,-35,2,5);x.restore()}
+  x.save(); x.rotate(ang); x.lineWidth=3; x.lineCap='round';
+  x.beginPath(); x.moveTo(0,4); x.lineTo(0,-30); x.stroke(); x.restore();
+}
+
+let last=0,T=0;
+function loop(ts){
+  const dt=Math.min(.1,(ts-last)/1000||0); last=ts;
+  T+=dt*st.tp;
+  if(opt.auto&&!dragging)st.yaw+=dt*.25;
+  draw();
+  if(opt.clk){
+    clk($('c1'),T*2*Math.PI/12,'#112299');
+    clk($('c2'),T*st.f*2*Math.PI/12,'#9a6a00');
+    $('t1').textContent=fm(T).slice(0,6);
+    $('t2').textContent=fm(T*st.f).slice(0,6);
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- Rechnung ---------- */
+function update(){
+  const M=MS*10**st.lm, Rs=2*G*M/C**2, rho=st.rho, r=rho*Rs;
+  const phi=-G*M/r, inner=1-1/rho;
+  const rows=[
+    ['M',fm(10**st.lm)+' M☉ = '+fm(M)+' kg'],
+    ['R<sub>S</sub> = 2GM/c²',len(Rs)],
+    ['r = ρ·R<sub>S</sub>, ρ = '+fm(rho),len(r)],
+    ['Φ = −GM/r',fm(phi)+' J/kg'],
+    ['2Φ/c² = −R<sub>S</sub>/r',fm(2*phi/C**2)],
+    ['1 + 2Φ/c²',fm(inner)]
+  ];
+  let h=rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');
+  if(rho>1){
+    const fv=Math.sqrt(inner); st.f=fv;
+    const loss=(1/rho)/(1+fv);
+    const s=Math.sqrt(1/rho), th=Math.asin(s)*180/Math.PI;
+    h+='<tr class="big"><td>Faktor f = √(1 + 2Φ/c²)</td><td>'+fm(fv)+'</td></tr>'
+      +'<tr><td>1 − f</td><td>'+fm(loss)+'</td></tr>'
+      +'<tr><td>Zeitverlust pro Tag</td><td>'+fm(loss*86400)+' s</td></tr>'
+      +'<tr><td>v<sub>esc</sub>/c = sin θ</td><td>'+fm(s)+'</td></tr>'
+      +'<tr><td>θ</td><td>'+fm(th)+'°</td></tr>'
+      +'<tr><td>cos θ (= f)</td><td>'+fm(Math.cos(th*Math.PI/180))+'</td></tr>';
+  } else {
+    st.f=0;
+    h+='<tr class="big"><td>Faktor f</td><td>'+(rho===1?'0':'nicht definiert')+'</td></tr>'
+      +'<tr><td colspan="2">'+(rho===1?'Am Horizont steht die Zeit aus Sicht des Fernbeobachters still.':'Probe liegt innerhalb von R<sub>S</sub> – die Formel gilt hier nicht.')+'</td></tr>';
+  }
+  $('out').innerHTML=h;
+  $('hint').textContent='Ziehen: drehen · Mausrad / Pinch: zoomen · Klick: Probe setzen · Gitterabstand = '+fm(2*st.rm/st.N)+' R_S';
+}
+
+/* ---------- Einstellungen ---------- */
+let prevRm=st.rm;
+function readSettings(){
+  st.lm=+$('lm').value; st.N=+$('gn').value; st.rm=+$('rm').value;
+  st.hs=+$('ws').value; st.tp=+$('tp').value; st.rho=+$('pr').value;
+  st.ang=+$('pw').value*Math.PI/180; st.hm=$('hm').value;
+  opt.grid=$('cG').checked; opt.iso=$('cI').checked; opt.clk=$('cC').checked; opt.auto=$('cA').checked;
+  $('clk').style.display=opt.clk?'flex':'none';
+  $('vM').textContent=fm(10**st.lm)+' M☉';
+  $('vN').textContent=st.N;
+  $('vR').textContent=st.rm.toFixed(1).replace('.',',')+' R_S';
+  $('vS').textContent='×'+st.hs.toFixed(2).replace('.',',');
+  $('vP').textContent=fm(st.rho);
+  $('vW').textContent=$('pw').value+'°';
+  $('vT').textContent='×'+st.tp.toFixed(1).replace('.',',');
+  if(st.rm!==prevRm){st.dist*=st.rm/prevRm;prevRm=st.rm}
+}
+function changed(){readSettings();geoDirty=true;update()}
+document.querySelectorAll('#set input,#set select').forEach(i=>i.addEventListener('input',changed));
+
+[['Erde',-5.522],['Sonne',0],['Neutronenstern',.146],['Schwarzes Loch 10 M☉',1],['Sgr A*',6.633]].forEach(([n,v])=>{
+  const b=document.createElement('button'); b.textContent=n;
+  b.onclick=()=>{$('lm').value=v;changed()};
+  $('presets').appendChild(b);
+});
+$('rv').onclick=()=>{st.yaw=.8;st.pit=.62;st.dist=st.rm*2.8};
+
+/* ---------- Maus / Touch: drehen, zoomen, Probe setzen ---------- */
+const ptr=new Map(); let dragging=false, moved=0, pinch=0;
+function pickProbe(e){
+  const R=cv.getBoundingClientRect();
+  const xn=(e.clientX-R.left-W/2)/fl, yn=-(e.clientY-R.top-H/2)/fl;
+  const d=[fw[0]+xn*rt[0]+yn*up[0], fw[1]+xn*rt[1]+yn*up[1], fw[2]+yn*up[2]];
+  if(d[2]>=-1e-6)return;
+  const t=-cam[2]/d[2], hx=cam[0]+t*d[0], hy=cam[1]+t*d[1];
+  st.rho=Math.min(30,Math.max(.5,Math.hypot(hx,hy)));
+  st.ang=Math.atan2(hy,hx);
+  $('pr').value=st.rho; $('pw').value=Math.round((st.ang*180/Math.PI+360)%360);
+  readSettings(); update();
+}
+cv.addEventListener('pointerdown',e=>{
+  cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  dragging=true; moved=0;
+  if(ptr.size===2){const [a,b]=[...ptr.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y)}
+});
+cv.addEventListener('pointermove',e=>{
+  const p=ptr.get(e.pointerId); if(!p)return;
+  const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
+  moved+=Math.abs(dx)+Math.abs(dy);
+  if(ptr.size===2){
+    const [a,b]=[...ptr.values()], d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(pinch>0)st.dist=Math.min(300,Math.max(3,st.dist*pinch/d)); pinch=d;
+  } else {
+    st.yaw-=dx*.007; st.pit=Math.min(1.5,Math.max(.03,st.pit+dy*.007));
+  }
+});
+function endPtr(e){
+  const wasSingle=ptr.size===1;
+  ptr.delete(e.pointerId); pinch=0;
+  if(wasSingle&&moved<5&&e.type==='pointerup')pickProbe(e);
+  if(!ptr.size)dragging=false;
+}
+cv.addEventListener('pointerup',endPtr);
+cv.addEventListener('pointercancel',endPtr);
+cv.addEventListener('wheel',e=>{
+  e.preventDefault();
+  st.dist=Math.min(300,Math.max(3,st.dist*Math.exp(e.deltaY*.0015)));
+},{passive:false});
+
+/* ---------- Größe & Vollbild ---------- */
+function resize(){
+  const s=$('stage'); W=s.clientWidth; H=s.clientHeight; dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  for(const id of['c1','c2']){$(id).width=84*dpr;$(id).height=84*dpr}
+}
+new ResizeObserver(resize).observe($('stage'));
+$('fs').onclick=()=>{
+  const e=$('app'), on=document.fullscreenElement||document.webkitFullscreenElement;
+  if(!on)(e.requestFullscreen||e.webkitRequestFullscreen).call(e).catch(()=>alert('Vollbildmodus nicht verfügbar.'));
+  else(document.exitFullscreen||document.webkitExitFullscreen).call(document);
+};
+document.addEventListener('fullscreenchange',()=>{
+  $('fs').textContent=document.fullscreenElement?'⛶ Beenden':'⛶ Vollbild';
+});
+
+readSettings(); st.dist=st.rm*2.8; resize(); update(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

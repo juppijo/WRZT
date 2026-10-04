@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT Zeitdilatationsfaktors</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      color: #112255;
+      background: #ededfd;
+      max-width : 1000px;
+      text-align: justify;
+      padding : auto;
+      margin  : auto;
+      }
+      h1 {
+        color: #112299;
+      }
+      .button-container {
+        display: flex;
+        justify-content: flex-end; 
+        padding: 10px 15px; 
+        gap: 10px; 
+      }
+      .link-box-button {
+        justify-content: flex-end;
+        padding: 10px 18px;
+        background: #112299;
+        color: #eeddff;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: opacity 0.2s ease;
+        cursor: pointer; 
+      }
+      .link-box-button:hover {
+        background: #666688;
+        padding: 10px 19px;
+      }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+  <h1>🌀 WRZT Zeitdilatationsfaktors</h1>
+
+  <p>Auf der Tafel ist die schrittweise Umformung des <strong>gravitativen Zeitdilatationsfaktors</strong> (bzw. des entsprechenden Eintrags der Schwarzschild-Metrik $g_{00}$) dargestellt.</p>
+  <p>Diese Formel beschreibt, wie stark die Zeit in einem Gravitationsfeld im Vergleich zu einem unendlich weit entfernten Beobachter langsamer vergeht.</p>
+  <hr>
+  <h3>Die drei Schritte auf der Tafel:</h3>
+  <p>$$\sqrt{1 + \frac{2\Phi}{c^2}} = \sqrt{1 - \frac{G M \cdot 2}{r c^2}} = \sqrt{1 - \frac{R_S}{r}}$$</p>
+  <hr>
+  <h3>1. Erster Ausdruck: Allgemeines Gravitationspotential</h3>
+  <p>$$\sqrt{1 + \frac{2\Phi}{c^2}}$$</p>
+  <ul>
+    <li><strong>$\Phi$ (Phi):</strong> Das newtonsche Gravitationspotential am jeweiligen Ort im Raum.</li>
+    <li><strong>$c$:</strong> Die Lichtgeschwindigkeit im Vakuum.</li>
+    <li><strong>Bedeutung:</strong> Für ein anziehendes (gebundenes) Gravitationsfeld ist das Potential $\Phi$ negativ. Da $\Phi &lt; 0$ ist, wird der Wert unter der Wurzel kleiner als 1, was bedeutet, dass Uhren im Gravitationsfeld langsamer ticken als fernab davon.</li>
+  </ul>
+  <hr>
+  <h3>2. Zweiter Ausdruck: Einsetzen des Gravitationspotentials einer Kugelmasse</h3>
+  <p>$$\sqrt{1 - \frac{2GM}{r c^2}}$$</p>
+  <ul>
+    <li>
+      <p>Hier wurde für das Potential einer punktförmigen oder kugelsymmetrischen Masse $M$ die Formel $\Phi = -\frac{GM}{r}$ eingesetzt:</p>
+    </li>
+    <li>
+      <p><strong>$G$:</strong> Die Newtonsche Gravitationskonstante.</p>
+    </li>
+    <li>
+      <p><strong>$M$:</strong> Die Masse des zentralen Himmelskörpers (z. B. Erde, Sonne oder Schwarzes Loch).</p>
+    </li>
+    <li>
+      <p><strong>$r$:</strong> Der Abstand vom Zentrum der Masse.</p>
+    </li>
+    <li>
+      <p>Durch das Einsetzen von $\Phi = -\frac{GM}{r}$ wird das Pluszeichen unter der Wurzel zu einem Minuszeichen.</p>
+    </li>
+  </ul>
+  <hr>
+  <h3>3. Dritter Ausdruck: Einführung des Schwarzschild-Radius</h3>
+  <p>$$\sqrt{1 - \frac{R_S}{r}}$$</p>
+  <ul>
+    <li><strong>$R_S$ (Schwarzschild-Radius):</strong> Der Schwarzschild-Radius charakterisiert die Ausdehnung des Ereignishorizonts eines nicht-rotierenden Schwarzen Lochs und ist definiert als:</li>
+  </ul>
+  <p>$$R_S = \frac{2GM}{c^2}$$</p>
+  <ul>
+    <li>Ersetzt man den Term $\frac{2GM}{c^2}$ durch $R_S$, erhält man die kompakte und klassische Form der Schwarzschild-Zeitdilatation.</li>
+  </ul>
+  <hr>
+  <h3>Physikalische Bedeutung</h3>
+  <ol>
+    <li><strong>Zeitdilatation im Gravitationsfeld:</strong> Ein Beobachter im Abstand $r$ misst eine Eigenzeit $d\tau$, die über diesen Faktor mit der Koordinatenzeit $dt$ eines weit entfernten Beobachters verknüpft ist:</li>
+  </ol>
+  <p>$$d\tau = \sqrt{1 - \frac{R_S}{r}}  dt$$</p>
+  <ol start="2">
+    <li><strong>Ereignishorizont ($r = R_S$):</strong> Nähert man sich dem Schwarzschild-Radius $r \to R_S$, strebt der Ausdruck unter der Wurzel gegen 0. Aus Sicht eines entfernten Beobachters scheint die Zeit am Ereignishorizont eines Schwarzen Lochs völlig stillezustehen.</li>
+  </ol>
+
+  <hr>
+
+  <h2>
+    〰️ Newtonsche Gravitationspotential $\Phi$ (Phi)
+  </h2>
+
+  <p>Das <strong>newtonsche Gravitationspotential</strong> $\Phi$ (Phi) beschreibt, wie viel <strong>potenzielle Energie pro Masseneinheit</strong> an einem bestimmten Ort im Raum vorhanden ist, die rein durch das Gravitationsfeld einer Masse verursacht wird.</p>
+  <hr>
+  <h3>1. Die mathematische Formel</h3>
+  <p>Für eine punktförmige oder kugelsymmetrische Masse $M$ (wie einen Planeten, Stern oder ein Schwarzes Loch) ist das Potential $\Phi$ im Abstand $r$ definiert als:</p>
+  <p>$$\Phi(r) = -\frac{G \cdot M}{r}$$</p>
+  <ul>
+    <li><strong>$G$:</strong> Die Newtonsche Gravitationskonstante ($G \approx 6{,}674 \times 10^{-11}  \text{ m}^3 / (\text{kg} \cdot \text{s}^2)$).</li>
+    <li><strong>$M$:</strong> Die Masse, die das Gravitationsfeld erzeugt (z. B. die Masse der Erde).</li>
+    <li><strong>$r$:</strong> Der Abstand vom Mittelpunkt dieser Masse zum betrachteten Punkt im Raum.</li>
+  </ul>
+  <hr>
+  <h3>2. Physikalische Anschaulichkeit: Die &quot;Senke&quot; im Raum</h3>
+  <p>Man kann sich das Gravitationspotential als eine Art <strong>Landschaft mit einem Trichter oder einer Senke</strong> vorstellen:</p>
+  <ol>
+    <li><strong>Einheit (Joule pro Kilogramm, $\text{J/kg}$):</strong>
+      Multipliziert man das Potential $\Phi$ mit der Masse $m$ eines Objekts (z. B. einem Satelliten), erhält man dessen <strong>potenzielle Gravitationsenergie</strong>:</li>
+  </ol>
+  <p>$$E_{\text{pot}} = m \cdot \Phi = -\frac{G \cdot M \cdot m}{r}$$</p>
+  <ol start="2">
+    <li><strong>Das negative Vorzeichen:</strong>
+      Das Potential hat per Konvention den Wert $0$ in <strong>unendlicher Entfernung</strong> ($r \to \infty$).</li>
+  </ol>
+  <ul>
+    <li>Je näher man der Masse $M$ kommt (kleineres $r$), desto <strong>negativer</strong> wird der Wert von $\Phi$.</li>
+    <li>Das bedeutet: Wenn ein Objekt aus dem unendlichen Weltall auf eine Masse zustürzt, fällt es sozusagen in eine &quot;Potentialsenke&quot;. Es gibt dabei Energie ab (z. B. indem es an Bewegungsenergie gewinnt).</li>
+    <li>Um ein Objekt wieder aus dem Feld ins Unendliche zu befördern, muss man Arbeit verrichten – man muss es aus der Senke &quot;herausheben&quot;.</li>
+  </ul>
+  <hr>
+  <h3>3. Zusammenhang mit der Gravitationskraft</h3>
+  <p>Das Potential $\Phi$ ist ein <strong>skalares Feld</strong> (ein einfacher Zahlenwert an jedem Ort im Raum, ohne Richtung).</p>
+  <p>Die <strong>Gravitationskraft</strong> bzw. die Gravitationsbeschleunigung $\vec{g}$ lässt sich direkt aus dem Gefälle (dem Gradienten) dieses Potentials ableiten:</p>
+  <p>$$\vec{g} = -\nabla \Phi$$</p>
+  <ul>
+    <li><strong>Bedeutung:</strong> Die Kraft wirkt immer in Richtung des stärksten Abfalls des Potentials – also steil bergab direkt hin zum Zentrum der Masse $M$.</li>
+  </ul>
+  <hr>
+  <h3>4. Einordnung in der Relativitätstheorie (Bezug zur Tafel)</h3>
+  <p>In der klassischen Physik nach Newton ist $\Phi$ schlicht ein Maß für die Stärke des Schwerefelds.</p>
+  <p>In Einsteins Allgemeine Relativitätstheorie fließt $\Phi$ als Näherung für schwache Felder direkt in die Verzerrung der Raumzeit ein:
+    Der Faktor $1 + \frac{2\Phi}{c^2}$ bestimmt, wie stark die Zeit an diesem Ort im Vergleich zum raumzeitlich flachen Unendlichen ($\Phi = 0$) langsamer vergeht. Da $\Phi$ negativ ist, ist dieser Faktor kleiner als 1 – die Zeit vergeht im Potentialtopf spürbar langsamer.</p>
+
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert("Fehler beim Aktivieren des Vollbildmodus!");
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

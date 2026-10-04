@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRZT Zeitdilatation – Gitter-Simulation</title>
+<style>
+:root{--ink:#112255;--acc:#112299;--bg:#ededfd;--pn:rgba(255,255,255,.92)}
+*{box-sizing:border-box}
+body{margin:0;font-family:sans-serif;color:var(--ink);background:var(--bg)}
+#app{display:flex;flex-direction:column;height:100vh;padding:10px;gap:8px;background:var(--bg)}
+header{display:flex;align-items:center;gap:10px}
+h1{font-size:1.15rem;margin:0;color:var(--acc);flex:1}
+button{background:var(--acc);color:#eeddff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+button:hover{background:#666688}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #c9a227;outline-offset:2px}
+.stage{position:relative;flex:1;min-height:320px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px #1122994d;background:#f4f4ff}
+#cv{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.panel{position:absolute;top:10px;background:var(--pn);border-radius:10px;padding:8px 12px;font-size:13px;max-height:calc(100% - 20px);overflow:auto;box-shadow:0 1px 8px #11229933}
+#set{left:10px;width:280px;max-width:46%}
+#calc{right:10px;width:340px;max-width:50%}
+summary{cursor:pointer;font-weight:700;color:var(--acc)}
+label{display:block;margin-top:8px}
+label b{float:right;font-weight:600}
+label.c{display:inline-block;margin:8px 12px 0 0}
+input[type=range]{width:100%}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.row button{padding:4px 8px;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+td{padding:2px 0;vertical-align:top}
+td:last-child{text-align:right;font-family:monospace;padding-left:8px}
+tr.big td{font-size:1.05rem;font-weight:700;color:var(--acc);border-top:1px solid #11229933;border-bottom:1px solid #11229933}
+.note{margin-top:6px;color:#666688}
+.clocks{display:flex;justify-content:space-around;margin-top:8px;text-align:center;font-size:12px}
+.clocks canvas{width:84px;height:84px}
+.hint{position:absolute;left:12px;bottom:8px;font-size:12px;color:var(--ink);pointer-events:none;background:var(--pn);padding:3px 8px;border-radius:6px}
+@media(max-width:700px){
+  #set,#calc{left:10px;right:10px;width:auto;max-width:none}
+  #calc{top:auto;bottom:34px;max-height:42%}
+  #set{max-height:48%}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🌀 WRZT – Gravitative Zeitdilatation im Gitter</h1>
+    <button id="fs" title="Vollbild umschalten">⛶ Vollbild</button>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+
+    <details class="panel" id="set" open>
+      <summary>⚙ Einstellungen</summary>
+      <div class="row" id="presets"></div>
+      <label>Masse M <b id="vM"></b><input type="range" id="lm" min="-6.5" max="7" step="0.01" value="1"></label>
+      <label>Gittergröße (Linien) <b id="vN"></b><input type="range" id="gn" min="8" max="60" step="1" value="24"></label>
+      <label>Anzeigebereich r<sub>max</sub> <b id="vR"></b><input type="range" id="rm" min="1.5" max="30" step="0.1" value="8"></label>
+      <label>Gitter-Verzerrung <b id="vS"></b><input type="range" id="ws" min="0" max="0.9" step="0.01" value="0.6"></label>
+      <label>Probe-Abstand ρ = r/R<sub>S</sub> <b id="vP"></b><input type="range" id="pr" min="0.5" max="30" step="0.01" value="3"></label>
+      <label>Zeitraffer <b id="vT"></b><input type="range" id="tp" min="0.1" max="5" step="0.1" value="1"></label>
+      <div>
+        <label class="c"><input type="checkbox" id="cH" checked> Farbfeld</label>
+        <label class="c"><input type="checkbox" id="cG" checked> Gitter</label>
+        <label class="c"><input type="checkbox" id="cI" checked> Isolinien</label>
+        <label class="c"><input type="checkbox" id="cC" checked> Uhren</label>
+      </div>
+    </details>
+
+    <details class="panel" id="calc" open>
+      <summary>∑ Rechnung an der Probe</summary>
+      <table id="out"></table>
+      <div class="note">f = √(1 + 2Φ/c²) = √(1 − R<sub>S</sub>/r) = cos θ, mit sin θ = v<sub>esc</sub>/c</div>
+      <div class="clocks" id="clk">
+        <div><canvas id="c1"></canvas><div>Fernbeobachter<br><span id="t1">0,0</span> s</div></div>
+        <div><canvas id="c2"></canvas><div>Probe<br><span id="t2">0,0</span> s</div></div>
+      </div>
+    </details>
+
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+
+<script>
+const G=6.6743e-11, C=299792458, MS=1.98847e30;
+const $=id=>document.getElementById(id);
+const cv=$('cv'), ctx=cv.getContext('2d');
+const base=document.createElement('canvas'), bctx=base.getContext('2d');
+const heat=document.createElement('canvas');
+let W=0,H=0,dpr=1,dirty=true;
+const st={lm:1,N:24,rm:8,s:.6,tp:1,rho:3,ang:-.6,f:1};
+const opt={heat:true,grid:true,iso:true,clk:true};
+
+/* ---------- Physik ---------- */
+const f=r=>r<=1?0:Math.sqrt(1-1/r);            // r in Einheiten von R_S
+const warp=r=>r*(1-st.s*(1-f(r)));            // Darstellungs-Radius
+const inv=d=>{let lo=0,hi=60;for(let i=0;i<26;i++){const m=(lo+hi)/2;warp(m)<d?lo=m:hi=m}return(lo+hi)/2};
+const Pf=()=>Math.max(W,H)/(2*st.rm);
+
+/* ---------- Format ---------- */
+function fm(x){
+  if(x===0)return'0';
+  const a=Math.abs(x);
+  const s=(a>=1e-3&&a<1e5)?x.toPrecision(6):x.toExponential(4);
+  return s.replace('.',',');
+}
+function len(m){return m<1?fm(m*1000)+' mm':m<1000?fm(m)+' m':fm(m/1000)+' km'}
+
+/* ---------- Farbe ---------- */
+const stops=[[0,[12,8,36]],[.25,[96,40,170]],[.55,[96,120,235]],[.85,[170,200,255]],[1,[236,240,255]]];
+function col(v){
+  for(let i=1;i<stops.length;i++){
+    if(v<=stops[i][0]){const a=stops[i-1],b=stops[i],t=(v-a[0])/(b[0]-a[0]);return a[1].map((x,k)=>x+(b[1][k]-x)*t)}
+  }
+  return stops[4][1];
+}
+
+/* ---------- Basis-Ebene (Farbfeld, Gitter, Isolinien) ---------- */
+function build(){
+  const b=bctx; b.setTransform(dpr,0,0,dpr,0,0); b.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, P=Pf();
+  if(opt.heat){
+    const hw=Math.ceil(W/4), hh=Math.ceil(H/4);
+    heat.width=hw; heat.height=hh;
+    const hc=heat.getContext('2d'), im=hc.createImageData(hw,hh);
+    for(let y=0;y<hh;y++)for(let x=0;x<hw;x++){
+      const d=Math.hypot((x+.5)*W/hw-cx,(y+.5)*H/hh-cy)/P;
+      const c=col(f(inv(d))), i=(y*hw+x)*4;
+      im.data[i]=c[0];im.data[i+1]=c[1];im.data[i+2]=c[2];im.data[i+3]=255;
+    }
+    hc.putImageData(im,0,0);
+    b.imageSmoothingEnabled=true; b.drawImage(heat,0,0,W,H);
+  } else { b.fillStyle='#f4f4ff'; b.fillRect(0,0,W,H); }
+
+  const dx=2*st.rm/st.N;
+  if(opt.grid){
+    const hx=W/2/P+dx, hy=H/2/P+dx;
+    const pa=new Path2D(), pb=new Path2D();
+    const wp=(x,y)=>{const r=Math.hypot(x,y);const sc=r<1e-9?1-st.s:warp(r)/r;return[cx+x*sc*P,cy+y*sc*P]};
+    const step=Math.min(dx/4,.15);
+    for(let dir=0;dir<2;dir++){
+      const L=dir?hx:hy, K=Math.ceil((dir?hy:hx)/dx);
+      const n=Math.min(600,Math.ceil(2*L/step));
+      for(let k=-K;k<=K;k++){
+        const c=k*dx; let prev=null;
+        for(let i=0;i<=n;i++){
+          const t=-L+2*L*i/n, x=dir?t:c, y=dir?c:t;
+          const p=wp(x,y);
+          if(prev){
+            const path=f(Math.hypot(x,y))<.45?pb:pa;
+            path.moveTo(prev[0],prev[1]); path.lineTo(p[0],p[1]);
+          }
+          prev=p;
+        }
+      }
+    }
+    b.lineWidth=1.2;
+    b.strokeStyle=opt.heat?'rgba(17,34,153,.55)':'rgba(17,34,153,.6)'; b.stroke(pa);
+    b.strokeStyle=opt.heat?'rgba(255,225,150,.85)':'rgba(120,40,170,.85)'; b.stroke(pb);
+  }
+  if(opt.iso){
+    b.save(); b.setLineDash([5,5]); b.lineWidth=1.3; b.font='12px sans-serif'; b.textAlign='center';
+    for(const v of[.9,.75,.5,.25]){
+      const rr=warp(1/(1-v*v))*P;
+      b.strokeStyle=v<.45?'#ffe196':'#112299'; b.fillStyle=b.strokeStyle;
+      b.beginPath(); b.arc(cx,cy,rr,0,7); b.stroke();
+      b.fillText('f = '+String(v).replace('.',','),cx,cy-rr-4);
+    }
+    b.restore();
+  }
+  // Ereignishorizont r = R_S
+  const rh=warp(1)*P;
+  b.beginPath(); b.arc(cx,cy,rh,0,7); b.fillStyle='#0b0820'; b.fill();
+  b.lineWidth=2; b.strokeStyle='#e0b840'; b.stroke();
+  b.fillStyle='#e0b840'; b.font='bold 12px sans-serif'; b.textAlign='center'; b.fillText('R_S',cx,cy+4);
+  dirty=false;
+}
+
+/* ---------- Frame ---------- */
+function render(){
+  if(dirty)build();
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(base,0,0,W,H);
+  const cx=W/2, cy=H/2, P=Pf(), rr=warp(st.rho)*P;
+  const px=cx+Math.cos(st.ang)*rr, py=cy+Math.sin(st.ang)*rr;
+  ctx.save(); ctx.setLineDash([4,4]); ctx.strokeStyle='#e0b840'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,py); ctx.stroke(); ctx.restore();
+  ctx.beginPath(); ctx.arc(px,py,8,0,7); ctx.fillStyle='#e0b840'; ctx.fill();
+  ctx.lineWidth=2.5; ctx.strokeStyle='#112299'; ctx.stroke();
+  ctx.fillStyle='#112299'; ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('Probe',px+12,py-10);
+}
+
+function clk(c,ang,color){
+  const x=c.getContext('2d');
+  x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,84,84); x.translate(42,42);
+  x.beginPath(); x.arc(0,0,38,0,7); x.fillStyle='#fff'; x.fill();
+  x.lineWidth=3; x.strokeStyle=color; x.stroke(); x.fillStyle=color;
+  for(let i=0;i<12;i++){x.save();x.rotate(i*Math.PI/6);x.fillRect(-1,-35,2,5);x.restore()}
+  x.save(); x.rotate(ang); x.lineWidth=3; x.lineCap='round';
+  x.beginPath(); x.moveTo(0,4); x.lineTo(0,-30); x.stroke(); x.restore();
+}
+
+let last=0,T=0;
+function loop(ts){
+  const dt=Math.min(.1,(ts-last)/1000||0); last=ts;
+  T+=dt*st.tp;
+  render();
+  if(opt.clk){
+    clk($('c1'),T*2*Math.PI/12,'#112299');
+    clk($('c2'),T*st.f*2*Math.PI/12,'#9a6a00');
+    $('t1').textContent=fm(T).slice(0,6);
+    $('t2').textContent=fm(T*st.f).slice(0,6);
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- Rechnung ---------- */
+function update(){
+  const M=MS*10**st.lm, Rs=2*G*M/C**2, rho=st.rho, r=rho*Rs;
+  const phi=-G*M/r, inner=1-1/rho;
+  const rows=[
+    ['M',fm(10**st.lm)+' M☉ = '+fm(M)+' kg'],
+    ['R<sub>S</sub> = 2GM/c²',len(Rs)],
+    ['r = ρ·R<sub>S</sub>, ρ = '+fm(rho),len(r)],
+    ['Φ = −GM/r',fm(phi)+' J/kg'],
+    ['2Φ/c² = −R<sub>S</sub>/r',fm(2*phi/C**2)],
+    ['1 + 2Φ/c²',fm(inner)]
+  ];
+  let h=rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('');
+  if(rho>1){
+    const fv=Math.sqrt(inner); st.f=fv;
+    const loss=(1/rho)/(1+fv);                        // 1 − f, numerisch stabil
+    const s=Math.sqrt(1/rho), th=Math.asin(s)*180/Math.PI;
+    h+='<tr class="big"><td>Faktor f = √(1 + 2Φ/c²)</td><td>'+fm(fv)+'</td></tr>'
+      +'<tr><td>1 − f</td><td>'+fm(loss)+'</td></tr>'
+      +'<tr><td>Zeitverlust pro Tag</td><td>'+fm(loss*86400)+' s</td></tr>'
+      +'<tr><td>v<sub>esc</sub>/c = sin θ</td><td>'+fm(s)+'</td></tr>'
+      +'<tr><td>θ</td><td>'+fm(th)+'°</td></tr>'
+      +'<tr><td>cos θ (= f)</td><td>'+fm(Math.cos(th*Math.PI/180))+'</td></tr>';
+  } else {
+    st.f=0;
+    h+='<tr class="big"><td>Faktor f</td><td>'+(rho===1?'0':'nicht definiert')+'</td></tr>'
+      +'<tr><td colspan="2">'+(rho===1?'Am Horizont steht die Zeit aus Sicht des Fernbeobachters still.':'Probe liegt innerhalb von R<sub>S</sub> – die Formel gilt hier nicht.')+'</td></tr>';
+  }
+  $('out').innerHTML=h;
+  $('hint').textContent='Klicken oder ziehen setzt die Probe · Gitterabstand = '+fm(2*st.rm/st.N)+' R_S · Punktmasse-Modell';
+}
+
+/* ---------- Einstellungen ---------- */
+function readSettings(){
+  st.lm=+$('lm').value; st.N=+$('gn').value; st.rm=+$('rm').value;
+  st.s=+$('ws').value; st.tp=+$('tp').value; st.rho=+$('pr').value;
+  opt.heat=$('cH').checked; opt.grid=$('cG').checked; opt.iso=$('cI').checked; opt.clk=$('cC').checked;
+  $('clk').style.display=opt.clk?'flex':'none';
+  $('vM').textContent=fm(10**st.lm)+' M☉';
+  $('vN').textContent=st.N;
+  $('vR').textContent=st.rm.toFixed(1).replace('.',',')+' R_S';
+  $('vS').textContent=st.s.toFixed(2).replace('.',',');
+  $('vP').textContent=fm(st.rho);
+  $('vT').textContent='×'+st.tp.toFixed(1).replace('.',',');
+}
+function changed(){readSettings();dirty=true;update()}
+document.querySelectorAll('#set input').forEach(i=>i.addEventListener('input',changed));
+
+[['Erde',-5.522],['Sonne',0],['Neutronenstern',.146],['Schwarzes Loch 10 M☉',1],['Sgr A*',6.633]].forEach(([n,v])=>{
+  const b=document.createElement('button'); b.textContent=n;
+  b.onclick=()=>{$('lm').value=v;changed()};
+  $('presets').appendChild(b);
+});
+
+/* ---------- Probe per Maus/Touch ---------- */
+let drag=false;
+function setProbe(e){
+  const R=cv.getBoundingClientRect(), x=e.clientX-R.left-W/2, y=e.clientY-R.top-H/2;
+  st.rho=Math.min(30,Math.max(.5,inv(Math.hypot(x,y)/Pf())));
+  st.ang=Math.atan2(y,x);
+  $('pr').value=st.rho; $('vP').textContent=fm(st.rho); update();
+}
+cv.addEventListener('pointerdown',e=>{drag=true;cv.setPointerCapture(e.pointerId);setProbe(e)});
+cv.addEventListener('pointermove',e=>{if(drag)setProbe(e)});
+cv.addEventListener('pointerup',()=>drag=false);
+
+/* ---------- Größe & Vollbild ---------- */
+function resize(){
+  const s=$('stage'); W=s.clientWidth; H=s.clientHeight; dpr=window.devicePixelRatio||1;
+  for(const c of[cv,base]){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr)}
+  for(const id of['c1','c2']){$(id).width=84*dpr;$(id).height=84*dpr}
+  dirty=true;
+}
+new ResizeObserver(resize).observe($('stage'));
+$('fs').onclick=()=>{
+  const e=$('app'), on=document.fullscreenElement||document.webkitFullscreenElement;
+  if(!on)(e.requestFullscreen||e.webkitRequestFullscreen).call(e).catch(()=>alert('Vollbildmodus nicht verfügbar.'));
+  else(document.exitFullscreen||document.webkitExitFullscreen).call(document);
+};
+document.addEventListener('fullscreenchange',()=>{
+  $('fs').textContent=document.fullscreenElement?'⛶ Beenden':'⛶ Vollbild';
+});
+
+readSettings(); resize(); update(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

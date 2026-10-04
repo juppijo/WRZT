@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Wellenraumzeit Gravitations-Simulation</title>
+  	<script>
+      MathJax = {
+        tex: {
+          inlineMath: [
+            ['$', '$'],
+            ['\\(', '\\)']
+          ],
+          displayMath: [
+            ['$$', '$$'],
+            ['\\[', '\\]']
+          ]
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #030712;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #f8fafc;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        /* Glassmorphism panel styling */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.5);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.8);
+        }
+        /* Custom styled range sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+            width: 100%;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -5px;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+            transition: transform 0.1s ease, background-color 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            background: #7dd3fc;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <div id="canvas-container" class="w-full h-full absolute inset-0"></div>
+
+    <!-- Header Overlay -->
+    <header class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none z-10">
+        <div class="glass-panel px-4 py-2.5 rounded-xl flex items-center gap-3 pointer-events-auto">
+            <div class="w-3.5 h-3.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_#38bdf8]"></div>
+            <h1 class="text-base sm:text-lg font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-sky-200 to-indigo-300">
+                WRZT – Wellenraumzeit-Simulation
+            </h1>
+        </div>
+
+        <div class="flex items-center gap-2 pointer-events-auto">
+            <!-- Toggle Controls Button -->
+            <button id="toggle-panel-btn" class="glass-panel hover:bg-slate-800 text-slate-200 p-2.5 rounded-xl transition duration-200 flex items-center justify-center border border-slate-700/60 shadow-lg" title="Einstellungen einklappen/ausklappen">
+                <i class="fa-solid fa-sliders text-cyan-400 text-lg"></i>
+            </button>
+            <!-- Fullscreen Button -->
+            <button id="fullscreen-btn" class="glass-panel hover:bg-slate-800 text-slate-200 p-2.5 rounded-xl transition duration-200 flex items-center justify-center border border-slate-700/60 shadow-lg" title="Vollbild umschalten">
+                <i class="fa-solid fa-expand text-cyan-400 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Collapsible Control Panel -->
+    <aside id="control-panel" class="absolute top-20 right-4 w-80 sm:w-96 max-h-[calc(100vh-6.5rem)] overflow-y-auto glass-panel rounded-2xl p-5 z-10 transition-all duration-300 transform translate-x-0">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-700/60 pb-3">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+                <i class="fa-solid fa-sliders"></i> Parameter & Gitter-Look
+            </h2>
+            <span class="text-[11px] text-cyan-300 bg-cyan-950/80 border border-cyan-800 px-2 py-0.5 rounded-md font-mono">WRZT Model</span>
+        </div>
+
+        <div class="space-y-4 text-xs">
+            <!-- Grid Brightness / Glow -->
+            <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                <div class="flex justify-between text-slate-200 mb-1 font-semibold">
+                    <label for="brightness-slider" class="text-cyan-300">Gitter-Helligkeit / Leuchten</label>
+                    <span id="brightness-value" class="text-cyan-400 font-mono">1.8</span>
+                </div>
+                <input type="range" id="brightness-slider" min="0.5" max="3.5" step="0.1" value="1.8">
+                <p class="text-[10px] text-slate-400 mt-1">Erhöht die Leuchtkraft der Gitterlinien und Knoten.</p>
+            </div>
+
+            <!-- Color Palette Selector -->
+            <div>
+                <label class="block text-slate-300 font-medium mb-1.5">Gitter-Farbschema</label>
+                <select id="color-scheme-select" class="w-full bg-slate-900 border border-slate-700 text-cyan-300 rounded-lg px-3 py-2 focus:outline-none focus:border-cyan-500 font-medium">
+                    <option value="neon">Neon-Pulse (Cyan → Pink/Orange)</option>
+                    <option value="cyan">Electric Cyan (Hellblau Monochrom)</option>
+                    <option value="emerald">Matrix Emerald (Leucht-Grün)</option>
+                    <option value="plasma">Deep Plasma (Violett → Gelb)</option>
+                </select>
+            </div>
+
+            <!-- Mass / Schwarzschild Radius -->
+            <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                    <label for="mass-slider" class="font-medium">Masse / Trichtertiefe ($R_s$)</label>
+                    <span id="mass-value" class="text-cyan-400 font-mono">1.60</span>
+                </div>
+                <input type="range" id="mass-slider" min="0.1" max="3.5" step="0.05" value="1.6">
+                <p class="text-[10px] text-slate-400 mt-0.5">Skaliert das Gravitationspotential $\Phi = -GM/r$.</p>
+            </div>
+
+            <!-- Grid Density / Size -->
+            <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                    <label for="grid-density-slider" class="font-medium">Gitter-Auflösung (Linien)</label>
+                    <span id="grid-density-value" class="text-cyan-400 font-mono">80 x 80</span>
+                </div>
+                <input type="range" id="grid-density-slider" min="30" max="120" step="10" value="80">
+            </div>
+
+            <!-- Wave Frequency -->
+            <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                    <label for="wave-freq-slider" class="font-medium">Oszillations-Frequenz ($\omega_0$)</label>
+                    <span id="wave-freq-value" class="text-cyan-400 font-mono">2.2</span>
+                </div>
+                <input type="range" id="wave-freq-slider" min="0.2" max="5.0" step="0.1" value="2.2">
+            </div>
+
+            <!-- Wave Amplitude -->
+            <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                    <label for="wave-amp-slider" class="font-medium">Wellen-Amplitude</label>
+                    <span id="wave-amp-value" class="text-cyan-400 font-mono">0.40</span>
+                </div>
+                <input type="range" id="wave-amp-slider" min="0.0" max="1.0" step="0.05" value="0.40">
+            </div>
+
+            <!-- Display Toggles -->
+            <div class="pt-2 border-t border-slate-700/60 space-y-2">
+                <label class="flex items-center justify-between text-slate-300 cursor-pointer">
+                    <span>Gitterlinien anzeigen</span>
+                    <input type="checkbox" id="show-wireframe-check" checked class="w-4 h-4 accent-cyan-500 rounded">
+                </label>
+                <label class="flex items-center justify-between text-slate-300 cursor-pointer">
+                    <span>Phasenringe & Testteilchen</span>
+                    <input type="checkbox" id="show-particles-check" checked class="w-4 h-4 accent-cyan-500 rounded">
+                </label>
+                <label class="flex items-center justify-between text-slate-300 cursor-pointer">
+                    <span>Ereignishorizont-Sphäre</span>
+                    <input type="checkbox" id="show-horizon-check" checked class="w-4 h-4 accent-cyan-500 rounded">
+                </label>
+            </div>
+        </div>
+
+        <!-- Formula display box -->
+        <div class="mt-4 p-3.5 rounded-xl bg-slate-900/90 border border-cyan-900/50 text-[11px] leading-relaxed text-slate-300 shadow-inner">
+            <div class="font-semibold text-cyan-300 mb-1 border-b border-slate-800 pb-1 flex justify-between">
+                <span>Relativistische Wellenregel</span>
+                <i class="fa-solid fa-atom text-cyan-400"></i>
+            </div>
+            <div class="font-mono text-[11px] text-amber-300 my-1.5 bg-slate-950 p-1.5 rounded text-center border border-slate-800">
+                f(r) = f₀ · √(1 - R_s / r)
+            </div>
+            <p class="text-slate-400 text-[10px]">
+                In der WRZT entspricht die Zeitdilatation der Verlangsamung lokaler Elementarwellen im dichten Raumzeit-Gitter.
+            </p>
+        </div>
+    </aside>
+
+    <!-- Bottom Realtime Stats Overlay -->
+    <div class="absolute bottom-4 left-4 right-4 sm:right-auto glass-panel rounded-xl px-4 py-3 z-10 flex flex-wrap items-center gap-4 text-xs font-mono">
+        <div>
+            <span class="text-slate-400">Uhr A (Fernfeld r=∞):</span>
+            <span id="clock-far" class="text-emerald-400 font-bold ml-1">1.00x</span>
+        </div>
+        <div class="h-4 w-[1px] bg-slate-700"></div>
+        <div>
+            <span class="text-slate-400">Uhr B (Nahfeld r≈2.2):</span>
+            <span id="clock-near" class="text-amber-300 font-bold ml-1">0.52x</span>
+        </div>
+        <div class="h-4 w-[1px] bg-slate-700"></div>
+        <div>
+            <span class="text-slate-400">Zeitdilatation:</span>
+            <span id="dilatation-factor" class="text-cyan-300 font-bold ml-1">48% verlangsamt</span>
+        </div>
+    </div>
+
+    <script>
+        // Main WebGL Application State
+        let scene, camera, renderer, controls;
+        let gridMesh, horizonMesh, centerMassMesh;
+        let particleSystem, clockMarkers = [];
+
+        // Interactive Parameters
+        const params = {
+            mass: 1.6,
+            gridResolution: 80,
+            gridSize: 20,
+            frequency: 2.2,
+            amplitude: 0.40,
+            deformScale: 2.2,
+            brightness: 1.8,
+            colorScheme: 'neon',
+            showWireframe: true,
+            showParticles: true,
+            showHorizon: true
+        };
+
+        let globalTime = 0;
+        const clock = new THREE.Clock();
+        const container = document.getElementById('canvas-container');
+
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x030712, 0.025);
+
+            camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 11, 17);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            container.appendChild(renderer.domElement);
+
+            // Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1;
+            controls.minDistance = 3;
+            controls.maxDistance = 45;
+
+            // Bright Space & Accent Lighting
+            const ambientLight = new THREE.AmbientLight(0x0284c7, 0.8);
+            scene.add(ambientLight);
+
+            const centerLight = new THREE.PointLight(0x38bdf8, 4, 30);
+            centerLight.position.set(0, 2, 0);
+            scene.add(centerLight);
+
+            const topLight = new THREE.DirectionalLight(0x818cf8, 1.2);
+            topLight.position.set(10, 20, 10);
+            scene.add(topLight);
+
+            // Central Mass Sphere
+            const massGeo = new THREE.SphereGeometry(0.45, 32, 32);
+            const massMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                emissive: 0x0284c7,
+                emissiveIntensity: 1.2,
+                roughness: 0.1
+            });
+            centerMassMesh = new THREE.Mesh(massGeo, massMat);
+            scene.add(centerMassMesh);
+
+            // Event Horizon
+            const horizonGeo = new THREE.SphereGeometry(1, 32, 32);
+            const horizonMat = new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                transparent: true,
+                opacity: 0.9
+            });
+            horizonMesh = new THREE.Mesh(horizonGeo, horizonMat);
+            scene.add(horizonMesh);
+
+            // Create Spacetime Elements
+            createSpacetimeGrid();
+            createWaveParticles();
+            createClockVisualizers();
+
+            window.addEventListener('resize', onWindowResize);
+            setupUIEventListeners();
+        }
+
+        function createSpacetimeGrid() {
+            if (gridMesh) scene.remove(gridMesh);
+
+            const res = parseInt(params.gridResolution);
+            const size = params.gridSize;
+
+            const geometry = new THREE.PlaneGeometry(size, size, res, res);
+            geometry.rotateX(-Math.PI / 2);
+
+            // Material with glowing vertex colors
+            const material = new THREE.MeshBasicMaterial({
+                wireframe: params.showWireframe,
+                vertexColors: true,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.95
+            });
+
+            const count = geometry.attributes.position.count;
+            const colors = new Float32Array(count * 3);
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            gridMesh = new THREE.Mesh(geometry, material);
+            scene.add(gridMesh);
+        }
+
+        function createWaveParticles() {
+            if (particleSystem) scene.remove(particleSystem);
+
+            const particleCount = 200;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 1.8 + Math.random() * 8.0;
+                positions[i * 3] = Math.cos(angle) * radius;
+                positions[i * 3 + 1] = 0;
+                positions[i * 3 + 2] = Math.sin(angle) * radius;
+
+                colors[i * 3] = 0.2;
+                colors[i * 3 + 1] = 0.8;
+                colors[i * 3 + 2] = 1.0;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.85
+            });
+
+            particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+        }
+
+        function createClockVisualizers() {
+            clockMarkers.forEach(m => scene.remove(m.group));
+            clockMarkers = [];
+
+            const positions = [
+                { r: 8.0, label: "A (Far)", color: 0x34d399, near: false },
+                { r: 2.2, label: "B (Near)", color: 0xfde047, near: true }
+            ];
+
+            positions.forEach(pos => {
+                const group = new THREE.Group();
+
+                const ringGeo = new THREE.RingGeometry(0.3, 0.36, 32);
+                ringGeo.rotateX(-Math.PI / 2);
+                const ringMat = new THREE.MeshBasicMaterial({ color: pos.color, side: THREE.DoubleSide });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                group.add(ring);
+
+                const handGeo = new THREE.BoxGeometry(0.04, 0.04, 0.28);
+                handGeo.translate(0, 0, 0.14);
+                const handMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const hand = new THREE.Mesh(handGeo, handMat);
+                hand.position.y = 0.02;
+                group.add(hand);
+
+                const beamGeo = new THREE.CylinderGeometry(0.015, 0.015, 2.5, 8);
+                beamGeo.translate(0, 1.25, 0);
+                const beamMat = new THREE.MeshBasicMaterial({ color: pos.color, transparent: true, opacity: 0.5 });
+                const beam = new THREE.Mesh(beamGeo, beamMat);
+                group.add(beam);
+
+                scene.add(group);
+
+                clockMarkers.push({
+                    group,
+                    hand,
+                    rDistance: pos.r,
+                    angle: Math.PI / 4,
+                    isNear: pos.near
+                });
+            });
+        }
+
+        function getSchemeColor(factor, brightness) {
+            let r, g, b;
+
+            if (params.colorScheme === 'neon') {
+                // Bright Cyan -> Magenta/Pink/Yellow
+                r = (1.0 - factor) * 1.0 + factor * 0.1;
+                g = factor * 0.85 + (1.0 - factor) * 0.2;
+                b = factor * 1.0 + (1.0 - factor) * 0.5;
+            } else if (params.colorScheme === 'cyan') {
+                // Electric Cyan Monochrom
+                r = factor * 0.2 + (1.0 - factor) * 0.1;
+                g = factor * 0.9 + 0.1;
+                b = 1.0;
+            } else if (params.colorScheme === 'emerald') {
+                // Matrix Emerald
+                r = (1.0 - factor) * 0.8;
+                g = factor * 1.0 + 0.2;
+                b = factor * 0.4 + (1.0 - factor) * 0.1;
+            } else {
+                // Plasma: Violet -> Yellow
+                r = (1.0 - factor) * 1.0 + factor * 0.4;
+                g = (1.0 - factor) * 0.8 + factor * 0.1;
+                b = factor * 0.9;
+            }
+
+            return [
+                Math.min(1.0, r * brightness),
+                Math.min(1.0, g * brightness),
+                Math.min(1.0, b * brightness)
+            ];
+        }
+
+        function updateGridAndPhysics(dt) {
+            if (!gridMesh) return;
+
+            const pos = gridMesh.geometry.attributes.position;
+            const colorAttr = gridMesh.geometry.attributes.color;
+
+            const Rs = params.mass;
+            const amplitude = params.amplitude;
+            const omega0 = params.frequency;
+            const deformScale = params.deformScale;
+            const brightness = params.brightness;
+
+            // Horizon Update
+            horizonMesh.scale.setScalar(Rs * 0.85);
+            horizonMesh.visible = params.showHorizon;
+
+            for (let i = 0; i < pos.count; i++) {
+                const x = pos.getX(i);
+                const z = pos.getZ(i);
+
+                const r = Math.max(Math.sqrt(x * x + z * z), Rs * 0.85);
+
+                // Relativistic Factor: sqrt(1 - Rs/r)
+                let dilatationFactor = 0;
+                if (r > Rs) {
+                    dilatationFactor = Math.sqrt(1.0 - Rs / r);
+                }
+
+                // WRZT Wave Dynamics
+                const localOmega = omega0 * dilatationFactor;
+                const staticDepth = -deformScale * (Rs / (r + 0.25));
+                const wave = Math.sin(r * 2.2 - globalTime * localOmega) * amplitude * dilatationFactor;
+
+                pos.setY(i, staticDepth + wave);
+
+                // High Luminosity Color Mapping
+                const factor = Math.min(Math.max(dilatationFactor, 0.0), 1.0);
+                const [rCol, gCol, bCol] = getSchemeColor(factor, brightness);
+
+                colorAttr.setXYZ(i, rCol, gCol, bCol);
+            }
+
+            pos.needsUpdate = true;
+            colorAttr.needsUpdate = true;
+
+            // Update Test Particles
+            if (particleSystem) {
+                particleSystem.visible = params.showParticles;
+                if (params.showParticles) {
+                    const pPos = particleSystem.geometry.attributes.position;
+                    for (let i = 0; i < pPos.count; i++) {
+                        let px = pPos.getX(i);
+                        let pz = pPos.getZ(i);
+                        let pr = Math.sqrt(px * px + pz * pz);
+
+                        let dil = pr > Rs ? Math.sqrt(1.0 - Rs / pr) : 0;
+                        let pDepth = -deformScale * (Rs / (pr + 0.25)) + 0.08;
+
+                        pPos.setY(i, pDepth + Math.sin(pr * 2.2 - globalTime * omega0 * dil) * amplitude * dil);
+                    }
+                    pPos.needsUpdate = true;
+                }
+            }
+
+            // Update Clocks
+            clockMarkers.forEach(cm => {
+                const x = Math.cos(cm.angle) * cm.rDistance;
+                const z = Math.sin(cm.angle) * cm.rDistance;
+                const r = cm.rDistance;
+
+                let dilatation = Math.sqrt(Math.max(0.001, 1.0 - Rs / r));
+                const staticDepth = -deformScale * (Rs / (r + 0.25));
+
+                cm.group.position.set(x, staticDepth, z);
+                cm.hand.rotation.y -= dt * omega0 * dilatation * 2.0;
+
+                if (cm.isNear) {
+                    document.getElementById('clock-near').innerText = dilatation.toFixed(2) + "x";
+                    const verlangsamung = Math.round((1.0 - dilatation) * 100);
+                    document.getElementById('dilatation-factor').innerText = verlangsamung + "% verlangsamt";
+                }
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const dt = clock.getDelta();
+            globalTime += dt;
+
+            if (centerMassMesh) {
+                centerMassMesh.rotation.y += dt * 0.6;
+            }
+
+            updateGridAndPhysics(dt);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function setupUIEventListeners() {
+            const setupSlider = (id, paramKey, displayId, formatFn = v => v) => {
+                const slider = document.getElementById(id);
+                const display = document.getElementById(displayId);
+                slider.addEventListener('input', (e) => {
+                    const val = parseFloat(e.target.value);
+                    params[paramKey] = val;
+                    if (display) display.innerText = formatFn(val);
+                    if (paramKey === 'gridResolution') createSpacetimeGrid();
+                });
+            };
+
+            setupSlider('brightness-slider', 'brightness', 'brightness-value', v => v.toFixed(1));
+            setupSlider('mass-slider', 'mass', 'mass-value', v => v.toFixed(2));
+            setupSlider('grid-density-slider', 'gridResolution', 'grid-density-value', v => `${v} x ${v}`);
+            setupSlider('wave-freq-slider', 'frequency', 'wave-freq-value', v => v.toFixed(1));
+            setupSlider('wave-amp-slider', 'amplitude', 'wave-amp-value', v => v.toFixed(2));
+
+            document.getElementById('color-scheme-select').addEventListener('change', (e) => {
+                params.colorScheme = e.target.value;
+            });
+
+            document.getElementById('show-wireframe-check').addEventListener('change', (e) => {
+                params.showWireframe = e.target.checked;
+                if (gridMesh) gridMesh.material.wireframe = params.showWireframe;
+            });
+
+            document.getElementById('show-particles-check').addEventListener('change', (e) => {
+                params.showParticles = e.target.checked;
+            });
+
+            document.getElementById('show-horizon-check').addEventListener('change', (e) => {
+                params.showHorizon = e.target.checked;
+            });
+
+            // Toggle Panel Collapse
+            const toggleBtn = document.getElementById('toggle-panel-btn');
+            const panel = document.getElementById('control-panel');
+            let isCollapsed = false;
+
+            toggleBtn.addEventListener('click', () => {
+                isCollapsed = !isCollapsed;
+                if (isCollapsed) {
+                    panel.classList.add('translate-x-[120%]');
+                } else {
+                    panel.classList.remove('translate-x-[120%]');
+                }
+            });
+
+            // Fullscreen Toggle
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.error(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+        }
+
+        // Run application on window load
+        window.onload = () => {
+            initScene();
+            animate();
+        };
+    </script>
+</body>
+</html>
