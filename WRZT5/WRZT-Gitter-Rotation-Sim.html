@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WRZT - Wellenraumzeit Simulation</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050508;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        h1 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #ff7b00;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .control-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+        input[type=range] {
+            width: 100%;
+            accent-color: #ff7b00;
+            cursor: pointer;
+        }
+        .btn-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background: rgba(255, 123, 0, 0.2);
+            border: 1px solid #ff7b00;
+            color: #ff7b00;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        button:hover {
+            background: #ff7b00;
+            color: #000;
+            box-shadow: 0 0 12px rgba(255, 123, 0, 0.5);
+        }
+        .legend {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 10px;
+            line-height: 1.4;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="gridCanvas"></canvas>
+
+        <!-- Steuerungspanel -->
+        <div class="ui-panel">
+            <h1>WRZT Gitter-Dynamik</h1>
+            
+            <div class="control-group">
+                <label>Gitter-Größe (Auflösung): <span id="val-grid">45x35</span></label>
+                <input type="range" id="slider-grid" min="15" max="90" step="5" value="45">
+            </div>
+
+            <div class="control-group">
+                <label>Gravitation ($Z$-Achse Tiefe): <span id="val-grav">1.0</span></label>
+                <input type="range" id="slider-grav" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Elektrizität (Zug/Radiale Dehnung): <span id="val-elec">1.0</span></label>
+                <input type="range" id="slider-elec" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Magnetismus (Torsion/Scherung): <span id="val-mag">1.0</span></label>
+                <input type="range" id="slider-mag" min="0" max="3" step="0.1" value="1">
+            </div>
+
+            <div class="control-group">
+                <label>Bug-Winkel $\alpha$ (Phasengeschwindigkeit): <span id="val-alpha">45</span>°</label>
+                <input type="range" id="slider-alpha" min="10" max="80" step="1" value="45">
+            </div>
+
+            <div class="control-group">
+                <label>Teilchen-Orbit Radius: <span id="val-radius">100</span>px</label>
+                <input type="range" id="slider-radius" min="20" max="300" step="5" value="100">
+            </div>
+
+            <div class="control-group">
+                <label>Rotations-Geschwindigkeit: <span id="val-speed">1.0</span></label>
+                <input type="range" id="slider-speed" min="0" max="3" step="0.1" value="1.0">
+            </div>
+
+            <div class="legend">
+                • <b>Maus bewegen:</b> Energiezentrum steuern<br>
+                • <b>Gitterabsenkung (Z):</b> Gravitationspotential<br>
+                • <b>Gitterstauchung (XY):</b> Elektrische Ladung<br>
+                • <b>Wirbel/Torsion:</b> Magnetisches Feld
+            </div>
+        </div>
+
+        <!-- Vollbild-Button -->
+        <div class="btn-container">
+            <button id="fullscreenBtn">⛶ Vollbild</button>
+            <button id="resetBtn">↻ Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Parameter & Controls
+        const sliderGrid = document.getElementById('slider-grid');
+        const sliderGrav = document.getElementById('slider-grav');
+        const sliderElec = document.getElementById('slider-elec');
+        const sliderMag = document.getElementById('slider-mag');
+        const sliderAlpha = document.getElementById('slider-alpha');
+        const sliderRadius = document.getElementById('slider-radius');
+        const sliderSpeed = document.getElementById('slider-speed');
+
+        const valGrid = document.getElementById('val-grid');
+        const valGrav = document.getElementById('val-grav');
+        const valElec = document.getElementById('val-elec');
+        const valMag = document.getElementById('val-mag');
+        const valAlpha = document.getElementById('val-alpha');
+        const valRadius = document.getElementById('val-radius');
+        const valSpeed = document.getElementById('val-speed');
+
+        let width, height;
+        let mouseX = 0, mouseY = 0;
+        let targetMouseX = 0, targetMouseY = 0;
+        let time = 0;
+        let particleAngle = 0;
+
+        // Dynamic Gitter-Dimensionen
+        let cols = parseInt(sliderGrid.value);
+        let rows = Math.round(cols * 0.778);
+        let grid = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initGrid();
+        }
+
+        function initGrid() {
+            cols = parseInt(sliderGrid.value);
+            rows = Math.round(cols * (height / width));
+            
+            grid = [];
+            for (let i = 0; i <= cols; i++) {
+                grid[i] = [];
+                for (let j = 0; j <= rows; j++) {
+                    grid[i][j] = {
+                        baseX: (i / cols) * width,
+                        baseY: (j / rows) * height,
+                        x: 0,
+                        y: 0,
+                        z: 0
+                    };
+                }
+            }
+            if (mouseX === 0 && mouseY === 0) {
+                mouseX = targetMouseX = width / 2;
+                mouseY = targetMouseY = height / 2;
+            }
+        }
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        // Event-Listener für Sliders
+        sliderGrid.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            const calculatedRows = Math.round(val * (height / width));
+            valGrid.textContent = `${val}x${calculatedRows}`;
+            initGrid();
+        });
+        sliderGrav.addEventListener('input', (e) => valGrav.textContent = e.target.value);
+        sliderElec.addEventListener('input', (e) => valElec.textContent = e.target.value);
+        sliderMag.addEventListener('input', (e) => valMag.textContent = e.target.value);
+        sliderAlpha.addEventListener('input', (e) => valAlpha.textContent = e.target.value);
+        sliderRadius.addEventListener('input', (e) => valRadius.textContent = e.target.value);
+        sliderSpeed.addEventListener('input', (e) => valSpeed.textContent = e.target.value);
+
+        // Vollbild Logik
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            sliderGrid.value = 45; 
+            sliderGrav.value = 1; valGrav.textContent = '1.0';
+            sliderElec.value = 1; valElec.textContent = '1.0';
+            sliderMag.value = 1; valMag.textContent = '1.0';
+            sliderAlpha.value = 45; valAlpha.textContent = '45';
+            sliderRadius.value = 100; valRadius.textContent = '100';
+            sliderSpeed.value = 1.0; valSpeed.textContent = '1.0';
+            initGrid();
+            valGrid.textContent = `${cols}x${rows}`;
+        });
+
+        // Simulations-Loop
+        function animate() {
+            time += 0.03;
+
+            // Sanfte Mausverfolgung
+            mouseX += (targetMouseX - mouseX) * 0.08;
+            mouseY += (targetMouseY - mouseY) * 0.08;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const kGrav = parseFloat(sliderGrav.value) * 80;
+            const kElec = parseFloat(sliderElec.value) * 60;
+            const kMag = parseFloat(sliderMag.value) * 0.8;
+            const alphaRad = (parseFloat(sliderAlpha.value) * Math.PI) / 180;
+
+            const orbitRadius = parseFloat(sliderRadius.value);
+            const rotSpeed = parseFloat(sliderSpeed.value);
+
+            // Aktualisiere Orbit-Winkel der Teilchen
+            particleAngle += 0.03 * rotSpeed;
+
+            // Positionen der beiden rotierenden Teilchen (Rot & Blau)
+            const p1x = mouseX + Math.cos(particleAngle) * orbitRadius;
+            const p1y = mouseY + Math.sin(particleAngle) * orbitRadius;
+
+            const p2x = mouseX + Math.cos(particleAngle + Math.PI) * orbitRadius;
+            const p2y = mouseY + Math.sin(particleAngle + Math.PI) * orbitRadius;
+
+            // Transformierte Punkte berechnen
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
+                    const pt = grid[i][j];
+
+                    // Distanz zu beiden Teilchen zur Überlagerung der Krümmung
+                    const dx1 = pt.baseX - p1x;
+                    const dy1 = pt.baseY - p1y;
+                    const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1) + 1;
+
+                    const dx2 = pt.baseX - p2x;
+                    const dy2 = pt.baseY - p2y;
+                    const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) + 1;
+
+                    // Effektiver Gesamtabstand (Superposition)
+                    const dist = Math.min(dist1, dist2);
+                    const dx = pt.baseX - mouseX;
+                    const dy = pt.baseY - mouseY;
+
+                    // Bug-Winkel Alpha Einfluss auf die Wellenfront
+                    const wavePhase = (dist * Math.tan(alphaRad) * 0.02) - time * 2;
+                    const wave = Math.sin(wavePhase) * Math.exp(-dist * 0.003);
+
+                    // 1. GRAVITATION (Z-Achse: Verschiebung nach unten durch beide Zentren)
+                    const zDeform1 = Math.exp(-dist1 * 0.006) * kGrav;
+                    const zDeform2 = Math.exp(-dist2 * 0.006) * kGrav;
+                    const zDeform = zDeform1 + zDeform2 + (wave * 10);
+                    pt.z = zDeform;
+
+                    // 2. ELEKTRIZITÄT (Radialer Zug/Druck in XY)
+                    const elecForce = (Math.sin(dist * 0.03 - time) / dist) * kElec * Math.exp(-dist * 0.004);
+                    const shiftX = (dx / dist) * elecForce;
+                    const shiftY = (dy / dist) * elecForce;
+
+                    // 3. MAGNETISMUS (Torsion / Scherung um das Zentrum)
+                    const angle = Math.atan2(dy, dx) + (kMag * Math.exp(-dist * 0.006) * Math.cos(time * 0.5));
+                    const magDist = dist + shiftX;
+                    
+                    // Finale Positionsberechnung (3D-Perspektivprojektion simulieren)
+                    const projScale = 1 + (pt.z * 0.0015);
+                    pt.x = mouseX + Math.cos(angle) * magDist * projScale;
+                    pt.y = mouseY + Math.sin(angle) * magDist * projScale + (pt.z * 0.4);
+                }
+            }
+
+            // Gitter zeichnen
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
+                    const pt = grid[i][j];
+
+                    // Farbgebung basierend auf der Z-Auslenkung (Gravitation) und Spannung
+                    const intensity = Math.min(255, Math.max(40, Math.floor(pt.z * 2.5)));
+                    const r = Math.floor(intensity * 1.2);
+                    const g = Math.floor(100 + intensity * 0.5);
+                    const b = Math.floor(255 - intensity * 0.5);
+
+                    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.45)`;
+
+                    // Horizontale Linien
+                    if (i < cols) {
+                        const nextPt = grid[i + 1][j];
+                        ctx.beginPath();
+                        ctx.moveTo(pt.x, pt.y);
+                        ctx.lineTo(nextPt.x, nextPt.y);
+                        ctx.stroke();
+                    }
+
+                    // Vertikale Linien
+                    if (j < rows) {
+                        const nextPt = grid[i][j + 1];
+                        ctx.beginPath();
+                        ctx.moveTo(pt.x, pt.y);
+                        ctx.lineTo(nextPt.x, nextPt.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Rotes Teilchen zeichnen
+            ctx.beginPath();
+            ctx.arc(p1x, p1y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff3344';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#ff3344';
+            ctx.fill();
+
+            // Blaues Teilchen zeichnen
+            ctx.beginPath();
+            ctx.arc(p2x, p2y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#3388ff';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#3388ff';
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+
+            requestAnimationFrame(animate);
+        }
+
+        // Animation starten
+        resize();
+        animate();
+    </script>
+</body>
+</html>
