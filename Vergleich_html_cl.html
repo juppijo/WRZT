@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Diff & Editor</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/nord.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/merge/merge.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/dialog/dialog.min.css">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--acc:#06b6d4;--acc2:#0284c7;--txt:#f8fafc;--mut:#94a3b8;--bd:#334155;--chunk:rgba(56,189,248,.13);--ins:rgba(34,197,94,.35);--del:rgba(239,68,68,.35);--hl:linear-gradient(to right,#06b6d4,#38bdf8)}
+body[data-theme=gold]{--bg:#14110b;--card:#241d10;--acc:#d4a017;--acc2:#a37a0c;--bd:#4a3d1c;--mut:#b8a67a;--chunk:rgba(212,160,23,.14);--hl:linear-gradient(to right,#f5c542,#d4a017)}
+body[data-theme=light]{--bg:#f1f5f9;--card:#fff;--acc:#0284c7;--acc2:#0369a1;--txt:#0f172a;--mut:#64748b;--bd:#cbd5e1;--chunk:rgba(2,132,199,.10);--ins:rgba(34,197,94,.30);--del:rgba(239,68,68,.28);--hl:linear-gradient(to right,#0369a1,#0284c7)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--card);padding:10px 16px;border-bottom:1px solid var(--bd);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+h1{font-size:1.15rem;font-weight:600;background:var(--hl);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{background:var(--card);color:var(--txt);border:1px solid var(--bd);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.82rem;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--acc);background:var(--bd)}
+.btn.primary{background:linear-gradient(135deg,var(--acc2),var(--acc));border:none;color:#fff}
+.btn.on{border-color:var(--acc);color:var(--acc)}
+select.btn{padding:6px 8px}
+.nav{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--mut)}
+#stat{min-width:120px;text-align:center}
+#stat.same{color:#22c55e}
+.heads{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-bottom:1px solid var(--bd);font-size:.82rem;color:var(--mut)}
+.heads>div{padding:6px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
+.heads>div:first-child{border-right:1px solid var(--bd)}
+.heads b{color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.heads span{display:flex;gap:6px;flex-shrink:0}
+main{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+#diff-view{flex:1;min-height:0}
+#drop{display:none;position:absolute;inset:0;z-index:50;background:rgba(6,182,212,.18);border:3px dashed var(--acc);align-items:center;justify-content:center;font-size:1.3rem;pointer-events:none}
+#drop.show{display:flex}
+.CodeMirror-merge,.CodeMirror-merge-pane,.CodeMirror-merge .CodeMirror{height:100%}
+.CodeMirror{font:13px/1.5 'Fira Code',Consolas,monospace}
+.CodeMirror-merge{border:none}
+.CodeMirror-merge-gap{background:var(--card)}
+.CodeMirror-merge-r-chunk{background:var(--chunk)}
+.CodeMirror-merge-r-chunk-start,.CodeMirror-merge-r-chunk-end{border-color:var(--acc)}
+.CodeMirror-merge-r-inserted{background:var(--ins)}
+.CodeMirror-merge-r-deleted{background:var(--del)}
+.CodeMirror-merge-r-connect{fill:var(--chunk);stroke:var(--acc)}
+.CodeMirror-merge-copybuttons-left,.CodeMirror-merge-copybuttons-right{color:var(--acc)}
+body[data-theme=light] .CodeMirror{background:#fff}
+.sbar{display:none;gap:6px;align-items:center;padding:6px 12px;background:var(--card);border-bottom:1px solid var(--bd);font-size:.82rem;color:var(--mut)}
+.sbar.show{display:flex}
+.sbar input[type=text]{flex:1;max-width:360px;background:var(--bg);color:var(--txt);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font-size:.85rem}
+.sbar input.bad{border-color:#ef4444}
+.sbar input:focus{outline:none;border-color:var(--acc)}
+.sm{background:rgba(250,204,21,.35);border-radius:2px}
+.sm-cur{background:rgba(251,146,60,.65);outline:1px solid #f97316;border-radius:2px}
+#preview{display:none;position:absolute;inset:0;z-index:100;background:var(--bg);flex-direction:column;padding:14px;gap:10px}
+#preview.active{display:flex}
+.pv-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pv-bar h2{font-size:1rem;margin-right:auto}
+.pv-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0}
+.pv-box{display:flex;flex-direction:column;min-height:0;min-width:0;border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:var(--card);align-items:center}
+.pv-box>div{width:100%;padding:6px 10px;font-size:.82rem;border-bottom:1px solid var(--bd)}
+iframe{flex:1;border:none;background:#fff;width:var(--w,100%);max-width:100%}
+@media(max-width:800px){.pv-grid{grid-template-columns:1fr;grid-auto-rows:1fr;overflow:auto}.heads span .btn{padding:4px 8px}}
+</style>
+</head>
+<body data-theme="dark">
+<header>
+  <h1>◧ HTML Diff & Editor</h1>
+  <div class="controls">
+    <div class="nav">
+      <button class="btn" onclick="jump(-1)" title="Vorherige Änderung (Alt+↑)">▲</button>
+      <span id="stat">–</span>
+      <button class="btn" onclick="jump(1)" title="Nächste Änderung (Alt+↓)">▼</button>
+    </div>
+    <button class="btn" id="b-search" onclick="toggleSearch()" title="Suchen (Strg+F)">🔍 Suchen</button>
+    <button class="btn" id="b-collapse" onclick="toggleCollapse()" title="Identische Bereiche einklappen">⇕ Nur Unterschiede</button>
+    <button class="btn" id="b-wrap" onclick="toggleWrap()">↩ Umbruch</button>
+    <button class="btn" onclick="swapSides()" title="Links und rechts tauschen">⇄ Tauschen</button>
+    <button class="btn" onclick="formatBoth()" title="Beide Seiten einheitlich einrücken">✨ Formatieren</button>
+    <button class="btn" onclick="togglePreview()">👁️ Vorschau</button>
+    <select class="btn" id="theme" onchange="setTheme(this.value)" title="Stil">
+      <option value="dark">🎨 Türkis-Dunkel</option>
+      <option value="gold">🎨 Dunkel-Gold</option>
+      <option value="light">🎨 Hell</option>
+    </select>
+    <button class="btn" onclick="toggleFS()">⛶ Vollbild</button>
+    <button class="btn" onclick="clearEditors()">🗑️ Leeren</button>
+    <button class="btn primary" onclick="saveBoth()">💾 Beide speichern</button>
+  </div>
+</header>
+
+<main>
+  <div class="heads">
+    <div><b id="n-left">Links (Original / Alt)</b>
+      <span><button class="btn" onclick="pick('left')">📂 Laden</button><button class="btn" onclick="saveOne('left')">💾</button></span></div>
+    <div><b id="n-right">Rechts (Geändert / Neu)</b>
+      <span><button class="btn" onclick="pick('right')">📂 Laden</button><button class="btn" onclick="saveOne('right')">💾</button></span></div>
+  </div>
+  <div class="sbar" id="sbar">
+    🔍 <input type="text" id="q" placeholder="In beiden Seiten suchen …" oninput="runSearch()" onkeydown="searchKey(event)">
+    <button class="btn" id="s-case" onclick="optToggle('s-case')" title="Groß-/Kleinschreibung beachten">Aa</button>
+    <button class="btn" id="s-re" onclick="optToggle('s-re')" title="Regulärer Ausdruck">.*</button>
+    <button class="btn" onclick="searchStep(-1)" title="Vorheriger Treffer (Shift+Enter)">▲</button>
+    <button class="btn" onclick="searchStep(1)" title="Nächster Treffer (Enter)">▼</button>
+    <span id="s-count"></span>
+    <button class="btn" onclick="toggleSearch(false)" title="Schließen (Esc)">✕</button>
+  </div>
+  <input type="file" id="f-left" hidden accept=".html,.htm,.txt,.css,.js,.svg,.xml" onchange="loadFile(this.files[0],'left');this.value=''">
+  <input type="file" id="f-right" hidden accept=".html,.htm,.txt,.css,.js,.svg,.xml" onchange="loadFile(this.files[0],'right');this.value=''">
+  <div id="diff-view"></div>
+  <div id="drop">📥 Datei(en) hier ablegen – eine Datei je nach Seite, zwei Dateien = links & rechts</div>
+
+  <div id="preview">
+    <div class="pv-bar">
+      <h2>Live-Vorschau (aktualisiert sich beim Tippen)</h2>
+      <button class="btn" onclick="pvWidth('100%')">🖥️ Desktop</button>
+      <button class="btn" onclick="pvWidth('768px')">📱 Tablet</button>
+      <button class="btn" onclick="pvWidth('375px')">📱 Mobil</button>
+      <button class="btn primary" onclick="togglePreview()">Schließen</button>
+    </div>
+    <div class="pv-grid">
+      <div class="pv-box"><div id="pv-nl">Links</div><iframe id="if-left" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>
+      <div class="pv-box"><div id="pv-nr">Rechts</div><iframe id="if-right" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/merge/merge.min.js"></script>
+<script>
+const KEY = 'hdiff_v2';
+const names = { left: 'Links (Original / Alt)', right: 'Rechts (Geändert / Neu)' };
+const defL = '<!DOCTYPE html>\n<html>\n<head>\n  <title>Alt</title>\n</head>\n<body>\n  <h1>Hallo Welt</h1>\n  <p>Dies ist der ursprüngliche Text.</p>\n</body>\n</html>';
+const defR = '<!DOCTYPE html>\n<html>\n<head>\n  <title>Neu</title>\n</head>\n<body>\n  <h1 style="color: teal;">Hallo Welt</h1>\n  <p>Dies ist der aktualisierte Text mit Änderungen.</p>\n</body>\n</html>';
+let mv, collapsed = false, wrap = true, cur = -1, saveT, pvT;
+
+const L = () => mv.editor();
+const R = () => mv.rightOriginal();
+const themeMap = { dark: 'nord', gold: 'monokai', light: 'default' };
+
+function store(get) {
+  try { return get ? JSON.parse(localStorage.getItem(KEY) || 'null') : null; } catch (e) { return null; }
+}
+function persist() {
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    try { localStorage.setItem(KEY, JSON.stringify({ l: L().getValue(), r: R().getValue(), n: names, t: document.body.dataset.theme })); } catch (e) {}
+  }, 400);
+}
+
+window.onload = () => {
+  const s = store(true);
+  mv = CodeMirror.MergeView(document.getElementById('diff-view'), {
+    value: s ? s.l : defL, orig: s ? s.r : defR, origLeft: null,
+    lineNumbers: true, mode: 'htmlmixed', theme: 'nord',
+    highlightDifferences: true, connect: 'align', collapseIdentical: false,
+    allowEditingOriginals: true, revertButtons: true, lineWrapping: true
+  });
+  if (s) { Object.assign(names, s.n || {}); showNames(); setTheme(s.t || 'dark'); }
+  [L(), R()].forEach(ed => ed.on('change', () => { onChange(); persist(); }));
+  setTimeout(onChange, 300);
+
+  // Drag & Drop
+  const dz = document.getElementById('drop');
+  ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('show'); }));
+  document.addEventListener('dragleave', e => { if (!e.relatedTarget) dz.classList.remove('show'); });
+  document.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('show');
+    const f = [...e.dataTransfer.files];
+    if (f.length >= 2) { loadFile(f[0], 'left'); loadFile(f[1], 'right'); }
+    else if (f.length === 1) loadFile(f[0], e.clientX < window.innerWidth / 2 ? 'left' : 'right');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); jump(1); }
+    if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); jump(-1); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') { e.preventDefault(); toggleSearch(true); }
+    if (e.key === 'Escape' && document.getElementById('sbar').classList.contains('show') && !document.getElementById('preview').classList.contains('active')) toggleSearch(false);
+    if (e.key === 'Escape' && document.getElementById('preview').classList.contains('active')) togglePreview();
+  });
+};
+
+// ---------- Suche ----------
+let sT, hits = [], hi = -1, curMark = null;
+const sOpt = { 's-case': false, 's-re': false };
+
+function toggleSearch(force) {
+  const bar = document.getElementById('sbar');
+  const show = force === undefined ? !bar.classList.contains('show') : force;
+  bar.classList.toggle('show', show);
+  document.getElementById('b-search').classList.toggle('on', show);
+  if (show) {
+    const sel = L().getSelection() || R().getSelection();
+    const q = document.getElementById('q');
+    if (sel && !sel.includes('\n')) q.value = sel;
+    q.focus(); q.select(); runSearch();
+  } else clearSearch();
+}
+function optToggle(id) {
+  sOpt[id] = !sOpt[id];
+  document.getElementById(id).classList.toggle('on', sOpt[id]);
+  runSearch();
+}
+function clearSearch() {
+  hits.forEach(h => h.mark.clear()); hits = []; hi = -1;
+  if (curMark) { curMark.clear(); curMark = null; }
+  document.getElementById('s-count').textContent = '';
+}
+function runSearch(keep) {
+  const prev = keep ? hi : -1;
+  clearSearch();
+  const inp = document.getElementById('q'), q = inp.value;
+  inp.classList.remove('bad');
+  if (!q) return;
+  let re;
+  try { re = new RegExp(sOpt['s-re'] ? q : q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), sOpt['s-case'] ? 'g' : 'gi'); }
+  catch (e) { inp.classList.add('bad'); document.getElementById('s-count').textContent = 'Ungültiger Ausdruck'; return; }
+  const nL = scan(L(), re, 'L'), nR = scan(R(), re, 'R');
+  const cnt = document.getElementById('s-count');
+  if (!hits.length) { cnt.textContent = 'Keine Treffer'; return; }
+  cnt.dataset.l = nL; cnt.dataset.r = nR;
+  gotoHit(prev >= 0 && prev < hits.length ? prev : 0, keep);
+}
+function scan(ed, re, side) {
+  const doc = ed.getDoc(), text = doc.getValue(); let m, n = 0;
+  re.lastIndex = 0;
+  while ((m = re.exec(text)) && hits.length < 4000) {
+    if (!m[0].length) { re.lastIndex++; continue; }
+    const from = doc.posFromIndex(m.index), to = doc.posFromIndex(m.index + m[0].length);
+    hits.push({ ed, from, to, side, mark: ed.markText(from, to, { className: 'sm' }) }); n++;
+  }
+  return n;
+}
+function gotoHit(i, noScroll) {
+  if (!hits.length) return;
+  hi = (i + hits.length) % hits.length;
+  const h = hits[hi];
+  if (curMark) curMark.clear();
+  curMark = h.ed.markText(h.from, h.to, { className: 'sm-cur' });
+  if (!noScroll) h.ed.scrollIntoView({ from: h.from, to: h.to }, 140);
+  const c = document.getElementById('s-count');
+  c.textContent = (hi + 1) + ' / ' + hits.length + '  (Links ' + c.dataset.l + ' · Rechts ' + c.dataset.r + ')';
+}
+function searchStep(d) { if (hits.length) gotoHit(hi + d); }
+function searchKey(e) {
+  if (e.key === 'Enter') { e.preventDefault(); searchStep(e.shiftKey ? -1 : 1); }
+  if (e.key === 'Escape') { e.stopPropagation(); toggleSearch(false); }
+}
+
+function chunks() { return mv.rightChunks ? mv.rightChunks() : []; }
+
+function onChange() {
+  const c = chunks(), st = document.getElementById('stat');
+  if (!c.length) { st.textContent = '✓ Identisch'; st.className = 'same'; cur = -1; }
+  else { st.className = ''; st.textContent = (cur >= 0 && cur < c.length ? (cur + 1) + ' / ' : '') + c.length + ' Änderung' + (c.length > 1 ? 'en' : ''); }
+  clearTimeout(sT);
+  if (document.getElementById('sbar').classList.contains('show')) sT = setTimeout(() => runSearch(true), 300);
+  clearTimeout(pvT);
+  if (document.getElementById('preview').classList.contains('active')) pvT = setTimeout(renderPreview, 400);
+}
+
+function jump(dir) {
+  const c = chunks(); if (!c.length) return;
+  cur = cur < 0 ? (dir > 0 ? 0 : c.length - 1) : (cur + dir + c.length) % c.length;
+  const line = c[cur].editFrom;
+  L().setCursor({ line, ch: 0 });
+  const y = L().charCoords({ line, ch: 0 }, 'local').top;
+  L().scrollTo(null, Math.max(0, y - L().getScrollInfo().clientHeight / 3));
+  onChange();
+}
+
+function loadFile(file, side) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    (side === 'left' ? L() : R()).setValue(e.target.result);
+    names[side] = file.name; showNames(); persist();
+    setTimeout(() => jump(1), 200); cur = -1;
+  };
+  r.readAsText(file);
+}
+function pick(side) { document.getElementById('f-' + side).click(); }
+function showNames() {
+  document.getElementById('n-left').textContent = names.left;
+  document.getElementById('n-right').textContent = names.right;
+  document.getElementById('pv-nl').textContent = names.left;
+  document.getElementById('pv-nr').textContent = names.right;
+}
+
+function swapSides() {
+  const a = L().getValue(), b = R().getValue();
+  L().setValue(b); R().setValue(a);
+  [names.left, names.right] = [names.right, names.left]; showNames(); persist();
+}
+
+function clearEditors() {
+  if (!confirm('Beide Seiten wirklich leeren?')) return;
+  L().setValue(''); R().setValue('');
+  names.left = 'Links (Original / Alt)'; names.right = 'Rechts (Geändert / Neu)'; showNames();
+}
+
+function toggleCollapse() {
+  collapsed = !collapsed;
+  // MergeView hat keine Laufzeit-Option -> neu aufbauen
+  const l = L().getValue(), r = R().getValue(), t = document.body.dataset.theme;
+  const target = document.getElementById('diff-view'); target.innerHTML = '';
+  mv = CodeMirror.MergeView(target, {
+    value: l, orig: r, origLeft: null, lineNumbers: true, mode: 'htmlmixed',
+    theme: themeMap[t], highlightDifferences: true, connect: 'align',
+    collapseIdentical: collapsed ? 2 : false, allowEditingOriginals: true,
+    revertButtons: true, lineWrapping: wrap
+  });
+  [L(), R()].forEach(ed => ed.on('change', () => { onChange(); persist(); }));
+  document.getElementById('b-collapse').classList.toggle('on', collapsed);
+  cur = -1; hits = []; hi = -1; curMark = null;
+  setTimeout(() => { onChange(); if (document.getElementById('sbar').classList.contains('show')) runSearch(); }, 200);
+}
+
+function toggleWrap() {
+  wrap = !wrap;
+  L().setOption('lineWrapping', wrap); R().setOption('lineWrapping', wrap);
+  document.getElementById('b-wrap').classList.toggle('on', wrap);
+}
+
+// Einfache Einrückung (nur für HTML-Struktur, kein vollwertiger Formatter)
+function prettify(src) {
+  const voids = /^(area|base|br|col|embed|hr|img|input|link|meta|source|track|wbr)$/i;
+  const parts = src.replace(/>\s+</g, '><').replace(/></g, '>\n<').split('\n');
+  let d = 0, inRaw = false;
+  return parts.map(p => {
+    const t = p.trim(); if (!t) return '';
+    if (inRaw) { if (/^<\/(script|style|pre|textarea)/i.test(t)) { inRaw = false; d = Math.max(0, d - 1); return '  '.repeat(d) + t; } return p; }
+    const m = t.match(/^<(\/?)([a-zA-Z0-9-]+)/);
+    let out;
+    if (m && m[1]) { d = Math.max(0, d - 1); out = '  '.repeat(d) + t; }
+    else { out = '  '.repeat(d) + t;
+      if (m && !voids.test(m[2]) && !/\/>$/.test(t) && !new RegExp('</' + m[2] + '>\\s*$', 'i').test(t) && !/^<!/.test(t)) {
+        d++; if (/^(script|style|pre|textarea)$/i.test(m[2])) inRaw = true; } }
+    return out;
+  }).join('\n');
+}
+function formatBoth() {
+  if (!confirm('Beide Seiten neu einrücken? (Rückgängig mit Strg+Z im jeweiligen Editor)')) return;
+  L().setValue(prettify(L().getValue())); R().setValue(prettify(R().getValue()));
+}
+
+function setTheme(t) {
+  document.body.dataset.theme = t; document.getElementById('theme').value = t;
+  L().setOption('theme', themeMap[t]); R().setOption('theme', themeMap[t]); persist();
+}
+
+function toggleFS() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+  else document.exitFullscreen?.();
+}
+
+function renderPreview() {
+  document.getElementById('if-left').srcdoc = L().getValue();
+  document.getElementById('if-right').srcdoc = R().getValue();
+}
+function togglePreview() {
+  const on = document.getElementById('preview').classList.toggle('active');
+  if (on) renderPreview();
+}
+function pvWidth(w) {
+  document.querySelectorAll('#preview iframe').forEach(f => f.style.setProperty('--w', w));
+}
+
+function dl(name, text) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/html;charset=utf-8' }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function fname(side, fallback) { return /\.[a-z0-9]+$/i.test(names[side]) ? names[side] : fallback; }
+function saveOne(side) { dl(fname(side, 'index_' + side + '.html'), (side === 'left' ? L() : R()).getValue()); }
+function saveBoth() {
+  let l = fname('left', 'index_left.html'), r = fname('right', 'index_right.html');
+  if (l === r) { l = 'links_' + l; r = 'rechts_' + r; }
+  dl(l, L().getValue()); setTimeout(() => dl(r, R().getValue()), 300);
+}
+</script>
+</body>
+</html>

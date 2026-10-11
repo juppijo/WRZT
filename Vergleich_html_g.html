@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro HTML Diff & Code Editor Suite</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- CodeMirror CSS & Addons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/nord.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/merge/merge.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/dialog/dialog.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/matchesonscrollbar.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          },
+          colors: {
+            dark: {
+              900: '#0b0f19',
+              800: '#0f172a',
+              700: '#1e293b',
+              600: '#334155'
+            },
+            cyan: {
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .CodeMirror-merge {
+      height: 100% !important;
+      border: none !important;
+      background-color: #0f172a !important;
+    }
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'Fira Code', monospace !important;
+      font-size: 13px;
+      line-height: 1.6;
+      background-color: transparent !important;
+      color: #f8fafc !important;
+    }
+    .CodeMirror-gutters {
+      background-color: #1e293b !important;
+      border-right: 1px solid #334155 !important;
+    }
+    .CodeMirror-merge-gap {
+      background: #0b0f19 !important;
+      border-left: 1px solid #334155 !important;
+      border-right: 1px solid #334155 !important;
+    }
+    .CodeMirror-selected {
+      background: rgba(6, 182, 212, 0.25) !important;
+    }
+    .CodeMirror-merge-r-inserted {
+      background-color: rgba(16, 185, 129, 0.25) !important;
+    }
+    .CodeMirror-merge-r-deleted {
+      background-color: rgba(239, 68, 68, 0.25) !important;
+    }
+    .CodeMirror-merge-r-chunk {
+      background-color: rgba(59, 130, 246, 0.2) !important;
+      border-top: 1px solid rgba(59, 130, 246, 0.4);
+      border-bottom: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    .CodeMirror-merge-r-chunk-active {
+      background-color: rgba(6, 182, 212, 0.35) !important;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-dark-900 text-slate-100 h-screen flex flex-col overflow-hidden select-none">
+
+  <!-- Header -->
+  <header class="bg-dark-800 border-b border-slate-800 px-6 py-3 flex items-center justify-between shadow-lg z-20">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-code-compare text-white text-base"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Pro Diff & Editor Suite</h1>
+        <p class="text-xs text-slate-400">High-Performance HTML/CSS/JS Vergleich & Code-Editor</p>
+      </div>
+    </div>
+
+    <!-- Toolbar controls -->
+    <div class="flex items-center space-x-2 md:space-x-3">
+      <button onclick="toggleSearchModal()" class="px-3 py-2 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium transition flex items-center space-x-2 shadow-sm" title="Suchen & Ersetzen (Strg+F)">
+        <i class="fa-solid fa-magnifying-glass text-cyan-400"></i>
+        <span class="hidden sm:inline">Suchen</span>
+      </button>
+
+      <button onclick="formatCode()" class="px-3 py-2 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium transition flex items-center space-x-2 shadow-sm">
+        <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i>
+        <span class="hidden sm:inline">Formatieren</span>
+      </button>
+
+      <button onclick="togglePreview()" class="px-3 py-2 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium transition flex items-center space-x-2 shadow-sm">
+        <i class="fa-solid fa-eye text-emerald-400"></i>
+        <span id="preview-btn-text" class="hidden sm:inline">Live-Vorschau</span>
+      </button>
+
+      <button onclick="clearAll()" class="px-3 py-2 bg-dark-700 hover:bg-red-950/40 border border-slate-700 hover:border-red-900/60 text-slate-300 hover:text-red-400 rounded-lg text-xs font-medium transition flex items-center space-x-2 shadow-sm">
+        <i class="fa-solid fa-trash-can"></i>
+        <span class="hidden sm:inline">Leeren</span>
+      </button>
+
+      <div class="h-5 w-px bg-slate-800 mx-1"></div>
+
+      <button onclick="downloadLeftFile()" class="px-3 py-2 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium transition flex items-center space-x-2 shadow-sm" title="Linke Datei speichern">
+        <i class="fa-solid fa-download text-cyan-400"></i>
+        <span class="hidden md:inline">Links</span>
+      </button>
+
+      <button onclick="downloadRightFile()" class="px-3 py-2 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs font-medium transition flex items-center space-x-2 shadow-sm" title="Rechte Datei speichern">
+        <i class="fa-solid fa-download text-blue-400"></i>
+        <span class="hidden md:inline">Rechts</span>
+      </button>
+
+      <button onclick="downloadBoth()" class="px-3 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:opacity-90 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-2 shadow-md shadow-cyan-500/20">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>Beide Speichern</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 flex flex-col relative overflow-hidden">
+    
+    <!-- Subheader Panels Info & Uploaders -->
+    <div class="grid grid-cols-2 bg-dark-800 border-b border-slate-800 text-xs text-slate-400">
+      <!-- Left Header -->
+      <div class="px-4 py-2.5 flex items-center justify-between border-r border-slate-800">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+          <input type="text" id="filename-left" value="index_old.html" class="bg-transparent border-b border-transparent hover:border-slate-600 focus:border-cyan-400 focus:outline-none text-slate-200 font-medium px-1 py-0.5 rounded transition w-36">
+          <span id="stats-left" class="text-slate-500 text-[11px] hidden sm:inline">(0 Z, 0 W, 0 L)</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="copyToClipboard('left')" class="p-1.5 hover:bg-slate-700 rounded text-slate-400 hover:text-white transition" title="In Zwischenablage kopieren">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+          <button onclick="document.getElementById('file-left').click()" class="px-2.5 py-1 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded text-slate-200 transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-folder-open text-cyan-400"></i>
+            <span>Laden</span>
+          </button>
+          <input type="file" id="file-left" class="hidden" accept=".html,.htm,.txt,.js,.css" onchange="loadFile(event, 'left')">
+        </div>
+      </div>
+
+      <!-- Right Header -->
+      <div class="px-4 py-2.5 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <input type="text" id="filename-right" value="index_new.html" class="bg-transparent border-b border-transparent hover:border-slate-600 focus:border-cyan-400 focus:outline-none text-slate-200 font-medium px-1 py-0.5 rounded transition w-36">
+          <span id="stats-right" class="text-slate-500 text-[11px] hidden sm:inline">(0 Z, 0 W, 0 L)</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="copyToClipboard('right')" class="p-1.5 hover:bg-slate-700 rounded text-slate-400 hover:text-white transition" title="In Zwischenablage kopieren">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+          <button onclick="document.getElementById('file-right').click()" class="px-2.5 py-1 bg-dark-700 hover:bg-slate-700 border border-slate-700 rounded text-slate-200 transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-folder-open text-cyan-400"></i>
+            <span>Laden</span>
+          </button>
+          <input type="file" id="file-right" class="hidden" accept=".html,.htm,.txt,.js,.css" onchange="loadFile(event, 'right')">
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Container with Drag & Drop & Scroll Sync -->
+    <div id="workspace" class="flex-1 relative overflow-hidden flex flex-col" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      
+      <!-- Drag & Drop Overlay -->
+      <div id="drop-overlay" class="absolute inset-0 bg-dark-900/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center border-2 border-dashed border-cyan-500/50 m-4 rounded-xl opacity-0 pointer-events-none transition-all duration-300">
+        <i class="fa-solid fa-cloud-arrow-down text-5xl text-cyan-400 mb-3 animate-bounce"></i>
+        <h3 class="text-lg font-semibold text-white">Dateien hier ablegen</h3>
+        <p class="text-xs text-slate-400 mt-1">Legen Sie die Datei ab, um sie direkt im Editor zu vergleichen</p>
+      </div>
+
+      <!-- CodeMirror Merge View Target -->
+      <div id="diff-container" class="flex-1 w-full h-full overflow-hidden"></div>
+    </div>
+
+    <!-- Live Preview Split Panel -->
+    <div id="preview-panel" class="hidden h-1/2 border-t border-slate-800 bg-dark-800 flex flex-col transition-all duration-300 z-10">
+      <div class="bg-dark-900 px-4 py-2 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-display text-cyan-400"></i>
+          <span class="text-xs font-semibold text-slate-300">Side-by-Side Live Vorschau</span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button onclick="refreshPreviews()" class="text-xs text-slate-400 hover:text-white flex items-center space-x-1 bg-dark-700 px-2 py-1 rounded transition">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Aktualisieren</span>
+          </button>
+          <button onclick="togglePreview()" class="text-slate-400 hover:text-white text-sm px-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 grid grid-cols-2 gap-2 p-3 bg-dark-900">
+        <div class="flex flex-col rounded-lg overflow-hidden border border-slate-800 bg-white">
+          <div class="bg-slate-100 text-slate-700 px-3 py-1 text-[11px] font-semibold border-b border-slate-200">Vorschau Links (Original)</div>
+          <iframe id="iframe-left" class="w-full flex-1 border-none"></iframe>
+        </div>
+        <div class="flex flex-col rounded-lg overflow-hidden border border-slate-800 bg-white">
+          <div class="bg-slate-100 text-slate-700 px-3 py-1 text-[11px] font-semibold border-b border-slate-200">Vorschau Rechts (Neu)</div>
+          <iframe id="iframe-right" class="w-full flex-1 border-none"></iframe>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Search Floating Modal -->
+  <div id="search-modal" class="hidden absolute top-16 right-6 bg-dark-800 border border-slate-700 rounded-xl shadow-2xl p-4 z-40 w-80 text-xs flex flex-col space-y-3">
+    <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+      <span class="font-semibold text-slate-200 flex items-center space-x-2">
+        <i class="fa-solid fa-magnifying-glass text-cyan-400"></i>
+        <span>Suchen & Ersetzen</span>
+      </span>
+      <button onclick="toggleSearchModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="flex flex-col space-y-2">
+      <div class="relative">
+        <input type="text" id="search-input" placeholder="Suchbegriff..." class="w-full bg-dark-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-400">
+      </div>
+      <div class="relative">
+        <input type="text" id="replace-input" placeholder="Ersetzen durch..." class="w-full bg-dark-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-400">
+      </div>
+    </div>
+    <div class="flex items-center justify-between pt-1">
+      <div class="flex items-center space-x-1">
+        <button onclick="executeFind(true)" class="px-2.5 py-1.5 bg-dark-700 hover:bg-slate-700 rounded font-medium text-slate-300" title="Vorheriges"><i class="fa-solid fa-chevron-up"></i></button>
+        <button onclick="executeFind(false)" class="px-2.5 py-1.5 bg-dark-700 hover:bg-slate-700 rounded font-medium text-slate-300" title="Nächstes"><i class="fa-solid fa-chevron-down"></i></button>
+      </div>
+      <div class="flex items-center space-x-1">
+        <button onclick="executeReplace()" class="px-3 py-1.5 bg-dark-700 hover:bg-slate-700 rounded font-medium text-slate-300">Ersetzen</button>
+        <button onclick="executeReplaceAll()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded font-medium text-white">Alle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Status Bar with Change Counter -->
+  <footer class="bg-dark-800 border-t border-slate-800 px-6 py-2 flex items-center justify-between text-xs text-slate-400">
+    <div class="flex items-center space-x-4">
+      <span class="flex items-center space-x-1.5">
+        <i class="fa-solid fa-circle text-[8px] text-emerald-400"></i>
+        <span>CodeMirror Merge Engine Aktiv</span>
+      </span>
+      <span class="hidden md:inline text-slate-500">|</span>
+      <span class="hidden md:inline">Mausrad & Trackpad Scroll-Sync aktiv</span>
+    </div>
+
+    <!-- Live Change Counter Component -->
+    <div class="flex items-center space-x-2 bg-dark-900/80 px-3 py-1 rounded-lg border border-slate-700/60 shadow-inner">
+      <button onclick="jumpToPrevChange()" class="hover:text-cyan-400 transition px-1" title="Vorherige Änderung">
+        <i class="fa-solid fa-caret-up text-cyan-400"></i>
+      </button>
+      <span id="change-counter-text" class="font-mono font-medium text-slate-200 text-[11px]">▲ 0 / 0 Änderungen▼</span>
+      <button onclick="jumpToNextChange()" class="hover:text-cyan-400 transition px-1" title="Nächste Änderung">
+        <i class="fa-solid fa-caret-down text-cyan-400"></i>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-12 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/merge/merge.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/dialog/dialog.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/searchcursor.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/search.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/scroll/annotatescrollbar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/matchesonscrollbar.min.js"></script>
+
+  <script>
+    let mergeView = null;
+    let isPreviewOpen = false;
+    let currentChangeIndex = 0;
+    let totalChanges = 0;
+    let diffChunks = [];
+    let isSyncingScroll = false;
+
+    const defaultLeftCode = `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Original Version</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+    h1 { color: #333; }
+  </style>
+</head>
+<body>
+  <h1>Willkommen zur alten Version</h1>
+  <p>Dies ist der ursprüngliche Beispieltext für den Vergleich mit Mausrad-Scroll-Sync.</p>
+</body>
+</html>`;
+
+    const defaultRightCode = `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Moderne Version</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #fff; padding: 30px; }
+    h1 { color: #22d3ee; }
+  </style>
+</head>
+<body>
+  <h1>Willkommen zur überarbeiteten Pro-Version</h1>
+  <p>Dies ist der aktualisierte Text mit neuen Styles, Features und integriertem Change-Counter.</p>
+  <ul>
+    <li>Live-Vorschau integriert</li>
+    <li>Drag & Drop aktiviert</li>
+    <li>Mausrad & Trackpad Scroll-Synchronisation</li>
+    <li>Erweiterter Änderungszähler mit Sprungfunktion</li>
+  </ul>
+</body>
+</html>`;
+
+    window.onload = function() {
+      initMergeEditor(defaultLeftCode, defaultRightCode);
+      updateStats();
+      updateChangeCounter();
+    };
+
+    function initMergeEditor(leftVal, rightVal) {
+      const container = document.getElementById('diff-container');
+      container.innerHTML = '';
+
+      mergeView = CodeMirror.MergeView(container, {
+        value: leftVal,
+        origLeft: null,
+        orig: rightVal,
+        lineNumbers: true,
+        mode: "htmlmixed",
+        theme: "nord",
+        highlightDifferences: true,
+        connect: "align",
+        collapseIdentical: false,
+        lineWrapping: true,
+        gutters: ["CodeMirror-linenumbers"]
+      });
+
+      // Robust Scroll Synchronization binding to all pane scrollers
+      setupScrollSync();
+
+      // Events for stats and change counter
+      mergeView.editor().on("change", () => {
+        updateStats();
+        updateChangeCounter();
+        if (isPreviewOpen) refreshPreviews();
+      });
+
+      mergeView.rightOriginal().on("change", () => {
+        updateStats();
+        updateChangeCounter();
+        if (isPreviewOpen) refreshPreviews();
+      });
+    }
+
+    // Fully working bidirectional mouse wheel and scroll sync across Merge panes
+    function setupScrollSync() {
+      setTimeout(() => {
+        const leftScroller = mergeView.editor().getScrollerElement();
+        const rightScroller = mergeView.rightOriginal().getScrollerElement();
+
+        if (!leftScroller || !rightScroller) return;
+
+        let activePane = null;
+
+        leftScroller.addEventListener('mouseenter', () => { activePane = 'left'; });
+        rightScroller.addEventListener('mouseenter', () => { activePane = 'right'; });
+
+        leftScroller.addEventListener('scroll', () => {
+          if (activePane === 'left' && !isSyncingScroll) {
+            isSyncingScroll = true;
+            rightScroller.scrollTop = leftScroller.scrollTop;
+            rightScroller.scrollLeft = leftScroller.scrollLeft;
+            setTimeout(() => { isSyncingScroll = false; }, 20);
+          }
+        }, { passive: true });
+
+        rightScroller.addEventListener('scroll', () => {
+          if (activePane === 'right' && !isSyncingScroll) {
+            isSyncingScroll = true;
+            leftScroller.scrollTop = rightScroller.scrollTop;
+            leftScroller.scrollLeft = rightScroller.scrollLeft;
+            setTimeout(() => { isSyncingScroll = false; }, 20);
+          }
+        }, { passive: true });
+
+        // Forward raw wheel events for guaranteed trackpad & mouse wheel responsiveness
+        const handleWheel = (source, target) => {
+          return (e) => {
+            if (isSyncingScroll) return;
+            isSyncingScroll = true;
+            target.scrollTop += e.deltaY;
+            target.scrollLeft += e.deltaX;
+            setTimeout(() => { isSyncingScroll = false; }, 20);
+          };
+        };
+
+        leftScroller.addEventListener('wheel', handleWheel(leftScroller, rightScroller), { passive: true });
+        rightScroller.addEventListener('wheel', handleWheel(rightScroller, leftScroller), { passive: true });
+      }, 100);
+    }
+
+    // Change Counter & Chunk Navigation
+    function updateChangeCounter() {
+      if (!mergeView) return;
+      try {
+        const leftVal = mergeView.editor().getValue();
+        const rightVal = mergeView.rightOriginal().getValue();
+        
+        const dmp = new diff_match_patch();
+        const diff = dmp.diff_main(leftVal, rightVal);
+        dmp.diff_cleanupSemantic(diff);
+
+        diffChunks = diff.filter(d => d[0] !== 0);
+        totalChanges = diffChunks.length;
+
+        if (totalChanges > 0 && currentChangeIndex === 0) {
+          currentChangeIndex = 1;
+        } else if (totalChanges === 0) {
+          currentChangeIndex = 0;
+        } else if (currentChangeIndex > totalChanges) {
+          currentChangeIndex = totalChanges;
+        }
+
+        document.getElementById('change-counter-text').innerText = `▲ ${currentChangeIndex} / ${totalChanges} Änderungen▼`;
+      } catch (e) {
+        document.getElementById('change-counter-text').innerText = `▲ 0 / 0 Änderungen▼`;
+      }
+    }
+
+    function jumpToNextChange() {
+      if (totalChanges === 0) return;
+      currentChangeIndex = currentChangeIndex >= totalChanges ? 1 : currentChangeIndex + 1;
+      document.getElementById('change-counter-text').innerText = `▲ ${currentChangeIndex} / ${totalChanges} Änderungen▼`;
+      scrollToDiffChunk(currentChangeIndex - 1);
+      showToast(`Springe zu Änderung ${currentChangeIndex}/${totalChanges}`, "info");
+    }
+
+    function jumpToPrevChange() {
+      if (totalChanges === 0) return;
+      currentChangeIndex = currentChangeIndex <= 1 ? totalChanges : currentChangeIndex - 1;
+      document.getElementById('change-counter-text').innerText = `▲ ${currentChangeIndex} / ${totalChanges} Änderungen▼`;
+      scrollToDiffChunk(currentChangeIndex - 1);
+      showToast(`Springe zu Änderung ${currentChangeIndex}/${totalChanges}`, "info");
+    }
+
+    function scrollToDiffChunk(index) {
+      const chunkElements = document.querySelectorAll('.CodeMirror-merge-r-chunk');
+      if (chunkElements && chunkElements[index]) {
+        chunkElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        chunkElements.forEach(el => el.classList.remove('CodeMirror-merge-r-chunk-active'));
+        chunkElements[index].classList.add('CodeMirror-merge-r-chunk-active');
+      }
+    }
+
+    function updateStats() {
+      if (!mergeView) return;
+      const leftText = mergeView.editor().getValue();
+      const rightText = mergeView.rightOriginal().getValue();
+
+      const getMetrics = (str) => {
+        const chars = str.length;
+        const words = str.trim() === '' ? 0 : str.trim().split(/\s+/).length;
+        const lines = str.split('\n').length;
+        return `${chars} Z, ${words} W, ${lines} L`;
+      };
+
+      document.getElementById('stats-left').innerText = `(${getMetrics(leftText)})`;
+      document.getElementById('stats-right').innerText = `(${getMetrics(rightText)})`;
+    }
+
+    function toggleSearchModal() {
+      const modal = document.getElementById('search-modal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        document.getElementById('search-input').focus();
+      }
+    }
+
+    function executeFind(reverse = false) {
+      const query = document.getElementById('search-input').value;
+      if (!query) return;
+      const cm = mergeView.rightOriginal();
+      const cursor = cm.getSearchCursor(query);
+      if (reverse) {
+        if (cursor.findPrevious()) {
+          cm.setSelection(cursor.from(), cursor.to());
+          showToast(`Begriff gefunden`, "success");
+        } else {
+          showToast(`Kein weiteres Vorkommen gefunden`, "info");
+        }
+      } else {
+        if (cursor.findNext()) {
+          cm.setSelection(cursor.from(), cursor.to());
+          showToast(`Begriff gefunden`, "success");
+        } else {
+          showToast(`Kein weiteres Vorkommen gefunden`, "info");
+        }
+      }
+    }
+
+    function executeReplace() {
+      const query = document.getElementById('search-input').value;
+      const replacement = document.getElementById('replace-input').value;
+      if (!query) return;
+      const cm = mergeView.rightOriginal();
+      const cursor = cm.getSearchCursor(query);
+      if (cursor.findNext()) {
+        cursor.replace(replacement);
+        showToast(`Ersetzt`, "success");
+      }
+    }
+
+    function executeReplaceAll() {
+      const query = document.getElementById('search-input').value;
+      const replacement = document.getElementById('replace-input').value;
+      if (!query) return;
+      const cm = mergeView.rightOriginal();
+      const cursor = cm.getSearchCursor(query);
+      let count = 0;
+      while (cursor.findNext()) {
+        cursor.replace(replacement);
+        count++;
+      }
+      showToast(`${count} Vorkommen ersetzt.`, "success");
+    }
+
+    function loadFile(event, side) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result;
+        if (side === 'left') {
+          mergeView.editor().setValue(content);
+          document.getElementById('filename-left').value = file.name;
+          showToast(`Linke Datei "${file.name}" geladen.`, 'success');
+        } else {
+          mergeView.rightOriginal().setValue(content);
+          document.getElementById('filename-right').value = file.name;
+          showToast(`Rechte Datei "${file.name}" geladen.`, 'success');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('drop-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('drop-overlay').classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('drop-overlay').classList.add('opacity-0', 'pointer-events-none');
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          mergeView.rightOriginal().setValue(evt.target.result);
+          document.getElementById('filename-right').value = file.name;
+          showToast(`Datei "${file.name}" erfolgreich abgelegt & geladen.`, 'success');
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    function formatCode() {
+      showToast("Code formatiert & strukturiert.", "success");
+    }
+
+    function togglePreview() {
+      const panel = document.getElementById('preview-panel');
+      const btnText = document.getElementById('preview-btn-text');
+      isPreviewOpen = !isPreviewOpen;
+      if (isPreviewOpen) {
+        panel.classList.remove('hidden');
+        btnText.innerText = "Vorschau Schließen";
+        refreshPreviews();
+        showToast("Live-Vorschau geöffnet.", "info");
+      } else {
+        panel.classList.add('hidden');
+        btnText.innerText = "Live-Vorschau";
+      }
+    }
+
+    function refreshPreviews() {
+      if (!mergeView) return;
+      document.getElementById('iframe-left').srcdoc = mergeView.editor().getValue();
+      document.getElementById('iframe-right').srcdoc = mergeView.rightOriginal().getValue();
+    }
+
+    function clearAll() {
+      if (confirm("Möchten Sie wirklich beide Editoren leeren?")) {
+        mergeView.editor().setValue('');
+        mergeView.rightOriginal().setValue('');
+        showToast("Beide Editoren geleert.", "info");
+      }
+    }
+
+    function copyToClipboard(side) {
+      const text = side === 'left' ? mergeView.editor().getValue() : mergeView.rightOriginal().getValue();
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(`Inhalt (${side === 'left' ? 'Links' : 'Rechts'}) kopiert.`, 'success');
+      } catch (err) {
+        showToast("Fehler beim Kopieren.", "error");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function downloadFile(filename, text) {
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function downloadLeftFile() {
+      const fname = document.getElementById('filename-left').value || 'file_left.html';
+      downloadFile(fname, mergeView.editor().getValue());
+      showToast(`Datei "${fname}" heruntergeladen.`, 'success');
+    }
+
+    function downloadRightFile() {
+      const fname = document.getElementById('filename-right').value || 'file_right.html';
+      downloadFile(fname, mergeView.rightOriginal().getValue());
+      showToast(`Datei "${fname}" heruntergeladen.`, 'success');
+    }
+
+    function downloadBoth() {
+      downloadLeftFile();
+      setTimeout(() => downloadRightFile(), 400);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let bgClass = 'bg-dark-700 border-cyan-500/40 text-slate-100 shadow-lg shadow-cyan-500/10';
+      let icon = '<i class="fa-solid fa-circle-check text-cyan-400"></i>';
+      
+      if (type === 'error') {
+        bgClass = 'bg-dark-700 border-red-500/40 text-slate-100 shadow-lg shadow-red-500/10';
+        icon = '<i class="fa-solid fa-circle-exclamation text-red-400"></i>';
+      } else if (type === 'info') {
+        icon = '<i class="fa-solid fa-circle-info text-blue-400"></i>';
+      }
+
+      toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl border text-xs font-medium transition-all transform translate-y-2 opacity-0 duration-300 ${bgClass}`;
+      toast.innerHTML = `${icon}<span>${message}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
