@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRZT Realistische Galaxienentstehung (Trailing Arms Korrektur)</title>
+  <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+    }
+    body, html {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #020208;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #e0e6ed;
+    }
+    #canvas-container {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+    
+    /* Glassmorphism Panel Header & UI */
+    #ui-panel {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 340px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+        background: rgba(8, 12, 24, 0.82);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(100, 180, 255, 0.22);
+        border-radius: 16px;
+        padding: 22px;
+        z-index: 10;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(56, 189, 248, 0.12);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    }
+    #ui-panel.collapsed {
+        transform: translateX(-370px);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    /* Custom Scrollbar */
+    #ui-panel::-webkit-scrollbar {
+        width: 5px;
+    }
+    #ui-panel::-webkit-scrollbar-track {
+        background: rgba(250, 250, 250, 0.05);
+        border-radius: 4px;
+    }
+    #ui-panel::-webkit-scrollbar-thumb {
+        background: rgba(56, 189, 248, 0.4);
+        border-radius: 4px;
+    }
+    
+    h1 {
+        font-size: 1.18rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #e0f2fe, #38bdf8, #818cf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 3px;
+        letter-spacing: 0.5px;
+    }
+    .subtitle {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        margin-bottom: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 600;
+    }
+    
+    .phase-indicator {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .phase-title {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+    .phase-value {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #38bdf8;
+        font-family: monospace;
+    }
+    
+    .control-group {
+        margin-bottom: 14px;
+    }
+    label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        margin-bottom: 6px;
+        color: #cbd5e1;
+        font-weight: 500;
+    }
+    label span {
+        color: #38bdf8;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+    }
+    input[type="range"] {
+        width: 100%;
+        accent-color: #38bdf8;
+        background: #0f172a;
+        height: 6px;
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+    }
+    
+    .btn-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 18px;
+    }
+    
+    .btn-action {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(129, 140, 248, 0.18));
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: #e2e8f0;
+        font-weight: 600;
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-action:hover {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.38), rgba(129, 140, 248, 0.38));
+        border-color: rgba(56, 189, 248, 0.75);
+        color: #fff;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+    .btn-action.full-width {
+        grid-column: span 2;
+        background: linear-gradient(135deg, #0284c7, #4f46e5);
+        border: none;
+        color: #ffffff;
+    }
+    .btn-action.full-width:hover {
+        background: linear-gradient(135deg, #0369a1, #4338ca);
+        box-shadow: 0 0 20px rgba(14, 165, 233, 0.45);
+    }
+    
+    /* Floating Top Control Overlay Buttons */
+    #toggle-btn, #fullscreen-btn {
+        position: absolute;
+        top: 20px;
+        z-index: 11;
+        background: rgba(8, 12, 24, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(100, 180, 255, 0.3);
+        color: #38bdf8;
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        transition: all 0.2s ease;
+    }
+    #toggle-btn { left: 20px; }
+    #fullscreen-btn { right: 20px; }
+    
+    #toggle-btn:hover, #fullscreen-btn:hover {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: rgba(56, 189, 248, 0.8);
+        color: #fff;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+    
+    .info-text {
+        font-size: 0.74rem;
+        color: #94a3b8;
+        margin-top: 16px;
+        line-height: 1.45;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding-top: 12px;
+    }
+    .info-text b {
+        color: #cbd5e1;
+    }
+    .info-badge {
+        display: inline-block;
+        background: rgba(56, 189, 248, 0.15);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.68rem;
+        margin-bottom: 4px;
+    }
+  </style>
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <button id="toggle-btn" onclick="toggleUI()">⚙️</button>
+  <button id="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+
+  <div id="ui-panel">
+    <h1> ✨ ✨ WRZT Galaxie-Modell</h1>
+    <div class="subtitle">Korrekt gewickelte Spiralärme (Trailing)</div>
+
+    <div class="phase-indicator">
+      <span class="phase-title">Entwicklungsphase:</span>
+      <span class="phase-value" id="phase-text">0% - Protogalaxie</span>
+    </div>
+
+    <div class="control-group">
+      <label>Kollaps-Geschwindigkeit: <span id="val-collapse">1.0</span>x</label>
+      <input type="range" id="collapseRange" min="0.1" max="3.0" step="0.1" value="1.0">
+    </div>
+
+    <div class="control-group">
+      <label>Rotations-Impuls: <span id="val-rot">1.0</span>x</label>
+      <input type="range" id="rotRange" min="0.0" max="3.0" step="0.1" value="1.0">
+    </div>
+
+    <div class="control-group">
+      <label>Kern-Leuchtkraft: <span id="val-core">2.0</span>x</label>
+      <input type="range" id="coreRange" min="0.5" max="4.0" step="0.1" value="2.0">
+    </div>
+
+    <div class="control-group">
+      <label>WRZT-Massespannung: <span id="val-amp">1.2</span></label>
+      <input type="range" id="ampRange" min="0.0" max="3.0" step="0.1" value="1.2">
+    </div>
+
+    <div class="control-group">
+      <label>Partikel-Dichte: <span id="val-gas">30000</span></label>
+      <input type="range" id="gasRange" min="10000" max="60000" step="5000" value="30000">
+    </div>
+
+    <div class="btn-grid">
+      <button class="btn-action" id="pause-btn" onclick="togglePause()">⏸️ Pause</button>
+      <button class="btn-action" onclick="resetCamera()">🎥 Kamera</button>
+      <button class="btn-action full-width" onclick="restartSimulation()">🔄 Simulation Neu Starten</button>
+    </div>
+
+    <div class="info-text">
+      <span class="info-badge">Physik-Korrektur</span><br>
+      <b>Nacheilende Spiralarme (Trailing Arms):</b> Da die Rotation im Zentrum durch Kepler'sche Bewegung schneller ist als in den Außenbereichen, ziehen sich die Arme mit der Zeit entgegen der Drehrichtung nach hinten.
+    </div>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <script>
+    // UI Steuerung
+    let uiVisible = true;
+
+    function toggleUI() {
+      const panel = document.getElementById('ui-panel');
+      const btn = document.getElementById('toggle-btn');
+      uiVisible = !uiVisible;
+      if (uiVisible) {
+        panel.classList.remove('collapsed');
+        btn.textContent = '⚙️';
+      } else {
+        panel.classList.add('collapsed');
+        btn.textContent = '⚙️ Regler';
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Three.js Grund-Setup
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x020208, 0.007);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const defaultCamPos = new THREE.Vector3(0, 36, 62);
+    camera.position.copy(defaultCamPos);
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: "high-performance"
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.3;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 220;
+    controls.minDistance = 5;
+
+    function resetCamera() {
+      camera.position.copy(defaultCamPos);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+
+    // Simulationsparameter
+    let collapseSpeed = 1.0;
+    let rotSpeed = 1.0;
+    let coreIntensity = 2.0;
+    let waveAmp = 1.2;
+    let particleCount = 30000;
+    let isPaused = false;
+
+    let simulationTime = 0;
+    let clock = new THREE.Clock();
+
+    // Soft Glowing Texture Generator
+    function createGlowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+
+      const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gradient.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+      gradient.addColorStop(0.18, 'rgba(230, 245, 255, 0.85)');
+      gradient.addColorStop(0.45, 'rgba(90, 170, 255, 0.3)');
+      gradient.addColorStop(0.75, 'rgba(30, 70, 180, 0.08)');
+      gradient.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const glowTexture = createGlowTexture();
+
+    // --- 1. WRZT WELLENNETZWERK (Oszillierendes Raumzeit-Gitter) ---
+    const gridDim = 52;
+    const gridSpacing = 2.3;
+    const gridGeometry = new THREE.BufferGeometry();
+    const gridPositions = [];
+    const gridOriginals = [];
+
+    for (let x = 0; x < gridDim; x++) {
+      for (let z = 0; z < gridDim; z++) {
+        const posX = (x - gridDim / 2) * gridSpacing;
+        const posZ = (z - gridDim / 2) * gridSpacing;
+        gridPositions.push(posX, -3, posZ);
+        gridOriginals.push(posX, -3, posZ);
+      }
+    }
+    gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridPositions, 3));
+
+    const gridMaterial = new THREE.PointsMaterial({
+      color: 0x38bdf8,
+      size: 0.32,
+      transparent: true,
+      opacity: 0.3,
+      blending: THREE.AdditiveBlending
+    });
+    const waveNetwork = new THREE.Points(gridGeometry, gridMaterial);
+    scene.add(waveNetwork);
+
+    // --- 2. BULGE / GALAKTISCHER KERN ---
+    const coreCount = 3500;
+    const coreGeometry = new THREE.BufferGeometry();
+    const corePositions = new Float32Array(coreCount * 3);
+    const coreColors = new Float32Array(coreCount * 3);
+
+    for (let i = 0; i < coreCount; i++) {
+      // Dichte Plummer-Verteilung im Zentrum
+      const r = Math.pow(Math.random(), 2.8) * 5.0;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      corePositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      corePositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.65; // Abgeflacht
+      corePositions[i * 3 + 2] = r * Math.cos(phi);
+
+      // Strahlend warm-weißer Kern mit leichtem Goldton
+      const c = new THREE.Color().setHSL(0.12, 0.85, 0.88 + Math.random() * 0.12);
+      coreColors[i * 3] = c.r;
+      coreColors[i * 3 + 1] = c.g;
+      coreColors[i * 3 + 2] = c.b;
+    }
+    coreGeometry.setAttribute('position', new THREE.BufferAttribute(corePositions, 3));
+    coreGeometry.setAttribute('color', new THREE.BufferAttribute(coreColors, 3));
+
+    const coreMaterial = new THREE.PointsMaterial({
+      size: 1.35,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.95,
+      map: glowTexture,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const coreParticles = new THREE.Points(coreGeometry, coreMaterial);
+    scene.add(coreParticles);
+
+    // --- 3. GALAXIEN-STERNPARTIKEL & INTERSTELLARE NEBEL ---
+    let galaxyParticles, galaxyGeometry;
+    let nebulaParticles, nebulaGeometry;
+    let particlesData = [];
+    let nebulaData = [];
+
+    function initGalaxy() {
+      if (galaxyParticles) scene.remove(galaxyParticles);
+      if (nebulaParticles) scene.remove(nebulaParticles);
+
+      galaxyGeometry = new THREE.BufferGeometry();
+      nebulaGeometry = new THREE.BufferGeometry();
+
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+      const sizes = new Float32Array(particleCount);
+
+      const nebulaCount = Math.floor(particleCount * 0.35);
+      const nebPositions = new Float32Array(nebulaCount * 3);
+      const nebColors = new Float32Array(nebulaCount * 3);
+
+      particlesData = [];
+      nebulaData = [];
+
+      const plummerCoreScale = 8.0;
+
+      // ROTATIONSRICHTUNG: Positiv (gegen den Uhrzeigersinn von oben gesehen)
+      // KORREKTE TRAILING ARMS FORMEL:
+      // Wenn sich das System gegen den Uhrzeigersinn dreht (Winkel nimmt zu),
+      // müssen äußere Teile einen KLEINEREN Startwinkel haben als innere Teile,
+      // damit die Arme nach hinten hängen (trailing).
+      const armCount = 2;
+
+      for (let i = 0; i < particleCount; i++) {
+        const u = Math.random();
+        const r = plummerCoreScale / Math.sqrt(Math.pow(u, -2 / 3) - 1);
+        const boundedR = Math.min(r, 42.0); // Begrenzung des Radius
+
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+
+        // Anfangs-Kugelhaufen (3D Protogalaxie)
+        const startX = boundedR * Math.sin(phi) * Math.cos(theta);
+        const startY = boundedR * Math.sin(phi) * Math.sin(theta);
+        const startZ = boundedR * Math.cos(phi);
+
+        positions[i * 3] = startX;
+        positions[i * 3 + 1] = startY;
+        positions[i * 3 + 2] = startZ;
+
+        const armIndex = i % armCount;
+        const armAngleOffset = armIndex * (Math.PI * 2 / armCount);
+        const targetRadius = Math.max(2.2, boundedR * 0.85);
+
+        // *** KRITISCHE KORREKTUR: TRAILING SPIRAL ARMS ***
+        // - targetRadius * 0.28 zieht äußere Radien im Winkel ZURÜCK.
+        // Dadurch wird die Spirale mathematisch exakt als nacheilend definiert.
+        const spiralWind = -targetRadius * 0.32 + armAngleOffset + (Math.random() - 0.5) * 0.55;
+
+        // Rotationsgeschwindigkeit fällt nach außen hin ab (Kepler-naher Verlauf)
+        const angularVelocity = (2.2 / (Math.pow(targetRadius, 0.6) + 1.0));
+
+        // Farbverlauf
+        const color = new THREE.Color();
+        const normR = boundedR / 36.0;
+
+        if (normR < 0.15) {
+          color.setHSL(0.12, 0.9, 0.85); // Strahlendes Gelb/Creme
+        } else if (normR < 0.45) {
+          color.setHSL(0.52, 0.85, 0.65); // Helles Cyan
+        } else if (normR < 0.75) {
+          color.setHSL(0.60, 0.9, 0.58); // Blaue Hauptarme
+        } else {
+          color.setHSL(0.76, 0.85, 0.52); // Violette Außenbereiche
+        }
+
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+        sizes[i] = (Math.random() * 0.4 + 0.4) * (1.0 - normR * 0.35);
+
+        particlesData.push({
+          startX,
+          startY,
+          startZ,
+          targetRadius,
+          angle: spiralWind,
+          angularVelocity,
+          boundedR,
+          randomPhase: Math.random() * Math.PI * 2
+        });
+      }
+
+      // Interstellarer Gasstaub (Nebulae)
+      for (let i = 0; i < nebulaCount; i++) {
+        const parent = particlesData[i * 2];
+        const offsetX = (Math.random() - 0.5) * 2.5;
+        const offsetZ = (Math.random() - 0.5) * 2.5;
+
+        nebPositions[i * 3] = parent.startX + offsetX;
+        nebPositions[i * 3 + 1] = parent.startY;
+        nebPositions[i * 3 + 2] = parent.startZ + offsetZ;
+
+        const c = new THREE.Color();
+        if (i % 2 === 0) {
+          c.setHSL(0.82, 0.8, 0.45); // Magenta/Pink Staub
+        } else {
+          c.setHSL(0.55, 0.9, 0.40); // Deep Cyan Nebel
+        }
+
+        nebColors[i * 3] = c.r;
+        nebColors[i * 3 + 1] = c.g;
+        nebColors[i * 3 + 2] = c.b;
+
+        nebulaData.push({
+          parentIndex: i * 2,
+          offsetX,
+          offsetZ
+        });
+      }
+
+      galaxyGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      galaxyGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      nebulaGeometry.setAttribute('position', new THREE.BufferAttribute(nebPositions, 3));
+      nebulaGeometry.setAttribute('color', new THREE.BufferAttribute(nebColors, 3));
+
+      const galaxyMaterial = new THREE.PointsMaterial({
+        size: 0.65,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        map: glowTexture,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      const nebulaMaterial = new THREE.PointsMaterial({
+        size: 2.2,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.22,
+        map: glowTexture,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      galaxyParticles = new THREE.Points(galaxyGeometry, galaxyMaterial);
+      nebulaParticles = new THREE.Points(nebulaGeometry, nebulaMaterial);
+
+      scene.add(galaxyParticles);
+      scene.add(nebulaParticles);
+
+      simulationTime = 0;
+      clock = new THREE.Clock();
+      updatePhaseText("0% - Protogalaxie");
+    }
+
+    initGalaxy();
+
+    function restartSimulation() {
+      initGalaxy();
+      if (isPaused) togglePause();
+    }
+
+    function togglePause() {
+      isPaused = !isPaused;
+      const btn = document.getElementById('pause-btn');
+      if (isPaused) {
+        btn.textContent = '▶️ Weiter';
+        btn.style.borderColor = '#34d399';
+      } else {
+        btn.textContent = '⏸️ Pause';
+        btn.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+      }
+    }
+
+    function updatePhaseText(text) {
+      document.getElementById('phase-text').textContent = text;
+    }
+
+    // --- UI Event Listener ---
+    document.getElementById('collapseRange').addEventListener('input', (e) => {
+      collapseSpeed = parseFloat(e.target.value);
+      document.getElementById('val-collapse').textContent = collapseSpeed.toFixed(1);
+    });
+    document.getElementById('rotRange').addEventListener('input', (e) => {
+      rotSpeed = parseFloat(e.target.value);
+      document.getElementById('val-rot').textContent = rotSpeed.toFixed(1);
+    });
+    document.getElementById('coreRange').addEventListener('input', (e) => {
+      coreIntensity = parseFloat(e.target.value);
+      document.getElementById('val-core').textContent = coreIntensity.toFixed(1);
+      coreMaterial.size = 1.35 * (coreIntensity / 2.0);
+    });
+    document.getElementById('ampRange').addEventListener('input', (e) => {
+      waveAmp = parseFloat(e.target.value);
+      document.getElementById('val-amp').textContent = waveAmp.toFixed(1);
+    });
+    document.getElementById('gasRange').addEventListener('input', (e) => {
+      particleCount = parseInt(e.target.value);
+      document.getElementById('val-gas').textContent = particleCount;
+      initGalaxy();
+    });
+
+    // --- Hauptanimationsschleife ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (!isPaused) {
+        const delta = clock.getDelta();
+        simulationTime += delta * collapseSpeed;
+      }
+
+      const time = simulationTime;
+
+      // 1. WRZT WELLENNETZWERK & RAUMZEITKRÜMMUNG
+      const gridPosAttr = waveNetwork.geometry.attributes.position;
+      const gridArray = gridPosAttr.array;
+
+      for (let i = 0; i < gridArray.length; i += 3) {
+        const x = gridArray[i];
+        const z = gridArray[i + 2];
+        const r = Math.sqrt(x * x + z * z);
+        const angle = Math.atan2(z, x);
+
+        // Dichtewellen-Oszillation synchron zu den Spiralarmen
+        const spiralDensityWave = Math.sin(2.0 * angle + r * 0.3 - time * 1.5 * rotSpeed) * 0.6;
+        const wave = Math.sin(r * 0.25 - time * 2.0) * waveAmp * Math.exp(-r * 0.03);
+        const gravitationalSink = -Math.min(9.0, (20.0 / (r + 2.5))) * Math.min(time * 0.25, 1.0);
+
+        gridArray[i + 1] = wave + spiralDensityWave * Math.min(time * 0.1, 1.0) + gravitationalSink - 2.8;
+      }
+      gridPosAttr.needsUpdate = true;
+
+      // 2. KERN-PULSATION
+      if (coreParticles) {
+        coreParticles.rotation.y = time * 0.09 * rotSpeed;
+        coreMaterial.opacity = (0.80 + Math.sin(time * 3.2) * 0.12) * (coreIntensity / 2.0);
+      }
+
+      // 3. PHYSILKALISCHE EXPANSION & KOLLAPS-DYNAMIK
+      if (galaxyParticles) {
+        const posAttr = galaxyParticles.geometry.attributes.position;
+        const posArray = posAttr.array;
+
+        const nebPosAttr = nebulaParticles.geometry.attributes.position;
+        const nebPosArray = nebPosAttr.array;
+
+        // Exponentieller Kollapsverlauf
+        const collapseProgress = 1.0 - Math.exp(-time * 0.32);
+        const progressPercent = Math.min(Math.floor(collapseProgress * 100), 100);
+
+        if (progressPercent < 20) {
+          updatePhaseText(`${progressPercent}% - Protogalaxie`);
+        } else if (progressPercent < 70) {
+          updatePhaseText(`${progressPercent}% - Scheiben-Akkretion`);
+        } else {
+          updatePhaseText(`${progressPercent}% - Trailing Spiralarm`);
+        }
+
+        for (let i = 0; i < particlesData.length; i++) {
+          const p = particlesData[i];
+
+          // Winkelfortschritt durch physikalische Rotation (Rotationsrichtung: positiv)
+          p.angle += p.angularVelocity * 0.016 * rotSpeed * collapseProgress;
+
+          // Radiale Abflachung
+          const currentRadius = THREE.MathUtils.lerp(p.boundedR, p.targetRadius, collapseProgress);
+
+          // Scheibenebenen-Kollaps
+          const diskThickness = (1.1 / (currentRadius * 0.12 + 1.0));
+          const currentY = THREE.MathUtils.lerp(p.startY, Math.sin(time + p.randomPhase) * diskThickness, collapseProgress);
+
+          // Spiralbahn-Berechnung
+          const targetX = Math.cos(p.angle) * currentRadius;
+          const targetZ = Math.sin(p.angle) * currentRadius;
+
+          posArray[i * 3] = THREE.MathUtils.lerp(p.startX, targetX, collapseProgress);
+          posArray[i * 3 + 1] = currentY;
+          posArray[i * 3 + 2] = THREE.MathUtils.lerp(p.startZ, targetZ, collapseProgress);
+        }
+
+        // Synchronisation des interstellaren Nebelgases
+        for (let i = 0; i < nebulaData.length; i++) {
+          const neb = nebulaData[i];
+          const parentIdx = neb.parentIndex;
+
+          nebPosArray[i * 3] = posArray[parentIdx * 3] + neb.offsetX;
+          nebPosArray[i * 3 + 1] = posArray[parentIdx * 3 + 1];
+          nebPosArray[i * 3 + 2] = posArray[parentIdx * 3 + 2] + neb.offsetZ;
+        }
+
+        posAttr.needsUpdate = true;
+        nebPosAttr.needsUpdate = true;
+
+        galaxyParticles.rotation.y = time * 0.015 * rotSpeed;
+        nebulaParticles.rotation.y = time * 0.015 * rotSpeed;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Responsive Resizing
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
