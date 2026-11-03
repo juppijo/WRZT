@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Laser-Labor 3D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{color-scheme:dark;--bg:#05070d;--pn:rgba(14,19,32,.86);--ln:#27304a;--tx:#dfe6f5;--mu:#8a95b3;--ac:#4cc9f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:13px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
+#app{position:relative;height:100%;width:100%;background:var(--bg)}
+#app>canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.hd{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;touch-action:none}.hd .tg{margin-left:auto;transition:.2s;color:var(--mu)}
+.pn.c>*:not(.hd){display:none}.pn.c .tg{transform:rotate(-90deg)}#top.c{right:auto}
+#tiles{position:absolute;left:190px;right:262px;bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;pointer-events:none}
+#tiles .pn{position:relative;pointer-events:auto;width:196px;font-size:12px}
+.tile canvas{width:100%;display:block;border-radius:6px;margin-top:6px;background:#000}.tile .inf{margin-top:6px;color:var(--mu);line-height:1.5}.tile .inf b{color:var(--ac)}
+.tb2{color:var(--mu);padding:0 4px;cursor:pointer;font-size:14px}.tb2:hover{color:var(--ac)}.tile .hd b{margin-right:auto}.tile .tg{margin-left:0}
+.tile:fullscreen{width:100vw!important;height:100vh;box-sizing:border-box;padding:24px;overflow:auto;border-radius:0;font-size:20px!important;background:#070b14}
+.tile:fullscreen .tv{width:auto;max-width:100%;height:58vh;margin:12px auto 0}.tile:fullscreen .pf{width:100%;height:22vh}
+@media(max-width:720px){#tiles{left:10px;right:10px;top:62px;bottom:auto}}
+.pn{position:absolute;background:var(--pn);backdrop-filter:blur(8px);border:1px solid var(--ln);border-radius:12px;padding:10px;box-sizing:border-box}
+#top{left:10px;right:10px;top:10px;display:flex;gap:8px;align-items:center;padding:6px 10px;flex-wrap:wrap}
+#top h1{font-size:15px;margin:0 auto 0 0;font-weight:600}#top h1 span{color:var(--ac)}
+#tb{left:10px;top:62px;width:170px;display:flex;flex-direction:column;gap:5px;max-height:calc(100% - 80px);overflow:auto}
+#pp{right:10px;top:62px;width:240px;max-height:calc(100% - 80px);overflow:auto}
+button,select{background:#18203a;color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:6px 9px;font:inherit;cursor:pointer;text-align:left}
+button:hover,select:hover{border-color:var(--ac);background:#1d2848}
+#tb button b{color:var(--ac);margin-right:5px}
+h4{margin:10px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mu)}h4:first-child{margin-top:0}
+label{display:block;margin:7px 0}label b{float:right;color:var(--ac);font-weight:500}label.ck{display:flex;gap:6px;align-items:center}
+input[type=range]{width:100%;accent-color:var(--ac)}.mu{color:var(--mu);margin:4px 0}
+#toast{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);background:var(--pn);border:1px solid var(--ln);padding:8px 14px;border-radius:10px;opacity:0;transition:.3s;pointer-events:none}
+@media(max-width:720px){#tb{top:auto;bottom:10px;left:10px;right:10px;width:auto;flex-direction:row;max-height:none;overflow-x:auto}#tb button{white-space:nowrap;flex:0 0 auto}#tb h4{display:none}#pp{top:auto;bottom:70px;width:210px;max-height:38%}}
+</style></head><body>
+<div id="app">
+<div id="top" class="pn"><h1 class="hd">🔦 Laser-Labor <span>3D</span> <span class="tg">▾</span></h1>
+<select id="pre"><option value="">Beispiel laden …</option><option value="0">Doppelspalt-Interferenz</option><option value="1">Prisma &amp; Weißlicht</option><option value="2">Polarisation (Malus)</option><option value="3">Verschränkungs-Kristall</option><option value="4">Linse &amp; Spiegel</option><option value="5">Weißlicht-Doppelspalt (Farbstreifen)</option><option value="6">Spiegel-Rundkurs + Polarisator + Doppelspalt</option><option value="7">Michelson-Aufbau (Strahlteiler + 2 Spiegel)</option><option value="8">Periskop (Höhenversatz)</option><option value="9">Kepler-Teleskop (2 Linsen)</option><option value="10">Polarisations-Weiche (2 Schirme)</option><option value="11">Verschränkung + Analysatoren</option></select>
+<button id="all" title="Alle Fenster ein- oder ausklappen">⇕ Fenster</button><button id="clr">Leeren</button><button id="sv">💾 Speichern</button><button id="ldb">📂 Laden</button><input type="file" id="ld" accept=".json,application/json" hidden><button id="fs">⛶ Vollbild</button></div>
+<div id="tb" class="pn"><h4 class="hd">Bauteile <span class="tg">▾</span></h4></div>
+<div id="pp" class="pn"><h4 class="hd">Einstellungen <span class="tg">▾</span></h4>
+<h4>Laser</h4>
+<label>Wellenlänge <b id="wlv">650 nm</b><input type="range" id="wl" min="400" max="700" value="650"></label>
+<label class="ck"><input type="checkbox" id="wh"> Weißlicht (Spektrum)</label>
+<label>Polarisation <b id="plv">0°</b><input type="range" id="pl" min="0" max="180" value="0"></label>
+<label class="ck"><input type="checkbox" id="un"> unpolarisiert</label>
+<h4>Auswahl</h4><div id="sp"></div></div>
+<div id="tiles"></div><div id="toast"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),D=Math.PI/180,V=THREE.Vector3,app=$('app');
+const NAME={laser:'Laser',mirror:'Spiegel',lens:'Linse',prism:'Prisma',pol:'Polarisationsfilter',split:'Strahlteiler',bbo:'Verschränkungs-Kristall (BBO)',slit:'Doppelspalt',screen:'Schirm'};
+const LIM={mirror:{r:.6},lens:{r:.5},pol:{r:.45},split:{r:.45},bbo:{r:.35},screen:{a:1.2,b:.7},slit:{a:.7,b:.6}};
+const KEYS=['type','x','y','z','yaw','pitch','f','al','d','a','wl','white','pol','unpol'];
+let els=[],sel=null,uid=1,main=[],fan=[],drag=null,tt=0,W=1,H=1;
+function toast(m){const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,2600)}
+function rgb(w){let r=0,g=0,b=0;
+ if(w<440){r=(440-w)/60;b=1}else if(w<490){g=(w-440)/50;b=1}else if(w<510){g=1;b=(510-w)/20}else if(w<580){r=(w-510)/70;g=1}else if(w<645){r=1;g=(645-w)/65}else r=1;
+ const f=w<420?.35+.65*(w-380)/40:w>680?.5:1;return[r*f,g*f,b*f]}
+/* three.js Szene */
+let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true})}catch(e){document.body.insertAdjacentHTML('beforeend','<p style="padding:80px 20px">WebGL wird von diesem Browser nicht unterstützt.</p>')}
+const cv=renderer.domElement;app.prepend(cv);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x05070d);scene.fog=new THREE.FogExp2(0x05070d,.012);
+const camera=new THREE.PerspectiveCamera(45,1,.1,200);
+let az=-.55,el=.55,rad=13,tgt=new V(0,.8,0);
+function cam(){camera.position.set(tgt.x+rad*Math.cos(el)*Math.cos(az),tgt.y+rad*Math.sin(el),tgt.z+rad*Math.cos(el)*Math.sin(az));camera.lookAt(tgt)}
+function resize(){W=app.clientWidth;H=app.clientHeight;renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.setSize(W,H,false);camera.aspect=W/H;camera.updateProjectionMatrix()}
+addEventListener('resize',resize);
+scene.add(new THREE.AmbientLight(0x8090b0,.9));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(4,10,6);scene.add(dl);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(26,16).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x090d18}));scene.add(floor);
+const grid=new THREE.GridHelper(26,26,0x2a3558,0x151c33);grid.position.y=.002;scene.add(grid);
+/* Strahlen: Zylinder (Instanzen) + Linien (Fächer) */
+const CAP=1500,BM={transparent:true,blending:THREE.AdditiveBlending,depthWrite:false};
+const core=new THREE.InstancedMesh(new THREE.CylinderGeometry(.014,.014,1,6,1,true),new THREE.MeshBasicMaterial({...BM}),CAP),
+ glow=new THREE.InstancedMesh(new THREE.CylinderGeometry(.06,.06,1,8,1,true),new THREE.MeshBasicMaterial({...BM}),CAP);
+for(const m of[core,glow]){m.frustumCulled=false;m.setColorAt(0,new THREE.Color(0,0,0));m.count=0;scene.add(m)}
+const FC=7000,fp=new Float32Array(FC*6),fcol=new Float32Array(FC*6),fg=new THREE.BufferGeometry();
+fg.setAttribute('position',new THREE.BufferAttribute(fp,3));fg.setAttribute('color',new THREE.BufferAttribute(fcol,3));fg.setDrawRange(0,0);
+const fl=new THREE.LineSegments(fg,new THREE.LineBasicMaterial({vertexColors:true,...BM}));fl.frustumCulled=false;scene.add(fl);
+/* Bauteile */
+function frameOf(e){const cy=Math.cos(e.yaw),sy=Math.sin(e.yaw),cp=Math.cos(e.pitch),sp=Math.sin(e.pitch);
+ e.c=new V(e.x,e.y,e.z);e.n=new V(cp*cy,sp,cp*sy);e.u=new V(sy,0,-cy);e.v=new V().crossVectors(e.n,e.u)}
+function add(type,x,z,yawD,ex){const e={id:uid++,type,x,y:1,z,yaw:(yawD||0)*D,pitch:0,...ex};
+ if(type==='lens'&&!e.f)e.f=3;if(type==='pol'&&e.al==null)e.al=0;if(type==='slit'){e.d=e.d||30;e.a=e.a||6}
+ if(type==='laser'){e.wl=e.wl||650;e.white=!!e.white;e.pol=e.pol||0;e.unpol=!!e.unpol}
+ e.post=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,1,8),new THREE.MeshPhongMaterial({color:0x39435f}));scene.add(e.post);
+ els.push(e);return e}
+function removeEl(e){for(const o of[e.g,e.post]){if(!o)continue;scene.remove(o);o.traverse(q=>{q.geometry&&q.geometry.dispose()})}}
+function mk(e){const g=new THREE.Group(),t=e.type;
+ const P=(c,o)=>new THREE.MeshPhongMaterial({color:c,shininess:90,...o}),
+  B=(w,h,d,m,x,y,z,par)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x||0,y||0,z||0);(par||g).add(q);return q},
+  CZ=(r,h,m)=>{const q=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,40).rotateX(Math.PI/2),m);g.add(q);return q},
+  gl={transparent:true,opacity:.4,depthWrite:false};
+ if(t==='laser'){B(.3,.3,.8,P(0x2a3350),0,0,-.1);B(.34,.34,.2,P(0x3b4770),0,0,-.45);
+  const c=e.white?[1,1,1]:rgb(e.wl),s=new THREE.Mesh(new THREE.SphereGeometry(.07,12,12),new THREE.MeshBasicMaterial({color:new THREE.Color(...c)}));s.position.z=.32;g.add(s)}
+ else if(t==='mirror'){CZ(.6,.04,P(0xdfe8ff,{specular:0xffffff}));CZ(.62,.03,P(0x56627f)).position.z=-.03}
+ else if(t==='lens'){const cx=e.f>0,pr=cx?[[0,-.12],[.25,-.1],[.5,-.01],[.5,.01],[.25,.1],[0,.12]]:[[0,-.025],[.25,-.05],[.5,-.1],[.5,.1],[.25,.05],[0,.025]];
+  g.add(new THREE.Mesh(new THREE.LatheGeometry(pr.map(p=>new THREE.Vector2(p[0],p[1])),40).rotateX(Math.PI/2),P(0x7fc8ff,{...gl,side:2})))}
+ else if(t==='pol'){CZ(.45,.03,P(0xffb35c,{...gl,opacity:.3}));const r=new THREE.Mesh(new THREE.TorusGeometry(.45,.02,6,40),P(0xffb35c));g.add(r);
+  const s=new THREE.Group();s.rotation.z=e.al*D;for(let y=-.3;y<=.31;y+=.1)B(.8-Math.abs(y)*.6,.012,.01,P(0xffd9a0),0,y,0,s);g.add(s)}
+ else if(t==='split'){CZ(.45,.03,P(0x7ff5d8,{...gl,opacity:.3}));g.add(new THREE.Mesh(new THREE.TorusGeometry(.45,.02,6,40),P(0x7ff5d8)))}
+ else if(t==='bbo'){B(.6,.6,.2,P(0xc878ff,{...gl,opacity:.5}));B(.6,.01,.2,P(0xffffff))}
+ else if(t==='slit'){const d=e.d/100,w=e.a/100,M=P(0x8892b0),bl=[[-.7,-d/2-w/2],[-d/2+w/2,d/2-w/2],[d/2+w/2,.7]];for(const k of bl)B(k[1]-k[0],1.2,.05,M,(k[0]+k[1])/2,0,0)}
+ else if(t==='screen'){e.cvs=document.createElement('canvas');e.cvs.width=512;e.cvs.height=256;e.tex=new THREE.CanvasTexture(e.cvs);e.img=new ImageData(512,256);
+  g.add(new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.4),new THREE.MeshBasicMaterial({map:e.tex,side:2})));B(2.5,1.5,.03,P(0x1b2238),0,0,-.025)}
+ else if(t==='prism'){const R=.6,sh=new THREE.Shape();for(let k=0;k<3;k++){const a=k*120*D;k?sh.lineTo(R*Math.cos(a),R*Math.sin(a)):sh.moveTo(R,0)}
+  const ge=new THREE.ExtrudeGeometry(sh,{depth:1,bevelEnabled:false}).translate(0,0,-.5),m=new THREE.Mesh(ge,P(0xa9d8ff,{...gl,opacity:.35,side:2}));
+  m.matrixAutoUpdate=false;m.matrix.makeBasis(new V(1,0,0),new V(0,0,1),new V(0,1,0));g.add(m);
+  const ed=new THREE.LineSegments(new THREE.EdgesGeometry(ge),new THREE.LineBasicMaterial({color:0xa9d8ff}));ed.matrixAutoUpdate=false;ed.matrix.copy(m.matrix);g.add(ed)}
+ e.ring=new THREE.Mesh(new THREE.TorusGeometry(t==='screen'?1.45:t==='prism'||t==='slit'?.85:t==='laser'?.5:.8,.015,6,56),new THREE.MeshBasicMaterial({color:0x4cc9f0}));g.add(e.ring);
+ g.matrixAutoUpdate=false;g.userData.eid=e.id;return g}
+function sync(){for(const e of els){frameOf(e);const sig=[e.type,e.f>0,e.d,e.a,e.al,e.white,e.wl].join();
+  if(e.sig!==sig){if(e.g){scene.remove(e.g);e.g.traverse(q=>{q.geometry&&q.geometry.dispose()})}e.g=mk(e);scene.add(e.g);e.sig=sig}
+  e.g.matrix.makeBasis(e.u,e.v,e.n).setPosition(e.c);e.g.matrixWorldNeedsUpdate=true;e.ring.visible=e===sel;
+  e.post.position.set(e.x,e.y/2,e.z);e.post.scale.y=Math.max(.01,e.y-.05)}}
+/* Strahlverfolgung in 3D */
+function hitPrism(e,r){let best=null;const R=.6;
+ for(let k=0;k<3;k++){const a0=k*120*D,a1=(k+1)*120*D,A=e.c.clone().addScaledVector(e.u,R*Math.cos(a0)).addScaledVector(e.n,R*Math.sin(a0)),
+  Bp=e.c.clone().addScaledVector(e.u,R*Math.cos(a1)).addScaledVector(e.n,R*Math.sin(a1)),am=(k+.5)*120*D,
+  nk=e.u.clone().multiplyScalar(Math.cos(am)).addScaledVector(e.n,Math.sin(am)),dn=r.d.dot(nk);if(Math.abs(dn)<1e-6)continue;
+  const t=A.clone().sub(r.p).dot(nk)/dn;if(t<.02||(best&&t>=best.t))continue;
+  const q=r.p.clone().addScaledVector(r.d,t),E=Bp.clone().sub(A),s=q.clone().sub(A).dot(E)/E.dot(E),b=q.clone().sub(e.c).dot(e.v);
+  if(s>=0&&s<=1&&Math.abs(b)<=.5)best={t,q,nk}}
+ return best}
+function hit(e,r){if(e.type==='prism')return hitPrism(e,r);
+ const dn=r.d.dot(e.n);if(Math.abs(dn)<1e-6)return null;const t=e.c.clone().sub(r.p).dot(e.n)/dn;if(t<.02)return null;
+ const q=r.p.clone().addScaledVector(r.d,t),w=q.clone().sub(e.c),a=w.dot(e.u),b=w.dot(e.v),L=LIM[e.type];
+ if(L.r?a*a+b*b>L.r*L.r:Math.abs(a)>L.a||Math.abs(b)>L.b)return null;return{t,q,a,b,w}}
+function nr(r,p,d,I,pol,fn){d=d.clone().normalize();if(pol){pol=pol.clone();pol.addScaledVector(d,-pol.dot(d));if(pol.lengthSq()<1e-9)pol=null;else pol.normalize()}
+ return{p:p,d,wl:r.wl,I,e:pol,dep:r.dep+1,fan:fn||r.fan}}
+function rot(d,k,th){return d.clone().multiplyScalar(Math.cos(th)).addScaledVector(new V().crossVectors(k,d),Math.sin(th)).addScaledVector(k,k.dot(d)*(1-Math.cos(th)))}
+function trace(){main=[];fan=[];
+ for(const e of els)if(e.type==='screen'){e.S=e.S||new Float32Array(512*256*3);e.S.fill(0);e.F=e.F||new Float32Array(512*3);e.F.fill(0);e.fy=128;e.pk=0}
+ const st=[],lz=els.find(e=>e.type==='laser');
+ if(lz){const ws=lz.white?[410,450,490,530,570,610,650,690]:[lz.wl],ph=lz.pol*D,e0=lz.u.clone().multiplyScalar(Math.cos(ph)).addScaledVector(lz.v,Math.sin(ph));
+  for(const w of ws)st.push({p:lz.c.clone().addScaledVector(lz.n,.34),d:lz.n.clone(),wl:w,I:lz.white?.6:1,e:lz.unpol?null:e0.clone(),dep:0,fan:false})}
+ let cnt=0;
+ while(st.length&&cnt++<5000){const r=st.pop();let best=null,be=null;
+  for(const e of els){if(e.type==='laser')continue;const h=hit(e,r);if(h&&(!best||h.t<best.t)){best=h;be=e}}
+  const T=best?best.t:40,P=best?best.q:r.p.clone().addScaledVector(r.d,T);
+  (r.fan?fan:main).push({a:r.p,b:P,wl:r.wl,I:r.I});
+  if(!best||r.dep>14)continue;
+  const e=be,t=e.type,n=e.n,dn=r.d.dot(n),sg=dn>0?1:-1;
+  if(t==='mirror'){const d=r.d.clone().addScaledVector(n,-2*dn);st.push(nr(r,P,d,r.I*.97,r.e&&r.e.clone().addScaledVector(n,-2*r.e.dot(n))))}
+  else if(t==='lens'){if(Math.abs(dn)<.05){st.push(nr(r,P,r.d,r.I,r.e));continue}
+   const vel=r.d.clone().addScaledVector(n,-dn).divideScalar(Math.abs(dn));vel.addScaledVector(best.w,-1/e.f);st.push(nr(r,P,n.clone().multiplyScalar(sg).add(vel),r.I*.98,r.e))}
+  else if(t==='pol'){const a=e.u.clone().multiplyScalar(Math.cos(e.al*D)).addScaledVector(e.v,Math.sin(e.al*D));a.addScaledVector(r.d,-a.dot(r.d));if(a.lengthSq()<1e-6)continue;a.normalize();
+   const I=r.e?r.I*r.e.dot(a)**2:r.I*.5;if(I>.004)st.push(nr(r,P,r.d,I,a))}
+  else if(t==='split'){st.push(nr(r,P,r.d,r.I*.5,r.e));st.push(nr(r,P,r.d.clone().addScaledVector(n,-2*dn),r.I*.5,r.e&&r.e.clone().addScaledVector(n,-2*r.e.dot(n))))}
+  else if(t==='bbo'){for(const q of[1,-1]){const d=rot(r.d,e.v,q*.1),h=e.u.clone();h.addScaledVector(d,-h.dot(d)).normalize();
+    st.push(nr(r,P,d,r.I*.5,q>0?h:new V().crossVectors(d,h)))}}
+  else if(t==='slit'){if(Math.abs(best.a)>e.d/200+e.a/100)continue;const lam=r.wl/1000,N=90;
+   for(let i=-N;i<=N;i++){const th=i/N*.13,s=Math.sin(th),ph=Math.PI*e.d*s/lam,x=Math.PI*e.a*s/lam,I=r.I*Math.cos(ph)**2*(x?(Math.sin(x)/x)**2:1);
+    if(I<.012)continue;st.push(nr(r,P,n.clone().multiplyScalar(sg*Math.cos(th)).addScaledVector(e.u,s),I,r.e,true))}}
+  else if(t==='screen'){const px=(best.a/2.4+.5)*512,py=(.5-best.b/1.4)*256,c=rgb(r.wl),ix=Math.round(px),iy=Math.round(py);
+   if(r.fan){e.fy=py;for(let k=-3;k<=3;k++){const j=ix+k;if(j<0||j>=512)continue;const w=r.I*.4*Math.exp(-k*k/2.5);e.F[j*3]+=c[0]*w;e.F[j*3+1]+=c[1]*w;e.F[j*3+2]+=c[2]*w}}
+   else for(let dy=-5;dy<=5;dy++)for(let dx=-5;dx<=5;dx++){const x=ix+dx,y=iy+dy;if(x<0||x>=512||y<0||y>=256)continue;const w=r.I*Math.exp(-(dx*dx+dy*dy)/6),i=(y*512+x)*3;e.S[i]+=c[0]*w;e.S[i+1]+=c[1]*w;e.S[i+2]+=c[2]*w}}
+  else if(t==='prism'){const Nx=best.nk,ent=r.d.dot(Nx)<0,F=ent?Nx.clone():Nx.clone().negate(),ci=-r.d.dot(F),nn=1.45+.02/((r.wl/1000)**2),eta=ent?1/nn:nn,k=1-eta*eta*(1-ci*ci);
+   if(k<0)st.push(nr(r,P,r.d.clone().addScaledVector(F,2*ci),r.I,r.e));
+   else st.push(nr(r,P,r.d.clone().multiplyScalar(eta).addScaledVector(F,eta*ci-Math.sqrt(k)),r.I*.96,r.e))}}}
+/* Darstellung der Strahlen und Schirme */
+const dum=new THREE.Object3D(),Y=new V(0,1,0),col=new THREE.Color();
+function drawBeams(){let n=0;
+ for(const s of main){if(s.I<.015||n>=CAP)continue;const d=s.b.clone().sub(s.a),len=d.length();if(len<1e-4)continue;
+  dum.position.copy(s.a).addScaledVector(d,.5);dum.quaternion.setFromUnitVectors(Y,d.divideScalar(len));dum.scale.set(1,len,1);dum.updateMatrix();
+  core.setMatrixAt(n,dum.matrix);glow.setMatrixAt(n,dum.matrix);const c=rgb(s.wl),k=Math.min(1,s.I);
+  col.setRGB(c[0]*k,c[1]*k,c[2]*k);core.setColorAt(n,col);col.setRGB(c[0]*k*.22,c[1]*k*.22,c[2]*k*.22);glow.setColorAt(n,col);n++}
+ core.count=glow.count=n;for(const m of[core,glow]){m.instanceMatrix.needsUpdate=true;m.instanceColor.needsUpdate=true}
+ let f=0;for(const s of fan){if(f>=FC||s.I<.02)continue;const c=rgb(s.wl),k=Math.min(1,s.I)*.5;
+  fp.set([s.a.x,s.a.y,s.a.z,s.b.x,s.b.y,s.b.z],f*6);fcol.set([c[0]*k,c[1]*k,c[2]*k,c[0]*k,c[1]*k,c[2]*k],f*6);f++}
+ fg.setDrawRange(0,f*2);fg.attributes.position.needsUpdate=true;fg.attributes.color.needsUpdate=true}
+function drawScreens(){for(const e of els){if(e.type!=='screen')continue;const d=e.img.data,S=e.S,F=e.F;let pk=0,sx=0,sm=0,TR=0,TG=0,TB=0;const pf=e.prof||(e.prof=new Float32Array(512));pf.fill(0);
+  for(let y=0;y<256;y++){const vp=Math.exp(-.5*((y-e.fy)/80)**2);for(let x=0;x<512;x++){const i=(y*512+x)*3,o=(y*512+x)*4,r=S[i]+F[x*3]*vp,g=S[i+1]+F[x*3+1]*vp,b=S[i+2]+F[x*3+2]*vp;
+   const m=Math.max(r,g,b);if(m>pk)pk=m;if(m>pf[x])pf[x]=m;sx+=m*x;sm+=m;TR+=r;TG+=g;TB+=b;d[o]=255*(1-Math.exp(-1.3*r))+6;d[o+1]=255*(1-Math.exp(-1.3*g))+8;d[o+2]=255*(1-Math.exp(-1.3*b))+14;d[o+3]=255}}
+  e.cvs.getContext('2d').putImageData(e.img,0,0);e.tex.needsUpdate=true;e.pk=pk;e.cx=sm>0?sx/sm:256;{const mx=Math.max(TR,TG,TB,1e-9);e.col=[TR/mx,TG/mx,TB/mx]}
+  if(e===sel&&$('rd'))$('rd').textContent=Math.min(100,Math.round(pk*100))+' %'}}
+/* Mess-Kacheln & einklappbare Fenster */
+const TL=new Map();let tk=0;
+let _mv=false;
+function tileAct(b){const t=b.closest('.tile');if(!t)return;
+ if(b.dataset.a==='size'){const S=[196,340,520],i=(S.indexOf(parseInt(t.dataset.sz||196))+1)%3;t.dataset.sz=S[i];t.style.width=Math.min(S[i],innerWidth-20)+'px';t.style.fontSize=[12,13,15][i]+'px';t.classList.remove('c')}
+ else{if(document.fullscreenElement===t){document.exitFullscreen();return}const r=t.requestFullscreen||t.webkitRequestFullscreen;if(!r)return toast('Vollbild nicht verfügbar – bitte F11 nutzen.');t.classList.remove('c');const p=r.call(t);p&&p.catch&&p.catch(()=>toast('Vollbild blockiert – bitte F11 nutzen.'))}}
+document.addEventListener('click',ev=>{if(_mv){_mv=false;return}const b=ev.target.closest&&ev.target.closest('.tb2');if(b){tileAct(b);return}const h=ev.target.closest&&ev.target.closest('.hd');if(h&&h.parentElement.classList.contains('pn'))h.parentElement.classList.toggle('c')});
+document.addEventListener('pointerdown',ev=>{const h=ev.target.closest&&ev.target.closest('.hd');if(!h||ev.target.closest('.tb2'))return;const p=h.parentElement;if(!p.classList.contains('pn')||p.id==='top')return;
+ const r=p.getBoundingClientRect(),ar=app.getBoundingClientRect(),st={x:ev.clientX,y:ev.clientY,l:r.left-ar.left,t:r.top-ar.top,w:r.width,go:false};
+ const mv=e=>{const dx=e.clientX-st.x,dy=e.clientY-st.y;
+  if(!st.go){if(Math.hypot(dx,dy)<5)return;st.go=true;_mv=true;p.style.width=st.w+'px';
+   if(p.classList.contains('tile')&&p.parentElement!==app){p.style.fontSize='12px';p.style.position='absolute';app.appendChild(p)}
+   p.style.right='auto';p.style.bottom='auto';p.style.margin='0'}
+  p.style.left=Math.max(0,Math.min(app.clientWidth-60,st.l+dx))+'px';p.style.top=Math.max(0,Math.min(app.clientHeight-30,st.t+dy))+'px'};
+ const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);setTimeout(()=>_mv=false,60)};
+ addEventListener('pointermove',mv);addEventListener('pointerup',up)});
+$('all').onclick=()=>{const ps=[...document.querySelectorAll('.pn')].filter(p=>p.id!=='top'),open=ps.some(p=>!p.classList.contains('c'));ps.forEach(p=>p.classList.toggle('c',open))};
+function mkTile(id,title,sc){const t=document.createElement('div');t.className='pn tile'+(innerWidth<720?' c':'');
+ t.innerHTML='<div class="hd"><b>'+title+'</b>'+(sc?'<span class="tb2" data-a="size" title="Größe wechseln">⤢</span><span class="tb2" data-a="fs" title="Vollbild">⛶</span>':'')+'<span class="tg">▾</span></div>'+(sc?'<canvas class="tv" width="512" height="256"></canvas><canvas class="pf" width="512" height="120"></canvas>':'')+'<div class="inf"></div>';
+ $('tiles').appendChild(t);const o={t,inf:t.querySelector('.inf'),tv:t.querySelector('.tv'),pf:t.querySelector('.pf')};
+ if(sc)o.tv.onclick=()=>{sel=els.find(e=>e.id===id)||null;ui()};TL.set(id,o);return o}
+function tiles(){tk++;const scr=els.filter(e=>e.type==='screen');
+ for(const [id,o] of [...TL])if(id!=='lz'&&!scr.some(e=>e.id===id)){o.t.remove();TL.delete(id)}
+ if(!TL.has('lz'))mkTile('lz','📡 Laser &amp; Szene',false);
+ scr.forEach((e,i)=>{if(!TL.has(e.id))mkTile(e.id,'',true);TL.get(e.id).t.querySelector('b').textContent='📺 Schirm '+(i+1)});
+ if(tk%3)return;
+ const z=lzr(),Lt=TL.get('lz');
+ if(z&&!Lt.t.classList.contains('c')){const wl=z.wl,c=rgb(wl).map(v=>v*255|0),n=main.length+fan.length;
+  Lt.inf.innerHTML=(z.white?'Weißlicht · 410–690 nm':'λ = <b>'+wl+' nm</b> <span style="color:rgb('+c+')">●</span><br>f = '+(299792/wl).toFixed(0)+' THz · E = '+(1239.84/wl).toFixed(2)+' eV')+'<br>Polarisation: '+(z.unpol?'unpolarisiert':z.pol+'°')+'<br>Strahlsegmente: '+n+' · Bauteile: '+(els.length-1)}
+ for(const e of scr){const o=TL.get(e.id);if(o.t.classList.contains('c')||!e.cvs||!e.prof)continue;
+  o.tv.getContext('2d').drawImage(e.cvs,0,0,512,256);
+  const g=o.pf.getContext('2d'),pf=e.prof,pk=e.pk||0;g.fillStyle='#070b14';g.fillRect(0,0,512,120);g.lineWidth=2.5;
+  g.beginPath();g.moveTo(0,120);for(let i=0;i<512;i++)g.lineTo(i,118-(1-Math.exp(-1.3*pf[i]))*112);g.lineTo(511,120);g.closePath();
+  g.fillStyle='rgba(76,201,240,.35)';g.fill();g.strokeStyle='#4cc9f0';g.stroke();
+  if(pk<.02){o.inf.textContent='Kein Licht auf dem Schirm.';continue}
+  g.strokeStyle='rgba(255,255,255,.45)';g.setLineDash([6,8]);const cx=e.cx;g.beginPath();g.moveTo(cx,0);g.lineTo(cx,120);g.stroke();g.setLineDash([]);
+  const pe=[];for(let x=3;x<509;x++){const v=pf[x];if(v<pk*.5)continue;let ok=true;for(let k=-6;k<=6;k++)if(pf[Math.max(0,Math.min(511,x+k))]>v){ok=false;break}if(ok&&(!pe.length||x-pe[pe.length-1]>6))pe.push(x)}
+  const cc=(e.col||[1,1,1]).map(v=>v*255|0);
+  o.inf.innerHTML='Spitze: <b>'+Math.min(100,Math.round(pk*100))+' %</b> <span style="color:rgb('+cc+')">●</span><br>Schwerpunkt: '+((e.cx/512-.5)*2.4).toFixed(2)+' Einh.<br>Maxima: '+pe.length+(pe.length>2?' · Abstand ≈ '+((pe[pe.length-1]-pe[0])/(pe.length-1)*2.4/512).toFixed(3)+' Einh.':'')}}
+function frame(){sync();trace();drawBeams();drawScreens();tiles();cam();renderer.render(scene,camera);requestAnimationFrame(frame)}
+/* Bedienung */
+const rc=new THREE.Raycaster(),ndc=new THREE.Vector2();
+function setRay(ev){const r=cv.getBoundingClientRect();ndc.set((ev.clientX-r.left)/r.width*2-1,-((ev.clientY-r.top)/r.height)*2+1);rc.setFromCamera(ndc,camera)}
+function pick(ev){setRay(ev);const h=rc.intersectObjects(els.map(e=>e.g).filter(Boolean),true);for(const x of h){let o=x.object;while(o&&o.userData.eid==null)o=o.parent;if(o)return els.find(e=>e.id===o.userData.eid)}return null}
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('pointerdown',ev=>{const hit=pick(ev);cv.setPointerCapture(ev.pointerId);
+ if(hit&&ev.button===0&&!ev.shiftKey){sel=hit;const pt=new V();rc.ray.intersectPlane(new THREE.Plane(new V(0,1,0),-hit.y),pt);drag={m:'mv',dx:hit.x-pt.x,dz:hit.z-pt.z,lx:ev.clientX,ly:ev.clientY}}
+ else{if(!hit)sel=null;drag={m:(ev.button===2||ev.shiftKey)?'pan':'orb',lx:ev.clientX,ly:ev.clientY}}ui()});
+cv.addEventListener('pointermove',ev=>{if(!drag)return;
+ if(drag.m==='mv'&&sel){setRay(ev);const pt=new V();if(rc.ray.intersectPlane(new THREE.Plane(new V(0,1,0),-sel.y),pt)){sel.x=Math.max(-12,Math.min(12,pt.x+drag.dx));sel.z=Math.max(-7,Math.min(7,pt.z+drag.dz))}}
+ else{const dx=ev.clientX-drag.lx,dy=ev.clientY-drag.ly;drag.lx=ev.clientX;drag.ly=ev.clientY;
+  if(drag.m==='orb'){az-=dx*.006;el=Math.max(.05,Math.min(1.5,el+dy*.006))}
+  else{const k=rad*.0016;tgt.x+=(Math.sin(az)*dx-Math.cos(az)*dy)*k;tgt.z+=(-Math.cos(az)*dx-Math.sin(az)*dy)*k}}});
+cv.addEventListener('pointerup',()=>drag=null);
+cv.addEventListener('wheel',ev=>{ev.preventDefault();rad=Math.max(3,Math.min(30,rad*Math.exp(ev.deltaY*.001)))},{passive:false});
+addEventListener('keydown',ev=>{if(/INPUT|SELECT/.test(ev.target.tagName))return;const k=ev.key.toLowerCase();
+ if((k==='delete'||k==='backspace')&&sel&&sel.type!=='laser')del();
+ else if((ev.ctrlKey||ev.metaKey)&&k==='d'){ev.preventDefault();dup()}
+ else if(sel&&(k==='q'||k==='e')){sel.yaw+=(k==='e'?1:-1)*5*D;syncAng()}});
+function del(){removeEl(sel);els=els.filter(e=>e!==sel);sel=null;ui()}
+function dup(){if(!sel||sel.type==='laser')return;const c={};for(const k of KEYS)if(sel[k]!==undefined)c[k]=sel[k];
+ sel=add(c.type,0,0,0,{...c,x:c.x+.5,z:c.z+.5});ui();toast('Bauteil dupliziert.')}
+function deg(r){return Math.round(((r/D)%360+360)%360)}
+function syncAng(){const i=document.querySelector('#sp input[data-k=yaw]');if(i){const v=deg(sel.yaw);i.value=v;i.previousElementSibling.textContent=v+'°'}}
+function row(l,k,mn,mx,st,v,u){return`<label>${l}<b>${v}${u}</b><input type="range" data-k="${k}" data-u="${u}" min="${mn}" max="${mx}" step="${st}" value="${v}"></label>`}
+function ui(){const e=sel,sp=$('sp');
+ if(!e){sp.innerHTML='<p class="mu">Bauteil anklicken und am Tisch ziehen. Leerer Raum: ziehen = Kamera drehen, Rechtsklick oder Shift + ziehen = verschieben, Mausrad = Zoom. Q/E = drehen, Entf = löschen.</p>';return}
+ let h=`<b>${NAME[e.type]}</b>`;h+=row('Drehung (Gieren)','yaw',0,360,1,deg(e.yaw),'°');h+=row('Neigung','pitch',-60,60,1,Math.round(e.pitch/D),'°');h+=row('Höhe über Tisch','y',.3,2.5,.05,+e.y.toFixed(2),'');
+ if(e.type==='lens')h+=row('Brennweite f (− = zerstreuend)','f',-8,8,.25,e.f,'');
+ if(e.type==='pol')h+=row('Durchlassrichtung','al',0,180,1,e.al,'°');
+ if(e.type==='slit'){h+=row('Spaltabstand d','d',16,60,1,e.d,' µm');h+=row('Spaltbreite a','a',3,12,1,e.a,' µm')}
+ if(e.type==='screen')h+='<p class="mu">Helligkeit ≈ <b id="rd">0 %</b></p>';
+ if(e.type!=='laser')h+='<button id="dup" style="margin-top:8px;width:100%">⧉ Bauteil duplizieren (Strg+D)</button><button id="del" style="margin-top:6px;width:100%">Bauteil löschen</button>';
+ sp.innerHTML=h;const b=$('del');if(b)b.onclick=del;const c=$('dup');if(c)c.onclick=dup}
+$('sp').addEventListener('input',ev=>{const i=ev.target,k=i.dataset.k;if(!sel||!k)return;let v=+i.value;
+ if(k==='yaw')sel.yaw=v*D;else if(k==='pitch')sel.pitch=v*D;else{if(k==='f'&&Math.abs(v)<.8)v=v<0?-.8:.8;sel[k]=v}i.previousElementSibling.textContent=v+i.dataset.u});
+function lzr(){return els.find(e=>e.type==='laser')}
+function lzUI(){const z=lzr();if(!z)return;$('wl').value=z.wl;$('wlv').textContent=z.wl+' nm';$('wh').checked=z.white;$('pl').value=z.pol;$('plv').textContent=z.pol+'°';$('un').checked=z.unpol}
+$('wl').oninput=e=>{const z=lzr();z.wl=+e.target.value;$('wlv').textContent=z.wl+' nm'};
+$('wh').onchange=e=>lzr().white=e.target.checked;
+$('pl').oninput=e=>{const z=lzr();z.pol=+e.target.value;$('plv').textContent=z.pol+'°'};
+$('un').onchange=e=>lzr().unpol=e.target.checked;
+const TOOLS=[['mirror','▬','Spiegel',45],['lens','◖◗','Sammellinse',0,{f:3}],['lens','◗◖','Zerstreuungslinse',0,{f:-3}],['prism','△','Prisma',0],['pol','▤','Polarisationsfilter',0],['slit','▮▮','Doppelspalt',0],['split','◫','Strahlteiler',45],['bbo','✦','Verschränkungs-Kristall',0],['screen','▭','Schirm',0]];
+for(const t of TOOLS){const b=document.createElement('button');b.innerHTML=`<b>${t[1]}</b>${t[2]}`;
+ b.onclick=()=>{sel=add(t[0],-1+Math.random()*1.5,(Math.random()-.5)*1.5,t[3],t[4]);ui()};$('tb').appendChild(b)}
+function clear(){const z=lzr()||add('laser',-5,0,0);for(const e of els.slice())if(e!==z)removeEl(e);els=[z];Object.assign(z,{x:-5,y:1,z:0,yaw:0,pitch:0,white:false,wl:650,pol:0,unpol:false});sel=null;lzUI();ui()}
+function preset(n){clear();const z=lzr();
+ if(n===0){add('slit',-2,0,0);add('screen',5,0,0)}
+ if(n===1){z.white=true;add('prism',0,0,0);add('screen',3.5,3.2,42)}
+ if(n===2){add('pol',-3,0,0,{al:0});add('pol',-1.5,0,0,{al:45});add('pol',0,0,0,{al:90});add('screen',4,0,0)}
+ if(n===3){z.wl=420;add('bbo',-2,0,0);add('screen',6,0,0)}
+ if(n===4){add('lens',-3,0,0,{f:3});add('mirror',1,0,45);add('screen',1,-4,90)}
+ if(n===5){z.white=true;add('slit',-2,0,0,{d:30,a:6});add('screen',5,0,0)}
+ if(n===6){add('mirror',-2,0,-45);add('mirror',-2,3,135);add('pol',-.5,3,0,{al:45});add('mirror',1,3,45);add('mirror',1,0,225);add('slit',3,0,0);add('screen',7.5,0,0)}
+ if(n===7){add('split',-2,0,45);add('mirror',2,0,0);add('mirror',-2,-3,90);add('screen',-2,4,90)}
+ if(n===8){z.y=.6;add('mirror',-2,0,0,{y:.6,pitch:-45*D});add('mirror',-2,0,180,{y:2.2,pitch:45*D});add('screen',5,0,0,{y:2.2})}
+ if(n===9){z.z=.15;add('lens',-3,0,0,{f:1.5});add('lens',1.5,0,0,{f:3});add('screen',5,0,0)}
+ if(n===10){z.pol=45;add('split',-2,0,45);add('pol',1,0,0,{al:0});add('screen',4.5,0,0);add('mirror',-2,-3,45);add('pol',1,-3,0,{al:90});add('screen',4.5,-3,0)}
+ if(n===11){z.wl=420;add('bbo',-2,0,0);add('pol',1.5,-.35,0,{al:0});add('pol',1.5,.35,0,{al:45});add('screen',6,0,0)}
+ sel=null;lzUI();ui()}
+$('pre').onchange=e=>{if(e.target.value!=='')preset(+e.target.value);e.target.value=''};
+$('clr').onclick=clear;
+async function save(){const data=JSON.stringify({format:'laser-labor-3d',version:1,els:els.map(e=>{const o={};for(const k of KEYS)if(e[k]!==undefined)o[k]=e[k];return o})},null,1),fn='laser-labor-3d-konfiguration.json';
+ try{const d=window.claude&&claude.use?await claude.use('downloads'):null;if(d){await d.save({filename:fn,data});toast('Konfiguration gespeichert.');return}}catch(err){if(err&&err.code==='declined')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000);toast('Konfiguration gespeichert.')}
+$('sv').onclick=save;$('ldb').onclick=()=>$('ld').click();
+$('ld').onchange=async ev=>{const f=ev.target.files[0];ev.target.value='';if(!f)return;
+ try{const j=JSON.parse(await f.text());if(j.format!=='laser-labor-3d'||!Array.isArray(j.els))throw 0;
+  for(const e of els)removeEl(e);els=[];uid=1;sel=null;
+  for(const o of j.els){if(!o||!NAME[o.type]||!isFinite(o.x)||!isFinite(o.z)||(o.type==='laser'&&lzr()))continue;
+   const c={};for(const k of KEYS){if(o[k]===undefined||k==='type'||k==='x'||k==='z')continue;c[k]=(k==='white'||k==='unpol')?!!o[k]:+o[k]}
+   if(c.wl)c.wl=Math.max(400,Math.min(700,c.wl));add(o.type,+o.x,+o.z,0,c)}
+  if(!lzr())add('laser',-5,0,0);lzUI();ui();toast('Konfiguration geladen.')}
+ catch(e){toast('Datei konnte nicht gelesen werden.')}};
+function updFs(){const fe=document.fullscreenElement||document.webkitFullscreenElement;$('fs').textContent=fe===app?'✕ Vollbild beenden':'⛶ Vollbild'}
+$('fs').onclick=()=>{try{const d=document;if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}
+ else{const r=(app.requestFullscreen||app.webkitRequestFullscreen);if(!r)return toast('Vollbild wird hier nicht unterstützt – bitte F11 nutzen.');const p=r.call(app);p&&p.catch&&p.catch(()=>toast('Vollbild blockiert – bitte F11 nutzen.'))}}catch(e){toast('Vollbild blockiert – bitte F11 nutzen.')}};
+document.addEventListener('fullscreenchange',()=>{resize();updFs()});document.addEventListener('webkitfullscreenchange',()=>{resize();updFs()});
+resize();preset(0);requestAnimationFrame(frame);
+</script></body></html>
