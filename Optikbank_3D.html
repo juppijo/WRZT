@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Optikbank 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0c09;--pn:rgba(22,20,15,.93);--gold:#d4a73a;--tx:#ece4d0;--mu:#9a917a;--ln:#3a3220;--red:#d9553f;--vio:#9b6bff;--cy:#4ec9d4;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root{--bg:#f6f1e4;--pn:rgba(255,252,243,.95);--gold:#a67c12;--tx:#2a2412;--mu:#6d6448;--ln:#d8cca6;--red:#b8321e;--vio:#6a3fd0;--cy:#0f8d99;color-scheme:light}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:Barlow,system-ui,sans-serif}
+#app{position:relative;height:100%;background:var(--bg);overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#bar{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:3}
+button{background:var(--pn);color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:6px 10px;font:600 13px Barlow,sans-serif;cursor:pointer}
+button:hover{background:var(--gold);color:var(--bg)}
+#pn{position:absolute;top:50px;left:8px;width:min(340px,92vw);max-height:calc(100% - 62px);overflow:auto;background:var(--pn);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;z-index:2}
+#pn.off{display:none}
+h1{font:400 26px 'Bebas Neue',Impact,sans-serif;letter-spacing:.06em;color:var(--gold);margin:4px 0}
+details{border-top:1px solid var(--ln);padding:6px 0}
+summary{cursor:pointer;font:400 18px 'Bebas Neue',Impact,sans-serif;letter-spacing:.06em;color:var(--gold)}
+label{display:block;font-size:13px;color:var(--mu);margin-top:6px}
+label b{color:var(--tx);float:right}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:5px;padding:5px}
+.row{display:flex;gap:6px;align-items:center;margin-top:7px;font-size:14px;flex-wrap:wrap}
+.el{border:1px solid var(--ln);border-radius:6px;padding:4px 8px 6px;margin-top:6px;position:relative}
+.el>b{font-size:14px;color:var(--gold)}.el>button{position:absolute;right:6px;top:4px;padding:1px 7px}
+#info{font-size:13px;line-height:1.55}#info i{color:var(--mu);font-style:normal}
+</style></head>
+<body>
+<div id="app"><canvas id="cv"></canvas>
+<div id="bar"><button id="tg">☰ Regler</button><button id="fs">⛶ Vollbild</button><button id="pl">❚❚ Pause</button></div>
+<div id="pn">
+<h1>Optikbank 3D</h1>
+<details open><summary>Quelle</summary>
+<label>Art<select id="src"><option value="unpol">Unpolarisiert</option><option value="lin">Linear polarisiert</option></select></label>
+<label>Winkel <b id="v_sa"></b><input type="range" id="sa" min="0" max="180" value="0"></label>
+<label>Photonen pro Sekunde <b id="v_rate"></b><input type="range" id="rate" min="1" max="60" value="10"></label>
+</details>
+<details open><summary>Bauteile (in Strahlrichtung)</summary>
+<div class="row" id="add"><button data-add="P">+ Polarisator</button><button data-add="B">+ Strahlteiler</button><button data-add="X">+ BBO</button><button data-add="D">+ Doppelspalt</button></div>
+<div id="els"></div><div class="row"><button id="clr">Alle entfernen</button></div>
+</details>
+<details open><summary>Statistik</summary>
+<div class="row"><button id="b1">+1 000 sofort</button><button id="b2">+100 000 sofort</button><button id="rs">Zähler zurücksetzen</button></div>
+<div id="info"></div></details>
+<details><summary>Ansicht</summary>
+<label>Zoom <b></b><input type="range" id="zoom" min="0.4" max="3" step="0.05" value="1"></label>
+<div class="row"><input type="checkbox" id="spin" checked><span>Kamera dreht automatisch (zum Steuern ziehen)</span></div>
+</details>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const cv=$('cv'),cx=cv.getContext('2d'),app=$('app');
+const R=Math.PI/180,L=10,SIDE=3,SP=5;
+const S={src:'unpol',sa:0,rate:10,yaw:-.7,pit:.38,zoom:1};
+let W,H,run=true,last=0,acc=0,uid=1,P=[],hits=[],hi=0,C,els=[{id:1,t:'D',d:2,a:0,b:0,side:1}];
+function fit(){const d=window.devicePixelRatio||1,r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',fit);
+['fullscreenchange','webkitfullscreenchange'].forEach(e=>document.addEventListener(e,()=>setTimeout(fit,60)));
+$('fs').onclick=()=>{try{if(document.fullscreenElement||document.webkitFullscreenElement)(document.exitFullscreen||document.webkitExitFullscreen).call(document);else(app.requestFullscreen||app.webkitRequestFullscreen).call(app)}catch(e){}};
+$('tg').onclick=()=>$('pn').classList.toggle('off');
+$('pl').onclick=()=>{run=!run;$('pl').textContent=run?'❚❚ Pause':'▶ Weiter'};
+function reset(){C={n:0,scr:0,pairs:0,idl:0,coin:0,side:{}};P=[];hits=[];hi=0}
+['src','sa','rate'].forEach(k=>{const e=$(k),h=()=>{S[k]=e.tagName==='SELECT'?e.value:+e.value;const v=$('v_'+k);if(v)v.textContent=S[k]+(k==='rate'?' /s':'°');if(k!=='rate')reset()};e.oninput=h;h()});
+$('zoom').oninput=e=>S.zoom=+e.target.value;
+$('rs').onclick=reset;$('b1').onclick=()=>batch(1000);$('b2').onclick=()=>batch(100000);
+$('clr').onclick=()=>{els=[];ui();reset()};
+$('add').onclick=e=>{const t=e.target.dataset.add;if(!t||els.length>=8||(t==='X'&&els.some(x=>x.t==='X')))return;
+ els.push({id:++uid,t,a:0,d:2,b:0,side:els.filter(x=>x.t==='B').length%2?-1:1});ui();reset()};
+$('els').oninput=e=>{const d=e.target.dataset;if(d.i===undefined)return;els[+d.i][d.k]=+e.target.value;e.target.previousElementSibling&&0;e.target.parentNode.querySelector('b').textContent=e.target.value+(d.k==='d'?'':'°');reset()};
+$('els').onclick=e=>{const r=e.target.dataset.r;if(r===undefined)return;els.splice(+r,1);ui();reset()};
+const sl=(i,k,l,v,mn,mx,u,st)=>'<label>'+l+' <b>'+v+u+'</b><input type="range" data-i="'+i+'" data-k="'+k+'" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+v+'"></label>';
+function ui(){$('els').innerHTML=els.map((e,i)=>{const nm={P:'Polarisator',B:'Strahlteiler 50/50',X:'BBO-Kristall',D:'Doppelspalt'}[e.t];let c='';
+ if(e.t==='P')c=sl(i,'a','Winkel',e.a,0,180,'°',1);if(e.t==='D')c=sl(i,'d','Spaltabstand d',e.d,1,4,'',.1);if(e.t==='X')c=sl(i,'b','Idler-Analysator β',e.b,0,180,'°',1);
+ return '<div class="el"><b>'+(i+1)+'. '+nm+'</b><button data-r="'+i+'">✕</button>'+c+'</div>'}).join('')}
+// Kamera
+let dr=null;
+cv.onpointerdown=e=>{dr=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId)};
+cv.onpointermove=e=>{if(!dr)return;S.yaw+=(e.clientX-dr[0])*.008;S.pit=Math.max(-1.2,Math.min(1.4,S.pit+(e.clientY-dr[1])*.008));dr=[e.clientX,e.clientY];$('spin').checked=false};
+cv.onpointerup=cv.onpointercancel=()=>dr=null;
+cv.addEventListener('wheel',e=>{e.preventDefault();S.zoom=Math.max(.4,Math.min(3,S.zoom*(e.deltaY<0?1.1:.9)));$('zoom').value=S.zoom},{passive:false});
+function pj(x,y,z){x-=L/2;const cy=Math.cos(S.yaw),sy=Math.sin(S.yaw),cp=Math.cos(S.pit),sp=Math.sin(S.pit);
+ let X=x*cy+z*sy,Z=-x*sy+z*cy,Y=y*cp-Z*sp;Z=y*sp+Z*cp;
+ const k=18/(18+Z),F=Math.min(W*.075,H*.14)*S.zoom;return[W/2+X*k*F,H*.5-Y*k*F,Z,k]}
+// Physik
+const sinc=x=>x?Math.sin(x)/x:1;
+function ds(e){for(;;){const u=Math.random()*2-1;if(Math.random()<Math.pow(Math.cos(6*e.d*u),2)*Math.pow(sinc(5*u),2))return u}}
+function trace(anim){
+ C.n++;let a=S.src==='unpol'?Math.random()*Math.PI:S.sa*R,x=0,z=0,m=0,end='screen',ent=false,idl=null,xb=0,zb=0;
+ const X=els.find(e=>e.t==='X'),V='#9b6bff',G='#d4a73a';let col=X?V:G;
+ const pts=[[0,0,0]],cols=[col],n=els.length,gap=L/(n+1);
+ const mv=nx=>{z+=m*(nx-x);x=nx;pts.push([x,0,z]);cols.push(col)};
+ for(let i=0;i<n;i++){const e=els[i];mv((i+1)*gap);
+  if(e.t==='P'){
+   if(ent){const ok=Math.random()<.5;idl.a=e.a*R+(ok?0:Math.PI/2);idl.k='lin';ent=false;if(!ok){end='abs';break}a=e.a*R}
+   else{if(Math.random()>=Math.pow(Math.cos(e.a*R-a),2)){end='abs';break}a=e.a*R}}
+  else if(e.t==='B'){if(Math.random()<.5){pts.push([x,0,e.side*SIDE]);cols.push(col);end='side';C.side[e.id]=(C.side[e.id]||0)+1;break}}
+  else if(e.t==='D'){m+=ds(e)*1.5/(L-x)}
+  else if(e.t==='X'){col=G;ent=true;idl={k:'unp',a:0};xb=x;zb=z;C.pairs++}}
+ let hit=null;
+ if(end==='screen'){mv(L);hit={y:(Math.random()-.5)*1.8,z:z};pts[pts.length-1][1]=hit.y;C.scr++}
+ const out=[{pts,cols,end,hit}];
+ if(idl){const ok=Math.random()<(idl.k==='unp'?.5:Math.pow(Math.cos(X.b*R-idl.a),2));
+  if(ok){C.idl++;if(end==='screen'||end==='side')C.coin++}
+  const e2=ok?[xb+3,0,zb+3.2]:[xb+1.8,0,zb+1.92];
+  out.push({pts:[[xb,0,zb],e2],cols:['#4ec9d4','#4ec9d4'],end:ok?'idl':'abs',hit:null})}
+ return out}
+function batch(k){for(let i=0;i<k;i++){for(const p of trace(false))if(p.hit)addHit(p.hit)}}
+function addHit(h){if(hits.length<5000)hits.push(h);else hits[hi++%5000]=h}
+function spawn(){for(const p of trace(true)){p.L=[0];let T=0;for(let i=1;i<p.pts.length;i++){const a=p.pts[i-1],b=p.pts[i],l=Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]);p.L.push(l);T+=l}p.T=T;p.s=0;p.age=0;P.push(p)}}
+function at(p){let s=p.s;const q=p.pts;for(let i=1;i<q.length;i++){const l=p.L[i];if(s<=l||i===q.length-1){const f=l?Math.min(1,s/l):1,a=q[i-1],b=q[i];return{q:[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f],c:p.cols[i]}}s-=l}}
+function step(dt){
+ if(run){acc+=dt*S.rate;while(acc>=1){acc--;spawn()}}
+ if($('spin').checked&&!dr)S.yaw+=dt*.12;
+ if(!run)return;
+ for(const p of P){if(p.s<p.T){p.s+=SP*dt;if(p.s>=p.T&&p.hit)addHit(p.hit)}else p.age+=dt}
+ P=P.filter(p=>p.age<.5)}
+// Zeichnen
+let col;
+function poly(v,f,al,st){cx.beginPath();v.forEach((q,i)=>{const p=pj(...q);i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1])});cx.closePath();
+ if(f){cx.globalAlpha=al;cx.fillStyle=f;cx.fill();cx.globalAlpha=1}if(st){cx.strokeStyle=st;cx.lineWidth=1.3;cx.stroke()}}
+function line(a,b,c,w,al){const p=pj(...a),q=pj(...b);cx.globalAlpha=al||1;cx.strokeStyle=c;cx.lineWidth=w;cx.beginPath();cx.moveTo(p[0],p[1]);cx.lineTo(q[0],q[1]);cx.stroke();cx.globalAlpha=1}
+function disc(c,nx,nz,r,ang,f,al,hatch){const N=28,v=[];for(let i=0;i<N;i++){const t=i/N*6.2832,u=Math.cos(t)*r,w=Math.sin(t)*r;v.push([c[0]-nz*u,c[1]+w,c[2]+nx*u])}
+ poly(v,f,al,f);if(hatch){const d=[Math.cos(ang)*-nz,Math.sin(ang),Math.cos(ang)*nx];for(let o=-.9;o<=.9;o+=.15){const q=[-nz*0,0,0],bx=[c[0],c[1],c[2]],pp=[-nz,0,nx],cc=[bx[0]+pp[0]*o*r*Math.cos(ang+1.5708)*0,0,0];
+  const ox=-Math.sin(ang)*o*r,oy=Math.cos(ang)*o*r,L2=Math.sqrt(Math.max(0,r*r-o*o*r*r))*.98,
+  base=[c[0]-nz*ox,c[1]+oy,c[2]+nx*ox];line([base[0]-d[0]*L2,base[1]-d[1]*L2,base[2]-d[2]*L2],[base[0]+d[0]*L2,base[1]+d[1]*L2,base[2]+d[2]*L2],f,1,.5)}}}
+function box(c,s,f,al){const[a,b,d]=s,v=[];for(const i of[-1,1])for(const j of[-1,1])for(const k of[-1,1])v.push([c[0]+i*a,c[1]+j*b,c[2]+k*d]);
+ [[0,1,3,2],[4,5,7,6],[0,1,5,4],[2,3,7,6],[0,2,6,4],[1,3,7,5]].forEach(q=>poly(q.map(i=>v[i]),f,al,f))}
+function draw(){
+ const cs=getComputedStyle(document.documentElement),g=k=>cs.getPropertyValue(k).trim();
+ const gold=g('--gold'),tx=g('--tx'),mu=g('--mu'),red=g('--red'),vio=g('--vio'),cy=g('--cy');
+ cx.clearRect(0,0,W,H);
+ for(let x=0;x<=L;x+=1)line([x,-1.2,-3.6],[x,-1.2,3.6],mu,1,.18);
+ for(let z=-3;z<=3;z+=1)line([0,-1.2,z],[L,-1.2,z],mu,1,.18);
+ line([0,0,0],[L,0,0],mu,1,.25);
+ // Quelle
+ box([-.1,0,0],[.2,.25,.25],gold,.8);
+ const n=els.length,gap=L/(n+1),items=[];
+ els.forEach((e,i)=>{const x=(i+1)*gap;items.push([pj(x,0,0)[2],()=>{
+  if(e.t==='P'){disc([x,0,0],1,0,1.1,e.a*R,gold,.14,true)}
+  if(e.t==='B'){const s=e.side;poly([[x-.8,-1,-.8*s],[x+.8,-1,.8*s],[x+.8,1,.8*s],[x-.8,1,-.8*s]],cy,.22,cy);
+   box([x,0,s*SIDE],[.3,.3,.3],cy,.5);line([x,0,0],[x,0,s*SIDE],cy,1,.25)}
+  if(e.t==='D'){const s=.15*e.d,gp=.05,q=[[-1.6,-s-gp],[-s+gp,s-gp],[s+gp,1.6]];
+   q.forEach(([a,b])=>poly([[x,-1,a],[x,-1,b],[x,1,b],[x,1,a]],mu,.55,mu))}
+  if(e.t==='X'){box([x,0,0],[.22,.5,.5],vio,.22);line([x,0,0],[x+3,0,3.2],cy,1,.3);
+   disc([x+1.8,0,1.92],.68,.73,.7,e.b*R,cy,.14,true);box([x+3,0,3.2],[.25,.25,.25],cy,.5)}}])});
+ items.sort((a,b)=>b[0]-a[0]);items.forEach(i=>i[1]());
+ // Schirm + Treffer
+ poly([[L,-1,-1.6],[L,-1,1.6],[L,1,1.6],[L,1,-1.6]],mu,.12,mu);
+ cx.fillStyle=gold;for(const h of hits){const p=pj(L,h.y,h.z);cx.globalAlpha=.55;cx.fillRect(p[0]-1,p[1]-1,2,2)}cx.globalAlpha=1;
+ // Photonen
+ for(const p of P){const o=at(p);if(!o)continue;const pp=pj(...o.q);
+  if(p.s>=p.T){if(p.end==='abs'){cx.strokeStyle=red;cx.globalAlpha=Math.max(0,1-p.age/.5);cx.lineWidth=1.5;cx.beginPath();cx.arc(pp[0],pp[1],(4+p.age*40)*pp[3],0,7);cx.stroke();cx.globalAlpha=1}continue}
+  cx.fillStyle=o.c;cx.beginPath();cx.arc(pp[0],pp[1],3.5*pp[3],0,7);cx.fill()}
+ // Beschriftung
+ cx.fillStyle=gold;cx.font='400 17px "Bebas Neue",Impact,sans-serif';cx.textAlign='center';
+ els.forEach((e,i)=>{const p=pj((i+1)*gap,1.35,0);cx.fillText((i+1)+' '+({P:'Polarisator '+e.a+'°',B:'Strahlteiler',X:'BBO',D:'Doppelspalt'})[e.t],p[0],p[1])});
+ let p=pj(0,.6,0);cx.fillText('Quelle',p[0],p[1]);p=pj(L,1.35,0);cx.fillText('Schirm',p[0],p[1]);
+ // Profil
+ if(els.some(e=>e.t==='D')&&hits.length){const B=70,bins=new Array(B).fill(0);for(const h of hits){const b=Math.floor((h.z+1.6)/3.2*B);if(b>=0&&b<B)bins[b]++}
+  const mx=Math.max(...bins),w=Math.min(W*.5,420),x0=W-w-12,y0=H-14,hh=Math.min(H*.14,90);
+  cx.fillStyle=gold;cx.globalAlpha=.8;bins.forEach((v,i)=>cx.fillRect(x0+i*w/B,y0-hh*v/mx,w/B-1,hh*v/mx));cx.globalAlpha=1;
+  cx.fillStyle=mu;cx.font='600 12px Barlow,sans-serif';cx.textAlign='left';cx.fillText('Trefferverteilung am Schirm',x0,y0-hh-6)}
+ // Info
+ const f=v=>v.toLocaleString('de-DE');let h='<i>Emittiert:</i> <b>'+f(C.n)+'</b><br><i>Am Schirm:</i> '+f(C.scr)+' ('+(C.n?(C.scr/C.n*100).toFixed(1):0)+' %)<br>';
+ els.forEach((e,i)=>{if(e.t==='B')h+='<i>Detektor Strahlteiler '+(i+1)+':</i> '+f(C.side[e.id]||0)+'<br>'});
+ if(els.some(e=>e.t==='X'))h+='<i>Paare:</i> '+f(C.pairs)+' · <i>Idler registriert:</i> '+f(C.idl)+'<br><i>Koinzidenzen:</i> '+f(C.coin)+' ('+(C.pairs?(C.coin/C.pairs*100).toFixed(1):0)+' % der Paare)';
+ $('info').innerHTML=h}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;step(dt);draw();requestAnimationFrame(loop)}
+reset();ui();fit();requestAnimationFrame(loop);
+</script></body></html>
