@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Phasenverschiebung & Doppelbrechung (WRZT / Optik)</title>
+    <!-- Tailwind CSS für modernes UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js für 3D-Grafik -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls für Kamera-Navigation per Maus/Touch -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { background-color: #07090e; color: #f8fafc; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; touch-action: none; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-3 flex justify-between items-center z-20">
+        <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 bg-cyan-400 rounded-full animate-ping"></div>
+            <h1 class="font-semibold text-sm md:text-base tracking-wide text-slate-100">3D-Phasenverschiebung (Doppelbrechung)</h1>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button id="togglePanelBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs md:text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                Regler
+            </button>
+            <button id="fullscreenBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs md:text-sm font-medium px-3 py-1.5 rounded-lg shadow transition">
+                Vollbild
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="flex-1 flex relative overflow-hidden">
+        
+        <!-- Einklappbares Control Panel -->
+        <div id="controlPanel" class="w-72 md:w-80 bg-slate-900/95 backdrop-blur border-r border-slate-800 p-4 md:p-6 flex flex-col space-y-4 z-10 transition-all duration-300 shadow-2xl overflow-y-auto absolute md:relative h-full">
+            <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-1">Kristall &amp; Wellen-Parameter</h2>
+                <p class="text-xs text-slate-400">Simuliere die Gangunterschiede im doppelbrechenden Medium.</p>
+            </div>
+
+            <!-- Phasenverschiebung / Verzögerung -->
+            <div class="space-y-2 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center text-sm">
+                    <label for="phaseRange" class="font-medium text-slate-200">Verzögerung ($\Delta\phi$)</label>
+                    <span id="phaseVal" class="text-cyan-400 font-mono font-bold">90° ($\lambda/4$)</span>
+                </div>
+                <input id="phaseRange" type="range" min="0" max="360" value="90" class="w-full accent-cyan-500 cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>0° (Linear)</span>
+                    <span>90° ($\lambda/4$)</span>
+                    <span>180° ($\lambda/2$)</span>
+                    <span>360°</span>
+                </div>
+            </div>
+
+            <!-- Kristall-Typ Schnellwahl -->
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Voreinstellungen</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setPhase(0)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 px-3 rounded-lg border border-slate-700 text-left font-mono">0° (Keine)</button>
+                    <button onclick="setPhase(90)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 px-3 rounded-lg border border-slate-700 text-left font-mono">90° ($\lambda/4$)</button>
+                    <button onclick="setPhase(180)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 px-3 rounded-lg border border-slate-700 text-left font-mono">180° ($\lambda/2$)</button>
+                    <button onclick="setPhase(270)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 px-3 rounded-lg border border-slate-700 text-left font-mono">270° ($3\lambda/4$)</button>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-2 text-xs text-slate-300">
+                <div class="text-cyan-400 font-bold uppercase text-[10px]">Modell-Legende:</div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-cyan-400 rounded-sm"></div>
+                    <span>Eingangs-Welle (Linear 45°)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-blue-500 rounded-sm"></div>
+                    <span>Schnelle Achse (FA / Blau)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-rose-500 rounded-sm"></div>
+                    <span>Langsame Achse (SA / Rot)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-amber-400 rounded-sm"></div>
+                    <span>Resultierende Welle (Spirale)</span>
+                </div>
+            </div>
+
+            <div class="text-[10px] text-slate-500 italic pt-2">
+                Tipp: Du kannst die 3D-Szene mit dem Finger oder der Maus drehen und heranzoomen!
+            </div>
+        </div>
+
+        <!-- 3D Canvas Container -->
+        <div id="canvasContainer" class="flex-1 relative bg-[#07090e]">
+            <!-- Touch/Drag Overlay Hinweis -->
+            <div class="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-400 pointer-events-none">
+                3D-Ansicht aktiv
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 3D Logik mit Three.js -->
+    <script>
+        // UI Elemente
+        const phaseRange = document.getElementById('phaseRange');
+        const phaseVal = document.getElementById('phaseVal');
+        const togglePanelBtn = document.getElementById('togglePanelBtn');
+        const controlPanel = document.getElementById('controlPanel');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        let isPanelOpen = true;
+
+        // Panel ein-/ausklappen für Mobile & Desktop
+        togglePanelBtn.addEventListener('click', () => {
+            isPanelOpen = !isPanelOpen;
+            if (isPanelOpen) {
+                controlPanel.style.transform = 'translateX(0)';
+                controlPanel.style.opacity = '1';
+                controlPanel.style.pointerEvents = 'auto';
+            } else {
+                controlPanel.style.transform = 'translateX(-100%)';
+                controlPanel.style.opacity = '0';
+                controlPanel.style.pointerEvents = 'none';
+            }
+        });
+
+        // Vollbild
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                fullscreenBtn.textContent = 'Fenster';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    fullscreenBtn.textContent = 'Vollbild';
+                }
+            }
+        });
+
+        function setPhase(deg) {
+            phaseRange.value = deg;
+            updatePhaseText();
+        }
+
+        function updatePhaseText() {
+            let val = parseInt(phaseRange.value);
+            if (val === 90) phaseVal.textContent = '90° (λ/4)';
+            else if (val === 180) phaseVal.textContent = '180° (λ/2)';
+            else if (val === 360) phaseVal.textContent = '360° (λ)';
+            else phaseVal.textContent = val + '°';
+        }
+
+        phaseRange.addEventListener('input', updatePhaseText);
+
+        // --- THREE.JS 3D INITIALISIERUNG ---
+        const container = document.getElementById('canvasContainer');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x07090e, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 15, 35);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // Licht
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0x38bdf8, 1, 50);
+        pointLight.position.set(0, 20, 10);
+        scene.add(pointLight);
+
+        // Koordinaten-Achse / Ausbreitungsrichtung (Z-Achse)
+        const axisMaterial = new THREE.LineBasicMaterial({ color: 0x334155 });
+        const pointsAxis = [new THREE.Vector3(0, 0, -20), new THREE.Vector3(0, 0, 25)];
+        const axisGeo = new THREE.BufferGeometry().setFromPoints(pointsAxis);
+        scene.add(new THREE.Line(axisGeo, axisMaterial));
+
+        // Kristall-Block in der Mitte (Visualisierung der Platte)
+        const crystalGeo = new THREE.BoxGeometry(8, 8, 2);
+        const crystalMat = new THREE.MeshPhysicalMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.15,
+            roughness: 0.1,
+            metalness: 0.1,
+            transmission: 0.9,
+            side: THREE.DoubleSide
+        });
+        const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+        crystal.position.set(0, 0, 0);
+        scene.add(crystal);
+
+        // Linien-Container für dynamische Wellen
+        const waveGroup = new THREE.Group();
+        scene.add(waveGroup);
+
+        let clock = new THREE.Clock();
+
+        function createWalledLine(points, color, linewidth = 2) {
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ color: color, linewidth: linewidth });
+            return new THREE.Line(geometry, material);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            const time = clock.getElapsedTime() * 3;
+            const phaseShiftDeg = parseInt(phaseRange.value);
+            const phaseShiftRad = phaseShiftDeg * (Math.PI / 180);
+
+            waveGroup.clear();
+
+            const length = 40;
+            const steps = 300;
+            const zStart = -20;
+            const zEnd = 20;
+
+            const ptsFast = [];
+            const ptsSlow = [];
+            const ptsResult = [];
+            const connectorPointsArray = [];
+
+            for (let i = 0; i <= steps; i++) {
+                let z = zStart + (i / steps) * (zEnd - zStart);
+                
+                // Vor dem Kristall (z < 0): Lineares Licht
+                // Im Kristall und danach (z >= 0): Phasenverschiebung für die langsame Achse
+                let currentPhaseDelta = (z >= 0) ? phaseShiftRad : 0;
+
+                let amplitude = 4;
+                // Vor dem Kristall schwingt alles synchron (45 Grad)
+                // Nach dem Kristall hinkt die Y-Komponente (langsame Achse) hinterher
+                let xVal = Math.sin(z * 0.4 - time) * amplitude;
+                let yVal = Math.sin(z * 0.4 - time - currentPhaseDelta) * amplitude;
+
+                ptsFast.push(new THREE.Vector3(xVal, 0, z));
+                ptsSlow.push(new THREE.Vector3(0, yVal, z));
+                ptsResult.push(new THREE.Vector3(xVal, yVal, z));
+
+                // Alle paar Schritte feine Verbindungs-Striche zur Veranschaulichung der Spirale
+                if (i % 6 === 0) {
+                    connectorPointsArray.push([
+                        new THREE.Vector3(0, 0, z),
+                        new THREE.Vector3(xVal, yVal, z)
+                    ]);
+                }
+            }
+
+            // 1. Schnelle Achse (Blau) - X-Komponente
+            waveGroup.add(createWalledLine(ptsFast, 0x3b82f6, 2));
+            // 2. Langsame Achse (Rot) - Y-Komponente
+            waveGroup.add(createWalledLine(ptsSlow, 0xf43f5e, 2));
+            // 3. Resultierende Welle (Gold/Gelb - Die Spirale)
+            waveGroup.add(createWalledLine(ptsResult, 0xfbbf24, 4));
+
+            // Verbindungs-Strahlen (Vektoren)
+            connectorPointsArray.forEach(pair => {
+                const connGeo = new THREE.BufferGeometry().setFromPoints(pair);
+                const connMat = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.3 });
+                waveGroup.add(new THREE.Line(connGeo, connMat));
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Fenstergrößen-Anpassung
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

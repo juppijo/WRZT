@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polarisationsfilter-Simulation (WRZT & Malus)</title>
+    <!-- Tailwind CSS für modernes, sauberes Design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
+        canvas { display: block; }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
+            <h1 class="font-semibold text-lg tracking-wide text-slate-100">Polfilter-Simulation &amp; WRZT-Modell</h1>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button id="togglePanelBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                Regler ein-/ausklappen
+            </button>
+            <button id="fullscreenBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium px-4 py-1.5 rounded-lg shadow transition flex items-center space-x-2">
+                <span>Vollbild</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="flex-1 flex relative overflow-hidden">
+        
+        <!-- Einklappbare Regler-Leiste (Control Panel) -->
+        <div id="controlPanel" class="w-80 bg-slate-900/95 border-r border-slate-800 p-6 flex flex-col space-y-6 z-10 transition-all duration-300 shadow-2xl overflow-y-auto">
+            <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-1">Parameter-Steuerung</h2>
+                <p class="text-xs text-slate-400">Passe den Filterwinkel und die Lichtintensität an.</p>
+            </div>
+
+            <!-- Winkel Regler -->
+            <div class="space-y-2 bg-slate-800/50 p-4 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center">
+                    <label for="angleRange" class="text-sm font-medium text-slate-200">Filter-Winkel ($\theta$)</label>
+                    <span id="angleVal" class="text-cyan-400 font-mono font-bold">45°</span>
+                </div>
+                <input id="angleRange" type="range" min="0" max="90" value="45" class="w-full accent-cyan-500 cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>0° (Max)</span>
+                    <span>45° (50%)</span>
+                    <span>90° (Sperre)</span>
+                </div>
+            </div>
+
+            <!-- Ursprungs-Intensität -->
+            <div class="space-y-2 bg-slate-800/50 p-4 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center">
+                    <label for="intensityRange" class="text-sm font-medium text-slate-200">Licht-Quellintensität</label>
+                    <span id="intensityVal" class="text-cyan-400 font-mono font-bold">100%</span>
+                </div>
+                <input id="intensityRange" type="range" min="20" max="150" value="100" class="w-full accent-cyan-500 cursor-pointer">
+            </div>
+
+            <!-- Live-Messwerte / WRZT-Auswertung -->
+            <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800/80 space-y-3 font-mono text-xs">
+                <div class="text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-800 pb-1">Live-Analyse (Malus / WRZT)</div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Transmission:</span>
+                    <span id="transVal" class="text-emerald-400 font-bold">50.0%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Absorption (Dissipation):</span>
+                    <span id="absVal" class="text-rose-400 font-bold">50.0%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">$\cos^2(\theta)$-Faktor:</span>
+                    <span id="cosVal" class="text-cyan-300">0.500</span>
+                </div>
+            </div>
+
+            <!-- Schnell-Buttons -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="setAngle(0)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 rounded-lg border border-slate-700 font-mono">0°</button>
+                <button onclick="setAngle(45)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 rounded-lg border border-slate-700 font-mono">45°</button>
+                <button onclick="setAngle(90)" class="bg-slate-800 hover:bg-slate-700 text-xs py-2 rounded-lg border border-slate-700 font-mono">90°</button>
+            </div>
+        </div>
+
+        <!-- Canvas für die grafische Echtzeit-Simulation -->
+        <div class="flex-1 relative bg-slate-950 flex items-center justify-center">
+            <canvas id="simCanvas" class="absolute inset-0 w-full h-full cursor-grab"></canvas>
+            
+            <!-- Overlay-Hinweis auf der Canvas -->
+            <div class="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur px-4 py-2 rounded-xl border border-slate-800 text-xs text-slate-400 pointer-events-none hidden md:block">
+                Tipp: Du kannst den Filterwinkel auch direkt mit der Maus auf dem Canvas verschieben oder drehen.
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logik -->
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const angleRange = document.getElementById('angleRange');
+        const angleVal = document.getElementById('angleVal');
+        const intensityRange = document.getElementById('intensityRange');
+        const intensityVal = document.getElementById('intensityVal');
+        const transVal = document.getElementById('transVal');
+        const absVal = document.getElementById('absVal');
+        const cosVal = document.getElementById('cosVal');
+        const togglePanelBtn = document.getElementById('togglePanelBtn');
+        const controlPanel = document.getElementById('controlPanel');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        let currentAngle = 45;
+        let baseIntensity = 100;
+        let isPanelOpen = true;
+        let isDragging = false;
+
+        // Panel einklappen / ausklappen
+        togglePanelBtn.addEventListener('click', () => {
+            isPanelOpen = !isPanelOpen;
+            if (isPanelOpen) {
+                controlPanel.style.width = '20rem';
+                controlPanel.style.opacity = '1';
+                controlPanel.style.padding = '1.5rem';
+                controlPanel.style.pointerEvents = 'auto';
+            } else {
+                controlPanel.style.width = '0rem';
+                controlPanel.style.opacity = '0';
+                controlPanel.style.padding = '0rem';
+                controlPanel.style.pointerEvents = 'none';
+            }
+        });
+
+        // Vollbild umschalten
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                fullscreenBtn.querySelector('span').textContent = 'Fenstermodus';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    fullscreenBtn.querySelector('span').textContent = 'Vollbild';
+                }
+            }
+        });
+
+        function setAngle(angle) {
+            angleRange.value = angle;
+            updateValues();
+        }
+
+        function updateValues() {
+            currentAngle = parseInt(angleRange.value);
+            baseIntensity = parseInt(intensityRange.value);
+            
+            angleVal.textContent = currentAngle + '°';
+            intensityVal.textContent = baseIntensity + '%';
+
+            const rad = currentAngle * (Math.PI / 180);
+            const cosValNum = Math.cos(rad);
+            const intensityRatio = Math.pow(cosValNum, 2);
+
+            const transmission = intensityRatio * 100;
+            const absorption = 100 - transmission;
+
+            transVal.textContent = transmission.toFixed(1) + '%';
+            absVal.textContent = absorption.toFixed(1) + '%';
+            cosVal.textContent = intensityRatio.toFixed(3);
+        }
+
+        angleRange.addEventListener('input', updateValues);
+        intensityRange.addEventListener('input', updateValues);
+
+        // Canvas Größe anpassen
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Maus / Touch Interaktion zum Drehen des Filters direkt im Bild
+        canvas.addEventListener('mousedown', (e) => { isDragging = true; });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - canvas.width / 2;
+            const y = e.clientY - rect.top - canvas.height / 2;
+            let angle = Math.atan2(y, x) * (180 / Math.PI);
+            if (angle < 0) angle += 360;
+            // Mappen auf 0 bis 90 Grad für den Filter
+            let mapped = Math.round(Math.abs(angle) % 90);
+            angleRange.value = mapped;
+            updateValues();
+        });
+
+        // Animations-Schleife für Lichtwellen und Filter-Visualisierung
+        let animTime = 0;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            
+            animTime += 0.05;
+
+            // 1. Unpolares Licht (Linke Seite)
+            ctx.save();
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+            ctx.lineWidth = 2;
+            for (let i = -3; i <= 3; i++) {
+                let yOffset = i * 40;
+                ctx.beginPath();
+                for (let x = 0; x < cx - 120; x += 5) {
+                    let wave = Math.sin(x * 0.03 - animTime + i) * 15 * (baseIntensity / 100);
+                    // Chaotische Schwingung überlagern
+                    let waveY = cy + yOffset + wave * Math.sin(i + animTime * 0.5);
+                    if (x === 0) ctx.moveTo(x + 50, waveY);
+                    else ctx.lineTo(x + 50, waveY);
+                }
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // 2. Der Polfilter (In der Mitte)
+            const filterX = cx;
+            const filterWidth = 40;
+            
+            ctx.save();
+            // Filter-Rahmen
+            ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.fillRect(filterX - filterWidth/2, cy - 180, filterWidth, 360);
+            ctx.strokeRect(filterX - filterWidth/2, cy - 180, filterWidth, 360);
+
+            // Jod-Ketten (Striche im Filter entsprechend dem Winkel)
+            ctx.strokeStyle = '#f43f5e'; // Rot für Absorptions-Achse
+            ctx.lineWidth = 3;
+            ctx.translate(filterX, cy);
+            ctx.rotate(currentAngle * (Math.PI / 180));
+            
+            for (let j = -120; j <= 120; j += 20) {
+                ctx.beginPath();
+                ctx.moveTo(-10, j);
+                ctx.lineTo(10, j);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Filter-Beschriftung
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '12px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Polfilter (${currentAngle}°)`, filterX, cy - 195);
+
+            // 3. Polarisiertes Licht nach dem Filter (Rechte Seite)
+            const rad = currentAngle * (Math.PI / 180);
+            const intensityFactor = Math.pow(Math.cos(rad), 2) * (baseIntensity / 100);
+
+            ctx.save();
+            ctx.strokeStyle = 'rgba(52, 211, 153, 0.8)'; // Grünliches Licht für den durchgelassenen Anteil
+            ctx.lineWidth = 3 * Math.max(0.2, intensityFactor);
+            
+            for (let i = -3; i <= 3; i++) {
+                let yOffset = i * 40;
+                ctx.beginPath();
+                for (let x = filterX + 50; x < canvas.width - 50; x += 5) {
+                    let relX = x - (filterX + 50);
+                    // Schwingung exakt im Winkel des Filters polarisiert
+                    let wave = Math.sin(relX * 0.03 - animTime) * 25 * intensityFactor;
+                    let waveY = cy + yOffset + wave * Math.cos(rad);
+                    let waveX = x + wave * Math.sin(rad);
+                    if (relX === 0) ctx.moveTo(waveX, waveY);
+                    else ctx.lineTo(waveX, waveY);
+                }
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            requestAnimationFrame(draw);
+        }
+
+        updateValues();
+        draw();
+    </script>
+</body>
+</html>

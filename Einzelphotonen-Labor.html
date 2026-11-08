@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Einzelphotonen-Labor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0c09;--pn:rgba(22,20,15,.92);--gold:#d4a73a;--tx:#ece4d0;--mu:#9a917a;--ln:#3a3220;--red:#d9553f;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root{--bg:#f6f1e4;--pn:rgba(255,252,243,.94);--gold:#a67c12;--tx:#2a2412;--mu:#6d6448;--ln:#d8cca6;--red:#b8321e;color-scheme:light}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:Barlow,system-ui,sans-serif}
+#app{position:relative;height:100%;background:var(--bg);overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#bar{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:3}
+button{background:var(--pn);color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:7px 11px;font:600 14px Barlow,sans-serif;cursor:pointer}
+button:hover{background:var(--gold);color:var(--bg)}
+#pn{position:absolute;top:52px;left:8px;width:min(330px,92vw);max-height:calc(100% - 64px);overflow:auto;background:var(--pn);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;z-index:2}
+#pn.off{display:none}
+h1{font:400 26px 'Bebas Neue',Impact,sans-serif;letter-spacing:.06em;color:var(--gold);margin:4px 0}
+details{border-top:1px solid var(--ln);padding:6px 0}
+summary{cursor:pointer;font:400 18px 'Bebas Neue',Impact,sans-serif;letter-spacing:.06em;color:var(--gold)}
+label{display:block;font-size:13px;color:var(--mu);margin-top:7px}
+label b{color:var(--tx);float:right}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:5px;padding:5px}
+.row{display:flex;gap:6px;align-items:center;margin-top:7px;font-size:14px;flex-wrap:wrap}
+#info{font-size:13px;line-height:1.55}
+#info i{color:var(--mu);font-style:normal}
+</style></head>
+<body>
+<div id="app">
+<canvas id="cv"></canvas>
+<div id="bar"><button id="tg">☰ Regler</button><button id="fs">⛶ Vollbild</button><button id="pl">❚❚ Pause</button></div>
+<div id="pn">
+<h1>Einzelphotonen-Labor</h1>
+<details open><summary>Quelle</summary>
+<label>Art<select id="src"><option value="unpol">Unpolarisiert (zufälliger Winkel je Photon)</option><option value="lin">Linear polarisiert</option><option value="circ">Zirkular polarisiert</option></select></label>
+<label>Polarisationswinkel <b id="v_sa"></b><input type="range" id="sa" min="0" max="180" step="1" value="0"></label>
+<label>Photonen pro Sekunde <b id="v_rate"></b><input type="range" id="rate" min="1" max="80" step="1" value="12"></label>
+</details>
+<details open><summary>Filter</summary>
+<label>Filter 1 <b id="v_f1"></b><input type="range" id="f1" min="0" max="180" step="1" value="0"></label>
+<div class="row"><input type="checkbox" id="m"><span>Mittleren Filter 2 einschalten</span></div>
+<label>Filter 2 <b id="v_f2"></b><input type="range" id="f2" min="0" max="180" step="1" value="45"></label>
+<label>Analysator <b id="v_an"></b><input type="range" id="an" min="0" max="180" step="1" value="30"></label>
+</details>
+<details open><summary>Statistik</summary>
+<div class="row"><button id="b1">+1 000 sofort</button><button id="b2">+100 000 sofort</button><button id="rs">Zähler zurücksetzen</button></div>
+<div id="info"></div>
+</details>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const cv=$('cv'),cx=cv.getContext('2d'),app=$('app');
+const S={src:'unpol',sa:0,rate:12,f1:0,m:false,f2:45,an:30};
+let W,H,run=true,last=0,acc=0,P=[],hits=[],cnt=[0,0,0];
+const R=Math.PI/180,SPEED=.26;
+function fit(){const d=window.devicePixelRatio||1,r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',fit);
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,60));
+document.addEventListener('webkitfullscreenchange',()=>setTimeout(fit,60));
+$('fs').onclick=()=>{try{const f=document.fullscreenElement||document.webkitFullscreenElement;
+ if(f){(document.exitFullscreen||document.webkitExitFullscreen).call(document)}
+ else{(app.requestFullscreen||app.webkitRequestFullscreen).call(app)}}catch(e){}};
+$('tg').onclick=()=>$('pn').classList.toggle('off');
+$('pl').onclick=()=>{run=!run;$('pl').textContent=run?'❚❚ Pause':'▶ Weiter'};
+const angs=()=>S.m?[S.f1,S.f2,S.an]:[S.f1,S.an];
+const fxs=()=>S.m?[.3,.5,.7]:[.35,.7];
+function reset(){cnt=new Array(angs().length+1).fill(0);P=[];hits=[]}
+['src','sa','rate','f1','m','f2','an'].forEach(k=>{
+ const e=$(k);const h=()=>{S[k]=e.type==='checkbox'?e.checked:(e.tagName==='SELECT'?e.value:+e.value);
+  const v=$('v_'+k);if(v)v.textContent=k==='rate'?S[k]+' /s':S[k]+'°';if(k!=='rate')reset()};
+ e.addEventListener('input',h);h()});
+$('rs').onclick=reset;
+function newPhoton(){return{x:W*.05,a:S.src==='unpol'?Math.random()*Math.PI:S.sa*R,k:S.src==='circ'?'circ':'lin',f:0,dead:false,age:0,y:(Math.random()-.5)*8}}
+function passes(p,fa){const pr=p.k==='circ'?.5:Math.pow(Math.cos(fa*R-p.a),2);return Math.random()<pr}
+function batch(n){const A=angs();
+ for(let i=0;i<n;i++){const p=newPhoton();cnt[0]++;
+  for(let f=0;f<A.length;f++){if(passes(p,A[f])){cnt[f+1]++;p.a=A[f]*R;p.k='lin'}else break;
+   if(f===A.length-1&&hits.length<400&&Math.random()<.02)hits.push({dx:Math.random(),dy:(Math.random()-.5)*2,t:0})}}}
+$('b1').onclick=()=>batch(1000);$('b2').onclick=()=>batch(100000);
+function theory(){let I=1,k=S.src,a=S.sa*R;const out=[1];
+ for(const d of angs()){const c=k==='lin'?Math.pow(Math.cos(d*R-a),2):.5;I*=c;k='lin';a=d*R;out.push(I)}return out}
+function step(dt){
+ if(run){acc+=dt*S.rate;while(acc>=1){acc--;P.push(newPhoton());cnt[0]++}}
+ const A=angs(),F=fxs(),sx=W*.93;
+ for(const p of P){
+  if(p.dead){p.age+=dt;continue}
+  if(!run)continue;
+  p.x+=SPEED*W*dt;
+  if(p.f<A.length&&p.x>=W*F[p.f]){
+   if(passes(p,A[p.f])){p.a=A[p.f]*R;p.k='lin';cnt[p.f+1]++;p.f++}else{p.dead=true;p.age=0}}
+  if(p.f===A.length&&p.x>=sx){p.done=true;hits.push({dx:Math.random(),dy:(Math.random()-.5)*2,t:0});if(hits.length>400)hits.shift()}}
+ P=P.filter(p=>!p.done&&!(p.dead&&p.age>.5));
+ for(const h of hits)h.t+=dt}
+function draw(){
+ const cs=getComputedStyle(document.documentElement);
+ const gold=cs.getPropertyValue('--gold').trim(),tx=cs.getPropertyValue('--tx').trim(),mu=cs.getPropertyValue('--mu').trim(),red=cs.getPropertyValue('--red').trim();
+ cx.clearRect(0,0,W,H);
+ const cy=H*.3,sc=Math.min(H*.1,W*.06),x0=W*.05,sx=W*.93,A=angs(),F=fxs();
+ cx.strokeStyle=mu;cx.globalAlpha=.4;cx.setLineDash([4,5]);cx.beginPath();cx.moveTo(x0,cy);cx.lineTo(sx,cy);cx.stroke();cx.setLineDash([]);cx.globalAlpha=1;
+ const names=S.m?['Filter 1','Filter 2','Analysator']:['Filter 1','Analysator'];
+ cx.textAlign='center';
+ for(let i=0;i<A.length;i++){const x=W*F[i],a=A[i]*R;
+  cx.fillStyle=gold;cx.globalAlpha=.22;cx.fillRect(x-4,cy-sc,8,sc*2);cx.globalAlpha=1;
+  cx.strokeStyle=gold;cx.lineWidth=1.5;cx.strokeRect(x-4,cy-sc,8,sc*2);
+  const dy=cy-sc-26;cx.beginPath();cx.arc(x,dy,15,0,7);cx.stroke();
+  cx.lineWidth=2;cx.beginPath();cx.moveTo(x-13*Math.cos(a),dy+13*Math.sin(a));cx.lineTo(x+13*Math.cos(a),dy-13*Math.sin(a));cx.stroke();
+  cx.fillStyle=gold;cx.font='400 19px "Bebas Neue",Impact,sans-serif';cx.fillText(names[i]+' · '+A[i]+'°',x,dy-24)}
+ cx.fillStyle=gold;cx.font='400 19px "Bebas Neue",Impact,sans-serif';cx.fillText('Quelle',x0,cy-sc-6);
+ cx.beginPath();cx.arc(x0,cy,6,0,7);cx.fill();
+ // Schirm
+ cx.fillStyle=mu;cx.globalAlpha=.25;cx.fillRect(sx,cy-sc,10,sc*2);cx.globalAlpha=1;cx.strokeStyle=mu;cx.lineWidth=1;cx.strokeRect(sx,cy-sc,10,sc*2);
+ cx.fillText('Schirm',sx+5,cy+sc+18);
+ for(const h of hits){cx.fillStyle=gold;cx.globalAlpha=Math.max(.25,1-h.t/6);cx.beginPath();cx.arc(sx+2+h.dx*6,cy+h.dy*sc*.9,2,0,7);cx.fill()}cx.globalAlpha=1;
+ // Photonen
+ for(const p of P){const y=cy+p.y;
+  if(p.dead){const r=4+p.age*50;cx.strokeStyle=red;cx.globalAlpha=Math.max(0,1-p.age/.5);cx.lineWidth=1.5;cx.beginPath();cx.arc(p.x,y,r,0,7);cx.stroke();cx.globalAlpha=1;continue}
+  cx.fillStyle=gold;cx.beginPath();cx.arc(p.x,y,3.5,0,7);cx.fill();
+  if(p.k==='circ'){cx.strokeStyle=gold;cx.lineWidth=1.2;cx.beginPath();cx.arc(p.x,y,8,0,7);cx.stroke()}
+  else{cx.strokeStyle=gold;cx.lineWidth=1.5;cx.beginPath();cx.moveTo(p.x-9*Math.cos(p.a),y+9*Math.sin(p.a));cx.lineTo(p.x+9*Math.cos(p.a),y-9*Math.sin(p.a));cx.stroke()}}
+ // Balkendiagramm
+ const th=theory(),n=th.length,yb=H*.9,ch=H*.2,sw=W*.8/n;
+ cx.fillStyle=mu;cx.font='600 12px Barlow,sans-serif';cx.textAlign='left';
+ cx.fillText('Anteil der Photonen, die diese Stufe erreichen: gemessen (Balken) und Theorie (Linie)',W*.1,yb-ch-18);
+ cx.textAlign='center';
+ for(let i=0;i<n;i++){const xc=W*.1+(i+.5)*sw,bw=Math.min(70,sw*.5),m=cnt[0]?cnt[i]/cnt[0]:0;
+  cx.fillStyle=gold;cx.globalAlpha=.75;cx.fillRect(xc-bw/2,yb-ch*m,bw,ch*m);cx.globalAlpha=1;
+  cx.strokeStyle=tx;cx.lineWidth=2.5;cx.beginPath();cx.moveTo(xc-bw/2-8,yb-ch*th[i]);cx.lineTo(xc+bw/2+8,yb-ch*th[i]);cx.stroke();
+  cx.fillStyle=tx;cx.font='600 13px Barlow,sans-serif';cx.fillText((m*100).toFixed(1)+' %',xc,yb-ch*Math.max(m,th[i])-8);
+  cx.fillStyle=mu;cx.fillText(i?names[i-1]:'Quelle',xc,yb+16)}
+ cx.strokeStyle=mu;cx.lineWidth=1;cx.beginPath();cx.moveTo(W*.1,yb);cx.lineTo(W*.9,yb);cx.stroke();
+ // Info
+ const f=x=>x.toLocaleString('de-DE');let h='<i>Emittiert:</i> <b>'+f(cnt[0])+'</b> Photonen<br>';
+ for(let i=1;i<n;i++){const m=cnt[0]?cnt[i]/cnt[0]:0;h+='<i>nach '+names[i-1]+':</i> '+f(cnt[i])+' → '+(m*100).toFixed(2)+' % <i>(Theorie '+(th[i]*100).toFixed(2)+' %)</i><br>'}
+ const pt=th[n-1],sg=cnt[0]?Math.sqrt(pt*(1-pt)/cnt[0])*100:0;
+ h+='<i>Zufallsstreuung am Ende:</i> ≈ ±'+sg.toFixed(2)+' %-Punkte (∝ 1/√N)';$('info').innerHTML=h}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;step(dt);draw();requestAnimationFrame(loop)}
+fit();requestAnimationFrame(loop);
+</script></body></html>

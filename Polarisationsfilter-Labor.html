@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polarisationsfilter-Labor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0c09;--pn:rgba(22,20,15,.92);--gold:#d4a73a;--tx:#ece4d0;--mu:#9a917a;--ln:#3a3220;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root{--bg:#f6f1e4;--pn:rgba(255,252,243,.94);--gold:#a67c12;--tx:#2a2412;--mu:#6d6448;--ln:#d8cca6;color-scheme:light}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:Barlow,system-ui,sans-serif}
+#app{position:relative;height:100%;background:var(--bg);overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#bar{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:3}
+button{background:var(--pn);color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:7px 11px;font:600 14px Barlow,sans-serif;cursor:pointer}
+button:hover{background:var(--gold);color:var(--bg)}
+#pn{position:absolute;top:52px;left:8px;width:min(330px,92vw);max-height:calc(100% - 64px);overflow:auto;background:var(--pn);border:1px solid var(--ln);border-radius:8px;padding:6px 10px;z-index:2}
+#pn.off{display:none}
+h1{font:400 26px 'Bebas Neue',Impact,sans-serif;letter-spacing:.06em;color:var(--gold);margin:4px 0}
+details{border-top:1px solid var(--ln);padding:6px 0}
+summary{cursor:pointer;font:400 18px 'Bebas Neue',Impact,sans-serif;letter-spacing:.06em;color:var(--gold)}
+label{display:block;font-size:13px;color:var(--mu);margin-top:7px}
+label b{color:var(--tx);float:right}
+input[type=range]{width:100%;accent-color:var(--gold)}
+select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:5px;padding:5px}
+.row{display:flex;gap:6px;align-items:center;margin-top:7px;font-size:14px}
+#info{font-size:13px;line-height:1.55;color:var(--tx)}
+#info i{color:var(--mu);font-style:normal}
+</style></head>
+<body>
+<div id="app">
+<canvas id="cv"></canvas>
+<div id="bar"><button id="tg">☰ Regler</button><button id="fs">⛶ Vollbild</button><button id="pl">❚❚ Pause</button></div>
+<div id="pn">
+<h1>Polarisationsfilter-Labor</h1>
+<details open><summary>Lichtquelle</summary>
+<label>Art<select id="src"><option value="unpol">Unpolarisiert (Sonne, Lampe)</option><option value="lin">Linear polarisiert</option><option value="circ">Zirkular polarisiert</option></select></label>
+<label>Polarisationswinkel <b id="v_sa"></b><input type="range" id="sa" min="0" max="180" step="1" value="0"></label>
+</details>
+<details open><summary>Filter</summary>
+<label>Filter 1 <b id="v_f1"></b><input type="range" id="f1" min="0" max="180" step="1" value="0"></label>
+<div class="row"><input type="checkbox" id="m"><span>Mittlerer Filter 2 einschalten</span></div>
+<label>Filter 2 <b id="v_f2"></b><input type="range" id="f2" min="0" max="180" step="1" value="45"></label>
+<label>Analysator <b id="v_an"></b><input type="range" id="an" min="0" max="180" step="1" value="90"></label>
+<div class="row"><button id="au">↻ Analysator automatisch drehen</button></div>
+</details>
+<details><summary>Darstellung</summary>
+<label>Wellengeschwindigkeit <b id="v_spd"></b><input type="range" id="spd" min="0.2" max="3" step="0.1" value="1"></label>
+</details>
+<details open><summary>Messwerte</summary><div id="info"></div></details>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const cv=$('cv'),cx=cv.getContext('2d'),app=$('app');
+const S={src:'unpol',sa:0,f1:0,m:false,f2:45,an:90,spd:1};
+let W,H,t=0,run=true,auto=false,last=0;
+function fit(){const d=window.devicePixelRatio||1,r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',fit);
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,60));
+document.addEventListener('webkitfullscreenchange',()=>setTimeout(fit,60));
+$('fs').onclick=()=>{try{const f=document.fullscreenElement||document.webkitFullscreenElement;
+ if(f){(document.exitFullscreen||document.webkitExitFullscreen).call(document)}
+ else{(app.requestFullscreen||app.webkitRequestFullscreen).call(app)}}catch(e){}};
+$('tg').onclick=()=>$('pn').classList.toggle('off');
+$('pl').onclick=()=>{run=!run;$('pl').textContent=run?'❚❚ Pause':'▶ Weiter'};
+$('au').onclick=()=>{auto=!auto;$('au').textContent=auto?'■ Drehen stoppen':'↻ Analysator automatisch drehen'};
+['src','sa','f1','m','f2','an','spd'].forEach(k=>{
+ const e=$(k);const h=()=>{S[k]=e.type==='checkbox'?e.checked:(e.tagName==='SELECT'?e.value:+e.value);
+  const v=$('v_'+k);if(v)v.textContent=k==='spd'?S[k].toFixed(1)+'×':S[k]+'°'};
+ e.addEventListener('input',h);h()});
+const R=Math.PI/180;
+function stages(){
+ let st={k:S.src,a:S.sa*R,I:1};const out=[st];
+ const fl=[S.f1];if(S.m)fl.push(S.f2);fl.push(S.an);
+ for(const d of fl){const a=d*R;
+  const c=st.k==='lin'?Math.cos(a-st.a):Math.SQRT1_2;
+  st={k:'lin',a,I:st.I*c*c};out.push(st)}
+ return out}
+function sheets(s,ph){
+ const A=Math.sqrt(s.I);
+ if(s.k==='lin'){const c=A*Math.cos(ph);return[[c*Math.cos(s.a),c*Math.sin(s.a)]]}
+ if(s.k==='circ')return[[A*Math.cos(ph),A*Math.sin(ph)]];
+ const r=[];for(let i=0;i<4;i++){const a=i*Math.PI/4+Math.sin(ph*.13+i)*.5,c=A*.5*Math.cos(ph+i*1.9);r.push([c*Math.cos(a),c*Math.sin(a)])}return r}
+function draw(){
+ const cs=getComputedStyle(document.documentElement);
+ const gold=cs.getPropertyValue('--gold').trim(),tx=cs.getPropertyValue('--tx').trim(),mu=cs.getPropertyValue('--mu').trim();
+ cx.clearRect(0,0,W,H);
+ const sc=Math.min(H*.2,W*.1),cy=H*.52,x0=W*.05,x1=W*.93;
+ const fx=S.m?[.3,.5,.7]:[.33,.7],nf=fx.length;
+ const zs=[x0,...fx.map(f=>W*f)],ze=[...fx.map(f=>W*f),x1];
+ const P=(z,ex,ey)=>[z+ex*sc*.5,cy-ey*sc-ex*sc*.3];
+ const st=stages(),ph=z=>(z-x0)*.05-t*3;
+ // Achse
+ cx.strokeStyle=mu;cx.globalAlpha=.4;cx.lineWidth=1;cx.setLineDash([4,5]);
+ cx.beginPath();cx.moveTo(x0,cy);cx.lineTo(x1+W*.03,cy);cx.stroke();cx.setLineDash([]);cx.globalAlpha=1;
+ // Wellen
+ for(let i=0;i<st.length;i++){
+  const s=st[i],a=zs[i]+(i?3:0),b=ze[i]-3;let pts=[];
+  for(let z=a;z<=b;z+=3){const sh=sheets(s,ph(z));sh.forEach((v,j)=>{(pts[j]=pts[j]||[]).push([z,v])})}
+  pts.forEach(arr=>{
+   cx.strokeStyle=gold;cx.lineWidth=s.k==='unpol'?1.2:2;cx.globalAlpha=s.k==='unpol'?.55:.95;
+   cx.beginPath();arr.forEach(([z,v],n)=>{const p=P(z,v[0],v[1]);n?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1])});cx.stroke();
+   cx.globalAlpha=s.k==='unpol'?.1:.3;cx.lineWidth=1;cx.beginPath();
+   for(let n=0;n<arr.length;n+=4){const [z,v]=arr[n],p=P(z,v[0],v[1]),q=P(z,0,0);cx.moveTo(q[0],q[1]);cx.lineTo(p[0],p[1])}
+   cx.stroke();cx.globalAlpha=1});
+  cx.fillStyle=tx;cx.font='600 13px Barlow,sans-serif';cx.textAlign='center';
+  cx.fillText('I = '+(s.I*100).toFixed(1)+' %',(a+b)/2,cy+sc*1.55)}
+ // Filter
+ const names=S.m?['Filter 1','Filter 2','Analysator']:['Filter 1','Analysator'],angs=S.m?[S.f1,S.f2,S.an]:[S.f1,S.an];
+ for(let i=0;i<nf;i++){
+  const z=W*fx[i],a=angs[i]*R,k=1.35;
+  const c=[[-k,-k],[k,-k],[k,k],[-k,k]].map(([x,y])=>P(z,x,y));
+  cx.save();cx.beginPath();c.forEach((p,n)=>n?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.closePath();
+  cx.fillStyle=gold;cx.globalAlpha=.1;cx.fill();cx.globalAlpha=1;cx.strokeStyle=gold;cx.lineWidth=1.5;cx.stroke();cx.clip();
+  cx.globalAlpha=.55;cx.lineWidth=1;cx.beginPath();
+  for(let o=-2;o<=2;o+=.18){const cxp=-Math.sin(a)*o,cyp=Math.cos(a)*o,L=3,
+   p=P(z,cxp-Math.cos(a)*L,cyp-Math.sin(a)*L),q=P(z,cxp+Math.cos(a)*L,cyp+Math.sin(a)*L);cx.moveTo(p[0],p[1]);cx.lineTo(q[0],q[1])}
+  cx.stroke();cx.restore();
+  cx.fillStyle=gold;cx.font='400 20px "Bebas Neue",Impact,sans-serif';cx.textAlign='center';
+  cx.fillText(names[i]+' · '+angs[i]+'°',z,Math.min(...c.map(p=>p[1]))-10)}
+ // Quelle & Schirm
+ cx.fillStyle=gold;cx.font='400 20px "Bebas Neue",Impact,sans-serif';cx.textAlign='left';cx.fillText('Quelle',x0,cy-sc*1.7);
+ const I=st[st.length-1].I,sx=W*.965,sr=Math.min(H*.09,W*.04);
+ const g=cx.createRadialGradient(sx,cy,0,sx,cy,sr);g.addColorStop(0,gold);g.addColorStop(1,'rgba(212,167,58,0)');
+ cx.globalAlpha=.08+.92*I;cx.fillStyle=g;cx.beginPath();cx.arc(sx,cy,sr,0,7);cx.fill();cx.globalAlpha=1;
+ cx.strokeStyle=mu;cx.lineWidth=1;cx.beginPath();cx.arc(sx,cy,sr,0,7);cx.stroke();
+ cx.fillStyle=mu;cx.font='600 12px Barlow,sans-serif';cx.textAlign='center';cx.fillText('Schirm',sx,cy+sr+16);
+ // Messwerte
+ let h='<i>Start:</i> '+({unpol:'unpolarisiert',lin:'linear '+S.sa+'°',circ:'zirkular'})[S.src]+', I = 100 %<br>';
+ let prev=st[0];
+ for(let i=1;i<st.length;i++){const s=st[i];
+  let f=prev.k==='lin'?'cos²('+Math.abs(Math.round(angs[i-1]-prev.a/R))+'°) = '+Math.pow(Math.cos(angs[i-1]*R-prev.a),2).toFixed(3):'Faktor ½ (Mittelung)';
+  h+='<i>'+names[i-1]+':</i> '+f+' → <b>'+(s.I*100).toFixed(1)+' %</b><br>';prev=s}
+ $('info').innerHTML=h}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+ if(run){t+=dt*S.spd}
+ if(auto){S.an=(S.an+dt*20*S.spd)%180;$('an').value=Math.round(S.an);$('v_an').textContent=Math.round(S.an)+'°'}
+ draw();requestAnimationFrame(loop)}
+fit();requestAnimationFrame(loop);
+</script></body></html>
