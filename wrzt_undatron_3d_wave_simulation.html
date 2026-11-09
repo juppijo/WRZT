@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WRZT Undatron 3D Simulation</title>
+    <!-- Tailwind CSS for UI Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slateDark: '#0b132b',
+                        cardDark: '#1c2541',
+                        accentBlue: '#4cc9f0',
+                        accentGreen: '#10b981',
+                        accentRed: '#ef4444',
+                        accentPurple: '#7209b7'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for 3D Interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #0b132b;
+            color: #f8fafc;
+            touch-action: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        /* Custom scrollbars for controls panel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .collapsible-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+            overflow: hidden;
+        }
+        .collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between select-none">
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Top Action Buttons (Fullscreen & Mobile Panel Toggle) -->
+    <div class="fixed top-4 left-4 z-20 flex gap-2">
+        <button id="btn-fullscreen" title="Vollbild umschalten" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 text-cyan-400 rounded-xl border border-slate-700 shadow-xl backdrop-blur-md transition flex items-center justify-center w-10 h-10">
+            <i class="fa-solid fa-expand text-base" id="fullscreen-icon"></i>
+        </button>
+        <button id="btn-toggle-mobile-menu" title="Steuerung umschalten" class="md:hidden p-2.5 bg-slate-900/90 hover:bg-slate-800 text-cyan-400 rounded-xl border border-slate-700 shadow-xl backdrop-blur-md transition flex items-center justify-center w-10 h-10">
+            <i class="fa-solid fa-sliders text-base"></i>
+        </button>
+    </div>
+
+    <!-- UI Overlay Header -->
+    <header class="relative z-10 p-4 pt-16 md:pt-4 pointer-events-none flex justify-between items-start">
+        <div class="bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-700/60 shadow-2xl pointer-events-auto max-w-sm md:max-w-md overflow-hidden">
+            <div class="p-3 md:p-4 flex justify-between items-center cursor-pointer select-none" id="header-accordion-btn">
+                <h1 class="text-base md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-indigo-300 to-purple-400 flex items-center gap-2">
+                    <span class="text-cyan-400">🌀</span> WRZT Undatron-Welle
+                </h1>
+                <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300" id="header-chevron"></i>
+            </div>
+            <div id="header-content" class="collapsible-content px-3 pb-3 md:px-4 md:pb-4 border-t border-slate-800">
+                <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Vektorielle 3D-Simulation im Raumzeit-Medium (Wellenraumzeit-Theorie).
+                </p>
+                <div class="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-red-950/80 text-red-300 border border-red-700/50 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> X: Mech.
+                    </span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Y: El. Potential ($E$)
+                    </span>
+                    <span class="px-2 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-700/50 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Z: Mag. Moment ($M$)
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Live Controls Panel (Right Side) -->
+    <aside id="controls-panel" class="fixed top-16 md:top-4 right-4 z-10 w-[calc(100vw-2rem)] sm:w-80 max-h-[calc(100vh-5rem)] overflow-y-auto bg-slate-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-700/60 shadow-2xl text-slate-200 transition-all duration-300 hidden md:block">
+        <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-3">
+            <h2 class="font-semibold text-xs md:text-sm tracking-wide text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-cyan-400"></i> Steuerung & Parameter
+            </h2>
+            <div class="flex items-center gap-2">
+                <button id="btn-play" class="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-medium transition flex items-center gap-1">
+                    <i class="fa-solid fa-pause" id="play-icon"></i> <span id="play-text">Pause</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <!-- Accordion Group 1: Wellenparameter -->
+            <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
+                <button class="w-full p-2.5 flex justify-between items-center text-slate-200 font-medium hover:bg-slate-800/50 transition text-left" onclick="toggleAccordion('acc-wave', 'chev-wave')">
+                    <span class="flex items-center gap-1.5 text-cyan-300"><i class="fa-solid fa-wave-square"></i> Wellen-Parameter</span>
+                    <i id="chev-wave" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="acc-wave" class="collapsible-content p-3 space-y-3 border-t border-slate-800/60">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300 font-medium">Frequenz ($\omega$)</label>
+                            <span id="val-freq" class="text-cyan-400 font-mono">1.5 rad/s</span>
+                        </div>
+                        <input type="range" id="param-freq" min="0.1" max="5.0" step="0.1" value="1.5" class="w-full accent-cyan-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300 font-medium">Geschwindigkeit ($c_w$)</label>
+                            <span id="val-speed" class="text-cyan-400 font-mono">2.0 m/s</span>
+                        </div>
+                        <input type="range" id="param-speed" min="0.5" max="6.0" step="0.1" value="2.0" class="w-full accent-cyan-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Group 2: Amplituden & Phasen -->
+            <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
+                <button class="w-full p-2.5 flex justify-between items-center text-slate-200 font-medium hover:bg-slate-800/50 transition text-left" onclick="toggleAccordion('acc-amp', 'chev-amp')">
+                    <span class="flex items-center gap-1.5 text-emerald-300"><i class="fa-solid fa-chart-line"></i> Amplituden & Phasen</span>
+                    <i id="chev-amp" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="acc-amp" class="collapsible-content p-3 space-y-3 border-t border-slate-800/60">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-red-300 font-medium">Mech. Amp. ($A_m$)</label>
+                            <span id="val-amp-m" class="text-red-400 font-mono">0.4</span>
+                        </div>
+                        <input type="range" id="param-amp-m" min="0.0" max="1.5" step="0.05" value="0.4" class="w-full accent-red-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-emerald-300 font-medium">Elektr. Amp. ($A_e$ / Y)</label>
+                            <span id="val-amp-e" class="text-emerald-400 font-mono">1.8</span>
+                        </div>
+                        <input type="range" id="param-amp-e" min="0.0" max="3.5" step="0.1" value="1.8" class="w-full accent-emerald-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-emerald-300/80">Phase $\phi_e$</label>
+                            <span id="val-phi-e" class="text-emerald-400 font-mono">0.0°</span>
+                        </div>
+                        <input type="range" id="param-phi-e" min="-180" max="180" step="5" value="0" class="w-full accent-emerald-500 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-blue-300 font-medium">Mag. Amp. ($A_b$ / Z)</label>
+                            <span id="val-amp-b" class="text-blue-400 font-mono">1.8</span>
+                        </div>
+                        <input type="range" id="param-amp-b" min="0.0" max="3.5" step="0.1" value="1.8" class="w-full accent-blue-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-blue-300/80">Phase $\phi_m$</label>
+                            <span id="val-phi-m" class="text-blue-400 font-mono">90.0°</span>
+                        </div>
+                        <input type="range" id="param-phi-m" min="-180" max="180" step="5" value="90" class="w-full accent-blue-500 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Group 3: Anzeige & Sichtbarkeit -->
+            <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
+                <button class="w-full p-2.5 flex justify-between items-center text-slate-200 font-medium hover:bg-slate-800/50 transition text-left" onclick="toggleAccordion('acc-vis', 'chev-vis')">
+                    <span class="flex items-center gap-1.5 text-purple-300"><i class="fa-solid fa-eye"></i> Visualisierung</span>
+                    <i id="chev-vis" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="acc-vis" class="collapsible-content p-3 space-y-2 border-t border-slate-800/60">
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition py-0.5">
+                        <input type="checkbox" id="toggle-helix" checked class="rounded accent-cyan-400 w-4 h-4">
+                        <span>3D Trajektorie (WRZT-Helix)</span>
+                    </label>
+
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition py-0.5">
+                        <input type="checkbox" id="toggle-elec" checked class="rounded accent-emerald-400 w-4 h-4">
+                        <span class="text-emerald-300">Elektrische Vektoren (Y-Feld)</span>
+                    </label>
+
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition py-0.5">
+                        <input type="checkbox" id="toggle-mag" checked class="rounded accent-blue-400 w-4 h-4">
+                        <span class="text-blue-300">Magnetische Vektoren (Z-Feld)</span>
+                    </label>
+
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition py-0.5">
+                        <input type="checkbox" id="toggle-mech" checked class="rounded accent-red-400 w-4 h-4">
+                        <span class="text-red-300">Mechanische Wellenspur (X)</span>
+                    </label>
+
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition py-0.5">
+                        <input type="checkbox" id="toggle-grid" checked class="rounded accent-slate-400 w-4 h-4">
+                        <span class="text-slate-400">Koordinatengitter & Achsen</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <button id="btn-reset" class="w-full mt-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition border border-slate-700 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-rotate-left"></i> Parameter zurücksetzen
+        </button>
+    </aside>
+
+    <!-- Footer Information Bar -->
+    <footer class="relative z-10 p-2.5 pointer-events-none flex justify-between items-center text-[11px] text-slate-400 bg-slate-950/60 backdrop-blur-sm border-t border-slate-800/50">
+        <div class="pointer-events-auto overflow-x-auto whitespace-nowrap pr-2">
+            <span>Koppelung:</span>
+            <span class="font-mono text-cyan-300 ml-1">W(x,t) = [ x + A_m·sin(kx-ωt), A_e·sin(kx-ωt+φ_e), A_b·sin(kx-ωt+φ_m) ]</span>
+        </div>
+        <div class="hidden lg:block whitespace-nowrap text-slate-500">
+            Touch / Drag: Drehen | Pinch / Scroll: Zoom
+        </div>
+    </footer>
+
+    <!-- ThreeJS Logic & UI Interactivity -->
+    <script>
+        // Helper function for collapsible accordions
+        function toggleAccordion(contentId, chevronId) {
+            const content = document.getElementById(contentId);
+            const chevron = document.getElementById(chevronId);
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('collapsed');
+                if (chevron) chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        // --- Simulation State Parameters ---
+        const state = {
+            freq: 1.5,          // omega (rad/s)
+            speed: 2.0,         // wave speed
+            ampMech: 0.4,       // X mechanical amplitude displacement
+            ampElec: 1.8,       // Y electrical potential amplitude
+            ampMag: 1.8,        // Z magnetic moment amplitude
+            phiElec: 0,         // Phase shift for E (deg)
+            phiMag: 90,         // Phase shift for M (deg)
+            isPlaying: true,
+            showHelix: true,
+            showElec: true,
+            showMag: true,
+            showMech: true,
+            showGrid: true
+        };
+
+        // --- Constants & Config ---
+        const WAVE_LENGTH_SPATIAL = 12; // Length of wave propagation axis
+        const NUM_POINTS = 300;         // Resolution of the continuous wave curve
+        const NUM_VECTORS = 32;          // Number of sampled field vector arrows
+
+        // --- Three.js Globals ---
+        let scene, camera, renderer, controls;
+        let helixLine, mechProjLine, elecProjLine, magProjLine;
+        let elecVectorGroup, magVectorGroup;
+        let emitterSphere, gridHelper, axesHelperGroup;
+        let clock = new THREE.Clock();
+        let totalTime = 0;
+
+        // --- Initialization ---
+        function init() {
+            const container = document.getElementById('canvas-container');
+
+            // 1. Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b132b);
+            scene.fog = new THREE.FogExp2(0x0b132b, 0.025);
+
+            // 2. Camera setup
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            // Adjust camera position based on screen width for mobile optimization
+            if (window.innerWidth < 768) {
+                camera.position.set(18, 12, 20);
+            } else {
+                camera.position.set(12, 8, 14);
+            }
+
+            // 3. Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // 4. Controls (Optimized for Touch & Mobile)
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(3, 0, 0);
+            controls.touches = {
+                ONE: THREE.TOUCH.ROTATE,
+                TWO: THREE.TOUCH.DOLLY_PAN
+            };
+
+            // 5. Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(10, 20, 15);
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0x4cc9f0, 1.5, 10);
+            pointLight.position.set(0, 0, 0);
+            scene.add(pointLight);
+
+            // 6. Build Scene Objects
+            buildEnvironment();
+            buildWaveObjects();
+
+            // 7. Event Listeners & UI Binding
+            setupUI();
+            window.addEventListener('resize', onWindowResize);
+
+            // 8. Start Loop
+            animate();
+        }
+
+        // --- Create Grids and Custom Labeled Axes ---
+        function buildEnvironment() {
+            // Base Grid
+            gridHelper = new THREE.GridHelper(30, 30, 0x334155, 0x1e293b);
+            gridHelper.position.set(5, -3, 0);
+            scene.add(gridHelper);
+
+            // Central Emitter Sphere at Origin
+            const sphereGeo = new THREE.SphereGeometry(0.5, 32, 32);
+            const sphereMat = new THREE.MeshStandardMaterial({
+                color: 0x4cc9f0,
+                emissive: 0x10b981,
+                emissiveIntensity: 0.5,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+            emitterSphere = new THREE.Mesh(sphereGeo, sphereMat);
+            emitterSphere.position.set(0, 0, 0);
+            scene.add(emitterSphere);
+
+            // Custom 3D Coordinate Arrows & Labels Group
+            axesHelperGroup = new THREE.Group();
+
+            const createAxisArrow = (dir, color, length = 10) => {
+                return new THREE.ArrowHelper(dir, new THREE.Vector3(-2, 0, 0), length, color, 0.4, 0.2);
+            };
+
+            // X Axis (Red - Mechanical)
+            axesHelperGroup.add(createAxisArrow(new THREE.Vector3(1, 0, 0), 0xef4444, 14));
+            // Y Axis (Green - Electric)
+            axesHelperGroup.add(createAxisArrow(new THREE.Vector3(0, 1, 0), 0x10b981, 5));
+            // Z Axis (Blue - Magnetic)
+            axesHelperGroup.add(createAxisArrow(new THREE.Vector3(0, 0, 1), 0x3b82f6, 5));
+
+            scene.add(axesHelperGroup);
+        }
+
+        // --- Build Wave Geometry & Vector Arrow Holders ---
+        function buildWaveObjects() {
+            // Main 3D Helix Trajectory Line
+            const helixGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(NUM_POINTS * 3);
+            helixGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const helixMat = new THREE.LineBasicMaterial({
+                color: 0x4cc9f0,
+                linewidth: 3
+            });
+            helixLine = new THREE.Line(helixGeo, helixMat);
+            scene.add(helixLine);
+
+            // Projection 2D lines along axes
+            const createProjLine = (color) => {
+                const geo = new THREE.BufferGeometry();
+                geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NUM_POINTS * 3), 3));
+                return new THREE.Line(geo, new THREE.LineDashedMaterial({ color: color, dashSize: 0.2, gapSize: 0.1 }));
+            };
+
+            mechProjLine = createProjLine(0xef4444); // Red: X Mech
+            elecProjLine = createProjLine(0x10b981); // Green: Y Elec
+            magProjLine = createProjLine(0x3b82f6);  // Blue: Z Mag
+
+            scene.add(mechProjLine);
+            scene.add(elecProjLine);
+            scene.add(magProjLine);
+
+            // Field Vector Arrow Groups
+            elecVectorGroup = new THREE.Group();
+            magVectorGroup = new THREE.Group();
+            scene.add(elecVectorGroup);
+            scene.add(magVectorGroup);
+
+            // Populate vector arrows
+            for (let i = 0; i < NUM_VECTORS; i++) {
+                // Electric vectors (y-axis offset)
+                const eArrow = new THREE.ArrowHelper(
+                    new THREE.Vector3(0, 1, 0),
+                    new THREE.Vector3(0, 0, 0),
+                    1,
+                    0x10b981,
+                    0.2,
+                    0.1
+                );
+                elecVectorGroup.add(eArrow);
+
+                // Magnetic vectors (z-axis offset)
+                const mArrow = new THREE.ArrowHelper(
+                    new THREE.Vector3(0, 0, 1),
+                    new THREE.Vector3(0, 0, 0),
+                    1,
+                    0x3b82f6,
+                    0.2,
+                    0.1
+                );
+                magVectorGroup.add(mArrow);
+            }
+        }
+
+        // --- Mathematical Core: Calculate Undatron State ---
+        function calculateWavePoint(xRaw, t) {
+            const k = (2 * Math.PI) / (state.speed * 2); // Wave number k
+            const omega = state.freq;
+            const phiE = (state.phiElec * Math.PI) / 180;
+            const phiM = (state.phiMag * Math.PI) / 180;
+
+            const phase = k * xRaw - omega * t;
+
+            // X Component: Mechanical sine wave propagation from center
+            const xMech = xRaw + state.ampMech * Math.sin(phase);
+
+            // Y Component: Electrical Potential
+            const yElec = state.ampElec * Math.sin(phase + phiE);
+
+            // Z Component: Magnetic Moment
+            const zMag = state.ampMag * Math.sin(phase + phiM);
+
+            return { x: xMech, y: yElec, z: zMag };
+        }
+
+        // --- Animation & Dynamic Geometry Update ---
+        function updateWaveGeometry() {
+            const positionsHelix = helixLine.geometry.attributes.position.array;
+            const posMech = mechProjLine.geometry.attributes.position.array;
+            const posElec = elecProjLine.geometry.attributes.position.array;
+            const posMag = magProjLine.geometry.attributes.position.array;
+
+            const step = WAVE_LENGTH_SPATIAL / (NUM_POINTS - 1);
+
+            // 1. Update Continuous Curve Points
+            for (let i = 0; i < NUM_POINTS; i++) {
+                const xRaw = i * step;
+                const pt = calculateWavePoint(xRaw, totalTime);
+
+                // Main 3D Helix trajectory
+                positionsHelix[i * 3]     = pt.x;
+                positionsHelix[i * 3 + 1] = pt.y;
+                positionsHelix[i * 3 + 2] = pt.z;
+
+                // Mechanical projection on X axis
+                posMech[i * 3]     = pt.x;
+                posMech[i * 3 + 1] = -2.9; // just above grid
+                posMech[i * 3 + 2] = 0;
+
+                // Electric projection on XY plane
+                posElec[i * 3]     = pt.x;
+                posElec[i * 3 + 1] = pt.y;
+                posElec[i * 3 + 2] = -3;
+
+                // Magnetic projection on XZ plane
+                posMag[i * 3]     = pt.x;
+                posMag[i * 3 + 1] = -2.9;
+                posMag[i * 3 + 2] = pt.z;
+            }
+
+            helixLine.geometry.attributes.position.needsUpdate = true;
+            mechProjLine.geometry.attributes.position.needsUpdate = true;
+            elecProjLine.geometry.attributes.position.needsUpdate = true;
+            magProjLine.geometry.attributes.position.needsUpdate = true;
+
+            // 2. Update Sampled Discrete Field Vectors
+            const vectorStep = WAVE_LENGTH_SPATIAL / (NUM_VECTORS - 1);
+
+            for (let i = 0; i < NUM_VECTORS; i++) {
+                const xRaw = i * vectorStep;
+                const pt = calculateWavePoint(xRaw, totalTime);
+
+                // Update Electric Arrows (Y-Axis)
+                const eArrow = elecVectorGroup.children[i];
+                eArrow.position.set(pt.x, 0, 0);
+                const magE = Math.abs(pt.y);
+                const dirE = pt.y >= 0 ? 1 : -1;
+                eArrow.setDirection(new THREE.Vector3(0, dirE, 0));
+                eArrow.setLength(Math.max(magE, 0.001), Math.min(0.2, magE * 0.3), 0.08);
+                eArrow.visible = state.showElec;
+
+                // Update Magnetic Arrows (Z-Axis)
+                const mArrow = magVectorGroup.children[i];
+                mArrow.position.set(pt.x, 0, 0);
+                const magM = Math.abs(pt.z);
+                const dirM = pt.z >= 0 ? 1 : -1;
+                mArrow.setDirection(new THREE.Vector3(0, 0, dirM));
+                mArrow.setLength(Math.max(magM, 0.001), Math.min(0.2, magM * 0.3), 0.08);
+                mArrow.visible = state.showMag;
+            }
+
+            // 3. Central Emitter Mechanical Pulsing Animation
+            const pulseScale = 1.0 + 0.25 * Math.sin(totalTime * state.freq * 2.0);
+            emitterSphere.scale.set(pulseScale, pulseScale, pulseScale);
+        }
+
+        // --- Main Render Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            if (state.isPlaying) {
+                totalTime += delta;
+            }
+
+            updateWaveGeometry();
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // --- Event Handlers & UI Binding ---
+        function setupUI() {
+            // Slider Binds
+            bindSlider('param-freq', 'val-freq', (v) => { state.freq = v; return `${v.toFixed(1)} rad/s`; });
+            bindSlider('param-speed', 'val-speed', (v) => { state.speed = v; return `${v.toFixed(1)} m/s`; });
+            bindSlider('param-amp-m', 'val-amp-m', (v) => { state.ampMech = v; return `${v.toFixed(2)}`; });
+            bindSlider('param-amp-e', 'val-amp-e', (v) => { state.ampElec = v; return `${v.toFixed(1)}`; });
+            bindSlider('param-amp-b', 'val-amp-b', (v) => { state.ampMag = v; return `${v.toFixed(1)}`; });
+            bindSlider('param-phi-e', 'val-phi-e', (v) => { state.phiElec = v; return `${v.toFixed(0)}°`; });
+            bindSlider('param-phi-m', 'val-phi-m', (v) => { state.phiMag = v; return `${v.toFixed(0)}°`; });
+
+            // Header Accordion Toggle
+            const headerBtn = document.getElementById('header-accordion-btn');
+            const headerContent = document.getElementById('header-content');
+            const headerChevron = document.getElementById('header-chevron');
+            headerBtn.addEventListener('click', () => {
+                if (headerContent.classList.contains('collapsed')) {
+                    headerContent.classList.remove('collapsed');
+                    headerChevron.style.transform = 'rotate(0deg)';
+                } else {
+                    headerContent.classList.add('collapsed');
+                    headerChevron.style.transform = 'rotate(-90deg)';
+                }
+            });
+
+            // Fullscreen Toggle Button
+            const btnFullscreen = document.getElementById('btn-fullscreen');
+            const fsIcon = document.getElementById('fullscreen-icon');
+            btnFullscreen.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                    });
+                    fsIcon.className = 'fa-solid fa-compress text-base';
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                    fsIcon.className = 'fa-solid fa-expand text-base';
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    fsIcon.className = 'fa-solid fa-expand text-base';
+                } else {
+                    fsIcon.className = 'fa-solid fa-compress text-base';
+                }
+            });
+
+            // Mobile Panel Toggle Button
+            const btnMobileMenu = document.getElementById('btn-toggle-mobile-menu');
+            const controlsPanel = document.getElementById('controls-panel');
+            btnMobileMenu.addEventListener('click', () => {
+                controlsPanel.classList.toggle('hidden');
+            });
+
+            // Play / Pause Button
+            const btnPlay = document.getElementById('btn-play');
+            const playIcon = document.getElementById('play-icon');
+            const playText = document.getElementById('play-text');
+
+            btnPlay.addEventListener('click', () => {
+                state.isPlaying = !state.isPlaying;
+                if (state.isPlaying) {
+                    playIcon.className = 'fa-solid fa-pause';
+                    playText.textContent = 'Pause';
+                    btnPlay.classList.replace('bg-emerald-600', 'bg-cyan-600');
+                    btnPlay.classList.replace('hover:bg-emerald-500', 'hover:bg-cyan-500');
+                } else {
+                    playIcon.className = 'fa-solid fa-play';
+                    playText.textContent = 'Start';
+                    btnPlay.classList.replace('bg-cyan-600', 'bg-emerald-600');
+                    btnPlay.classList.replace('hover:bg-cyan-500', 'hover:bg-emerald-500');
+                }
+            });
+
+            // Toggle Visibility Checkboxes
+            document.getElementById('toggle-helix').addEventListener('change', (e) => {
+                state.showHelix = e.target.checked;
+                helixLine.visible = state.showHelix;
+            });
+            document.getElementById('toggle-elec').addEventListener('change', (e) => {
+                state.showElec = e.target.checked;
+                elecProjLine.visible = state.showElec;
+            });
+            document.getElementById('toggle-mag').addEventListener('change', (e) => {
+                state.showMag = e.target.checked;
+                magProjLine.visible = state.showMag;
+            });
+            document.getElementById('toggle-mech').addEventListener('change', (e) => {
+                state.showMech = e.target.checked;
+                mechProjLine.visible = state.showMech;
+            });
+            document.getElementById('toggle-grid').addEventListener('change', (e) => {
+                state.showGrid = e.target.checked;
+                gridHelper.visible = state.showGrid;
+                axesHelperGroup.visible = state.showGrid;
+            });
+
+            // Reset Button
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                document.getElementById('param-freq').value = 1.5;
+                document.getElementById('param-speed').value = 2.0;
+                document.getElementById('param-amp-m').value = 0.4;
+                document.getElementById('param-amp-e').value = 1.8;
+                document.getElementById('param-amp-b').value = 1.8;
+                document.getElementById('param-phi-e').value = 0;
+                document.getElementById('param-phi-m').value = 90;
+
+                state.freq = 1.5;
+                state.speed = 2.0;
+                state.ampMech = 0.4;
+                state.ampElec = 1.8;
+                state.ampMag = 1.8;
+                state.phiElec = 0;
+                state.phiMag = 90;
+
+                document.getElementById('val-freq').textContent = '1.5 rad/s';
+                document.getElementById('val-speed').textContent = '2.0 m/s';
+                document.getElementById('val-amp-m').textContent = '0.40';
+                document.getElementById('val-amp-e').textContent = '1.8';
+                document.getElementById('val-amp-b').textContent = '1.8';
+                document.getElementById('val-phi-e').textContent = '0°';
+                document.getElementById('val-phi-m').textContent = '90°';
+            });
+        }
+
+        function bindSlider(id, valId, formatFn) {
+            const input = document.getElementById(id);
+            const label = document.getElementById(valId);
+            input.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                label.textContent = formatFn(val);
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Run on Page Load
+        window.onload = init;
+    </script>
+</body>
+</html>
