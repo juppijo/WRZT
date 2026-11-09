@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>3D Phasenverschiebung & Doppelbrechung (WRZT / Optik)</title>
+    <title>3D Phasenverschiebung &amp; Doppelbrechung (WRZT / Optik)</title>
     <!-- Tailwind CSS für modernes UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js für 3D-Grafik -->
@@ -177,9 +177,9 @@
         controls.autoRotateSpeed = 0.5;
 
         // Licht
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
         scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0x38bdf8, 1, 50);
+        const pointLight = new THREE.PointLight(0x00f0ff, 1.5, 60);
         pointLight.position.set(0, 20, 10);
         scene.add(pointLight);
 
@@ -189,20 +189,28 @@
         const axisGeo = new THREE.BufferGeometry().setFromPoints(pointsAxis);
         scene.add(new THREE.Line(axisGeo, axisMaterial));
 
-        // Kristall-Block in der Mitte (Visualisierung der Platte)
-        const crystalGeo = new THREE.BoxGeometry(8, 8, 2);
+        // --- HIER: HELLE, LEUCHTENDE LAMBDA/4-PLATTE (CYAN-BLAU) ---
+        const crystalGeo = new THREE.BoxGeometry(9, 9, 2.2);
         const crystalMat = new THREE.MeshPhysicalMaterial({
-            color: 0x38bdf8,
+            color: 0x00e5ff,          // Helles, leuchtendes Cyan-Blau
+            emissive: 0x005577,       // Eigenleuchten für bessere Sichtbarkeit
             transparent: true,
-            opacity: 0.15,
-            roughness: 0.1,
+            opacity: 0.35,            // Etwas weniger transparent, damit die Farbe kräftig wirkt
+            roughness: 0.05,
             metalness: 0.1,
-            transmission: 0.9,
+            transmission: 0.8,
+            reflectivity: 0.9,
             side: THREE.DoubleSide
         });
         const crystal = new THREE.Mesh(crystalGeo, crystalMat);
         crystal.position.set(0, 0, 0);
         scene.add(crystal);
+
+        // Umrandung der Platte für noch klarere Konturen
+        const edgesGeo = new THREE.EdgesGeometry(crystalGeo);
+        const edgesMat = new THREE.LineBasicMaterial({ color: 0x80f7ff, linewidth: 2 });
+        const crystalEdges = new THREE.LineSegments(edgesGeo, edgesMat);
+        crystal.add(crystalEdges);
 
         // Linien-Container für dynamische Wellen
         const waveGroup = new THREE.Group();
@@ -226,7 +234,6 @@
 
             waveGroup.clear();
 
-            const length = 40;
             const steps = 300;
             const zStart = -20;
             const zEnd = 20;
@@ -244,8 +251,6 @@
                 let currentPhaseDelta = (z >= 0) ? phaseShiftRad : 0;
 
                 let amplitude = 4;
-                // Vor dem Kristall schwingt alles synchron (45 Grad)
-                // Nach dem Kristall hinkt die Y-Komponente (langsame Achse) hinterher
                 let xVal = Math.sin(z * 0.4 - time) * amplitude;
                 let yVal = Math.sin(z * 0.4 - time - currentPhaseDelta) * amplitude;
 
@@ -253,7 +258,7 @@
                 ptsSlow.push(new THREE.Vector3(0, yVal, z));
                 ptsResult.push(new THREE.Vector3(xVal, yVal, z));
 
-                // Alle paar Schritte feine Verbindungs-Striche zur Veranschaulichung der Spirale
+                // Verbindungsstriche für die Spirale
                 if (i % 6 === 0) {
                     connectorPointsArray.push([
                         new THREE.Vector3(0, 0, z),
