@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WRZT Gummifeld & Wellennetz 3D Simulation</title>
+    <!-- Tailwind CSS for UI Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slateDark: '#0b132b',
+                        cardDark: '#1c2541',
+                        accentBlue: '#4cc9f0',
+                        accentGreen: '#10b981',
+                        accentRed: '#ef4444',
+                        accentPurple: '#7209b7'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for 3D Interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #070b19;
+            color: #f8fafc;
+            touch-action: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        .collapsible-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+            overflow: hidden;
+        }
+        .collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between select-none">
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Top Action Buttons -->
+    <div class="fixed top-4 left-4 z-20 flex gap-2">
+        <button id="btn-fullscreen" title="Vollbild umschalten" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 text-cyan-400 rounded-xl border border-slate-700 shadow-xl backdrop-blur-md transition flex items-center justify-center w-10 h-10">
+            <i class="fa-solid fa-expand text-base" id="fullscreen-icon"></i>
+        </button>
+        <button id="btn-toggle-mobile-menu" title="Steuerung umschalten" class="md:hidden p-2.5 bg-slate-900/90 hover:bg-slate-800 text-cyan-400 rounded-xl border border-slate-700 shadow-xl backdrop-blur-md transition flex items-center justify-center w-10 h-10">
+            <i class="fa-solid fa-sliders text-base"></i>
+        </button>
+    </div>
+
+    <!-- UI Overlay Header -->
+    <header class="relative z-10 p-4 pt-16 md:pt-4 pointer-events-none flex justify-between items-start">
+        <div class="bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-700/60 shadow-2xl pointer-events-auto max-w-sm md:max-w-md overflow-hidden">
+            <div class="p-3 md:p-4 flex justify-between items-center cursor-pointer select-none" id="header-accordion-btn">
+                <h1 class="text-base md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-indigo-300 to-purple-400 flex items-center gap-2">
+                    <span class="text-cyan-400">🕸️</span> WRZT Gummifeld-Modell
+                </h1>
+                <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300" id="header-chevron"></i>
+            </div>
+            <div id="header-content" class="collapsible-content px-3 pb-3 md:px-4 md:pb-4 border-t border-slate-800">
+                <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Elastisches Raumzeit-Netz. Klicke oder tippe auf das Netz, um Wellenimpulse auszulösen!
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Controls Panel -->
+    <aside id="controls-panel" class="fixed top-16 md:top-4 right-4 z-10 w-[calc(100vw-2rem)] sm:w-80 max-h-[calc(100vh-5rem)] overflow-y-auto bg-slate-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-700/60 shadow-2xl text-slate-200 transition-all duration-300 hidden md:block">
+        <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-3">
+            <h2 class="font-semibold text-xs md:text-sm tracking-wide text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-cyan-400"></i> Netz-Parameter
+            </h2>
+            <div class="flex items-center gap-2">
+                <button id="btn-play" class="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-medium transition flex items-center gap-1">
+                    <i class="fa-solid fa-pause" id="play-icon"></i> <span id="play-text">Pause</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
+                <button class="w-full p-2.5 flex justify-between items-center text-slate-200 font-medium hover:bg-slate-800/50 transition text-left" onclick="toggleAccordion('acc-dyn', 'chev-dyn')">
+                    <span class="flex items-center gap-1.5 text-cyan-300"><i class="fa-solid fa-wave-square"></i> Wellen-Ausbreitung</span>
+                    <i id="chev-dyn" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="acc-dyn" class="collapsible-content p-3 space-y-3 border-t border-slate-800/60">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300 font-medium">Spannung / Elastizität</label>
+                            <span id="val-tension" class="text-cyan-400 font-mono">0.15</span>
+                        </div>
+                        <input type="range" id="param-tension" min="0.05" max="0.4" step="0.01" value="0.15" class="w-full accent-cyan-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300 font-medium">Dämpfung</label>
+                            <span id="val-damping" class="text-cyan-400 font-mono">0.985</span>
+                        </div>
+                        <input type="range" id="param-damping" min="0.950" max="0.999" step="0.001" value="0.985" class="w-full accent-cyan-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-slate-300 font-medium">Impuls-Stärke</label>
+                            <span id="val-amplitude" class="text-cyan-400 font-mono">1.2</span>
+                        </div>
+                        <input type="range" id="param-amplitude" min="0.2" max="3.0" step="0.1" value="1.2" class="w-full accent-cyan-400 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
+                <button class="w-full p-2.5 flex justify-between items-center text-slate-200 font-medium hover:bg-slate-800/50 transition text-left" onclick="toggleAccordion('acc-actions', 'chev-actions')">
+                    <span class="flex items-center gap-1.5 text-emerald-300"><i class="fa-solid fa-bolt"></i> Quellen & Verschränkung</span>
+                    <i id="chev-actions" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="acc-actions" class="collapsible-content p-3 space-y-2 border-t border-slate-800/60">
+                    <button id="btn-dual-source" class="w-full py-2 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-700/50 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i> Verschränktes Quellen-Paar
+                    </button>
+                    <button id="btn-center-pulse" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition border border-slate-700 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-bullseye"></i> Zentraler Impuls
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button id="btn-reset" class="w-full mt-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition border border-slate-700 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-rotate-left"></i> Netz glätten (Reset)
+        </button>
+    </aside>
+
+    <footer class="relative z-10 p-2.5 pointer-events-none flex justify-between items-center text-[11px] text-slate-400 bg-slate-950/60 backdrop-blur-sm border-t border-slate-800/50">
+        <div class="pointer-events-auto overflow-x-auto whitespace-nowrap pr-2">
+            <span>Prinzip:</span>
+            <span class="font-mono text-cyan-300 ml-1">Gekoppelte Oszillatoren im 2D-Raumzeitgitter</span>
+        </div>
+    </footer>
+
+    <!-- ThreeJS Logic -->
+    <script>
+        function toggleAccordion(contentId, chevronId) {
+            const content = document.getElementById(contentId);
+            const chevron = document.getElementById(chevronId);
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('collapsed');
+                if (chevron) chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        const state = {
+            tension: 0.15,
+            damping: 0.985,
+            amplitude: 1.2,
+            isPlaying: true
+        };
+
+        const GRID_SIZE = 45;
+        const SPACING = 0.5;
+
+        let heightCurrent = new Float32Array(GRID_SIZE * GRID_SIZE);
+        let heightVelocity = new Float32Array(GRID_SIZE * GRID_SIZE);
+
+        let scene, camera, renderer, controls;
+        let meshGrid, geometry;
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+
+        function init() {
+            const container = document.getElementById('canvas-container');
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x070b19);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 16, 22);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 0, 0);
+
+            // Deutlich hellere Beleuchtung für das Netz
+            scene.add(new THREE.AmbientLight(0x4cc9f0, 0.8));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight.position.set(10, 25, 15);
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0x4cc9f0, 2, 25);
+            pointLight.position.set(0, 5, 0);
+            scene.add(pointLight);
+
+            buildMeshGrid();
+            setupUI();
+
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('pointerdown', onPointerDown);
+
+            triggerPulse(Math.floor(GRID_SIZE / 2), Math.floor(GRID_SIZE / 2), 2.5);
+
+            animate();
+        }
+
+        function buildMeshGrid() {
+            geometry = new THREE.PlaneGeometry(GRID_SIZE * SPACING, GRID_SIZE * SPACING, GRID_SIZE - 1, GRID_SIZE - 1);
+            geometry.rotateX(-Math.PI / 2);
+
+            // Gut sichtbares, leuchtendes Cyberpunk-Netzmaterial
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x1e3a8a,
+                emissive: 0x0284c7,
+                emissiveIntensity: 0.3,
+                wireframe: true,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+
+            meshGrid = new THREE.Mesh(geometry, material);
+            scene.add(meshGrid);
+        }
+
+        function updateWaveSimulation() {
+            if (!state.isPlaying) return;
+
+            const positions = geometry.attributes.position.array;
+            const w = GRID_SIZE;
+            const tension = state.tension;
+            const damping = state.damping;
+
+            for (let z = 1; z < w - 1; z++) {
+                for (let x = 1; x < w - 1; x++) {
+                    const idx = z * w + x;
+                    
+                    const left = heightCurrent[z * w + (x - 1)];
+                    const right = heightCurrent[z * w + (x + 1)];
+                    const up = heightCurrent[(z - 1) * w + x];
+                    const down = heightCurrent[(z + 1) * w + x];
+
+                    const laplacian = (left + right + up + down) - 4 * heightCurrent[idx];
+                    let velocity = heightVelocity[idx] + laplacian * tension;
+                    velocity *= damping;
+
+                    heightVelocity[idx] = velocity;
+                }
+            }
+
+            for (let i = 0; i < w * w; i++) {
+                heightCurrent[i] += heightVelocity[i];
+                positions[i * 3 + 1] = heightCurrent[i];
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+        }
+
+        function triggerPulse(gx, gz, strength) {
+            const w = GRID_SIZE;
+            const radius = 4;
+            for (let z = Math.max(0, gz - radius); z <= Math.min(w - 1, gz + radius); z++) {
+                for (let x = Math.max(0, gx - radius); x <= Math.min(w - 1, gx + radius); x++) {
+                    const idx = z * w + x;
+                    const dist = Math.hypot(x - gx, z - gz);
+                    if (dist <= radius) {
+                        heightCurrent[idx] += strength * Math.cos((dist / radius) * (Math.PI / 2));
+                    }
+                }
+            }
+        }
+
+        function onPointerDown(event) {
+            if (event.clientX > window.innerWidth - 320 && event.clientY < 400) return;
+            if (event.clientX < 100 && event.clientY < 100) return;
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(meshGrid);
+
+            if (intersects.length > 0) {
+                const localPoint = meshGrid.worldToLocal(intersects[0].point);
+                const gx = Math.floor((localPoint.x / (GRID_SIZE * SPACING) + 0.5) * GRID_SIZE);
+                const gz = Math.floor((localPoint.z / (GRID_SIZE * SPACING) + 0.5) * GRID_SIZE);
+
+                if (gx >= 0 && gx < GRID_SIZE && gz >= 0 && gz < GRID_SIZE) {
+                    triggerPulse(gx, gz, state.amplitude * 1.8);
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            updateWaveSimulation();
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function setupUI() {
+            bindSlider('param-tension', 'val-tension', (v) => { state.tension = v; return v.toFixed(2); });
+            bindSlider('param-damping', 'val-damping', (v) => { state.damping = v; return v.toFixed(3); });
+            bindSlider('param-amplitude', 'val-amplitude', (v) => { state.amplitude = v; return v.toFixed(1); });
+
+            document.getElementById('header-accordion-btn').addEventListener('click', () => {
+                const content = document.getElementById('header-content');
+                const chevron = document.getElementById('header-chevron');
+                content.classList.toggle('collapsed');
+                chevron.style.transform = content.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
+            });
+
+            document.getElementById('btn-fullscreen').addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                    document.getElementById('fullscreen-icon').className = 'fa-solid fa-compress text-base';
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    document.getElementById('fullscreen-icon').className = 'fa-solid fa-expand text-base';
+                }
+            });
+
+            document.getElementById('btn-toggle-mobile-menu').addEventListener('click', () => {
+                document.getElementById('controls-panel').classList.toggle('hidden');
+            });
+
+            const btnPlay = document.getElementById('btn-play');
+            btnPlay.addEventListener('click', () => {
+                state.isPlaying = !state.isPlaying;
+                document.getElementById('play-icon').className = state.isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+                document.getElementById('play-text').textContent = state.isPlaying ? 'Pause' : 'Start';
+            });
+
+            document.getElementById('btn-dual-source').addEventListener('click', () => {
+                triggerPulse(GRID_SIZE / 2 - 8, GRID_SIZE / 2, 2.5);
+                triggerPulse(GRID_SIZE / 2 + 8, GRID_SIZE / 2, -2.5);
+            });
+
+            document.getElementById('btn-center-pulse').addEventListener('click', () => {
+                triggerPulse(GRID_SIZE / 2, GRID_SIZE / 2, 3.0);
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                heightCurrent.fill(0);
+                heightVelocity.fill(0);
+            });
+        }
+
+        function bindSlider(id, valId, formatFn) {
+            const input = document.getElementById(id);
+            const label = document.getElementById(valId);
+            input.addEventListener('input', (e) => {
+                label.textContent = formatFn(parseFloat(e.target.value));
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
