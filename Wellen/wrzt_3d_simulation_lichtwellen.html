@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WRZT 3D-Simulation – Lichtdurchlässigkeit & Wellenbrechung</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js & OrbitControls (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Google Font: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-panel: rgba(13, 19, 33, 0.84);
+      --border-panel: rgba(94, 165, 255, 0.25);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --card-bg: rgba(30, 41, 59, 0.65);
+    }
+
+    body.theme-light {
+      --bg-panel: rgba(248, 250, 252, 0.9);
+      --border-panel: rgba(15, 23, 42, 0.16);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.25);
+      --card-bg: rgba(226, 232, 240, 0.72);
+    }
+
+    body.theme-holo {
+      --bg-panel: rgba(4, 22, 28, 0.86);
+      --border-panel: rgba(0, 255, 213, 0.35);
+      --text-main: #e0f2fe;
+      --text-muted: #67e8f9;
+      --accent: #00ffd5;
+      --accent-glow: rgba(0, 255, 213, 0.38);
+      --card-bg: rgba(8, 51, 68, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background-color: #050811;
+      color: var(--text-main);
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    .hud-glass {
+      background: var(--bg-panel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-panel);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+      color: var(--text-main);
+      transition: all 0.25s ease;
+    }
+
+    .hud-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-panel);
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Custom Range Sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.3);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+    }
+
+    /* Scrollbar styling inside control panel */
+    .panel-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .panel-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .panel-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+    }
+
+    .btn-interactive {
+      transition: transform 0.12s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .btn-interactive:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body class="theme-cosmos">
+
+  <!-- 3D WebGL Viewport -->
+  <div id="canvas-container"></div>
+
+  <!-- Top Header / Title & Action Buttons -->
+  <header class="fixed top-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+    <!-- Title Pill -->
+    <div class="hud-glass rounded-2xl px-4 py-2.5 flex items-center gap-3 pointer-events-auto max-w-full">
+      <div class="w-3 h-3 rounded-full animate-pulse" style="background: var(--accent); box-shadow: 0 0 12px var(--accent);"></div>
+      <div>
+        <h1 class="text-sm sm:text-base font-bold tracking-tight leading-tight">
+          WRZT 3D-Wellennetzwerk <span class="hidden sm:inline font-normal opacity-75">| Transparenz & Brechung</span>
+        </h1>
+        <p class="text-[11px] opacity-75 hidden md:block">
+          Mechanische Knoten-Kopplung, Phasenverzögerung Δφ & Snellius-Brechung im Raumzeit-Netzwerk
+        </p>
+      </div>
+    </div>
+
+    <!-- Top Right Controls (Info, Play/Pause, Reset, Panel Toggle, Fullscreen) -->
+    <div class="flex items-center gap-2 pointer-events-auto">
+      <button id="btn-info" title="WRZT-Physik Info & Legende" class="hud-glass btn-interactive rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 hover:border-sky-400">
+        <span>ℹ️</span>
+        <span class="hidden sm:inline">WRZT-Info</span>
+      </button>
+
+      <button id="btn-play-pause" title="Animation Pausieren / Fortsetzen" class="hud-glass btn-interactive rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 hover:border-sky-400">
+        <span id="icon-play-pause">⏸️</span>
+        <span id="label-play-pause" class="hidden md:inline">Pause</span>
+      </button>
+
+      <button id="btn-reset-cam" title="Kamera zurücksetzen" class="hud-glass btn-interactive rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 hover:border-sky-400">
+        <span>🎥</span>
+        <span class="hidden md:inline">Reset</span>
+      </button>
+
+      <button id="btn-toggle-panel" title="Steuerung ein-/ausblenden" class="hud-glass btn-interactive rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-1.5 hover:border-sky-400">
+        <span>🎛️</span>
+        <span id="label-toggle-panel">Steuerung</span>
+      </button>
+
+      <button id="btn-fullscreen" title="Vollbild umschalten" class="hud-glass btn-interactive rounded-xl px-3.5 py-2.5 text-sm sm:text-base font-bold flex items-center justify-center hover:border-sky-400">
+        <span id="icon-fullscreen">⛶</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Collapsible Control & Telemetry Panel (Left/Bottom-Left on Mobile) -->
+  <aside id="control-panel" class="fixed top-20 left-3 z-20 w-[calc(100vw-1.5rem)] sm:w-96 max-h-[calc(100vh-6rem)] hud-glass rounded-2xl p-4 overflow-y-auto panel-scroll flex flex-col gap-3.5">
+    
+    <!-- Live Telemetry Box -->
+    <div class="hud-card rounded-xl p-3">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider opacity-80">📊 Live-Telemetrie (WRZT)</span>
+        <span id="telemetry-status" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          Kohärente Transmission
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="p-2 rounded-lg bg-black/20">
+          <div class="opacity-70 text-[11px]">Brechungswinkel β</div>
+          <div id="val-beta" class="mono text-sm font-bold text-sky-400 mt-0.5">28.1°</div>
+        </div>
+        <div class="p-2 rounded-lg bg-black/20">
+          <div class="opacity-70 text-[11px]">Phasengeschw. v_Netz</div>
+          <div id="val-vnet" class="mono text-sm font-bold text-emerald-400 mt-0.5">68.5% c₀</div>
+          <div id="val-vkms" class="mono text-[10px] opacity-75">205.337 km/s</div>
+        </div>
+        <div class="p-2 rounded-lg bg-black/20">
+          <div class="opacity-70 text-[11px]">Wellenlänge λ_Netz</div>
+          <div id="val-lambdanet" class="mono text-sm font-bold text-amber-300 mt-0.5">377 nm</div>
+          <div id="val-lambda0" class="mono text-[10px] opacity-75">Vakuum: 550 nm</div>
+        </div>
+        <div class="p-2 rounded-lg bg-black/20">
+          <div class="opacity-70 text-[11px]">Phasenverzögerung Δφ</div>
+          <div id="val-deltaphi-deg" class="mono text-sm font-bold text-purple-300 mt-0.5">603°</div>
+          <div id="val-deltaphi-rad" class="mono text-[10px] opacity-75">10.52 rad</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Structure Mode Selector -->
+    <div>
+      <label class="block text-xs font-semibold mb-1.5 opacity-90">🔬 Netzwerk-Struktur im Medium</label>
+      <div class="grid grid-cols-3 gap-1.5">
+        <button data-mode="amorphous" class="mode-btn btn-interactive rounded-xl py-2 px-2 text-xs font-semibold border border-sky-400 bg-sky-500/25 text-center">
+          Amorphes Glas
+        </button>
+        <button data-mode="crystal" class="mode-btn btn-interactive rounded-xl py-2 px-2 text-xs font-semibold border border-transparent hud-card text-center opacity-80 hover:opacity-100">
+          Kristallgitter
+        </button>
+        <button data-mode="turbid" class="mode-btn btn-interactive rounded-xl py-2 px-2 text-xs font-semibold border border-transparent hud-card text-center opacity-80 hover:opacity-100">
+          Trübes Glas
+        </button>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="flex flex-col gap-3">
+      <!-- Einfallswinkel α -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="font-medium">Einfallswinkel α</span>
+          <span id="lbl-alpha" class="mono font-bold text-sky-400">42°</span>
+        </div>
+        <input id="slider-alpha" type="range" min="0" max="75" step="1" value="42" />
+      </div>
+
+      <!-- Netzwerk-Kopplung / Brechzahl n_WRZT -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="font-medium">Kopplung / Brechzahl n_WRZT</span>
+          <span id="lbl-n" class="mono font-bold text-emerald-400">1.46</span>
+        </div>
+        <input id="slider-n" type="range" min="1.00" max="2.45" step="0.01" value="1.46" />
+        <!-- Material Presets -->
+        <div class="flex flex-wrap gap-1 mt-1.5">
+          <button data-n="1.00" class="preset-btn text-[11px] px-2 py-1 rounded-lg hud-card hover:border-sky-400">Vakuum 1.00</button>
+          <button data-n="1.33" class="preset-btn text-[11px] px-2 py-1 rounded-lg hud-card hover:border-sky-400">Wasser 1.33</button>
+          <button data-n="1.46" class="preset-btn text-[11px] px-2 py-1 rounded-lg hud-card border-sky-400">Quarzglas 1.46</button>
+          <button data-n="1.52" class="preset-btn text-[11px] px-2 py-1 rounded-lg hud-card hover:border-sky-400">Fensterglas 1.52</button>
+          <button data-n="2.42" class="preset-btn text-[11px] px-2 py-1 rounded-lg hud-card hover:border-sky-400">Diamant 2.42</button>
+        </div>
+      </div>
+
+      <!-- Lichtwellenlänge λ_0 -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="font-medium">Lichtwellenlänge λ₀ (inkl. Dispersion)</span>
+          <span id="lbl-lambda" class="mono font-bold" style="color: #4ade80;">550 nm</span>
+        </div>
+        <input id="slider-lambda" type="range" min="400" max="700" step="2" value="550" />
+        <div class="w-full h-1.5 rounded-full mt-1 opacity-85" style="background: linear-gradient(to right, #7c3aed, #2563eb, #06b6d4, #22c55e, #eab308, #f97316, #ef4444);"></div>
+      </div>
+
+      <!-- Glasdicke d -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="font-medium">Effektive Schichtdicke d (für Δφ)</span>
+          <span id="lbl-thickness" class="mono font-bold text-purple-300">2.00 µm</span>
+        </div>
+        <input id="slider-thickness" type="range" min="0.5" max="5.0" step="0.1" value="2.0" />
+      </div>
+
+      <!-- Animationsgeschwindigkeit -->
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="font-medium">Wellen-Geschwindigkeit (Zeitlupe)</span>
+          <span id="lbl-speed" class="mono font-bold">1.0x</span>
+        </div>
+        <input id="slider-speed" type="range" min="0.1" max="2.5" step="0.1" value="1.0" />
+      </div>
+    </div>
+
+    <!-- Visual Toggles & Theme Switcher -->
+    <div class="pt-2 border-t border-slate-500/25 flex flex-col gap-2.5">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-medium">Phasen-Referenzmarker (Vakuum vs. Glas)</span>
+        <input id="toggle-phasemarker" type="checkbox" checked class="w-4 h-4 accent-sky-400 cursor-pointer" />
+      </div>
+
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-medium">3D-Wellenfront-Ebenen anzeigen</span>
+        <input id="toggle-wavefronts" type="checkbox" checked class="w-4 h-4 accent-sky-400 cursor-pointer" />
+      </div>
+
+      <div>
+        <span class="block text-xs font-medium mb-1">🎨 Design-Theme</span>
+        <div class="grid grid-cols-3 gap-1.5">
+          <button data-theme="cosmos" class="theme-btn btn-interactive rounded-lg py-1.5 px-2 text-[11px] font-semibold border border-sky-400 bg-sky-500/20">
+            Kosmos-Lab
+          </button>
+          <button data-theme="light" class="theme-btn btn-interactive rounded-lg py-1.5 px-2 text-[11px] font-semibold border border-transparent hud-card">
+            Physik-Studio
+          </button>
+          <button data-theme="holo" class="theme-btn btn-interactive rounded-lg py-1.5 px-2 text-[11px] font-semibold border border-transparent hud-card">
+            Holo-Cyan
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Collapsible Physics Info & Legend Modal -->
+  <div id="info-modal" class="fixed inset-0 z-30 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="hud-glass rounded-2xl max-w-xl w-full p-5 sm:p-6 max-h-[88vh] overflow-y-auto panel-scroll relative">
+      <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-500/30">
+        <h2 class="text-base sm:text-lg font-bold flex items-center gap-2">
+          <span>🌌</span> Mechanische Lichtdurchlässigkeit in der WRZT
+        </h2>
+        <button id="btn-close-info" class="rounded-lg px-2.5 py-1 text-sm font-bold hud-card hover:border-sky-400">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm leading-relaxed opacity-95">
+        <p>
+          In der <strong>Wellenraumzeit-Theorie (WRZT)</strong> breitet sich Licht als elastische Transversalwelle über gekoppelte Raumzeit-Knoten aus. Tritt die Welle in ein Glas-Segment ein, verändert sich die lokale Kopplungs- und Trägheitsbilanz:
+        </p>
+
+        <div class="hud-card rounded-xl p-3 space-y-2">
+          <div>
+            <strong class="text-sky-400">1. Mechanische Kopplung ohne Resonanzsperre:</strong><br />
+            Die gebundenen <span class="mono">Si–O</span>-Knoten im Glas schwingen im Takt der Lichtwelle elastisch mit, ohne die Energie dauerhaft als Wärme zu absorbieren. Jede Schwingung wird kohärent an die Nachbarknoten weitergereicht.
+          </div>
+          <div>
+            <strong class="text-emerald-400">2. Phasenverzögerung Δφ & langsamere Welle:</strong><br />
+            Durch die höhere lokale Kopplungs- und Trägheitsdichte benötigt die Weitergabe pro Knoten mehr Phase. Dadurch sinkt die Phasengeschwindigkeit auf <span class="mono">v_Netz = c₀ / n_WRZT</span> und die Wellenlänge verkürzt sich auf <span class="mono">λ_Netz = λ₀ / n_WRZT</span>. Die goldene Referenzkugel zeigt, wie weit eine ungestörte Vakuumwelle im selben Zeitraum voraneilt!
+          </div>
+          <div>
+            <strong class="text-amber-300">3. Warum amorphes Glas klar bleibt:</strong><br />
+            Obwohl amorphes Glas keine kristalline Fernordnung besitzt, sind die Abstände der <span class="mono">SiO₄</span>-Tetraeder (~1.6 Å) winzig gegenüber der Lichtwellenlänge (~550 nm). Erst im Modus <em>„Trübes Glas“</em> treten große Inhomogenitäten (Bläschen/Einschlüsse) auf, die die Wellenfront streuen.
+          </div>
+        </div>
+
+        <div class="text-[11px] opacity-75 pt-1">
+          <strong>Steuerung:</strong> Linke Maustaste / 1 Finger zum Drehen • Mausrad / 2 Finger zum Zoomen • Rechte Maustaste zum Schwenken.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast / Status Notification -->
+  <div id="toast-msg" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 hud-glass rounded-full px-4 py-2 text-xs font-medium opacity-0 pointer-events-none transition-opacity duration-300">
+    Hinweis
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // =========================================================================
+      // 1. STATE & PHYSIKALISCHE PARAMETER
+      // =========================================================================
+      const state = {
+        alphaDeg: 42,          // Einfallswinkel in Grad
+        nBase: 1.46,           // Basis-Brechzahl bei 550 nm
+        lambdaNm: 550,         // Vakuum-Wellenlänge in nm (400..700)
+        thicknessUm: 2.0,      // Effektive Glasdicke in Mikrometern
+        speed: 1.0,            // Zeitlupen-Multiplikator
+        mode: "amorphous",     // "amorphous" | "crystal" | "turbid"
+        showPhaseMarker: true,
+        showWavefronts: true,
+        isPlaying: true,
+        theme: "cosmos",
+        time: 0
+      };
+
+      const C0_KMS = 299792.458; // Lichtgeschwindigkeit im Vakuum in km/s
+
+      // Hilfsfunktion: Wellenlänge (400..700 nm) in RGB / Hex umrechnen
+      function wavelengthToColor(nm) {
+        let r = 0, g = 0, b = 0;
+        if (nm >= 380 && nm < 440) {
+          r = -(nm - 440) / (440 - 380);
+          g = 0.0;
+          b = 1.0;
+        } else if (nm >= 440 && nm < 490) {
+          r = 0.0;
+          g = (nm - 440) / (490 - 440);
+          b = 1.0;
+        } else if (nm >= 490 && nm < 510) {
+          r = 0.0;
+          g = 1.0;
+          b = -(nm - 510) / (510 - 490);
+        } else if (nm >= 510 && nm < 580) {
+          r = (nm - 510) / (580 - 510);
+          g = 1.0;
+          b = 0.0;
+        } else if (nm >= 580 && nm < 645) {
+          r = 1.0;
+          g = -(nm - 645) / (645 - 580);
+          b = 0.0;
+        } else if (nm >= 645 && nm <= 750) {
+          r = 1.0;
+          g = 0.0;
+          b = 0.0;
+        }
+        // Intensitätsanpassung an Rändern
+        let factor = 1.0;
+        if (nm >= 380 && nm < 420) {
+          factor = 0.35 + 0.65 * (nm - 380) / (420 - 380);
+        } else if (nm > 645 && nm <= 750) {
+          factor = 0.35 + 0.65 * (750 - nm) / (750 - 645);
+        }
+        const c = new THREE.Color(r * factor, g * factor, b * factor);
+        return c;
+      }
+
+      // Effektive Brechzahl inkl. leichter chromatischer Dispersion (Cauchy-ähnlich)
+      function getEffectiveN() {
+        if (state.nBase <= 1.001) return 1.0;
+        // Dispersion: kürzere Wellenlängen (Blau/Violett) erfahren leicht stärkere Kopplung
+        const lambdaRef = 550;
+        const dispersionStrength = (state.nBase - 1.0) * 0.055;
+        const deltaN = dispersionStrength * ((lambdaRef / state.lambdaNm) - 1.0);
+        return Math.max(1.0, state.nBase + deltaN);
+      }
+
+      // =========================================================================
+      // 2. THREE.JS SZENE, KAMERA, RENDERER & LICHT
+      // =========================================================================
+      const container = document.getElementById("canvas-container");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050811, 0.022);
+
+      const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 200);
+      const defaultCamPos = new THREE.Vector3(0, 7.5, 22);
+      camera.position.copy(defaultCamPos);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.minDistance = 6;
+      controls.maxDistance = 48;
+      controls.target.set(0, -0.5, 0);
+
+      // Beleuchtung
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      const dirLight1 = new THREE.DirectionalLight(0x93c5fd, 1.1);
+      dirLight1.position.set(12, 18, 14);
+      scene.add(dirLight1);
+
+      const dirLight2 = new THREE.DirectionalLight(0x38bdf8, 0.6);
+      dirLight2.position.set(-14, -10, -10);
+      scene.add(dirLight2);
+
+      // =========================================================================
+      // 3. WRZT-RAUMZEIT-NETZWERK & GLAS-SEGMENT (Y = 0 ist die Grenzfläche!)
+      //    Oben (Y > 0): Freies Vakuum-/Luft-Netzwerk (n = 1.0)
+      //    Unten (Y < 0): Glas-Netzwerk (SiO2 amorph / kristallin / trüb)
+      // =========================================================================
+      const networkGroup = new THREE.Group();
+      scene.add(networkGroup);
+
+      // Grenzflächen-Ebene (Y = 0)
+      const interfaceGeo = new THREE.PlaneGeometry(24, 12, 24, 12);
+      interfaceGeo.rotateX(-Math.PI / 2);
+      const interfaceMat = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.16
+      });
+      const interfaceMesh = new THREE.Mesh(interfaceGeo, interfaceMat);
+      networkGroup.add(interfaceMesh);
+
+      // Einfallslot (gestrichelte vertikale Linie bei x=0, z=0)
+      const normalPoints = [new THREE.Vector3(0, 8.5, 0), new THREE.Vector3(0, -8.5, 0)];
+      const normalGeo = new THREE.BufferGeometry().setFromPoints(normalPoints);
+      const normalMat = new THREE.LineDashedMaterial({
+        color: 0x94a3b8,
+        dashSize: 0.35,
+        gapSize: 0.25,
+        transparent: true,
+        opacity: 0.55
+      });
+      const normalLine = new THREE.Line(normalGeo, normalMat);
+      normalLine.computeLineDistances();
+      networkGroup.add(normalLine);
+
+      // Glasblock-Hülle (visueller Rahmen für y < 0)
+      const glassBoxGeo = new THREE.BoxGeometry(22, 9.5, 10);
+      const glassEdges = new THREE.EdgesGeometry(glassBoxGeo);
+      const glassBoxMat = new THREE.LineBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.28
+      });
+      const glassBoxWire = new THREE.LineSegments(glassEdges, glassBoxMat);
+      glassBoxWire.position.set(0, -4.75, 0);
+      networkGroup.add(glassBoxWire);
+
+      const glassFillMat = new THREE.MeshPhysicalMaterial({
+        color: 0x0ea5e9,
+        transparent: true,
+        opacity: 0.06,
+        roughness: 0.1,
+        metalness: 0.0,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+      const glassFillMesh = new THREE.Mesh(glassBoxGeo, glassFillMat);
+      glassFillMesh.position.set(0, -4.75, 0);
+      networkGroup.add(glassFillMesh);
+
+      // --- Vakuum-Netzwerk (Oben: Y > 0, lockeres WRZT-Gitter) ---
+      const vacNodesData = [];
+      const vacNodeGeo = new THREE.SphereGeometry(0.075, 8, 8);
+      const vacNodeMat = new THREE.MeshBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.45 });
+      const vacPositions = [];
+
+      for (let ix = -4; ix <= 4; ix++) {
+        for (let iy = 1; iy <= 3; iy++) {
+          for (let iz = -2; iz <= 2; iz++) {
+            const x = ix * 2.4;
+            const y = iy * 2.4;
+            const z = iz * 2.2;
+            vacPositions.push(new THREE.Vector3(x, y, z));
+          }
+        }
+      }
+
+      const vacInstanced = new THREE.InstancedMesh(vacNodeGeo, vacNodeMat, vacPositions.length);
+      const dummy = new THREE.Object3D();
+      vacPositions.forEach((pos, idx) => {
+        dummy.position.copy(pos);
+        dummy.updateMatrix();
+        vacInstanced.setMatrixAt(idx, dummy.matrix);
+        vacNodesData.push({ base: pos.clone(), phaseOffset: (pos.x + pos.y) * 0.4 });
+      });
+      networkGroup.add(vacInstanced);
+
+      // --- Glas-Netzwerk Knoten & Bindungen (Unten: Y < 0) ---
+      const glassNetworkContainer = new THREE.Group();
+      networkGroup.add(glassNetworkContainer);
+
+      let glassNodes = []; // { base: Vector3, type: 'Si'|'O'|'bubble', radius: number }
+      let glassInstancedSi = null;
+      let glassInstancedO = null;
+      let glassBondsLines = null;
+      let turbidBubblesGroup = new THREE.Group();
+      glassNetworkContainer.add(turbidBubblesGroup);
+
+      function buildGlassNetwork(mode) {
+        // Alte Meshes aufräumen
+        if (glassInstancedSi) { glassNetworkContainer.remove(glassInstancedSi); glassInstancedSi.geometry.dispose(); }
+        if (glassInstancedO) { glassNetworkContainer.remove(glassInstancedO); glassInstancedO.geometry.dispose(); }
+        if (glassBondsLines) { glassNetworkContainer.remove(glassBondsLines); glassBondsLines.geometry.dispose(); }
+        while (turbidBubblesGroup.children.length > 0) {
+          const child = turbidBubblesGroup.children[0];
+          turbidBubblesGroup.remove(child);
+        }
+
+        glassNodes = [];
+        const siList = [];
+        const oList = [];
+        const bondSegments = [];
+
+        // Deterministischer Pseudo-Zufallsgenerator für reproduzierbares amorphes Netzwerk
+        let seed = 421337;
+        function rand() {
+          seed = (seed * 1664525 + 1013904223) % 4294967296;
+          return seed / 4294967296;
+        }
+
+        const nx = 9, ny = 5, nz = 4;
+        const stepX = 2.1, stepY = 1.75, stepZ = 2.1;
+
+        const gridMap = new Map();
+
+        for (let ix = 0; ix < nx; ix++) {
+          for (let iy = 0; iy < ny; iy++) {
+            for (let iz = 0; iz < nz; iz++) {
+              let bx = (ix - (nx - 1) / 2) * stepX;
+              let by = -0.85 - iy * stepY;
+              let bz = (iz - (nz - 1) / 2) * stepZ;
+
+              if (mode === "amorphous" || mode === "turbid") {
+                // Amorphes SiO2: lokale Nahordnung bleibt, Winkel/Positionen streuen leicht
+                bx += (rand() - 0.5) * 0.72;
+                by += (rand() - 0.5) * 0.55;
+                bz += (rand() - 0.5) * 0.72;
+              }
+
+              const siPos = new THREE.Vector3(bx, by, bz);
+              siList.push(siPos);
+              glassNodes.push({ base: siPos.clone(), type: "Si", index: siList.length - 1 });
+              gridMap.set(`${ix},${iy},${iz}`, siPos);
+            }
+          }
+        }
+
+        // Brückensauerstoff-Knoten (O) & Bindungslinien zwischen benachbarten Si-Knoten
+        const dirs = [
+          [1, 0, 0],
+          [0, 1, 0],
+          [0, 0, 1]
+        ];
+
+        for (let ix = 0; ix < nx; ix++) {
+          for (let iy = 0; iy < ny; iy++) {
+            for (let iz = 0; iz < nz; iz++) {
+              const p1 = gridMap.get(`${ix},${iy},${iz}`);
+              if (!p1) continue;
+
+              for (const [dx, dy, dz] of dirs) {
+                const p2 = gridMap.get(`${ix + dx},${iy + dy},${iz + dz}`);
+                if (!p2) continue;
+
+                // Mittelpunkt + Winkelknick (Si-O-Si Winkel ~ 144° im Kristall, streuend in Glas)
+                const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                if (mode === "amorphous" || mode === "turbid") {
+                  mid.x += (rand() - 0.5) * 0.28;
+                  mid.y += (rand() - 0.5) * 0.28;
+                  mid.z += (rand() - 0.5) * 0.28;
+                } else {
+                  // Leichter kristalliner Tetraeder-Versatz
+                  mid.y += ((ix + iz) % 2 === 0 ? 0.14 : -0.14);
+                }
+
+                oList.push(mid);
+                glassNodes.push({ base: mid.clone(), type: "O", index: oList.length - 1 });
+
+                bondSegments.push(p1.x, p1.y, p1.z, mid.x, mid.y, mid.z);
+                bondSegments.push(mid.x, mid.y, mid.z, p2.x, p2.y, p2.z);
+              }
+            }
+          }
+        }
+
+        // InstancedMeshes für Silizium- (rot/koralle) und Sauerstoff-Knoten (blau/cyan)
+        const siGeo = new THREE.SphereGeometry(0.14, 12, 12);
+        const siMat = new THREE.MeshStandardMaterial({
+          color: 0xf43f5e,
+          roughness: 0.35,
+          metalness: 0.1
+        });
+        glassInstancedSi = new THREE.InstancedMesh(siGeo, siMat, siList.length);
+        siList.forEach((p, i) => {
+          dummy.position.copy(p);
+          dummy.updateMatrix();
+          glassInstancedSi.setMatrixAt(i, dummy.matrix);
+        });
+        glassNetworkContainer.add(glassInstancedSi);
+
+        const oGeo = new THREE.SphereGeometry(0.10, 10, 10);
+        const oMat = new THREE.MeshStandardMaterial({
+          color: 0x38bdf8,
+          roughness: 0.35,
+          metalness: 0.1
+        });
+        glassInstancedO = new THREE.InstancedMesh(oGeo, oMat, oList.length);
+        oList.forEach((p, i) => {
+          dummy.position.copy(p);
+          dummy.updateMatrix();
+          glassInstancedO.setMatrixAt(i, dummy.matrix);
+        });
+        glassNetworkContainer.add(glassInstancedO);
+
+        // Elastische Bindungslinien
+        const bondGeo = new THREE.BufferGeometry();
+        bondGeo.setAttribute("position", new THREE.Float32BufferAttribute(bondSegments, 3));
+        const bondMat = new THREE.LineBasicMaterial({
+          color: 0x7dd3fc,
+          transparent: true,
+          opacity: 0.26
+        });
+        glassBondsLines = new THREE.LineSegments(bondGeo, bondMat);
+        glassNetworkContainer.add(glassBondsLines);
+
+        // Falls Trübes Glas: Große Inhomogenitäten / Mikrobläschen in Wellenlängengröße hinzufügen
+        if (mode === "turbid") {
+          const bubbleGeo = new THREE.SphereGeometry(0.58, 16, 16);
+          const bubbleMat = new THREE.MeshStandardMaterial({
+            color: 0xe2e8f0,
+            roughness: 0.2,
+            metalness: 0.1,
+            transparent: true,
+            opacity: 0.72
+          });
+          for (let b = 0; b < 18; b++) {
+            const mesh = new THREE.Mesh(bubbleGeo, bubbleMat);
+            mesh.position.set(
+              (rand() - 0.5) * 14,
+              -1.2 - rand() * 6.8,
+              (rand() - 0.5) * 5.5
+            );
+            const s = 0.65 + rand() * 0.85;
+            mesh.scale.set(s, s, s);
+            turbidBubblesGroup.add(mesh);
+          }
+        }
+      }
+
+      buildGlassNetwork(state.mode);
+
+      // =========================================================================
+      // 4. ANIMIERTE 3D-LICHTWELLEN (EINFALLEND, REFLEKTIERT, GEBROCHEN, STREUUNG)
+      // =========================================================================
+      const waveGroup = new THREE.Group();
+      scene.add(waveGroup);
+
+      // Hilfsfunktion zur Erzeugung eines schwingenden 3D-Wellenstrangs (Ribbon/Tube + E-Feld-Vektoren)
+      function createWaveStrand(segments, colorHex, opacity = 0.95) {
+        const group = new THREE.Group();
+
+        // Haupt-Wellenlinie (als dickere Geometrie über mehrere parallele Stränge für klare Sichtbarkeit)
+        const lineGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array((segments + 1) * 3);
+        lineGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+        const lineMat = new THREE.LineBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: opacity
+        });
+        const mainLine = new THREE.Line(lineGeo, lineMat);
+        group.add(mainLine);
+
+        // Zweite leicht versetzte Linie für räumliche Dicke
+        const lineGeo2 = new THREE.BufferGeometry();
+        const positions2 = new Float32Array((segments + 1) * 3);
+        lineGeo2.setAttribute("position", new THREE.BufferAttribute(positions2, 3));
+        const mainLine2 = new THREE.Line(lineGeo2, lineMat);
+        group.add(mainLine2);
+
+        // Strahl-Zentralachse (Leitstrahl)
+        const axisGeo = new THREE.BufferGeometry();
+        axisGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(6), 3));
+        const axisMat = new THREE.LineBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: opacity * 0.35
+        });
+        const axisLine = new THREE.Line(axisGeo, axisMat);
+        group.add(axisLine);
+
+        // E-Feld-Sprossen (Transversal-Schwingungspfeile/Sprossen)
+        const rungsCount = Math.floor(segments / 3);
+        const rungsGeo = new THREE.BufferGeometry();
+        rungsGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(rungsCount * 6), 3));
+        const rungsMat = new THREE.LineBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: opacity * 0.55
+        });
+        const rungsLines = new THREE.LineSegments(rungsGeo, rungsMat);
+        group.add(rungsLines);
+
+        return {
+          group,
+          segments,
+          mainLine,
+          mainLine2,
+          axisLine,
+          rungsLines,
+          rungsCount,
+          material: lineMat,
+          axisMat,
+          rungsMat
+        };
+      }
+
+      const incidentStrand = createWaveStrand(120, 0x22c55e, 1.0);
+      const reflectedStrand = createWaveStrand(90, 0x22c55e, 0.42);
+      const refractedStrand = createWaveStrand(140, 0x22c55e, 0.98);
+
+      waveGroup.add(incidentStrand.group);
+      waveGroup.add(reflectedStrand.group);
+      waveGroup.add(refractedStrand.group);
+
+      // 3D-Wellenfront-Ebenen (quer zur Ausbreitungsrichtung laufende Wellenberge)
+      const wavefrontPlanesGroup = new THREE.Group();
+      waveGroup.add(wavefrontPlanesGroup);
+
+      const wfPlaneGeo = new THREE.PlaneGeometry(2.6, 2.6);
+      const wfEdgesGeo = new THREE.EdgesGeometry(wfPlaneGeo);
+
+      const incWfMeshes = [];
+      const refWfMeshes = [];
+      for (let i = 0; i < 6; i++) {
+        const mat1 = new THREE.MeshBasicMaterial({
+          color: 0x22c55e,
+          transparent: true,
+          opacity: 0.14,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const m1 = new THREE.Mesh(wfPlaneGeo, mat1);
+        m1.add(new THREE.LineSegments(wfEdgesGeo, new THREE.LineBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.45 })));
+        wavefrontPlanesGroup.add(m1);
+        incWfMeshes.push(m1);
+
+        const mat2 = new THREE.MeshBasicMaterial({
+          color: 0x22c55e,
+          transparent: true,
+          opacity: 0.16,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const m2 = new THREE.Mesh(wfPlaneGeo, mat2);
+        m2.add(new THREE.LineSegments(wfEdgesGeo, new THREE.LineBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.5 })));
+        wavefrontPlanesGroup.add(m2);
+        refWfMeshes.push(m2);
+      }
+
+      // Phasenverzögerungs-Vergleichsmarker (Vakuum-Referenzkugel vs. verzögerter Wellenpuls im Glas)
+      const phaseMarkerGroup = new THREE.Group();
+      waveGroup.add(phaseMarkerGroup);
+
+      const vacuumPulseMarker = new THREE.Mesh(
+        new THREE.SphereGeometry(0.24, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xfacc15 }) // Goldgelb: ungebremster Vakuum-Takt
+      );
+      const glassPulseMarker = new THREE.Mesh(
+        new THREE.SphereGeometry(0.26, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffffff }) // Weiß/Leuchtend: verzögerter Puls im Glas
+      );
+      // Halo um Glas-Marker
+      const glassHalo = new THREE.Mesh(
+        new THREE.SphereGeometry(0.42, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 })
+      );
+      glassPulseMarker.add(glassHalo);
+
+      // Verbindungslinie für den Phasenrückstand
+      const lagLineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+      const lagLine = new THREE.Line(
+        lagLineGeo,
+        new THREE.LineDashedMaterial({ color: 0xfacc15, dashSize: 0.25, gapSize: 0.15 })
+      );
+
+      phaseMarkerGroup.add(vacuumPulseMarker, glassPulseMarker, lagLine);
+
+      // Streustrahlen für Modus "Trübes Glas"
+      const scatterGroup = new THREE.Group();
+      waveGroup.add(scatterGroup);
+      const scatterStrands = [];
+      for (let s = 0; s < 14; s++) {
+        const sGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+        const sMat = new THREE.LineBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.55 });
+        const sLine = new THREE.Line(sGeo, sMat);
+        scatterGroup.add(sLine);
+        scatterStrands.push({
+          line: sLine,
+          angleOffset: ((s / 14) - 0.5) * Math.PI * 1.45,
+          zOffset: Math.sin(s * 2.1) * 0.7,
+          length: 2.5 + (s % 4) * 1.4,
+          startFrac: 0.15 + (s % 5) * 0.14
+        });
+      }
+
+      // Winkelbögen (Einfallswinkel α und Brechungswinkel β)
+      const alphaArcGeo = new THREE.BufferGeometry();
+      const alphaArcLine = new THREE.Line(alphaArcGeo, new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 }));
+      scene.add(alphaArcLine);
+
+      const betaArcGeo = new THREE.BufferGeometry();
+      const betaArcLine = new THREE.Line(betaArcGeo, new THREE.LineBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.85 }));
+      scene.add(betaArcLine);
+
+      function updateAngleArcs(alphaRad, betaRad) {
+        const r = 2.6;
+        const ptsA = [];
+        const steps = 24;
+        for (let i = 0; i <= steps; i++) {
+          const t = (i / steps) * alphaRad;
+          ptsA.push(new THREE.Vector3(-Math.sin(t) * r, Math.cos(t) * r, 0));
+        }
+        alphaArcGeo.setFromPoints(ptsA);
+
+        const ptsB = [];
+        for (let i = 0; i <= steps; i++) {
+          const t = (i / steps) * betaRad;
+          ptsB.push(new THREE.Vector3(Math.sin(t) * r, -Math.cos(t) * r, 0));
+        }
+        betaArcGeo.setFromPoints(ptsB);
+      }
+
+      // =========================================================================
+      // 5. WELLEN-UPDATE & KNOTEN-KOPPLUNGS-ANIMATION
+      // =========================================================================
+      function updateStrandGeometry(strand, startPt, dirVec, perpVec, length, kWave, omegaTime, amp, phaseShift = 0) {
+        const posAttr = strand.mainLine.geometry.attributes.position;
+        const posAttr2 = strand.mainLine2.geometry.attributes.position;
+        const axisAttr = strand.axisLine.geometry.attributes.position;
+        const rungsAttr = strand.rungsLines.geometry.attributes.position;
+
+        const endPt = new THREE.Vector3().copy(startPt).addScaledVector(dirVec, length);
+        axisAttr.setXYZ(0, startPt.x, startPt.y, startPt.z);
+        axisAttr.setXYZ(1, endPt.x, endPt.y, endPt.z);
+        axisAttr.needsUpdate = true;
+
+        const segs = strand.segments;
+        let rungIdx = 0;
+
+        for (let i = 0; i <= segs; i++) {
+          const u = i / segs;
+          const dist = u * length;
+          const phase = kWave * dist - omegaTime + phaseShift;
+          const disp = Math.sin(phase) * amp;
+
+          const bx = startPt.x + dirVec.x * dist;
+          const by = startPt.y + dirVec.y * dist;
+          const bz = startPt.z + dirVec.z * dist;
+
+          const px = bx + perpVec.x * disp;
+          const py = by + perpVec.y * disp;
+          const pz = bz + perpVec.z * disp;
+
+          posAttr.setXYZ(i, px, py, pz);
+          posAttr2.setXYZ(i, px, py, pz + 0.06);
+
+          if (i % 3 === 0 && rungIdx < strand.rungsCount) {
+            rungsAttr.setXYZ(rungIdx * 2, bx, by, bz);
+            rungsAttr.setXYZ(rungIdx * 2 + 1, px, py, pz);
+            rungIdx++;
+          }
+        }
+
+        posAttr.needsUpdate = true;
+        posAttr2.needsUpdate = true;
+        rungsAttr.needsUpdate = true;
+      }
+
+      // =========================================================================
+      // 6. UI-ELEMENTE, TELEMETRIE & EVENT-LISTENER
+      // =========================================================================
+      const elValBeta = document.getElementById("val-beta");
+      const elValVnet = document.getElementById("val-vnet");
+      const elValVkms = document.getElementById("val-vkms");
+      const elValLambdaNet = document.getElementById("val-lambdanet");
+      const elValLambda0 = document.getElementById("val-lambda0");
+      const elValDeltaPhiDeg = document.getElementById("val-deltaphi-deg");
+      const elValDeltaPhiRad = document.getElementById("val-deltaphi-rad");
+      const elTelemetryStatus = document.getElementById("telemetry-status");
+
+      const sliderAlpha = document.getElementById("slider-alpha");
+      const sliderN = document.getElementById("slider-n");
+      const sliderLambda = document.getElementById("slider-lambda");
+      const sliderThickness = document.getElementById("slider-thickness");
+      const sliderSpeed = document.getElementById("slider-speed");
+
+      const lblAlpha = document.getElementById("lbl-alpha");
+      const lblN = document.getElementById("lbl-n");
+      const lblLambda = document.getElementById("lbl-lambda");
+      const lblThickness = document.getElementById("lbl-thickness");
+      const lblSpeed = document.getElementById("lbl-speed");
+
+      function showToast(msg) {
+        const toast = document.getElementById("toast-msg");
+        toast.textContent = msg;
+        toast.style.opacity = "1";
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => {
+          toast.style.opacity = "0";
+        }, 2400);
+      }
+
+      function updateTelemetryAndColors() {
+        const nEff = getEffectiveN();
+        const alphaRad = THREE.MathUtils.degToRad(state.alphaDeg);
+        // Snelliussches Gesetz: sin(beta) = sin(alpha) / n_WRZT
+        const sinBeta = Math.sin(alphaRad) / nEff;
+        const betaRad = Math.asin(Math.min(1, Math.max(-1, sinBeta)));
+        const betaDeg = THREE.MathUtils.radToDeg(betaRad);
+
+        const vRel = 1 / nEff;
+        const vKms = C0_KMS * vRel;
+        const lambdaNet = state.lambdaNm / nEff;
+
+        // Phasenverzögerung Δφ = (2 * pi * d / lambda_0) * (n_WRZT - 1)
+        const dNm = state.thicknessUm * 1000;
+        const deltaPhiRad = ((2 * Math.PI * dNm) / state.lambdaNm) * (nEff - 1.0);
+        const deltaPhiDeg = THREE.MathUtils.radToDeg(deltaPhiRad);
+
+        // UI Labels
+        lblAlpha.textContent = `${state.alphaDeg}°`;
+        lblN.textContent = `${nEff.toFixed(2)}`;
+        lblLambda.textContent = `${state.lambdaNm} nm`;
+        lblThickness.textContent = `${state.thicknessUm.toFixed(2)} µm`;
+        lblSpeed.textContent = `${state.speed.toFixed(1)}x`;
+
+        const waveColor = wavelengthToColor(state.lambdaNm);
+        const hexCss = `#${waveColor.getHexString()}`;
+        lblLambda.style.color = hexCss;
+
+        // Telemetrie-Werte
+        elValBeta.textContent = `${betaDeg.toFixed(1)}°`;
+        elValVnet.textContent = `${(vRel * 100).toFixed(1)}% c₀`;
+        elValVkms.textContent = `${Math.round(vKms).toLocaleString("de-DE")} km/s`;
+        elValLambdaNet.textContent = `${Math.round(lambdaNet)} nm`;
+        elValLambda0.textContent = `Vakuum: ${state.lambdaNm} nm`;
+        elValDeltaPhiDeg.textContent = `${Math.round(deltaPhiDeg)}°`;
+        elValDeltaPhiRad.textContent = `${deltaPhiRad.toFixed(2)} rad`;
+
+        // Status-Badge
+        if (state.mode === "turbid") {
+          elTelemetryStatus.textContent = "Diffuse Streuung (Trüb)";
+          elTelemetryStatus.className = "text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        } else if (state.mode === "crystal") {
+          elTelemetryStatus.textContent = "Kristallin-Kohärent";
+          elTelemetryStatus.className = "text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30";
+        } else {
+          elTelemetryStatus.textContent = "Amorph-Kohärent (Klar)";
+          elTelemetryStatus.className = "text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        }
+
+        // Wellenfarben aktualisieren
+        [incidentStrand, reflectedStrand, refractedStrand].forEach((s) => {
+          s.material.color.copy(waveColor);
+          s.axisMat.color.copy(waveColor);
+          s.rungsMat.color.copy(waveColor);
+        });
+        incWfMeshes.forEach((m) => {
+          m.material.color.copy(waveColor);
+          m.children[0].material.color.copy(waveColor);
+        });
+        refWfMeshes.forEach((m) => {
+          m.material.color.copy(waveColor);
+          m.children[0].material.color.copy(waveColor);
+        });
+        scatterStrands.forEach((s) => s.line.material.color.copy(waveColor));
+
+        updateAngleArcs(alphaRad, betaRad);
+      }
+
+      // Slider Events
+      sliderAlpha.addEventListener("input", (e) => {
+        state.alphaDeg = parseFloat(e.target.value);
+        updateTelemetryAndColors();
+      });
+
+      sliderN.addEventListener("input", (e) => {
+        state.nBase = parseFloat(e.target.value);
+        document.querySelectorAll(".preset-btn").forEach((btn) => btn.classList.remove("border-sky-400"));
+        updateTelemetryAndColors();
+      });
+
+      sliderLambda.addEventListener("input", (e) => {
+        state.lambdaNm = parseFloat(e.target.value);
+        updateTelemetryAndColors();
+      });
+
+      sliderThickness.addEventListener("input", (e) => {
+        state.thicknessUm = parseFloat(e.target.value);
+        updateTelemetryAndColors();
+      });
+
+      sliderSpeed.addEventListener("input", (e) => {
+        state.speed = parseFloat(e.target.value);
+        updateTelemetryAndColors();
+      });
+
+      // Material Presets
+      document.querySelectorAll(".preset-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const val = parseFloat(btn.dataset.n);
+          state.nBase = val;
+          sliderN.value = val;
+          document.querySelectorAll(".preset-btn").forEach((b) => b.classList.remove("border-sky-400"));
+          btn.classList.add("border-sky-400");
+          updateTelemetryAndColors();
+          showToast(`Kopplung auf n = ${val.toFixed(2)} gesetzt`);
+        });
+      });
+
+      // Struktur-Modus Buttons
+      document.querySelectorAll(".mode-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.mode = btn.dataset.mode;
+          document.querySelectorAll(".mode-btn").forEach((b) => {
+            b.classList.remove("border-sky-400", "bg-sky-500/25");
+            b.classList.add("border-transparent", "hud-card", "opacity-80");
+          });
+          btn.classList.remove("border-transparent", "hud-card", "opacity-80");
+          btn.classList.add("border-sky-400", "bg-sky-500/25");
+
+          buildGlassNetwork(state.mode);
+          updateTelemetryAndColors();
+        });
+      });
+
+      // Toggles
+      document.getElementById("toggle-phasemarker").addEventListener("change", (e) => {
+        state.showPhaseMarker = e.target.checked;
+        phaseMarkerGroup.visible = state.showPhaseMarker;
+      });
+
+      document.getElementById("toggle-wavefronts").addEventListener("change", (e) => {
+        state.showWavefronts = e.target.checked;
+        wavefrontPlanesGroup.visible = state.showWavefronts;
+      });
+
+      // Theme Switcher
+      document.querySelectorAll(".theme-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const theme = btn.dataset.theme;
+          state.theme = theme;
+          document.body.classList.remove("theme-cosmos", "theme-light", "theme-holo");
+          document.body.classList.add(`theme-${theme}`);
+
+          document.querySelectorAll(".theme-btn").forEach((b) => {
+            b.classList.remove("border-sky-400", "bg-sky-500/20");
+            b.classList.add("border-transparent", "hud-card");
+          });
+          btn.classList.remove("border-transparent", "hud-card");
+          btn.classList.add("border-sky-400", "bg-sky-500/20");
+
+          if (theme === "light") {
+            scene.background = new THREE.Color(0xe2e8f0);
+            scene.fog.color.setHex(0xe2e8f0);
+            vacNodeMat.color.setHex(0x475569);
+            glassFillMat.opacity = 0.12;
+          } else if (theme === "holo") {
+            scene.background = new THREE.Color(0x021217);
+            scene.fog.color.setHex(0x021217);
+            vacNodeMat.color.setHex(0x0891b2);
+            glassFillMat.opacity = 0.08;
+          } else {
+            scene.background = new THREE.Color(0x050811);
+            scene.fog.color.setHex(0x050811);
+            vacNodeMat.color.setHex(0x64748b);
+            glassFillMat.opacity = 0.06;
+          }
+        });
+      });
+
+      // Play / Pause
+      const btnPlayPause = document.getElementById("btn-play-pause");
+      btnPlayPause.addEventListener("click", () => {
+        state.isPlaying = !state.isPlaying;
+        document.getElementById("icon-play-pause").textContent = state.isPlaying ? "⏸️" : "▶️";
+        document.getElementById("label-play-pause").textContent = state.isPlaying ? "Pause" : "Start";
+      });
+
+      // Kamera Reset
+      document.getElementById("btn-reset-cam").addEventListener("click", () => {
+        camera.position.copy(defaultCamPos);
+        controls.target.set(0, -0.5, 0);
+        controls.update();
+        showToast("Kameraansicht zurückgesetzt");
+      });
+
+      // Steuerungs-Panel ein-/ausklappen
+      const controlPanel = document.getElementById("control-panel");
+      let panelOpen = true;
+      document.getElementById("btn-toggle-panel").addEventListener("click", () => {
+        panelOpen = !panelOpen;
+        if (panelOpen) {
+          controlPanel.classList.remove("hidden");
+        } else {
+          controlPanel.classList.add("hidden");
+        }
+      });
+
+      // Info Modal
+      const infoModal = document.getElementById("info-modal");
+      document.getElementById("btn-info").addEventListener("click", () => {
+        infoModal.classList.remove("hidden");
+        infoModal.classList.add("flex");
+      });
+      document.getElementById("btn-close-info").addEventListener("click", () => {
+        infoModal.classList.add("hidden");
+        infoModal.classList.remove("flex");
+      });
+      infoModal.addEventListener("click", (e) => {
+        if (e.target === infoModal) {
+          infoModal.classList.add("hidden");
+          infoModal.classList.remove("flex");
+        }
+      });
+
+      // =========================================================================
+      // 7. VOLLBILD-BUTTON (FULLSCREEN API)
+      // =========================================================================
+      const btnFullscreen = document.getElementById("btn-fullscreen");
+      const iconFullscreen = document.getElementById("icon-fullscreen");
+
+      function updateFullscreenIcon() {
+        const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        iconFullscreen.textContent = isFs ? "🗗" : "⛶";
+      }
+
+      btnFullscreen.addEventListener("click", () => {
+        const docEl = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (docEl.requestFullscreen) {
+            docEl.requestFullscreen().catch(() => showToast("Vollbild vom Browser blockiert"));
+          } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+      });
+
+      document.addEventListener("fullscreenchange", updateFullscreenIcon);
+      document.addEventListener("webkitfullscreenchange", updateFullscreenIcon);
+
+      // =========================================================================
+      // 8. RESIZE HANDLER & HAUPT-ANIMATIONSSCHLEIFE
+      // =========================================================================
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const dt = Math.min(clock.getDelta(), 0.05);
+        if (state.isPlaying) {
+          state.time += dt * state.speed * 4.2;
+        }
+
+        const nEff = getEffectiveN();
+        const alphaRad = THREE.MathUtils.degToRad(state.alphaDeg);
+        const sinBeta = Math.sin(alphaRad) / nEff;
+        const betaRad = Math.asin(Math.min(1, Math.max(-1, sinBeta)));
+
+        // Geometrie der Strahlen (Auftreffpunkt auf Grenzfläche ist (0, 0, 0))
+        const hitPoint = new THREE.Vector3(0, 0, 0);
+        const incLength = 10.5;
+        const refLength = 9.5;
+        const transLength = 10.8;
+
+        // Richtungsvektoren
+        const incDir = new THREE.Vector3(Math.sin(alphaRad), -Math.cos(alphaRad), 0).normalize();
+        const incStart = new THREE.Vector3().copy(hitPoint).addScaledVector(incDir, -incLength);
+        const incPerp = new THREE.Vector3(-incDir.y, incDir.x, 0);
+
+        const reflDir = new THREE.Vector3(Math.sin(alphaRad), Math.cos(alphaRad), 0).normalize();
+        const reflPerp = new THREE.Vector3(-reflDir.y, reflDir.x, 0);
+
+        const transDir = new THREE.Vector3(Math.sin(betaRad), -Math.cos(betaRad), 0).normalize();
+        const transPerp = new THREE.Vector3(-transDir.y, transDir.x, 0);
+
+        // Wellenzahl k_0 (skaliert mit Wellenlänge) und k_Netz = k_0 * n_WRZT
+        const lambdaScale = 550 / state.lambdaNm;
+        const k0 = 2.2 * lambdaScale;
+        const kNet = k0 * nEff;
+
+        // Kontinuierliche Phase am Auftreffpunkt (0,0,0)
+        const phaseAtHit = k0 * incLength - state.time;
+
+        // 1) Einfallende Welle
+        updateStrandGeometry(incidentStrand, incStart, incDir, incPerp, incLength, k0, state.time, 0.55, 0);
+
+        // 2) Reflektierte Welle (Reflexionsanteil steigt mit n_WRZT und Einfallswinkel α)
+        const fresnelApprox = Math.min(0.85, Math.pow((nEff - 1) / (nEff + 1), 2) * 3.5 + Math.pow(state.alphaDeg / 90, 3) * 0.45);
+        reflectedStrand.material.opacity = nEff <= 1.001 ? 0.0 : Math.max(0.15, fresnelApprox);
+        reflectedStrand.rungsMat.opacity = reflectedStrand.material.opacity * 0.5;
+        updateStrandGeometry(reflectedStrand, hitPoint, reflDir, reflPerp, refLength, k0, 0, 0.35 * Math.sqrt(fresnelApprox + 0.1), phaseAtHit + Math.PI);
+
+        // 3) Gebrochene Welle im Glas-Netzwerk
+        const isTurbid = state.mode === "turbid";
+        refractedStrand.material.opacity = isTurbid ? 0.38 : 0.98;
+        refractedStrand.rungsMat.opacity = isTurbid ? 0.2 : 0.55;
+        const transAmp = isTurbid ? 0.35 : 0.52;
+        updateStrandGeometry(refractedStrand, hitPoint, transDir, transPerp, transLength, kNet, 0, transAmp, phaseAtHit);
+
+        // 4) 3D-Wellenfront-Ebenen aktualisieren
+        if (state.showWavefronts) {
+          const lambdaVis0 = (2 * Math.PI) / k0;
+          const lambdaVisNet = (2 * Math.PI) / kNet;
+          const phaseFrac = ((state.time / (2 * Math.PI)) % 1 + 1) % 1;
+
+          for (let i = 0; i < incWfMeshes.length; i++) {
+            const distInc = (i + phaseFrac) * lambdaVis0;
+            const mInc = incWfMeshes[i];
+            if (distInc <= incLength) {
+              mInc.visible = true;
+              mInc.position.copy(incStart).addScaledVector(incDir, distInc);
+              mInc.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), incDir);
+            } else {
+              mInc.visible = false;
+            }
+
+            const distTrans = (i + phaseFrac) * lambdaVisNet;
+            const mTrans = refWfMeshes[i];
+            if (distTrans <= transLength && !isTurbid) {
+              mTrans.visible = true;
+              mTrans.position.copy(hitPoint).addScaledVector(transDir, distTrans);
+              mTrans.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), transDir);
+            } else {
+              mTrans.visible = false;
+            }
+          }
+        }
+
+        // 5) Phasenverzögerungs-Marker (Vakuum-Referenz vs. verzögerte Welle im Glas)
+        if (state.showPhaseMarker) {
+          const cycleLength = 9.0;
+          const pulseDistVac = ((state.time * 0.45) % cycleLength);
+          const pulseDistGlass = pulseDistVac / nEff;
+
+          vacuumPulseMarker.position.copy(hitPoint).addScaledVector(transDir, pulseDistVac);
+          glassPulseMarker.position.copy(hitPoint).addScaledVector(transDir, pulseDistGlass);
+
+          const lagPts = lagLine.geometry.attributes.position;
+          lagPts.setXYZ(0, glassPulseMarker.position.x, glassPulseMarker.position.y, glassPulseMarker.position.z);
+          lagPts.setXYZ(1, vacuumPulseMarker.position.x, vacuumPulseMarker.position.y, vacuumPulseMarker.position.z);
+          lagPts.needsUpdate = true;
+          lagLine.computeLineDistances();
+        }
+
+        // 6) Streustrahlen bei trübem Glas
+        scatterGroup.visible = isTurbid;
+        if (isTurbid) {
+          scatterStrands.forEach((s, idx) => {
+            const origin = new THREE.Vector3().copy(hitPoint).addScaledVector(transDir, s.startFrac * transLength);
+            const angle = betaRad + s.angleOffset + Math.sin(state.time * 0.4 + idx) * 0.08;
+            const sDir = new THREE.Vector3(Math.sin(angle), -Math.cos(angle), s.zOffset).normalize();
+            const end = new THREE.Vector3().copy(origin).addScaledVector(sDir, s.length);
+            const attr = s.line.geometry.attributes.position;
+            attr.setXYZ(0, origin.x, origin.y, origin.z);
+            attr.setXYZ(1, end.x, end.y, end.z);
+            attr.needsUpdate = true;
+          });
+        }
+
+        // 7) Mechanische Kopplung: Atom-/Netzwerkknoten im Glas schwingen elastisch mit der Welle!
+        if (glassInstancedSi && glassInstancedO) {
+          let siIdx = 0;
+          let oIdx = 0;
+          const couplingStrength = (nEff - 1.0) * 0.22 + 0.04;
+
+          for (let i = 0; i < glassNodes.length; i++) {
+            const node = glassNodes[i];
+            const bx = node.base.x;
+            const by = node.base.y;
+            const bz = node.base.z;
+
+            // Abstand des Knotens zum Strahl im Glas berechnen
+            const toNodeX = bx - hitPoint.x;
+            const toNodeY = by - hitPoint.y;
+            const projAlong = toNodeX * transDir.x + toNodeY * transDir.y;
+            const perpDist = Math.abs(toNodeX * transPerp.x + toNodeY * transPerp.y);
+            const radialDist = Math.sqrt(perpDist * perpDist + bz * bz);
+
+            let oscX = 0, oscY = 0;
+            if (projAlong > -0.5 && radialDist < 3.4) {
+              const envelope = Math.exp(-radialDist * 0.65);
+              const localPhase = kNet * Math.max(0, projAlong) + phaseAtHit;
+              const amp = Math.sin(localPhase) * couplingStrength * envelope;
+              oscX = transPerp.x * amp;
+              oscY = transPerp.y * amp;
+            }
+
+            dummy.position.set(bx + oscX, by + oscY, bz);
+            dummy.updateMatrix();
+
+            if (node.type === "Si") {
+              glassInstancedSi.setMatrixAt(siIdx++, dummy.matrix);
+            } else {
+              glassInstancedO.setMatrixAt(oIdx++, dummy.matrix);
+            }
+          }
+          glassInstancedSi.instanceMatrix.needsUpdate = true;
+          glassInstancedO.instanceMatrix.needsUpdate = true;
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+      }
+
+      // Initialisierung & Start nach window.onload
+      window.onload = function () {
+        updateTelemetryAndColors();
+        animate();
+      };
+    })();
+  </script>
+</body>
+</html>
